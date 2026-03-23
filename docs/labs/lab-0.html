@@ -170,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#submission" id="toc-submission" class="nav-link" data-scroll-target="#submission">Submission</a>
   <ul class="collapse">
-  <li><a href="#publish-via-github-pages-recommended-simple-main-docs-workflow" id="toc-publish-via-github-pages-recommended-simple-main-docs-workflow" class="nav-link" data-scroll-target="#publish-via-github-pages-recommended-simple-main-docs-workflow">Publish via GitHub Pages (recommended: simple main → docs workflow)</a></li>
+  <li><a href="#notes-publish-via-github-pages-recommended-simple-main-docs-workflow" id="toc-notes-publish-via-github-pages-recommended-simple-main-docs-workflow" class="nav-link" data-scroll-target="#notes-publish-via-github-pages-recommended-simple-main-docs-workflow">Notes: Publish via GitHub Pages (recommended: simple main → docs workflow)</a></li>
   </ul></li>
   <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
   </ul>
@@ -337,7 +337,7 @@ You need both. They communicate, but they are separate tools.</p>
 <p>Once you have an account:</p>
 <ol type="1">
 <li>Complete your profile: name, location, a short bio, and a profile photo — doesn’t need to be personal, but shouldn’t be the default avatar</li>
-<li>Search for <strong><code>mikejohnson51/csu-ess-523c-2026</code></strong> and <strong>star</strong> the repository — this bookmarks it for you and helps me find your account</li>
+<li>Search for <strong><code>mikejohnson51/csu-523c-2026</code></strong> and <strong>star</strong> the repository — this bookmarks it for you and helps me find your account</li>
 </ol>
 <hr>
 </section>
@@ -404,8 +404,8 @@ GitHub
 <li>Windows: press <code>Win+Shift+S</code> to use the Snip &amp; Sketch tool</li>
 <li>Linux: use <code>PrtSc</code> or your desktop environment’s screenshot tool</li>
 </ul>
-<section id="publish-via-github-pages-recommended-simple-main-docs-workflow" class="level2">
-<h2 class="anchored" data-anchor-id="publish-via-github-pages-recommended-simple-main-docs-workflow">Publish via GitHub Pages (recommended: simple main → docs workflow)</h2>
+<section id="notes-publish-via-github-pages-recommended-simple-main-docs-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="notes-publish-via-github-pages-recommended-simple-main-docs-workflow">Notes: Publish via GitHub Pages (recommended: simple main → docs workflow)</h2>
 <p>Preferred workflow (concise): students create their <em>own</em> GitHub repository, configure Quarto to render into a <code>docs/</code> folder, push <code>main</code>, enable Pages, and submit the Pages URL. This keeps the course repo untouched and makes grading easy.</p>
 <p>Quick steps:</p>
 <ul>
@@ -415,10 +415,9 @@ GitHub
 <p><em>quarto.yml (minimal):</em></p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">project</span><span class="kw">:</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> website</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">website</span><span class="kw">:</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"csu-523c"</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">output-dir</span><span class="kw">:</span><span class="at"> docs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">website</span><span class="kw">:</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"csu-523c"</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">output-dir</span><span class="kw">:</span><span class="at"> docs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li>Add or copy the lab QMD(s) into the repo and render:</li>
 </ul>
@@ -432,7 +431,6 @@ GitHub
 <ul>
 <li>Enable GitHub Pages: <strong>Settings → Pages → Deploy from branch → main / folder: /docs</strong>. Submit the resulting Pages URL (e.g., <code>https://YOURUSERNAME.github.io/YOURREPO/lab-01.html</code>) to Canvas.</li>
 </ul>
-<p>Notes: - Do not push student work to the instructor’s repo — use your own repo and <code>main</code> branch. - If you cannot publish to Pages, upload a ZIP containing <code>lab-01.html</code>, <code>data/</code>, <code>images/</code>, <code>session-info.txt</code>, and <code>README.md</code> instead.</p>
 <hr>
 </section>
 </section>
