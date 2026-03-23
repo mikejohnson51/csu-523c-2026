@@ -1,0 +1,744 @@
+---
+title: 'Lab 1: Data Science Tools'
+subtitle: 'Exploring Streamflow Across the Colorado River Basin'
+format:
+  html:
+    code-fold: true
+    toc: true
+    include-before-body: ../slides/header.html
+    include-after-body: ../slides/footer-annotations.html
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(
+  fig.width  = 8,
+  message    = FALSE,
+  warning    = FALSE,
+  comment    = "",
+  cache      = FALSE,
+  fig.retina = 3
+)
+```
+
+```{r}
+#| echo: false
+#| fig-align: center
+#| out-width: "100%"
+knitr::include_graphics('img/colorado-river.jpg')
+```
+
+In January 2023, the federal government announced the first-ever Tier 3 shortage on the Colorado River — triggering mandatory cuts to Arizona, Nevada, and Mexico. Those cuts were calculated from streamflow records like the ones you are about to pull.
+
+The Colorado River Basin supplies drinking water to 40 million people across 7 US states, irrigates 5 million acres of farmland, and is governed by one of the oldest and most contested water rights agreements in American history — the Colorado River Compact of 1922. Understanding how streamflow varies across this system is not an academic exercise. It is the daily work of water managers, federal agencies, tribal water rights holders, and scientists navigating a river under compounding stress from drought, overallocation, and climate change.
+
+In this lab you will work with real streamflow records pulled directly from the **USGS National Water Information System (NWIS)** — the same federal system water managers query every morning. You will build a complete analytical pipeline: from raw API call to normalized comparisons, threshold detection, basin-wide trend visualization, and a predictive model of the Compact's key accounting point.
+
+---
+
+# Set-up {#setup}
+
+## Repository
+
+1. Create a new repository called `csu-523c` on GitHub
+2. Clone it to your `~/github/` directory
+3. Open the project in RStudio (`File → Open Project`)
+4. Download this labs qmd file [here](lab-01.qmd) into your repo
+5. Add your information to the yaml
+
+```yaml
+---
+...
+author:
+  - name: Your Name
+    email: your@colostate.edu
+...
+---
+```
+
+## Libraries
+
+Install and load the following packages. If any are missing, run `install.packages("packagename")` first:
+
+```{r}
+#| eval: false
+if (!requireNamespace("pacman", quietly = TRUE)) install.packages("pacman")
+
+pacman::p_load(
+  tidyverse,
+  dataRetrieval,
+  zoo,
+  patchwork,
+  flextable,
+  lubridate,
+  broom
+)
+```
+
+::: callout-note
+`pacman::p_load()` installs any missing packages and loads them in one step — convenient for students setting up dependencies.
+:::
+
+## Data
+
+We will use the `dataRetrieval` package — developed and maintained by the USGS — to pull 44 years of daily mean discharge from 7 long-record gauges spanning the Colorado River's main stem and major tributaries.
+
+The USGS parameter code for discharge is `00060` (cubic feet per second). The statistic code `00003` is the daily mean value. Under the hood, `dataRetrieval` constructs and queries the same REST API URL we explored in lecture:
+
+```
+https://waterservices.usgs.gov/nwis/dv/?sites=09380000&parameterCd=00060&statCd=00003
+```
+
+The data is already in your hands. Let's use it.
+
+```{r}
+#| label: data-pull
+#| cache: true
+
+gauges <- tribble(
+  ~site_no,     ~name,                           ~state,
+  "09380000",   "Colorado R at Lees Ferry",      "AZ",
+  "09163500",   "Colorado R near CO-UT border",  "CO",
+  "09085000",   "Colorado R at Glenwood Springs","CO",
+  "09306500",   "White R near Watson",           "UT",
+  "09379500",   "San Juan R near Bluff",         "UT",
+  "09402500",   "Little Colorado R near Cameron","AZ",
+  "09423000",   "Colorado R below Hoover Dam",   "NV"
+)
+
+raw <- readNWISdv(
+  siteNumbers = gauges$site_no,
+  parameterCd = "00060",
+  startDate   = "1980-01-01",
+  endDate     = "2023-12-31"
+) |>
+  renameNWISColumns() |>              # renames X_00060_00003 → Flow
+  left_join(gauges, by = "site_no") |>
+  select(site_no, name, state, Date, Flow)
+
+glimpse(raw)
+```
+
+Note: this chunk is cached (`cache = TRUE`). If you change the data-pull arguments and need fresh data, set `cache = FALSE` temporarily or delete the `_cache/` directory and re-render to force a new download.
+
+::: callout-tip
+## What does `glimpse()` tell you?
+Before doing anything with a new dataset, always check: Does the row count make sense? Are data types correct (`Date` should be `<date>`, `Flow` should be `<dbl>`)? Are there obvious NAs or impossible values? For ~7 gauges × 44 years × 365 days you should expect roughly 112,000 rows.
+:::
+
+---
+
+# **Question 1**: Daily Conditions Report {#q1}
+
+You are a water resources analyst. Each morning you deliver a reproducible snapshot of current conditions to Colorado River Compact stakeholders. The analysis must be re-runnable on any date with a single change — that requires building it around **parameter objects** rather than hardcoded values.
+
+**a.** Create a `my.date` parameter object set to the last day of water year 2023. Ensure it is stored as a proper `Date` object, not a character string.
+
+::: callout-tip
+`as.Date()` converts a character string to a Date. R stores dates internally as days since 1970-01-01, enabling date arithmetic (`my.date - 7` = one week earlier) and use in `filter()` comparisons.
+Hint: use `as.Date()` to convert strings to `Date` objects and confirm with `class()` before using date arithmetic or `filter()`.
+:::
+
+```{r}
+my.date <- as.Date("2023-09-01")
+```
+
+**b.** Compute the **day-over-day change in discharge** for each gauge — how much flow rose or fell compared to the previous day. Store this as a new column called `flow_delta`. This tells you whether conditions are improving or deteriorating, which is often more actionable than the raw level alone.
+
+::: callout-tip
+`lag()` shifts a vector back by one position, so `Flow - lag(Flow)` gives today's flow minus yesterday's. Because you want to compute this *within* each gauge, `group_by(site_no)` first, then `arrange(Date)` to ensure chronological order before lagging.
+
+Hint: structure this as: group by `site_no`, arrange by `Date`, then use `lag()` to compute `flow_delta` (so today's Flow minus yesterday's Flow).
+:::
+
+```{r}
+
+```
+
+```{r}
+# student: create two flextables for `my.date`
+# e.g., table1 <- flow |> filter(Date == my.date) |> slice_max(Flow, n = 5)
+# and then pass to `flextable()` with `set_header_labels()` and `autofit()`
+```
+
+```{r}
+# student: compute `flow_delta` within each gauge
+# example: flow <- raw |> group_by(site_no) |> arrange(Date) |> 
+#   mutate(flow_delta = Flow - lag(Flow)) |> ungroup()
+```
+
+**c.** Filter to `my.date` and produce **two formatted tables** using `flextable`:
+
+- **Table 1**: The 5 gauges with the **highest discharge** — where is flow greatest right now?
+- **Table 2**: The 5 gauges with the **greatest day-over-day increase** — where is flow rising fastest?
+
+Both tables should have clear column names, rounded numbers, and descriptive captions.
+
+::: callout-tip
+## Introducing `flextable`
+`flextable` creates publication-quality HTML tables directly from data frames.
+
+Hint: use `flextable()` with `set_header_labels()`, `set_caption()`, and `autofit()` for clean tables. Use `slice_max()` to select top `n` rows and `round()` to tidy numeric columns before rendering.
+:::
+
+```{r}
+
+```
+
+```{r}
+#| eval: false
+# Concrete `flextable` example (student-visible):
+example_table <- tibble(
+  Gauge = c("Lees Ferry", "Glenwood Springs", "San Juan Bluff"),
+  Flow  = c(12345.6, 2345.2, 987.4)
+) |> mutate(Flow = round(Flow, 0))
+
+example_table |>
+  flextable() |>
+  set_header_labels(Gauge = "Gauge", Flow = "Flow (cfs)") |>
+  set_caption("Example: current flows (rounded)") |>
+  autofit()
+```
+
+---
+
+# **Question 2**: Basin Metadata Join {#q2}
+
+Raw discharge numbers alone don't tell the full story. Lees Ferry always carries more water than the San Juan at Bluff — but that is largely because it drains over **111,000 square miles** versus the San Juan's ~23,000. To compare these sites meaningfully, we need each gauge's drainage area. That information lives in a separate table and must be **joined in**.
+
+This is the core relational data problem: observations in one table, attributes in another, connected through a shared key. It is also one of the most error-prone operations in data science — not because the syntax is hard, but because bad joins fail silently.
+
+## The anatomy of a join
+
+Before writing a single `_join()` call, answer three questions:
+
+1. **What is the key?** Which column connects the two tables?
+2. **What is the relationship?** One-to-one, or one-to-many?
+3. **What happens to non-matching rows?** Keep them (with NAs), or drop them?
+
+::: callout-tip
+## The four joins — and when to use each
+
+| Function | Keeps rows from... | Non-matching rows |
+|---|---|---|
+| `left_join(x, y)` | All of `x` | `y` columns filled with `NA` |
+| `right_join(x, y)` | All of `y` | `x` columns filled with `NA` |
+| `inner_join(x, y)` | Only rows matching in **both** | Dropped entirely |
+| `full_join(x, y)` | Both `x` and `y` | NAs on whichever side has no match |
+
+**The most common mistake**: using `inner_join` when you meant `left_join`. An inner join silently drops every row from `x` that has no match in `y` — your dataset shrinks and you may not notice until downstream results are wrong.
+
+**The second most common mistake**: joining on a key that is not unique in one of the tables. If `site_no` appears twice in `site_meta`, every matching row in your flow data will be **duplicated** — your dataset grows and you may not notice.
+
+Both failures are invisible without explicit verification.
+:::
+
+**a.** Pull site metadata for all 7 gauges. Before joining, verify that `site_no` is actually unique in `site_meta` — a duplicated key will silently inflate your row count.
+
+```{r}
+#| label: site-meta
+#| cache: true
+
+site_meta <- readNWISsite(gauges$site_no) |>
+  select(
+    site_no,
+    drain_area_va,   # drainage area in square miles
+    huc_cd,          # 8-digit HUC watershed code
+    dec_lat_va,      # latitude
+    dec_long_va      # longitude
+  )
+
+# Is site_no actually unique? If any row shows n > 1, the join will duplicate rows
+site_meta |> count(site_no) |> filter(n > 1)
+```
+
+::: callout-tip
+## Keys: primary and foreign
+
+A **primary key** uniquely identifies each row in its own table. `site_no` in `site_meta` is a primary key — exactly one row per gauge.
+
+A **foreign key** appears in another table to link observations back. `site_no` in your flow data is a foreign key — it appears thousands of times (once per day per gauge) and connects each observation to its gauge's metadata.
+
+The join matches on this shared key. Because one gauge has many flow records, this is a **one-to-many** relationship — one `site_meta` row fans out to match thousands of flow rows.
+:::
+
+**b.** Join `site_meta` to your flow data using `site_no` as the key. Use the join type that keeps **all flow records** regardless of whether metadata is available.
+
+```{r}
+
+```
+
+```{r}
+# student: join metadata to flow records
+# e.g., flow_meta <- raw |> left_join(site_meta, by = "site_no")
+# then run the verification checks below
+```
+
+**c.** Verify the join — this step is not optional:
+
+```{r}
+#| eval: false
+# Check 1: row count must be unchanged
+# FALSE means rows were gained (duplicate key) or lost (wrong join type)
+nrow(flow_meta) == nrow(flow)
+
+# Check 2: no unexpected NAs in the joined column
+flow_meta |>
+  summarize(
+    n_total        = n(),
+    n_missing_area = sum(is.na(drain_area_va)),
+    pct_complete   = round(100 * mean(!is.na(drain_area_va)), 1)
+  )
+
+# Check 3: spot-check a known value
+# Lees Ferry (09380000) should have drain_area_va ≈ 111,800 mi²
+flow_meta |>
+  filter(site_no == "09380000") |>
+  distinct(site_no, name, drain_area_va)
+```
+
+::: callout-important
+## Always verify your joins — three checks, every time
+
+1. `nrow(result) == nrow(left_table)` — row count unchanged ✓
+2. `sum(is.na(new_column)) == 0` — no unexpected NAs ✓
+3. Spot-check a known value — numbers are plausible ✓
+
+These checks cost 30 seconds and catch errors that would otherwise corrupt every downstream calculation silently. You will join data in every lab this semester. Build the habit now.
+:::
+
+```{r}
+
+```
+
+---
+
+# **Question 3**: Per-Unit-Area Normalization {#q3}
+
+Lees Ferry's high discharge reflects its enormous watershed, not necessarily more intense rainfall or runoff. To compare **runoff intensity** across sites with different drainage areas, we normalize by expressing flow per unit area: cfs per square mile.
+
+**a.** Add a `flow_per_sqmi` column: `flow_per_sqmi = Flow / drain_area_va`.
+
+```{r}
+
+```
+
+**b.** On `my.date`, build a flextable showing **both raw and normalized rankings** side by side for all 7 gauges. Include columns for gauge name, raw discharge (cfs), drainage area (mi²), normalized flow (cfs/mi²), raw rank, and normalized rank. Sort by raw rank.
+
+::: callout-tip
+`rank(-Flow)` gives rank 1 to the highest flow (the negative sign reverses the default ascending order). Create both rank columns before passing to `flextable()`:
+Hint: create ranking columns with `rank()` (e.g., `raw_rank = rank(-Flow)` and `norm_rank = rank(-flow_per_sqmi)`) before rendering tables.
+:::
+
+```{r}
+
+```
+
+**c.** Answer in 2–3 sentences: (1) do the raw and normalized rankings differ, and if so, which gauge changes most dramatically? (2) Why does per-area normalization matter for comparing gauges in the Colorado Basin? (3) Name one analysis where you would use raw discharge and one where you would use normalized discharge.
+
+> ...
+
+---
+
+# **Question 4**: Low-Flow Threshold Monitoring {#q4}
+
+Drought managers don't just watch absolute flow levels — they watch how current conditions compare to **historical norms**. The standard operational metric is the **7Q10**: the lowest 7-day average flow expected to occur once in 10 years. We'll use a related approach: flag when the 7-day rolling mean falls below the historical 10th percentile.
+
+::: callout-note
+The USGS computes official low-flow statistics — including the 7Q10 — and makes them accessible via `dataRetrieval::readNWISstat()`. The thresholds you compute here will closely approximate those official values and follow the same logic water rights lawyers and regulators actually use.
+:::
+
+**a.** For each gauge, compute the **7-day rolling mean** of daily discharge. Use `zoo::rollmean()` with `fill = NA` and `align = "right"` so each value represents the average of the current and 6 preceding days.
+
+::: callout-tip
+Hint: compute a 7-day rolling mean (e.g., `roll7`) with `zoo::rollmean(..., k = 7, fill = NA, align = "right")` inside a `group_by(site_no)` + `arrange(Date)` block.
+:::
+
+```{r}
+
+```
+
+```{r}
+# student: compute 7-day rolling mean
+# e.g., flow_meta <- flow_meta |> group_by(site_no) |> arrange(Date) |> 
+#   mutate(roll7 = zoo::rollmean(Flow, k = 7, fill = NA, align = "right")) |> ungroup()
+```
+
+```{r}
+#| eval: false
+# Optional concrete example: 8-hour rolling mean using `zoo::rollmean`
+# If you have *hourly* discharge data with a POSIXct `DateTime` column,
+# compute an 8-hour rolling mean like so (align = "right" uses the
+# current hour plus the previous 7 hours):
+#
+# library(zoo)
+# flow_hourly <- tibble(
+#   DateTime = seq.POSIXt(as.POSIXct("2023-01-01 00:00", tz = "UTC"), by = "hour", length.out = 48),
+#   Flow = c(rnorm(24, 100, 10), rnorm(24, 80, 12))
+# )
+#
+# flow_hourly <- flow_hourly |> 
+#   arrange(DateTime) |> 
+#   mutate(mean8 = zoo::rollmean(Flow, k = 8, fill = NA, align = "right"))
+#
+# # show the first rows with the new 8-hour mean
+# head(flow_hourly, 12)
+```
+
+**b.** Define a **low-flow threshold** for each gauge as the 10th percentile of its historical discharge during **1980–2010**. A flow that is critically low for Lees Ferry might be above average for the Little Colorado — thresholds must be site-specific.
+
+::: callout-tip
+Two steps: summarize baselines, then join them back. This is the same join pattern you practiced in Q2 — verify it the same way.
+
+Hint: summarize the 10th-percentile threshold per gauge over the baseline period, then left-join those thresholds back to the full flow table so every row carries its gauge's threshold.
+:::
+
+```{r}
+
+```
+
+**c.** Add a logical column `below_threshold` that is `TRUE` when the 7-day rolling mean is below the gauge's 10th percentile threshold.
+
+```{r}
+
+```
+
+**d.** For **Lees Ferry** (site `09380000`) — the Compact's primary accounting point — plot the 7-day rolling mean from 2000–2023. Shade periods below threshold in red and add a dashed horizontal reference line at the threshold.
+
+::: callout-tip
+`geom_ribbon()` draws a filled band between `ymin` and `ymax`. Make the band appear only during below-threshold periods:
+
+Hint: use `geom_ribbon()` with `ymin` at the threshold and `ymax` set to `if_else(below_threshold, roll7, threshold)` so the ribbon only appears while the rolling mean is below threshold.
+:::
+
+```{r}
+
+```
+
+**e.** How many days per year, on average, did Lees Ferry fall below its low-flow threshold in **2000–2010** vs. **2011–2023**? Produce a small summary table and answer in 2–3 sentences: (1) what direction did the exceedance frequency change? (2) Is this a shift in isolated dry years or a persistent baseline change? (3) What does this imply for Compact delivery obligations?
+
+::: callout-tip
+`n_distinct(year(Date))` counts unique years in a group — useful for computing per-year averages across a multi-year period.
+:::
+
+```{r}
+
+```
+
+> ...
+
+---
+
+# **Question 5**: Annual Water Year Summary {#q5}
+
+Calendar years are a poor fit for western US hydrology. The **water year** (October 1 – September 30) captures the full snowmelt cycle: snowpack accumulates through winter, melts in spring, and by September the basin has recharged or drawn down for the year. Water year 2023 = October 1, 2022 through September 30, 2023.
+
+**a.** Add `water_year` and `month` columns to your dataset. The water year is the calendar year of the ending September 30 — months October through December belong to the *next* water year.
+
+::: callout-tip
+Hint: derive `month` from `Date` and set `water_year` so Oct–Dec map to the next calendar year (e.g., `if_else(month >= 10, year + 1, year)`).
+
+**b.** For each gauge and water year, compute: total annual discharge (`sum(Flow)`), peak daily discharge (`max(Flow)`), and number of days below the low-flow threshold (`sum(below_threshold)`).
+
+```{r}
+
+```
+
+**c.** Plot **total annual discharge at Lees Ferry** by water year (1980–2023) as a bar chart. Color bars above the long-term median blue and bars below it red. Add a dashed horizontal reference line at the median.
+
+::: callout-tip
+Hint: compute the long-term median and color bars by whether each year's total is above or below it; add a dashed horizontal line at the median for reference.
+:::
+
+```{r}
+
+```
+
+In 2–3 sentences: (1) describe the direction and approximate timing of any structural shift in the record, (2) identify one year that stands out as an exception to the dominant pattern and what you know about its cause, and (3) explain what this pattern means for Compact water accounting.
+
+> ...
+
+---
+
+# **Question 6**: Basin-Wide Trend Analysis {#q6}
+
+A single gauge tells you about one location. To understand whether drought is consistent across the entire basin — or whether some tributaries are diverging from the main stem — you need to compare all gauges simultaneously on the same scale.
+
+Raw discharge can't serve this purpose: a large-watershed gauge will always dominate. The solution is a **standardized anomaly** — each year's flow expressed as standard deviations above or below the site's own baseline mean:
+
+$$\text{anomaly} = \frac{\bar{Q}_{year} - \bar{Q}_{baseline}}{\sigma_{baseline}}$$
+
+where baseline = 1980–2010. An anomaly of –2 means "two standard deviations below normal for this gauge" — directly comparable to the same metric at any other gauge.
+
+**a.** Compute the 1980–2010 baseline mean and SD per gauge. Join those stats back to the full annual data and compute the standardized anomaly for every gauge-year combination.
+
+::: callout-tip
+Hint: summarize baseline mean and SD per gauge (1980–2010), join those stats to the annual table, and compute the standardized anomaly as (total_flow − baseline_mean)/baseline_sd. This is a join you've seen twice now — verify row counts and NAs after the join.
+:::
+
+```{r}
+
+```
+
+**b.** Visualize as a **heatmap**: water year on x, gauge name on y, fill = standardized anomaly. Use a diverging color scale centered at zero (blue = above average, red = below average).
+
+::: callout-tip
+`geom_tile()` draws one rectangle per gauge-year. For the color scale:
+
+Hint: use a diverging color scale centered at zero (e.g., RdBu), clamp extreme values with `oob = scales::squish`, and wrap long gauge names to keep labels readable.
+:::
+
+```{r}
+
+```
+
+**c.** In 3–4 sentences: (1) describe whether the post-2000 drought signal appears across all gauges or only some, (2) identify two specific years that appear as basin-wide anomalies — one dry, one wet — and name the climate event that caused each, and (3) explain what simultaneous basin-wide anomalies tell you that a single-gauge record cannot.
+
+> ...
+
+---
+
+# **Question 7**: The Moving Center of Drought {#q7}
+
+You have been asked to understand how the *geographic locus* of streamflow has shifted over time. If drought has disproportionately reduced flow in the southern tributaries, the flow-weighted center of the basin should drift north — proportionally more flow is coming from northern headwater gauges. In exceptional snowmelt years it should shift back.
+
+We measure this with the **flow-weighted mean position**: each gauge's coordinates are weighted by its fraction of total annual basin flow.
+
+$$\bar{X}_{year} = \frac{\sum (lon_i \times Q_i)}{\sum Q_i} \qquad \bar{Y}_{year} = \frac{\sum (lat_i \times Q_i)}{\sum Q_i}$$
+
+**a.** Join gauge coordinates (`dec_lat_va`, `dec_long_va`) from `site_meta` to your annual summary. Compute the flow-weighted mean latitude and longitude for each water year.
+
+::: callout-tip
+Hint: join coordinates from `site_meta` to the annual table, then compute weighted longitude/latitude per year as sum(coord * total_flow) / sum(total_flow). This is your third join — verify row counts, NAs, and spot-check known values.
+:::
+:::
+
+Note: mapping below uses `map_data("state")`; if `map_data()` is not available install the `maps` package (`install.packages("maps")`) or use `ggplot2::map_data("state")` which provides equivalent polygons.
+
+```{r}
+
+```
+
+**b.** Create a two-panel figure using `patchwork`:
+
+- **Left**: western US base map with the weighted center plotted as points colored by water year (blue = early, red = recent) and connected by a path through time
+- **Right**: line plot of weighted mean latitude over time with a linear trend line
+
+::: callout-tip
+Hint: draw a western-US polygon basemap and overlay the annual weighted centers as a colored path and points; beside it, plot weighted latitude over time with a linear trend. Use a diverging color gradient for year progression and `patchwork` to combine panels.
+:::
+
+```{r}
+
+```
+
+**c.** Your latitude time series should show two years where the weighted center spikes dramatically northward. Identify those two years and explain: (1) what climate event caused each spike, (2) what they have in common physically, and (3) what the long-term upward trend in weighted latitude suggests about which part of the basin is becoming proportionally more important to total flow — and why that matters for water managers downstream.
+
+> ...
+
+---
+
+# **Question 8**: Seasonal Regimes and Peak Timing {#q8}
+
+Annual totals mask important seasonal structure. The Colorado Basin has two distinct runoff pulses: a **snowmelt** surge in spring (April–June) driven by Rocky Mountain headwater snowpack, and a **monsoon** pulse in late summer (July–September) driven by convective storms across the Arizona-New Mexico plateau. These seasons respond differently to climate forcing — and under warming, the snowmelt season is arriving earlier.
+
+**a.** Add a `season` column using `case_when()`:
+
+- **Snowmelt**: April–June (months 4–6)
+- **Monsoon**: July–September (months 7–9)
+- **Low-flow**: October–December (months 10–12)
+- **Winter**: January–March (months 1–3)
+
+Make `season` a factor with levels in hydrological order: Snowmelt, Monsoon, Low-flow, Winter.
+
+::: callout-tip
+Hint: create `season` with `case_when()` mapping month ranges to labels and convert to a factor with hydrological order: Snowmelt, Monsoon, Low-flow, Winter.
+
+:::
+:::
+
+```{r}
+
+```
+
+**b.** Group by gauge, water year, and season. Summarize total seasonal discharge and normalized runoff (`sum(flow_per_sqmi)`) per group.
+
+```{r}
+
+```
+
+**c.** For each gauge and water year, identify the **date of peak 7-day mean flow** and convert it to day-of-year. Plot peak day-of-year vs. water year for **Lees Ferry** with a linear trend line.
+
+::: callout-tip
+`slice_max(roll7, n = 1, with_ties = FALSE)` inside a `group_by(site_no, water_year)` block selects the single highest 7-day mean row per gauge per year. Then `yday(Date)` converts to day-of-year (1–365).
+:::
+
+```{r}
+
+```
+
+**d.** In 2–3 sentences: (1) describe the direction and magnitude of the peak timing trend, (2) is it statistically visible or buried in noise? (3) What would a two-week earlier peak timing mean operationally for reservoir managers trying to capture spring runoff before it passes downstream?
+
+> ...
+
+---
+
+# **Question 9**: Predicting Lees Ferry from Upstream Conditions {#q9}
+
+Lees Ferry is the **Compact's accounting point** — the location where upper basin states must deliver flow to lower basin states. Predicting annual discharge at Lees Ferry from upstream conditions has direct operational value: managers can begin planning deliveries months before the water arrives.
+
+We'll build a simple but physically grounded model: can Glenwood Springs (an upper Rocky Mountain gauge) predict Lees Ferry annual flow? Does that relationship change by season?
+
+## Data Preparation
+
+**a.** Build your model dataset through three sequential joins:
+
+1. Filter `annual` to Lees Ferry; rename `total_flow` to `lees_flow`
+2. Join annual Glenwood Springs flow (site `09085000`); rename to `glenwood_flow`
+3. Join the **dominant season** at Lees Ferry per water year — the season with the highest total discharge
+4. Log-transform both flow variables
+
+::: callout-tip
+The dominant season join: filter your seasonal summary to Lees Ferry, then within each water year select the season with the highest total flow:
+Hint: produce a single-row-per-year table by selecting Lees Ferry annual flows, left-joining Glenwood annual flows by `water_year`, joining the dominant season for Lees Ferry, and log-transforming the flow columns for modeling.
+
+This is your fourth join. Verify: the final dataset should have ~44 rows, one per water year.
+:::
+
+```{r}
+
+```
+
+## Model Building
+
+**b.** Fit a linear model predicting `log_lees` from `log_glenwood`, `season`, and their interaction:
+
+```{r}
+#| eval: false
+mod <- lm(log_lees ~ log_glenwood * season, data = lees_model_data)
+summary(mod)
+```
+
+```{r}
+
+```
+
+**c.** In 3–4 sentences: (1) report the R² and state whether the overall model is statistically significant, (2) interpret the `log_glenwood` coefficient as an elasticity — what does it mean physically that the coefficient is greater than 1? (3) describe what the significant negative interaction terms tell you about the upstream-downstream relationship outside of Snowmelt season.
+
+::: callout-tip
+In a log-log model, the coefficient on `log_glenwood` is an **elasticity**: a coefficient of 1.8 means a 1% increase in Glenwood Springs flow is associated with a 1.8% increase at Lees Ferry. This super-linear amplification makes physical sense — flow accumulates from tributaries between the two gauges, so an above-average headwater year compounds as it moves downstream.
+:::
+
+> ...
+
+---
+
+# **Question 10**: Model Evaluation {#q10}
+
+A model that fits well on average can still fail in predictable ways. Two core assumptions of linear regression are: predictions should be unbiased across the full range of fitted values, and residuals should be approximately normally distributed. Let's check both — and look for the outlier year that the model cannot predict.
+
+**a.** Use `broom::augment()` to produce a tidy data frame of predictions and residuals alongside the original data:
+
+```{r}
+#| eval: false
+aug <- augment(mod, data = lees_model_data)
+```
+
+::: callout-tip
+## Introducing `broom`
+
+`broom` converts messy R model objects into tidy, pipeable data frames:
+
+- `augment(mod)` — adds `.fitted` (predictions) and `.resid` (residuals) to your data
+- `glance(mod)` — one-row summary of model fit: R², AIC, p-value
+- `tidy(mod)` — one-row-per-coefficient table with estimates and p-values
+
+Together these make model results as pipeable as any other data frame — straight into `ggplot` or `flextable`.
+:::
+
+```{r}
+
+```
+
+**b.** Create a **predicted vs. actual scatter plot**. Add a dashed 1:1 reference line (perfect prediction). Color points by `season`. Identify any point that sits noticeably off the line.
+
+::: callout-tip
+`geom_abline(slope = 1, intercept = 0, linetype = "dashed")` draws the 1:1 line. Points above it = underpredicted (actual > predicted); points below = overpredicted.
+:::
+
+```{r}
+
+```
+
+**c.** Plot a **histogram of the residuals** with a vertical dashed line at zero.
+
+```{r}
+
+```
+
+**d.** In 3–4 sentences: (1) identify the outlier water year visible in your scatter plot — which year is it and why did the model fail to predict it? (2) Do the residuals appear approximately normal, or is there a tail that concerns you? (3) Name two additional predictors that would most improve this model and explain the physical mechanism behind each.
+
+> ...
+
+---
+
+# Going Further (ungraded)
+
+The model in Q9 predicts Lees Ferry from a single upstream gauge. `dataRetrieval` gives you access to hundreds more across the basin — and to SNOTEL snow water equivalent data, streamflow statistics, and groundwater levels. Could a multi-gauge ensemble prediction outperform the single-gauge model? Could peak SWE in March predict the following June's flow at Lees Ferry months before snowmelt begins?
+
+These are real operational forecasting questions that USBR and state water agencies work on every year. The data is already in your hands.
+
+---
+
+# Summary
+
+In this lab you built a complete analytical pipeline for one of the most consequential river systems in North America:
+
+- **Retrieved** 44 years of daily streamflow directly from the USGS NWIS API using `dataRetrieval`
+- **Joined** gauge metadata using relational keys — and verified every join
+- **Normalized** by drainage area to enable fair comparisons across the basin
+- **Detected** low-flow threshold exceedances using rolling statistics for operational drought monitoring
+- **Aggregated** by water year and season — the natural temporal units of western hydrology
+- **Visualized** basin-wide trends with a standardized anomaly heatmap and a flow-weighted spatial center analysis
+- **Modeled** the upstream-downstream relationship at the Compact's accounting point
+- **Evaluated** model assumptions and identified the outlier year the model couldn't predict
+
+Every tool — `dplyr`, `ggplot2`, `zoo`, `patchwork`, `broom`, `flextable` — recurs in every lab ahead. The workflow is always the same: get → tidy → explore → model → communicate.
+
+**Next week** you will bring spatial geometry into this pipeline — moving from time series at point locations to vector features, watershed boundaries, and the river network itself. The wrangling skills you practiced today carry forward directly.
+
+---
+
+# Rubric
+
+| Question | Topic | Points |
+|----------|-------|--------|
+| Q1 | Daily conditions report | 10 |
+| Q2 | Basin metadata join | 10 |
+| Q3 | Per-unit-area normalization | 10 |
+| Q4 | Low-flow threshold monitoring | 20 |
+| Q5 | Annual water year summary | 10 |
+| Q6 | Basin-wide trend analysis | 15 |
+| Q7 | Moving center of drought | 15 |
+| Q8 | Seasonal regimes + peak timing | 15 |
+| Q9 | Predictive model | 15 |
+| Q10 | Model evaluation | 10 |
+| Well-structured, legible Qmd | — | 10 |
+| Deployed as a webpage | — | 10 |
+| **Total** | | **150** |
+
+---
+
+**Grading key (brief):**
+- **Correctness (primary):** calculations, joins, and checks — e.g., Q2 join verification and Q4 rolling mean logic.
+- **Reproducibility:** code runs end-to-end, used parameter objects (`my.date`), and included any small checks or assertions.
+- **Clarity & Presentation:** readable code, labeled tables/plots, captions for `flextable` outputs, and a clear 1-paragraph interpretation.
+
+# Submission
+
+1. Render: `quarto render lab-01.qmd`
+2. Push: `git add -A && git commit -m "lab 1 complete" && git push`
+3. Activate GitHub Pages: **GitHub → Settings → Pages → Deploy from branch → main**
+4. Submit your live URL to Canvas: `https://USERNAME.github.io/csu-523c/lab-01.html`
+
+Add this project to your personal website with a brief description — it counts toward end-of-semester extra credit.

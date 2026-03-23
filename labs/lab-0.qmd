@@ -1,0 +1,309 @@
+---
+title: "Lab 0"
+subtitle: "Verify Your Environment + Meet Your Tools"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+```{r}
+#| echo: false
+#| message: false
+library(kableExtra)
+```
+
+# Overview
+
+You're coming into this course with R, RStudio, and Git already installed. This homework is not an in-depth installation guide but rather a **verification and orientation**. If you need help with installing from scratch please reach out.
+
+By the end of this document you will have confirmed your environment meets course requirements, installed the packages we'll use this semester, organized your file system the way we'll work all term, and connected local Git to your GitHub account.
+
+If you hit a snag at any step, the [troubleshooting appendix](#troubleshooting) at the bottom of this page covers the most common issues. If that doesn't resolve it, reach out before the next class.
+
+---
+
+# Step 1: Verify R and RStudio {#verify}
+
+Open RStudio and run the following in the **Console**:
+
+```{r}
+version$major
+version$minor
+```
+
+You need **R ≥ 4.0**. If you're below that, update R from [cran.r-project.org](https://cran.r-project.org) before continuing.
+
+To check your RStudio version: **RStudio → Help → About RStudio**. You need **RStudio ≥ 2026.x**. Update from [posit.co/download/rstudio-desktop](https://posit.co/download/rstudio-desktop/) if needed.
+
+::: callout-tip
+## R and RStudio are not the same thing
+R is the language and computation engine. RStudio is the interface. Both need to be current — updating one does not update the other.
+:::
+
+---
+
+# Step 2: Install Course Packages {#packages}
+
+R's power comes from packages — collections of functions written and shared by the community. We'll add packages throughout the semester, but this core set covers the first half of the course.
+
+Run the following in your Console. This will take a few minutes the first time:
+
+```{r}
+#| eval: false
+install.packages(c(
+  "tidyverse",    # data manipulation and visualization
+  "tidymodels",   # machine learning
+  "sf",           # vector spatial data
+  "terra",        # raster spatial data
+  "here",         # robust file paths
+  "remotes",      # install packages from GitHub
+  "usethis",      # project and git workflow utilities
+  "gitcreds"      # secure credential storage
+))
+```
+
+Once installed, verify everything loaded correctly:
+
+```{r}
+#| eval: false
+c("tidyverse", "tidymodels", "sf", "terra", 
+  "here", "remotes", "usethis", "gitcreds") %in% rownames(installed.packages())
+```
+
+All values should return `TRUE`. If any return `FALSE`, re-run `install.packages()` for just that package.
+
+---
+
+# Step 3: Confirm Your Setup {#confirm}
+
+Run all four lines below in the Console. This is your **environment check** — it confirms your username, R version, RStudio version, and that the key packages are installed:
+
+```{r}
+#| eval: false
+Sys.getenv("LOGNAME")                                             # your machine username
+version$major                                                     # R major version
+RStudio.Version()$version                                         # RStudio version
+c("tidymodels", "remotes", "sf", "terra") %in%
+  rownames(installed.packages())                                  # package check
+```
+
+Expected output looks something like:
+
+```
+[1] "mikejohnson"
+[1] "4"
+[1] '2026.1.0.392'
+[1] TRUE TRUE TRUE TRUE
+```
+
+**Take a screenshot of this output** — it's part of your submission.
+
+---
+
+# Step 4: Organize Your File System {#filesystem}
+
+We'll use a consistent project structure all semester. Set it up now so it's ready when the labs start.
+
+Open the **Terminal tab** in RStudio (next to the Console tab) and run:
+
+```bash
+cd ~
+mkdir github
+ls ~
+```
+
+You should see `github` in the output. This folder is where every Git-enabled project will live — course labs, your own projects, anything you clone from GitHub.
+
+::: callout-note
+## Why a dedicated folder?
+When you clone a repository it creates a folder on your machine. Keeping everything under `~/github/` means you always know where your projects are and paths stay predictable across your machine. It's a small habit that prevents a lot of confusion later.
+:::
+
+---
+
+# Step 5: Configure Git {#git}
+
+Git needs to know who you are before it can track your work. This is a one-time setup per machine.
+
+First, check whether you're already configured — run this in the **Terminal tab**:
+
+```bash
+git config --list --global
+```
+
+If you see `user.name` and `user.email` in the output, you're set. If not, run the following with your info:
+
+```bash
+git config --global user.name 'Your Name'
+git config --global user.email 'your@email.com'
+```
+
+Quick check: make sure Git is installed and on your PATH before running the config commands:
+
+```bash
+git --version    # should print git version
+which git        # shows git location on macOS/Linux
+```
+
+If these commands fail, follow the troubleshooting notes below for platform-specific instructions.
+
+Use the **same email as your GitHub account** — this is how commits get linked to your profile.
+
+::: callout-important
+## Git and GitHub are not the same thing
+**Git** runs on your machine and tracks changes to files.  
+**GitHub** is a cloud platform that hosts Git repositories — backup, sharing, and collaboration.  
+You need both. They communicate, but they are separate tools.
+:::
+
+---
+
+# Step 6: Set Up Your GitHub Account {#github}
+
+If you don't yet have a GitHub account, create one at [github.com](https://github.com). Choose your username carefully — it will appear on every project you publish and will become a professional portfolio over time.
+
+Once you have an account:
+
+1. Complete your profile: name, location, a short bio, and a profile photo — doesn't need to be personal, but shouldn't be the default avatar
+2. Search for **`mikejohnson51/csu-ess-523c-2026`** and **star** the repository — this bookmarks it for you and helps me find your account
+
+---
+
+# Step 7: Connect Git to GitHub {#connection}
+
+Git is configured locally but doesn't yet know how to authenticate with GitHub. This step creates that connection using a **Personal Access Token (PAT)** — a secure credential that lets your local Git push and pull without entering a password every time.
+
+## Generate a Token
+
+In the RStudio **Console**, run:
+
+```r
+usethis::create_github_token()
+```
+
+This opens GitHub in your browser with the recommended token settings pre-filled. 
+
+- Give the token a descriptive name: e.g. `csu-523c-laptop`
+- Set expiration to at least **90 days** (long enough to cover the semester)
+- Click **Generate token**
+
+Note: choose appropriate token scopes (at minimum `repo` and `workflow`; add `gist` if you need gists). Set a reasonable expiration and revoke the token if compromised.
+
+::: callout-important
+Copy the token immediately — GitHub shows it only once. If you close the page without copying it, you'll need to generate a new one.
+:::
+
+## Store the Token
+
+Back in the RStudio Console, run:
+
+```r
+gitcreds::gitcreds_set()
+```
+
+When prompted, paste your token. You'll see a confirmation that credentials were set.
+
+## Verify the Connection
+
+```r
+usethis::git_sitrep()
+```
+
+Look for these lines in the output:
+
+```
+Git config (global)
+• Name: 'Your Name'
+• Email: 'your@email.com'
+GitHub
+• Default GitHub host: 'https://github.com'
+• Personal access token for 'https://github.com': '<discovered>'
+• GitHub user: 'yourusername'
+• Token scopes: 'gist, repo, user, workflow'
+```
+
+If the token line shows `<unset>` instead of `<discovered>`, re-run `gitcreds::gitcreds_set()` and paste the token again.
+
+---
+
+# Submission {#submission}
+
+Submit the following on Canvas:
+
+**1. Screenshot of your Console output** from Step 3 — showing your username, R version, RStudio version, and four `TRUE` values.
+
+**2. Screenshot of your Terminal output** from Step 5 — showing `git config --list --global` with your `user.name` and `user.email`.
+
+**3. Your GitHub profile URL** — e.g. `https://github.com/yourusername`
+
+When we visit your profile we should see: a completed profile, the course repository starred, and your `user.name` email matching what's in your git config.
+
+Screenshot tips:
+
+- macOS: press `Cmd+Shift+4` and drag to select area
+- Windows: press `Win+Shift+S` to use the Snip & Sketch tool
+- Linux: use `PrtSc` or your desktop environment's screenshot tool
+
+## Publish via GitHub Pages (recommended: simple main → docs workflow)
+
+Preferred workflow (concise): students create their *own* GitHub repository, configure Quarto to render into a `docs/` folder, push `main`, enable Pages, and submit the Pages URL. This keeps the course repo untouched and makes grading easy.
+
+Quick steps:
+
+- Create a personal repo on GitHub (e.g., `csu-523c`) and clone it into `~/github/`.
+- In the repo root add a `_quarto.yml` with `website: output-dir: docs` (example below). This makes `quarto render` write into `docs/` automatically.
+
+_quarto.yml (minimal):_
+```yaml
+project:
+  type: website
+
+website:
+  title: "csu-523c"
+  output-dir: docs
+```
+
+- Add or copy the lab QMD(s) into the repo and render:
+```bash
+quarto render lab-01.qmd    # outputs go to docs/
+```
+- Commit & push `main`:
+```bash
+git add .
+git commit -m "Add Lab 1 and site config"
+git push origin main
+```
+- Enable GitHub Pages: **Settings → Pages → Deploy from branch → main / folder: /docs**. Submit the resulting Pages URL (e.g., `https://YOURUSERNAME.github.io/YOURREPO/lab-01.html`) to Canvas.
+
+Notes:
+- Do not push student work to the instructor's repo — use your own repo and `main` branch.
+- If you cannot publish to Pages, upload a ZIP containing `lab-01.html`, `data/`, `images/`, `session-info.txt`, and `README.md` instead.
+
+---
+
+# Troubleshooting {#troubleshooting}
+
+**Package installation fails**  
+Install the failing package individually: `install.packages("packagename")`. Read the error — it usually identifies the problem. Common causes: outdated R, missing system dependency (Linux), or a network issue.
+
+**`RStudio.Version()` returns an error**  
+This function only works inside RStudio, not in a plain R terminal. Make sure you're in the RStudio Console pane, not the Terminal tab.
+
+**`which git` / `where git` returns nothing**  
+Git is not installed or not on your PATH. On macOS run `xcode-select --install` in the Terminal. On Windows install [Git for Windows](https://gitforwindows.org/) and restart RStudio.
+
+**Terminal tab not visible in RStudio**  
+Go to **Tools → Terminal → New Terminal**, or use `Shift + Alt + R`.
+
+**Windows: bash commands not working in the terminal**  
+RStudio on Windows defaults to PowerShell. To use bash commands (`ls`, `touch`, etc.), go to **Tools → Global Options → Terminal** and switch the shell to Git Bash.
+
+**`git config --list --global` shows nothing**  
+You haven't run the config commands yet, or ran them in the Console instead of the Terminal. Switch to the Terminal tab and re-run `git config --global user.name` and `git config --global user.email`.
+
+**`usethis::git_sitrep()` shows token as `<unset>`**  
+The PAT wasn't stored correctly. Re-run `gitcreds::gitcreds_set()` and paste the token again. If it's expired, generate a new one with `usethis::create_github_token()`.
+
+**`git clone` prompts for username and password**  
+Your PAT isn't being picked up. Run `gitcreds::gitcreds_set()` again — paste the token (not your GitHub password) when prompted.

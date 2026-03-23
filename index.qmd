@@ -1,0 +1,399 @@
+---
+title: "ESS 523c: Environmental Data Science Applications"
+subtitle: "Water Resources"
+author:
+  - name: Mike Johnson
+    email: mike.johnson@colostate.edu
+    degrees: PhD
+    affiliations:
+      - name: Chief Data Scientist, Lynker
+format:
+  html:
+    toc: false
+---
+
+```{=html}
+<style>
+/* ── Hero ─────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, #1E4D2B 0%, #2d6e40 60%, #1a3d22 100%);
+  color: white;
+  padding: 3.5rem 2.5rem 3rem;
+  border-radius: 8px;
+  margin-bottom: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: -80px; left: -40px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.03);
+}
+.hero-logo {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.hero-logo img { width: 64px; }
+.hero-course-code {
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 0.35rem;
+}
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+  color: white;
+  border: none;
+}
+.hero-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.85;
+  margin-bottom: 1.5rem;
+}
+.hero-meta {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+.hero-meta span { display: flex; align-items: center; gap: 0.4rem; }
+
+/* ── Info cards ───────────────────────────────────────── */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+.info-card {
+  background: #f8faf8;
+  border: 1px solid #dce8dc;
+  border-left: 4px solid #1E4D2B;
+  border-radius: 6px;
+  padding: 1.1rem 1.25rem;
+}
+.info-card .label {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1E4D2B;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.info-card .value {
+  font-size: 0.95rem;
+  color: #1a2e1a;
+  line-height: 1.4;
+}
+
+/* ── Section headings ─────────────────────────────────── */
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1E4D2B;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 2px solid #1E4D2B;
+  padding-bottom: 0.4rem;
+  margin: 2rem 0 1.2rem;
+}
+
+/* ── Schedule ─────────────────────────────────────────── */
+.week-block {
+  margin-bottom: 1.5rem;
+  border: 1px solid #e2ebe2;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.week-header {
+  background: #1E4D2B;
+  color: white;
+  padding: 0.6rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.week-header .week-num {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.week-header .week-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.week-items { padding: 0.6rem 0; }
+.week-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.88rem;
+  border-bottom: 1px solid #f0f5f0;
+  transition: background 0.15s;
+}
+.week-item:last-child { border-bottom: none; }
+.week-item:hover { background: #f4f9f4; }
+.week-item .item-icon {
+  width: 26px; height: 26px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+.icon-lecture { background: #e8f4e8; color: #1E4D2B; }
+.icon-tech    { background: #e8f0fa; color: #2c5f9e; }
+.icon-lab     { background: #fef3e2; color: #b35c00; }
+.icon-hw      { background: #f3e8f8; color: #6b2fa0; }
+.item-type {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #777;
+  width: 52px;
+  flex-shrink: 0;
+}
+.item-link a {
+  color: #1E4D2B;
+  text-decoration: none;
+  font-weight: 500;
+}
+.item-link a:hover { text-decoration: underline; }
+.item-plain { color: #444; }
+.badge-soon {
+  margin-left: auto;
+  font-size: 0.65rem;
+  background: #C8C372;
+  color: #1E4D2B;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+.badge-old {
+  margin-left: auto;
+  font-size: 0.65rem;
+  background: #f0f0f0;
+  color: #888;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+.badge-new {
+  margin-left: auto;
+  font-size: 0.65rem;
+  background: #e8f4e8;
+  color: #1E4D2B;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.badge-ec {
+  margin-left: auto;
+  font-size: 0.65rem;
+  background: #fef3e2;
+  color: #b35c00;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ── Grading table ────────────────────────────────────── */
+.grade-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.grade-table th {
+  background: #1E4D2B;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.grade-table td {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid #e8ede8;
+}
+.grade-table tr:last-child td { border-bottom: none; }
+.grade-table tr:hover td { background: #f6faf6; }
+
+/* ── Footer note ──────────────────────────────────────── */
+.appendix-note {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #dce8dc;
+  font-size: 0.82rem;
+  color: #666;
+  line-height: 1.6;
+}
+</style>
+```
+
+```{=html}
+<div class="hero">
+  <div class="hero-logo">
+    <img src="csu-rams-logo.png" alt="CSU Rams logo"/>
+    <div>
+      <div class="hero-course-code">Colorado State University · ESS 523c · Spring 2026</div>
+    </div>
+  </div>
+  <h1>Environmental Data Science Applications:<br>Water Resources</h1>
+  <div class="hero-subtitle">
+    Building the quantitative, computational, and communication skills to work at the frontier of water science.
+  </div>
+  <div class="hero-meta">
+    <span>📍 CSU Fort Collins</span>
+    <span>👤 Mike Johnson, PhD — Chief Data Scientist, Lynker</span>
+    <span>✉️ mike.johnson@colostate.edu</span>
+  </div>
+</div>
+```
+
+```{=html}
+<div class="info-grid">
+  <div class="info-card">
+    <div class="label">Meeting Times</div>
+    <div class="value">Mon &amp; Wed · 4:00 – 5:50 PM</div>
+  </div>
+  <div class="info-card">
+    <div class="label">Location</div>
+    <div class="value">Stadium, Room 1215</div>
+  </div>
+  <div class="info-card">
+    <div class="label">Dates</div>
+    <div class="value">Mar 23 – May 17, 2026</div>
+  </div>
+  <div class="info-card">
+    <div class="label">Prerequisites</div>
+    <div class="value">ESS/WR 523a or equivalent experience with R and RStudio</div>
+  </div>
+  <div class="info-card">
+    <div class="label">Structure</div>
+    <div class="value">Mon: Lecture &nbsp;|&nbsp; Wed: Tech Talk + Lab</div>
+  </div>
+  <div class="info-card">
+    <div class="label">Grading</div>
+    <div class="value">7 Labs = 950 pts<br>+150 optional final project</div>
+  </div>
+</div>
+```
+
+## About This Course
+
+This course focuses on analyzing and understanding water resources through the lens of modern data science. Building on the foundational R skills from ESS/WR 523a, we examine key innovations in data science, geospatial processing and machine learning for hydrological prediction and model parameterization — with an emphasis using real data.
+
+Every dataset, every example, and every lab draws from systems you will encounter in professional practice. The course is organized around a single professional question: **what does it take to turn raw environmental data into a reproducible, publishable result that informs real decisions?** Each week answers a piece of that question with a different class of data and methods — from spatial analysis through to machine learning workflows applied directly to hydrological problems.
+
+By the end of the course you will have built a public portfolio of six published analyses spanning data wrangling, vector data, raster data, machine learning, and time series — using the same data infrastructure that federal agencies and consulting firms use operationally.
+
+::: {.callout-tip}
+## Open Science
+All course materials — slides, labs, and code — are open source under the Apache 2.0 license and built with [Quarto](https://quarto.org/). If you find something that could be improved, please [submit an issue](https://github.com/mikejohnson51/csu-523c-2026/issues) on the course GitHub repository.
+:::
+
+---
+
+```{=html}
+<div class="section-heading">📋 Grading</div>
+```
+
+```{=html}
+<table class="grade-table">
+  <thead>
+    <tr><th>Component</th><th>Count</th><th>Points Each</th><th>Total</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Labs</td><td>7</td><td>950</td><td>950</td></tr>
+    <tr><td>Final Project (optional)</td><td>1</td><td>150 EC</td><td>+150</td></tr>
+    <tr><td><strong>Total (required)</strong></td><td></td><td></td><td><strong>950</strong></td></tr>
+  </tbody>
+</table>
+```
+
+**Grade scale** (percentage of 950 required points): A+ ≥ 96.67% · A ≥ 93.33% · A– ≥ 90% · B+ ≥ 86.67% · B ≥ 83.33% · B– ≥ 80% · C+ ≥ 76.67% · C ≥ 70% · D ≥ 60% · F < 60%
+
+Labs - with the exception of Lab 0 - are assigned on Wednesdays and due the following Wednesday before class. All submissions are deployed as GitHub Pages. Collaboration on concepts is encouraged; code, writing, and results must be individually produced.
+
+---
+
+```{=html}
+<div class="section-heading">📅 Schedule</div>
+```
+
+```{=html}
+
+<!-- ── WEEK 1 ── -->
+<div class="week-block">
+  <div class="week-header">
+    <span class="week-num">Week 1</span>
+    <span class="week-title">Data Science Tools &amp; Digital Environment</span>
+  </div>
+  <div class="week-items">
+    <div class="week-item">
+      <div class="item-icon icon-lecture">🎓</div>
+      <div class="item-type">Lecture</div>
+      <div class="item-link"><a href="slides/week-1-1.html">Day 1: Digital Environment — Files, Paths, URLs &amp; Git</a></div>
+      <span class="badge-new">new</span>
+    </div>
+    <div class="week-item">
+      <div class="item-icon icon-hw">📝</div>
+      <div class="item-type">HW</div>
+      <div class="item-link"><a href="labs/lab-0.html">Lab 0: Verify Your Environment + Meet Your Tools</a></div>
+      <span class="badge-new">new</span>
+    </div>
+    <div class="week-item">
+      <div class="item-icon icon-tech">⚙️</div>
+      <div class="item-type">Tech Talk</div>
+      <div class="item-link"><a href="slides/week-1-2.html">Day 2: Data Manipulation, Visualization &amp; Relational Data</a></div>
+      <span class="badge-soon">next time</span>
+    </div>
+    <div class="week-item">
+      <div class="item-icon icon-lab">🔬</div>
+      <div class="item-type">Lab</div>
+      <div class="item-link"><a href="labs/lab-01.html">Lab 1: Streamflow Across the Colorado River Basin</a></div>
+      <span class="badge-soon">next time</span>
+    </div>
+  </div>
+</div>
+</div>
+```
+
+---
+
+```{=html}
+<div class="appendix-note">
+  <strong>Reuse and licensing:</strong> Unless otherwise noted, all course materials are licensed under
+  <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a>.
+  Slides, labs, and code are built with <a href="https://quarto.org/">Quarto</a>.
+  Found something that needs fixing?
+  <a href="https://github.com/mikejohnson51/csu-523c-2026/issues">Submit an issue</a> on GitHub.
+</div>
+```

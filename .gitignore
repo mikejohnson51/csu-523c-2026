@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+slides/data
+labs/keys/*
+docs/labs/keys/*
+/.quarto/
+.DS_Store
+README.html
+labs/*_cache/
