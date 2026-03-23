@@ -51,7 +51,7 @@ splits_pal   <- c(data_color, train_color, test_color)
 - 95–110 min: Wrap-up, homework, Q&A
 
 
-# Welcome {background-color="#1E4D2B"}
+# Welcome
 
 This is a class about water.
 
@@ -200,26 +200,33 @@ The work we do in this course is in many ways the same work being done at the fe
 ::: {layout-ncol=2}
 
 ::: {.column}
-**Collaboration is encouraged:**
-- Discuss problems, share approaches, help each other debug
-- You will learn more working with peers than alone
+::: callout-tip
+**Collaboration — encouraged**
 
-**Individual work is required:**
-- Your code, your writing, your results — submitted individually
+Discuss problems, share approaches, and help each other debug — you learn more working with peers.
+:::
 
-**On AI tools (ChatGPT, Claude, Copilot):**
-- Acceptable: exploring concepts, debugging syntax, understanding error messages, and short illustrative code examples — always verify and understand outputs before using them.
+::: callout-important
+**Individual work — required**
+
+Your code, writing, and results must be submitted individually.
+:::
+
+::: callout-note
+**AI tools (ChatGPT, Claude, Copilot)**
+
+- Acceptable: exploring concepts, debugging syntax, understanding errors, and short illustrative examples — always verify and understand outputs.
 - Not acceptable: producing final analyses, lab write-ups, figures, or any submission you present as solely your own work.
-- Disclosure: If AI contributed substantively to your work, include a brief note in your submission describing the tool, model, and a short prompt summary.
-- The goal of this course is to build *your* capability — outsourcing that defeats the purpose
-- When in doubt, ask
+- Disclosure: If AI contributed substantively, include a brief note describing the tool, model, and a short prompt summary.
+:::
+
 :::
 
 ::: {.column}
 ```{r}
 #| echo: false
 #| fig-align: center
-#| out.width: "80%"
+#| out.width: "60%"
 knitr::include_graphics('img/collaboration.png')
 ```
 :::
