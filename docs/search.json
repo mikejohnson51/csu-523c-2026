@@ -18,7 +18,7 @@
     "href": "slides/week-1-2.html#tidy-data-the-assumed-shape",
     "title": "Week 1 | Day 2",
     "section": "Tidy Data: The Assumed Shape",
-    "text": "Tidy Data: The Assumed Shape\n\nThree rules — every tidyverse tool assumes them:\n\nEach variable has its own column\nEach observation has its own row\nEach value has its own cell\n\nWhen your data doesn’t conform, you fix the data — not the tools."
+    "text": "Tidy Data: The Assumed Shape\n\nTidy data follows three rules: each variable is a column, each observation is a row, each value is a cell. Every tidyverse tool assumes this shape.\nWhen your data doesn’t conform, you fix the data — not the tools."
   },
   {
     "objectID": "slides/week-1-2.html#the-grammar-of-data-manipulation",
@@ -32,7 +32,7 @@
     "href": "slides/week-1-2.html#a-note-on-subsetting",
     "title": "Week 1 | Day 2",
     "section": "A Note on Subsetting",
-    "text": "A Note on Subsetting\nYou already know base R subsetting. Here’s the vocabulary:\n\ndf &lt;- data.frame(country = c(\"USA\", \"Brazil\", \"India\"),\n                 pop     = c(300e6, 200e6, 1.4e9))\n\ndf[1, 2]          # row 1, col 2 — matrix style\n#&gt; [1] 3e+08\ndf[[\"pop\"]]       # column by name — list style\n#&gt; [1] 3.0e+08 2.0e+08 1.4e+09\ndf$pop            # column shorthand\n#&gt; [1] 3.0e+08 2.0e+08 1.4e+09\n\n\n\n\n\n\n\n\nImportant\n\n\nNever subset by row number in a script:\n\ngapminder[19:70, ]   # ❌ not self-documenting, breaks if data changes\n\nAlways subset by condition — it is explicit, readable, and robust."
+    "text": "A Note on Subsetting\nBefore we use these verbs, let’s ground ourselves in base R subsetting — it’s what dplyr builds on. Understanding the foundation makes the syntax sugar more transparent.\nYou already know base R subsetting. Here’s the vocabulary:\n\ndf &lt;- data.frame(country = c(\"USA\", \"Brazil\", \"India\"),\n                 pop     = c(300e6, 200e6, 1.4e9))\n\ndf[1, 2]          # row 1, col 2 — matrix style\n#&gt; [1] 3e+08\ndf[[\"pop\"]]       # column by name — list style\n#&gt; [1] 3.0e+08 2.0e+08 1.4e+09\ndf$pop            # column shorthand\n#&gt; [1] 3.0e+08 2.0e+08 1.4e+09\n\n\n\n\n\n\n\n\nImportant\n\n\nNever subset by row number in a script:\n\ngapminder[19:70, ]   # ❌ not self-documenting, breaks if data changes\n\nAlways subset by condition — it is explicit, readable, and robust."
   },
   {
     "objectID": "slides/week-1-2.html#filter-keep-rows-by-condition",
@@ -137,7 +137,7 @@
     "href": "slides/week-1-2.html#why-visualization",
     "title": "Week 1 | Day 2",
     "section": "Why Visualization?",
-    "text": "Why Visualization?\nData without visualization is just numbers. Before building any model or writing any interpretation, plot your data. Always.\n\nggplot2 is built on the Grammar of Graphics — the idea that every chart can be described by the same small set of components:\n\nData — what are we visualizing?\nAesthetic mappings — which variables map to which visual properties?\nGeometries — what shape represents the data?\nLabels, facets, themes — everything else"
+    "text": "Why Visualization?\nData without visualization is just numbers. Before building any model or writing any interpretation, plot your data. Always.\n\nggplot2 is built on a consistent grammar — the same recipe works for scatter plots, line charts, heatmaps, and beyond. This systematic grammar is what makes ggplot2 powerful: once you learn the components, you can build any visualization.\nThe Grammar of Graphics says every chart is built from the same small set of components:\n\nData — what are we visualizing?\nAesthetic mappings — which variables map to which visual properties?\nGeometries — what shape represents the data?\nLabels, facets, themes — everything else"
   },
   {
     "objectID": "slides/week-1-2.html#the-ggplot2-workflow",
@@ -396,7 +396,7 @@
     "href": "slides/week-1-1.html#instructor-mike-johnson",
     "title": "Week 1",
     "section": "Instructor: Mike Johnson",
-    "text": "Instructor: Mike Johnson\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nChief Data Scientist, Lynker\nPhD in Geography, UC Santa Barbara\n10+ years in hydrology and ecosystem science\nActive work with NOAA, USACE, and federal water programs\n\nThe work we do in this course is in many ways the same work being done at the federal/state level right now. You’re learning a living skillset.\nCourse site:\nmikejohnson51.github.io/csu-ess-523c"
+    "text": "Instructor: Mike Johnson\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nChief Data Scientist, Lynker\nPhD in Geography, UC Santa Barbara\n10+ years in hydrology and ecosystem science\nActive work with NOAA, USACE, and federal water programs\n\nThe work we do in this course is in many ways the same work being done at the federal/state level right now. You’re learning a living skillset.\nCourse site:\nhttps://mikejohnson51.github.io/csu-ess-523c/"
   },
   {
     "objectID": "slides/week-1-1.html#course-structure",
@@ -774,7 +774,7 @@
     "href": "labs/lab-01.html#data-preparation",
     "title": "Lab 1: Data Science Tools",
     "section": "Data Preparation",
-    "text": "Data Preparation\na. Build your model dataset through three sequential joins:\n\nFilter annual to Lees Ferry; rename total_flow to lees_flow\nJoin annual Glenwood Springs flow (site 09085000); rename to glenwood_flow\nJoin the dominant season at Lees Ferry per water year — the season with the highest total discharge\nLog-transform both flow variables\n\n\n\n\n\n\n\nTip\n\n\n\nThe dominant season join: filter your seasonal summary to Lees Ferry, then within each water year select the season with the highest total flow: Hint: produce a single-row-per-year table by selecting Lees Ferry annual flows, left-joining Glenwood annual flows by water_year, joining the dominant season for Lees Ferry, and log-transforming the flow columns for modeling.\nThis is your fourth join. Verify: the final dataset should have ~44 rows, one per water year."
+    "text": "Data Preparation\na. Build your model dataset through four sequential operations:\n\nFilter annual to Lees Ferry; rename total_flow to lees_flow\nJoin annual Glenwood Springs flow (site 09085000); rename to glenwood_flow\nJoin the dominant season at Lees Ferry per water year — the season with the highest total discharge\nLog-transform both flow variables\n\n\n\n\n\n\n\nTip\n\n\n\nThe dominant season: within each water year, which season (Snowmelt, Monsoon, Low-flow, Winter) carried the most flow at Lees Ferry? Filter seasonal summaries to Lees Ferry, then group_by(water_year) |&gt; slice_max(total_flow, n = 1) to select one season per year.\nThen join that back to your Lees Ferry & Glenwood annual table by water_year.\nThis is your fourth join. Always verify: the final dataset should have ~44 rows (one per water year, 1980–2023), zero NAs in flow columns, and log-transformed values should be positive.\n\n\nCode\nlees_model_data &lt;- annual |&gt;\n  filter(site_no == \"09380000\") |&gt;\n  rename(lees_flow = total_flow) |&gt;\n  left_join(annual |&gt; filter(site_no == \"09085000\") |&gt; rename(glenwood_flow = total_flow),\n            by = \"water_year\") |&gt;\n  left_join(dominant_season, by = \"water_year\") |&gt;\n  mutate(log_lees = log(lees_flow),\n         log_glenwood = log(glenwood_flow))\n\n# Verify: 44 rows? No NAs in log columns?\nnrow(lees_model_data)\nsum(is.na(lees_model_data$log_lees))"
   },
   {
     "objectID": "labs/lab-01.html#model-building",
@@ -831,5 +831,432 @@
     "title": "Lab 0",
     "section": "Notes: Publish via GitHub Pages (recommended: simple main → docs workflow)",
     "text": "Notes: Publish via GitHub Pages (recommended: simple main → docs workflow)\nPreferred workflow (concise): students create their own GitHub repository, configure Quarto to render into a docs/ folder, push main, enable Pages, and submit the Pages URL. This keeps the course repo untouched and makes grading easy.\nQuick steps:\n\nCreate a personal repo on GitHub (e.g., csu-523c) and clone it into ~/github/.\nIn the repo root add a _quarto.yml with website: output-dir: docs (example below). This makes quarto render write into docs/ automatically.\n\nquarto.yml (minimal):\nproject:\n  type: website\nwebsite:\n  title: \"csu-523c\"\n  output-dir: docs\n\nAdd or copy the lab QMD(s) into the repo and render:\n\nquarto render lab-01.qmd    # outputs go to docs/\n\nCommit & push main:\n\ngit add .\ngit commit -m \"Add Lab 1 and site config\"\ngit push origin main\n\nEnable GitHub Pages: Settings → Pages → Deploy from branch → main / folder: /docs. Submit the resulting Pages URL (e.g., https://YOURUSERNAME.github.io/YOURREPO/lab-01.html) to Canvas."
+  },
+  {
+    "objectID": "slides/week-1-2.html#select-helpers-tidyselect-functions",
+    "href": "slides/week-1-2.html#select-helpers-tidyselect-functions",
+    "title": "Week 1 | Day 2",
+    "section": "select() Helpers — tidyselect Functions",
+    "text": "select() Helpers — tidyselect Functions\nBeyond explicit column names, use tidyselect helpers to match columns by pattern:\n\n# Select columns starting with a pattern\nselect(gapminder, starts_with(\"life\"))\n#&gt; # A tibble: 1,704 × 1\n#&gt;    lifeExp\n#&gt;      &lt;dbl&gt;\n#&gt;  1    28.8\n#&gt;  2    30.3\n#&gt;  3    32.0\n#&gt;  4    34.0\n#&gt;  5    36.1\n#&gt;  6    38.4\n#&gt;  7    39.9\n#&gt;  8    40.8\n#&gt;  9    41.7\n#&gt; 10    41.8\n#&gt; # ℹ 1,694 more rows\n\n# Select columns ending with a pattern\nselect(gapminder, ends_with(\"pc\"))\n#&gt; # A tibble: 1,704 × 0\n\n# Select columns containing a substring\nselect(gapminder, contains(\"pop\"))\n#&gt; # A tibble: 1,704 × 1\n#&gt;         pop\n#&gt;       &lt;int&gt;\n#&gt;  1  8425333\n#&gt;  2  9240934\n#&gt;  3 10267083\n#&gt;  4 11537966\n#&gt;  5 13079460\n#&gt;  6 14880372\n#&gt;  7 12881816\n#&gt;  8 13867957\n#&gt;  9 16317921\n#&gt; 10 22227415\n#&gt; # ℹ 1,694 more rows\n\n\n\n\n\n\n\n\nTip\n\n\nThese patterns are especially useful for water data where columns follow naming conventions: site_no, site_name, discharge_cfs, temp_c. You’ll select all temperature columns with starts_with(\"temp_\")."
+  },
+  {
+    "objectID": "slides/week-1-2.html#transmute-keep-only-new-columns",
+    "href": "slides/week-1-2.html#transmute-keep-only-new-columns",
+    "title": "Week 1 | Day 2",
+    "section": "transmute() — Keep Only New Columns",
+    "text": "transmute() — Keep Only New Columns\ntransmute() is like mutate(), but it drops all other columns — you’re left with only what you explicitly create.\n\n# mutate() keeps everything\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap) |&gt;\n  head(2)\n#&gt; # A tibble: 2 × 7\n#&gt;   country     continent  year lifeExp     pop gdpPercap         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8 8425333      779. 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3 9240934      821. 7585448670.\n\n\n\n# transmute() keeps only the new column\ngapminder |&gt;\n  transmute(gdp = pop * gdpPercap) |&gt;\n  head(2)\n#&gt; # A tibble: 2 × 1\n#&gt;           gdp\n#&gt;         &lt;dbl&gt;\n#&gt; 1 6567086330.\n#&gt; 2 7585448670.\n\n\n\n\n\n\n\n\n\nTip\n\n\nUse transmute() when you want to extract a subset of computed columns in one go — cleaner than mutate() followed by select()."
+  },
+  {
+    "objectID": "slides/week-1-2.html#conditional-mutations-with-if_else",
+    "href": "slides/week-1-2.html#conditional-mutations-with-if_else",
+    "title": "Week 1 | Day 2",
+    "section": "Conditional Mutations with if_else()",
+    "text": "Conditional Mutations with if_else()\nWhen you need to compute values based on a condition, use if_else():\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  mutate(income_level = if_else(gdpPercap &gt; 10000, \"high\", \"low\")) |&gt;\n  select(country, gdpPercap, income_level) |&gt;\n  head(8)\n#&gt; # A tibble: 8 × 3\n#&gt;   country     gdpPercap income_level\n#&gt;   &lt;fct&gt;           &lt;dbl&gt; &lt;chr&gt;       \n#&gt; 1 Afghanistan      975. low         \n#&gt; 2 Albania         5937. low         \n#&gt; 3 Algeria         6223. low         \n#&gt; 4 Angola          4797. low         \n#&gt; 5 Argentina      12779. high        \n#&gt; 6 Australia      34435. high        \n#&gt; 7 Austria        36126. high        \n#&gt; 8 Bahrain        29796. high\n\n\nIn Lab 1 context: Flag anomalies in streamflow:\n\nflow_data |&gt;\n  mutate(is_low = if_else(discharge &lt; quantile(discharge, 0.1), TRUE, FALSE))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom",
+    "href": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom",
+    "title": "Week 1 | Day 2",
+    "section": "Building a Plot: Data → Aesthetics → Geom",
+    "text": "Building a Plot: Data → Aesthetics → Geom\nAll ggplot2 plots follow the same structure: data + aesthetics (which variables to visual properties) + geometry (what shape).\n\ngm2007 &lt;- filter(gapminder, year == 2007)\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point()\n\n\n\nKey point: Aesthetic mappings in aes() describe how variables are visualized — placed in ggplot(), they apply globally to all layers."
+  },
+  {
+    "objectID": "slides/week-1-2.html#what-is-quarto",
+    "href": "slides/week-1-2.html#what-is-quarto",
+    "title": "Week 1 | Day 2",
+    "section": "What is Quarto?",
+    "text": "What is Quarto?\nQuarto is the evolution of R Markdown — same authoring paradigm, modernized syntax and expanded scope:\n\nR Markdown (2014–): Documents combining code + prose, renders to HTML/PDF/Word\nQuarto (2022–): Same concept, better syntax, works with R, Python, Julia, Observable\n\nEverything you did in lab 0 still applies. Three things changed:\n\nCode chunk options: New YAML-style syntax\nCallout blocks: Native features, simpler markup\nRendering: Universal command-line tool"
+  },
+  {
+    "objectID": "slides/week-1-2.html#old-vs.-new-chunk-options",
+    "href": "slides/week-1-2.html#old-vs.-new-chunk-options",
+    "title": "Week 1 | Day 2",
+    "section": "Old vs. New: Chunk Options",
+    "text": "Old vs. New: Chunk Options\nR Markdown syntax:\n`{r echo=FALSE, fig.width=6}`\nplot(1:10)\n`{}`\n\nQuarto syntax:\n`{r}`\n#| echo: false\n#| fig-width: 6\nplot(1:10)\n`{}`\n\n\nQuarto uses YAML-style options — one per #| line. Clearer, easier to scan."
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-formatting-callouts",
+    "href": "slides/week-1-2.html#built-in-formatting-callouts",
+    "title": "Week 1 | Day 2",
+    "section": "Built-in Formatting: Callouts",
+    "text": "Built-in Formatting: Callouts\nOld way (complicated divs):\n:::{.callout-note}\nThis is a note.\n:::\nQuarto way (same syntax, more types):\n:::{.callout-tip}\nThis is a tip.\n:::\n\nTypes: callout-note, callout-tip, callout-warning, callout-important, callout-caution\nWe’ve been using these all along — now you know how to author them."
+  },
+  {
+    "objectID": "slides/week-1-2.html#how-to-render-preview",
+    "href": "slides/week-1-2.html#how-to-render-preview",
+    "title": "Week 1 | Day 2",
+    "section": "How to Render & Preview",
+    "text": "How to Render & Preview\nPreview live (auto-reload on save):\nquarto preview slides/week-1-2.qmd\nOutput opens in your browser.\n\nRender to static HTML:\nquarto render slides/week-1-2.qmd\nOutput lands in docs/ and is ready to share.\n\n\nIn RStudio: click Render button → preview in Viewer pane."
+  },
+  {
+    "objectID": "slides/week-1-2.html#the-key-takeaway",
+    "href": "slides/week-1-2.html#the-key-takeaway",
+    "title": "Week 1 | Day 2",
+    "section": "The Key Takeaway",
+    "text": "The Key Takeaway\nYou will author and submit assignments in Quarto. The workflow:\n\nHeader (YAML) → sets title, output format, theme\nCode chunks → execute, embed output, with #| options\nCallouts → highlight key points\nProse → explains the data story\n\nThis deck is a Quarto reveal.js presentation. Lab assignments are Quarto HTML documents. Same tool, different output format."
+  },
+  {
+    "objectID": "slides/week-1-2.html#project-configuration-_quarto.yml",
+    "href": "slides/week-1-2.html#project-configuration-_quarto.yml",
+    "title": "Week 1 | Day 2",
+    "section": "Project Configuration: _quarto.yml",
+    "text": "Project Configuration: _quarto.yml\nEvery Quarto project has a _quarto.yml file that sets global defaults.\nHere’s the one for this course:\nproject:\n  type: website\n  \nwebsite:\n  title: \"ESS 523c: Environmental Data Science\"\n  site-url: https://github.com/mikejohnson51/csu-ess-523c\n  navbar:\n    left:\n      - href: index.qmd\n        text: Home\n      - href: labs/lab-01.qmd\n        text: Lab 1\n\nformat:\n  html:\n    theme: cosmo\n    toc: true\n    code-fold: false\n\nYou won’t edit this — I maintain it. But when you quarto render, it reads these defaults and applies them to every .qmd file in the project."
+  },
+  {
+    "objectID": "slides/week-1-2.html#how-filter-works-boolean-vectors",
+    "href": "slides/week-1-2.html#how-filter-works-boolean-vectors",
+    "title": "Week 1 | Day 2",
+    "section": "How filter() Works: Boolean Vectors",
+    "text": "How filter() Works: Boolean Vectors\nUnder the hood, filter() creates a boolean vector (all TRUE or FALSE) and keeps only the rows where the condition is TRUE.\n\n# Create a boolean vector\nlifeExp_condition &lt;- gapminder$lifeExp &lt; 40\n\n# This is what filter() does internally\ngapminder[lifeExp_condition, ]  # base R subsetting with boolean vector\n#&gt; # A tibble: 124 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.\n#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.\n#&gt; 10 Angola      Africa     1962    34    4826015     4269.\n#&gt; # ℹ 114 more rows\n\n\nEquivalent to:\n\n# Using filter()\ngapminder |&gt;\n  filter(lifeExp &lt; 40)\n#&gt; # A tibble: 124 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.\n#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.\n#&gt; 10 Angola      Africa     1962    34    4826015     4269.\n#&gt; # ℹ 114 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nfilter() is cleaner and more readable, but it’s doing exactly what base R subsetting does: keeping rows where the condition is TRUE, dropping rows where it’s FALSE or NA."
+  },
+  {
+    "objectID": "slides/week-1-2.html#select-base-r-equivalence",
+    "href": "slides/week-1-2.html#select-base-r-equivalence",
+    "title": "Week 1 | Day 2",
+    "section": "select() — Base R Equivalence",
+    "text": "select() — Base R Equivalence\nUnder the hood, select() is doing column subsetting — the same operation as base R.\n\n# Base R column subsetting\ngapminder[, c(\"country\", \"lifeExp\")]     # [rows, cols]\ngapminder[[\"lifeExp\"]]                   # extract single column\ngapminder$lifeExp                        # $ shorthand\n\n\nUsing select():\n\ngapminder |&gt;\n  select(country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     lifeExp\n#&gt;    &lt;fct&gt;         &lt;dbl&gt;\n#&gt;  1 Afghanistan    28.8\n#&gt;  2 Afghanistan    30.3\n#&gt;  3 Afghanistan    32.0\n#&gt;  4 Afghanistan    34.0\n#&gt;  5 Afghanistan    36.1\n#&gt;  6 Afghanistan    38.4\n#&gt;  7 Afghanistan    39.9\n#&gt;  8 Afghanistan    40.8\n#&gt;  9 Afghanistan    41.7\n#&gt; 10 Afghanistan    41.8\n#&gt; # ℹ 1,694 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nselect() is syntactic sugar on top of base R’s column subsetting. It’s more readable and composable with pipes."
+  },
+  {
+    "objectID": "slides/week-1-2.html#mutate-base-r-equivalence",
+    "href": "slides/week-1-2.html#mutate-base-r-equivalence",
+    "title": "Week 1 | Day 2",
+    "section": "mutate() — Base R Equivalence",
+    "text": "mutate() — Base R Equivalence\nUnder the hood, mutate() is column assignment — the same operation as base R.\n\n# Base R column assignment\ngapminder$gdp &lt;- gapminder$pop * gapminder$gdpPercap\n\n# Remove a column (assign to NULL)\ngapminder$gdpPercap &lt;- NULL\n\n\nUsing mutate():\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap,\n         gdpPercap = NULL)\n#&gt; # A tibble: 1,704 × 6\n#&gt;    country     continent  year lifeExp      pop          gdp\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333  6567086330.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934  7585448670.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083  8758855797.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966  9648014150.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460  9678553274.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372 11697659231.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816 12598563401.\n#&gt;  8 Afghanistan Asia       1987    40.8 13867957 11820990309.\n#&gt;  9 Afghanistan Asia       1992    41.7 16317921 10595901589.\n#&gt; 10 Afghanistan Asia       1997    41.8 22227415 14121995875.\n#&gt; # ℹ 1,694 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nmutate() builds on base R assignment but allows you to chain operations with the pipe and reference newly created columns within the same call."
+  },
+  {
+    "objectID": "slides/week-1-2.html#now-lets-apply-them",
+    "href": "slides/week-1-2.html#now-lets-apply-them",
+    "title": "Week 1 | Day 2",
+    "section": "Now Let’s Apply Them",
+    "text": "Now Let’s Apply Them\nNow let’s walk through each verb with concrete examples. You’ll see how they work in isolation, then how they compose into powerful pipelines."
+  },
+  {
+    "objectID": "slides/week-2-2.html#pattern-1-basic-markers-popups",
+    "href": "slides/week-2-2.html#pattern-1-basic-markers-popups",
+    "title": "Week 2 | Day 2",
+    "section": "Pattern 1: Basic Markers + Popups",
+    "text": "Pattern 1: Basic Markers + Popups\n\nlibrary(leaflet); library(sf)\n\n# External data (not included here)\nstarbucks &lt;- read_csv(\"data/starbucks.csv\") |&gt; \n  st_as_sf(coords = c(\"longitude\", \"latitude\"), crs = 4326)\n\nleaflet(starbucks) |&gt; \n  addProviderTiles(providers$CartoDB) |&gt; \n  addMarkers(popup = ~store_name, label = ~city)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#pattern-2-clustering-for-large-point-sets",
+    "href": "slides/week-2-2.html#pattern-2-clustering-for-large-point-sets",
+    "title": "Week 2 | Day 2",
+    "section": "Pattern 2: Clustering for Large Point Sets",
+    "text": "Pattern 2: Clustering for Large Point Sets\nWhen you have 1,000+ points, clustering auto-aggregates them at lower zoom levels:\n\nleaflet(starbucks) |&gt; \n  addProviderTiles(providers$CartoDB) |&gt; \n  addMarkers(clusterOptions = markerClusterOptions())"
+  },
+  {
+    "objectID": "slides/week-2-2.html#pattern-3-custom-awesome-icons",
+    "href": "slides/week-2-2.html#pattern-3-custom-awesome-icons",
+    "title": "Week 2 | Day 2",
+    "section": "Pattern 3: Custom Awesome Icons",
+    "text": "Pattern 3: Custom Awesome Icons\n\nicons &lt;- awesomeIcons(icon = 'coffee', markerColor = \"green\", library = 'fa')\n\nleaflet(starbucks) |&gt; \n  addProviderTiles(providers$CartoDB) |&gt; \n  addAwesomeMarkers(icon = icons, popup = ~store_name)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#pattern-4-color-ramps-by-attribute",
+    "href": "slides/week-2-2.html#pattern-4-color-ramps-by-attribute",
+    "title": "Week 2 | Day 2",
+    "section": "Pattern 4: Color Ramps by Attribute",
+    "text": "Pattern 4: Color Ramps by Attribute\n\n# Color circles by categorical attribute (e.g., city name)\npal &lt;- colorFactor(c(\"darkgreen\", \"navy\"), domain = unique(starbucks$city))\n\nleaflet(starbucks) |&gt; \n  addProviderTiles(providers$CartoDB) |&gt; \n  addCircleMarkers(\n    color = ~pal(city), \n    fillOpacity = 0.5, \n    stroke = FALSE,\n    popup = ~paste0(store_name, \" (\", city, \")\")\n  ) |&gt; \n  addLegend(pal = pal, values = ~city, title = \"City\")\n\nVariation: Color by numeric field (e.g., elevation, population density):\n\n# Continuous color ramp for numeric data\npal_num &lt;- colorNumeric(palette = \"viridis\", domain = starbucks$elevation)\n\nleaflet(starbucks) |&gt; \n  addProviderTiles(providers$CartoDB) |&gt; \n  addCircleMarkers(\n    radius = ~sqrt(elevation) / 20,     # size scaled by elevation\n    color = ~pal_num(elevation),         # color scaled by elevation\n    fillOpacity = 0.7,\n    stroke = FALSE\n  ) |&gt; \n  addLegend(pal = pal_num, values = ~elevation, title = \"Elevation (m)\")"
+  },
+  {
+    "objectID": "slides/week-2-2.html#why-vector-tiles",
+    "href": "slides/week-2-2.html#why-vector-tiles",
+    "title": "Week 2 | Day 2",
+    "section": "Why Vector Tiles?",
+    "text": "Why Vector Tiles?\nRaster tiles (PNG/JPEG basemaps) are pre-computed images — styling is baked in.\nVector tiles are GeoJSON delivered at tile level — styling happens client-side, so:\n\nOne dataset, infinite styling options (day/night, language, theme)\nFile sizes 10–100× smaller than raster tiles\nClient applies filters, clustering, legends on the fly\nStandard format: .mbtiles or .pmtiles\n\n\nUse case: You have 500k city points. Instead of pre-rendering a billion zoom-specific PNGs, ship vector tiles (20MB) + style JSON (5KB) and let the user’s browser render on demand."
+  },
+  {
+    "objectID": "slides/week-2-2.html#the-pipeline-geojson-tiles-pmtiles-styled-map",
+    "href": "slides/week-2-2.html#the-pipeline-geojson-tiles-pmtiles-styled-map",
+    "title": "Week 2 | Day 2",
+    "section": "The Pipeline: GeoJSON → Tiles → PMTiles → Styled Map",
+    "text": "The Pipeline: GeoJSON → Tiles → PMTiles → Styled Map\nStep 1: Prepare GeoJSON\n\ncities &lt;- us_cities |&gt; \n  st_transform(4326) |&gt;      # ALWAYS 4326 for web\n  select(name, population, state)\n\nst_write(cities, \"cities.geojson\")\n\nStep 2: Build Vector Tiles with tippecanoe (command line, not R)\n# Create .mbtiles from GeoJSON\n# -Z0 -z14: zoom levels 0 (world) to 14 (neighborhood)\n# --coalesce-fraction 0.8: merge nearby points to reduce file size\ntippecanoe -o cities.mbtiles -Z0 -z14 \\\n  --coalesce-fraction 0.8 \\\n  cities.geojson\nStep 3: Convert to .pmtiles (Optional, Recommended)\n.mbtiles is SQLite-based; .pmtiles is a single portable file optimized for HTTP range requests:\n# Option A: Use official pmtiles tool\npmtiles convert cities.mbtiles cities.pmtiles\n\n# Option B: Python tool\npip install pmtiles\npmtiles convert cities.mbtiles cities.pmtiles\nStep 4: Style with freestiler (R)\nfreestiler generates Mapbox/MapLibre JSON styles programmatically:\n\nlibrary(freestiler)\n\n# Start with defaults\nstyle &lt;- freestile()\n\n# Set background\nstyle &lt;- style |&gt; add_background(color = \"#f0f0f0\")\n\n# Add circle layer for points\nstyle &lt;- style |&gt; \n  add_vector_layer(\n    id = \"cities\",\n    source = \"cities\",       # must match tiles source name\n    type = \"circle\",\n    paint = list(\n      \"circle-radius\" = list(\"base\" = 5, \"stops\" = list(c(5, 4), c(15, 12))),\n      \"circle-color\" = list(\"base\" = \"#1f77b4\"),\n      \"circle-stroke-color\" = \"#ffffff\",\n      \"circle-stroke-width\" = 1,\n      \"circle-opacity\" = 0.8\n    )\n  )\n\n# Add text labels at higher zoom\nstyle &lt;- style |&gt; \n  add_vector_layer(\n    id = \"cities-labels\",\n    source = \"cities\",\n    type = \"symbol\",\n    layout = list(\n      \"text-field\" = \"{name}\",\n      \"text-size\" = 11,\n      \"text-offset\" = list(0, 1.5)\n    ),\n    paint = list(\n      \"text-color\" = \"#000000\",\n      \"text-halo-color\" = \"#ffffff\",\n      \"text-halo-width\" = 1\n    ),\n    minzoom = 6   # labels only above zoom 6\n  )\n\n# Write to JSON for the browser\njsonlite::write_json(style, \"style.json\", pretty = TRUE, auto_unbox = TRUE)\n\nStep 5: Serve with MapLibre GL JS (in HTML/JavaScript)\n&lt;link href=\"https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.css\" rel=\"stylesheet\" /&gt;\n&lt;script src=\"https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.js\"&gt;&lt;/script&gt;\n\n&lt;div id=\"map\" style=\"width: 100%; height: 600px;\"&gt;&lt;/div&gt;\n\n&lt;script&gt;\n  const map = new maplibregl.Map({\n    container: 'map',\n    style: './style.json',  // your freestiler output\n    center: [-95, 40],      // continental US center\n    zoom: 3\n  });\n  \n  // Add pmtiles source\n  map.on('load', () =&gt; {\n    map.addSource('cities', {\n      type: 'vector',\n      url: 'pmtiles:///path/to/cities.pmtiles'\n    });\n  });\n&lt;/script&gt;\nOr use MapLibre with @pmtiles/protomaps-leaflet in Leaflet:\n#| eval: false\n# R + leaflet approach (hybrid)\n# Leaflet with PMTiles can integrate vector tiles + Leaflet interactivity\n\nlibrary(leaflet)\n# (Note: pmtiles support in R is emerging; JavaScript/HTML is currently easier)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#example-magnitude-colored-earthquake-points",
+    "href": "slides/week-2-2.html#example-magnitude-colored-earthquake-points",
+    "title": "Week 2 | Day 2",
+    "section": "Example: Magnitude-Colored Earthquake Points",
+    "text": "Example: Magnitude-Colored Earthquake Points\n\nlibrary(freestiler)\n\n# Create a style with data-driven color (magnitude → interpolated color ramp)\nstyle &lt;- freestile() |&gt; \n  add_background(color = \"#e8e4d6\") |&gt; \n  add_vector_layer(\n    id = \"earthquakes\",\n    source = \"earthquakes\",      # must match your pmtiles source\n    type = \"circle\",\n    paint = list(\n      # Data-driven color: interpolate based on 'magnitude' property\n      \"circle-color\" = list(\n        \"type\" = \"exponential\",\n        \"property\" = \"magnitude\",\n        \"base\" = 1.5,\n        \"colorSpace\" = \"interpolate\",\n        \"stops\" = list(\n          list(3, \"#1a1a1a\"),     # magnitude 3 → dark gray\n          list(5, \"#ffd700\"),     # magnitude 5 → gold\n          list(8, \"#ff4500\")      # magnitude 8 → orangered\n        )\n      ),\n      # Size proportional to magnitude\n      \"circle-radius\" = list(\n        \"type\" = \"exponential\",\n        \"property\" = \"magnitude\",\n        \"base\" = 1.5,\n        \"stops\" = list(\n          list(3, 4),             # mag 3 → small circle\n          list(8, 15)             # mag 8 → large circle\n        )\n      ),\n      \"circle-opacity\" = 0.8,\n      \"circle-stroke-color\" = \"#ffffff\",\n      \"circle-stroke-width\" = 1.5\n    )\n  )\n\n# Write JSON for use in browser\njsonlite::write_json(style, \"earthquake-style.json\", pretty = TRUE, auto_unbox = TRUE)\n\nOutput JSON excerpt:\n{\n  \"layers\": [{\n    \"id\": \"earthquakes\",\n    \"source\": \"earthquakes\",\n    \"type\": \"circle\",\n    \"paint\": {\n      \"circle-color\": {\n        \"property\": \"magnitude\",\n        \"type\": \"exponential\",\n        \"stops\": [[3, \"#1a1a1a\"], [5, \"#ffd700\"], [8, \"#ff4500\"]]\n      },\n      \"circle-radius\": {\n        \"property\": \"magnitude\",\n        \"type\": \"exponential\",\n        \"stops\": [[3, 4], [8, 15]]\n      }\n    }\n  }]\n}"
+  },
+  {
+    "objectID": "slides/week-2-2.html#example-text-labels-with-layout-properties",
+    "href": "slides/week-2-2.html#example-text-labels-with-layout-properties",
+    "title": "Week 2 | Day 2",
+    "section": "Example: Text Labels with Layout Properties",
+    "text": "Example: Text Labels with Layout Properties\n\nstyle &lt;- style |&gt; \n  add_vector_layer(\n    id = \"magnitude-labels\",\n    source = \"earthquakes\",\n    type = \"symbol\",\n    layout = list(\n      \"text-field\" = \"{magnitude}\",        # show magnitude value\n      \"text-size\" = 12,\n      \"text-color\" = \"#ffffff\",\n      \"text-font\" = list(\"Open Sans Regular\"), # fallback to system fonts\n      \"text-offset\" = list(0, 0),\n      \"text-allow-overlap\" = FALSE          # prevent label overlap at low zoom\n    ),\n    paint = list(\n      \"text-color\" = \"#ffffff\",\n      \"text-halo-color\" = \"#000000\",        # black outline\n      \"text-halo-width\" = 1\n    ),\n    minzoom = 5   # labels only show at zoom 5+\n  )\n\n\n\n\n\n\n\n\nNote\n\n\nWhen to use which: - Leaflet + colorFactor() → 1–5k points, simple colors by category - Leaflet + clustering → 5–20k points, need interactivity (drill-down) - leafgl + WebGL → 20–100k points, real-time filtering - Vector tiles + freestiler → 100k+, public map, complex styling, and you want professional cartography"
+  },
+  {
+    "objectID": "slides/week-2-2.html#class-task-10-minutes-live-demo",
+    "href": "slides/week-2-2.html#class-task-10-minutes-live-demo",
+    "title": "Week 2 | Day 2",
+    "section": "Class Task (10 minutes, live demo)",
+    "text": "Class Task (10 minutes, live demo)\nScenario: You have a CSV of 25,000 city points (name, population, elevation). Your instructor will live-code converting it to sf (4326), mapping it three ways: 1. Leaflet with clusterOptions 2. Leaflet with leafgl::addGlPoints() 3. Visual walkthrough of .pmtiles + freestiler style\nYour job: Watch and observe: - Which approach feels “snappy” as you pan/zoom? - At what point does DOM clustering feel sluggish? - How does WebGL differ visually? (Hint: no popups on hover; speed trade-off)\nOne-sentence takeaway: “I’d use ______ for this project because ______.”"
+  },
+  {
+    "objectID": "slides/week-2-2.html#homework-mini-project-1-week",
+    "href": "slides/week-2-2.html#homework-mini-project-1-week",
+    "title": "Week 2 | Day 2",
+    "section": "Homework (mini project, 1 week)",
+    "text": "Homework (mini project, 1 week)\nGoal: Build an interactive web map dashboard (Shiny or plain HTML + JavaScript) to explore a spatial dataset of your choice (10k–100k features).\nRequirements:\n\nData prep (1 hour):\n\nLoad spatial data (shapefile, CSV, GeoJSON)\nTransform to EPSG:4326\nSelect 3–5 attributes for visualization\n\nImplementation (choose one):\n\nOption A (Easiest): Leaflet + clustering + color ramp + legend in leaflet()\nOption B (Intermediate): Leaflet + leafgl**::addGlPoints() + Shiny slider to filter by attribute\nOption C (Stretch): Vector tiles: tippecanoe → .pmtiles + freestiler style JSON + MapLibre client\n\nDeliverable:\n\nDeployed URL (GitHub Pages, Shinyapps.io, or netlify)\n1-paragraph reflection: What tool did you choose? Why? What would you change with 10× more data?\n\n\nStarter repo: (instructor provides Git template with sample data, Make targets for tippecanoe)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#r-packages",
+    "href": "slides/week-2-2.html#r-packages",
+    "title": "Week 2 | Day 2",
+    "section": "R Packages",
+    "text": "R Packages\ninstall.packages(c(\n  'leaflet',      # classic web maps\n  'leafgl',       # WebGL acceleration via maplibre-gl\n  'mapdeck',      # deck.gl GPU layers\n  'mapview',      # quick exploration\n  'leafem',       # leaflet extensions\n  'leafpop',      # popups\n  'freestiler'    # Mapbox/MapLibre style authoring\n))"
+  },
+  {
+    "objectID": "slides/week-2-2.html#system-tools-command-line",
+    "href": "slides/week-2-2.html#system-tools-command-line",
+    "title": "Week 2 | Day 2",
+    "section": "System Tools (Command Line)",
+    "text": "System Tools (Command Line)\n# macOS\nbrew install tippecanoe\n\n# Ubuntu/Linux\nsudo apt-get install tippecanoe\n\n# All OS: Python-based pmtiles conversion\npip install pmtiles-cli"
+  },
+  {
+    "objectID": "slides/week-2-2.html#key-links",
+    "href": "slides/week-2-2.html#key-links",
+    "title": "Week 2 | Day 2",
+    "section": "Key Links",
+    "text": "Key Links\n\nleaflet R: https://rstudio.github.io/leaflet/\nleafgl: https://cran.r-project.org/web/packages/leafgl/\nfreestiler guide: https://walker-data.com/freestiler/\nMapLibre GL JS: https://maplibre.org/maplibre-gl-js/\ntippecanoe docs: https://github.com/mapbox/tippecanoe\npmtiles spec: https://github.com/protomaps/pmtiles"
+  },
+  {
+    "objectID": "slides/week-2-2.html#system-tools",
+    "href": "slides/week-2-2.html#system-tools",
+    "title": "Week 2 | Day 2",
+    "section": "System Tools",
+    "text": "System Tools\n# macOS\nbrew install tippecanoe\n\n# Ubuntu\nsudo apt-get install tippecanoe\n\n# Python (all platforms)\npip install pmtiles-cli"
+  },
+  {
+    "objectID": "slides/week-2-2.html#links",
+    "href": "slides/week-2-2.html#links",
+    "title": "Week 2 | Day 2",
+    "section": "Links",
+    "text": "Links\n\nleaflet R: https://rstudio.github.io/leaflet/\nleafgl: https://github.com/r-spatial/leafgl\nfreestiler: https://walker-data.com/freestiler/\nMapLibre: https://maplibre.org/\ntippecanoe: https://github.com/mapbox/tippecanoe"
+  },
+  {
+    "objectID": "slides/week-2-2.html#motivation-yesterday",
+    "href": "slides/week-2-2.html#motivation-yesterday",
+    "title": "Week 2 | Day 2",
+    "section": "0. Motivation & Yesterday",
+    "text": "0. Motivation & Yesterday\nYesterday: spatial coverages (grid, hexagon, Voronoi, Delaunay) — algorithms to partition and interpolate space.\nToday: interactive visualization — how to publish so others explore without coding.\nWhy? Your analysis is only useful if stakeholders (water managers, EPA, public) can interact with it. This requires understanding web constraints: tiles, projections, performance."
+  },
+  {
+    "objectID": "slides/week-2-2.html#learning-objectives",
+    "href": "slides/week-2-2.html#learning-objectives",
+    "title": "Week 2 | Day 2",
+    "section": "Learning Objectives",
+    "text": "Learning Objectives\n\nUnderstand the CRS constraint for web maps: all interactive web mapping uses WGS84 (EPSG:4326).\nKnow when to use Leaflet (simple, familiar), WebGL (GPU, 10k+ points), vs. vector tiles (100k+, complex styling).\nBuild interactive leaflet maps with markers, popups, clustering, and layers.\nProduce and serve vector tiles (.pmtiles, .mbtiles) for large datasets.\nAuthor map styles using freestiler → Mapbox/MapLibre JSON for tile-based maps."
+  },
+  {
+    "objectID": "slides/week-2-2.html#what-is-leaflet",
+    "href": "slides/week-2-2.html#what-is-leaflet",
+    "title": "Week 2 | Day 2",
+    "section": "1. What is Leaflet?",
+    "text": "1. What is Leaflet?\nLeaflet — open-source JavaScript library for interactive web maps.\nUsed by: New York Times, Washington Post, GitHub, OpenStreetMap, Mapbox, CartoDB, USGS, EPA.\n\nWhy Leaflet (not ArcGIS Online, Mapbox Studio, etc.)?\n\nSimple: Layer-by-layer like ggplot2\nR native: leaflet package — build maps in R code\nFlexible: Works in Rmd, Quarto, Shiny, plain HTML\nFree: No subscriptions, no API keys for basemaps\nFast: Optimized for panning/zooming on mobile\nPlugins: 100+ extensions (clustering, 3D, heatmaps, etc.)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#why-build-maps-in-r",
+    "href": "slides/week-2-2.html#why-build-maps-in-r",
+    "title": "Week 2 | Day 2",
+    "section": "2. Why Build Maps in R?",
+    "text": "2. Why Build Maps in R?\nMaps should be reproducible, version-controlled, scriptable — like all your code.\n\nR advantages: - Maps are code (git-tracked, shareable) - Embed directly in reports (Rmd, Quarto) - Automated updates — rerun code, map updates - Consistency — same CRS handling, styling across all maps - Scalability — generate 100 maps from a loop\n\n\nArcGIS drawbacks for research: - Click-based (hard to reproduce) - Saved as .mxd (proprietary, hard to version) - Sharing requires purchase or web license - Updates are manual reclicks"
+  },
+  {
+    "objectID": "slides/week-2-2.html#map-building-blocks-like-ggplot2",
+    "href": "slides/week-2-2.html#map-building-blocks-like-ggplot2",
+    "title": "Week 2 | Day 2",
+    "section": "3. Map Building Blocks (Like ggplot2)",
+    "text": "3. Map Building Blocks (Like ggplot2)\n\nleaflet() |&gt;                                # Initialize\n  addProviderTiles(providers$CartoDB) |&gt;   # Basemap tile layer\n  addCircleMarkers(data = sites) |&gt;        # Data points (sf object)\n  addPolylines(data = rivers, color = ...) # Lines\n  addPolygons(data = zones) |&gt;             # Polygons (with fill)\n  setView(lng = -105, lat = 40, zoom = 10) # Set center & zoom\n\n\nComponents: - Basemaps: CartoDB, OpenStreetMap, Satellite, Imagery, Terrain - Markers: pins (circles, awesomeIcons, custom images) - Shapes: polylines (rivers, roads), polygons (watersheds, zoning), rectangles - Interactive: Popups (click), labels (hover), clustering, heatmaps - UI: Legend, scale bar, search, draw tools, fullscreen"
+  },
+  {
+    "objectID": "slides/week-2-2.html#the-crs-constraint-web-maps-are-always-4326",
+    "href": "slides/week-2-2.html#the-crs-constraint-web-maps-are-always-4326",
+    "title": "Week 2 | Day 2",
+    "section": "4. The CRS Constraint: Web Maps Are Always 4326",
+    "text": "4. The CRS Constraint: Web Maps Are Always 4326\nYou learned EPSG:5070 for analysis (equal-area, no distortion).\nWeb browsers have no choice: all maps use WGS84 (EPSG:4326).\n\nWhy? Web tiles are pre-rendered globally in a Mercator grid. Only works in 4326.\n\n\nThe workflow:\n\n## 1. Analyze in EPSG:5070 (accurate areas, distances)\nwatersheds &lt;- st_read(\"shp\") |&gt; st_transform(5070) |&gt; \n  mutate(area_km2 = drop_units(st_area(.) / 1e6))\n\n## 2. Transform to 4326 ONLY when publishing to web\nwatersheds_web &lt;- watersheds |&gt; st_transform(4326)\n\n## 3. Map it\nleaflet(watersheds_web) |&gt; addPolygons(color = ~color_by_area(area_km2))\n\nThis is the ONLY time you transform away from your analysis CRS."
+  },
+  {
+    "objectID": "slides/week-2-2.html#map-tiles-a-tiled-web-map-slippy-map",
+    "href": "slides/week-2-2.html#map-tiles-a-tiled-web-map-slippy-map",
+    "title": "Week 2 | Day 2",
+    "section": "5. Map Tiles: A Tiled Web Map (Slippy Map)",
+    "text": "5. Map Tiles: A Tiled Web Map (Slippy Map)\nA tiled web map seamlessly joins dozens of 256×256 pixel images streamed over the internet.\n\nGoogle Maps conventions (adopted industry-wide):\n\nEach tile is exactly 256 pixels × 256 pixels\nAt zoom level 0, the entire world fits in one 256px tile\nEach zoom level doubles in both X and Y → replaces 1 tile with 4\nAbout 22 zoom levels are sufficient for Earth to building-level detail\nWeb Mercator projection (EPSG:3857) is standard — includes latitude limits at approximately ±85°\n\n\n\nOpenStreetMap “Slippy Map” standard:\n\nURL format: http://.../{Z}/{X}/{Y}.png\n\nZ = zoom level (0–22)\nX = column index (0 at left, increases rightward)\nY = row index (0 at top, increases downward)\n\nAll tiles are PNG images\nWorldwide coverage at all zoom levels"
+  },
+  {
+    "objectID": "slides/week-2-2.html#zoom-levels-tile-coordinates",
+    "href": "slides/week-2-2.html#zoom-levels-tile-coordinates",
+    "title": "Week 2 | Day 2",
+    "section": "6. Zoom Levels & Tile Coordinates",
+    "text": "6. Zoom Levels & Tile Coordinates\nAt zoom 0, the entire Earth is one 256×256 pixel tile. As you zoom in, tiles split exponentially:\n\nZoom 0: 1 tile (1×1 grid)\nZoom 1: 4 tiles (2×2 grid)\nZoom Z: \\(4^Z\\) tiles total\n\nAt zoom 18 (street-level), there are ~68 billion tiles covering Earth.\n\nTile coordinates & URLs:\nTiles are indexed by (Z, X, Y) with (0,0) at top-left:\nhttps://tile-server.org/{Z}/{X}/{Y}.png\n\n\nExample: UCSB at zoom 18\nhttps://a.tile.openstreetmap.org/18/43803/104352.png\n\nTile column 43803, row 104352 → PNG of UCSB streets\nEach pixel ≈ 1.2 meters on the ground\n\n\n\nKey insight: Each zoom increments X/Y quadrants, so user pans/zooms seamlessly fetch neighboring tiles client-side."
+  },
+  {
+    "objectID": "slides/week-2-2.html#tile-size-resolution-math",
+    "href": "slides/week-2-2.html#tile-size-resolution-math",
+    "title": "Week 2 | Day 2",
+    "section": "7. Tile Size & Resolution Math",
+    "text": "7. Tile Size & Resolution Math\nThe horizontal distance covered by each tile depends on latitude and zoom level:\n\\[S_{tile} = C \\cdot \\cos(latitude) / 2^{zoomlevel}\\]\nwhere \\(C = 2\\pi \\cdot 6,378,137\\) m (Earth’s equatorial circumference).\n\nOne pixel in that tile represents:\n\\[S_{pixel} = S_{tile} / 256\\]\n\n\nExample: UCSB (lat = 34.414°, zoom = 18)\n\nC &lt;- 2 * pi * 6378137.00\nS_tile &lt;- C * cos(34.4140 * pi / 180) / 2^18\nS_pixel &lt;- S_tile / 256\n\ncat(\"Tile covers:\", round(S_tile), \"meters\\n\")\ncat(\"Each pixel:\", round(S_pixel, 2), \"meters\\n\")\n\nAt zoom 18, each pixel is roughly 1.2 meters on the ground — street-level detail."
+  },
+  {
+    "objectID": "slides/week-2-2.html#web-mercator-projection-distortion",
+    "href": "slides/week-2-2.html#web-mercator-projection-distortion",
+    "title": "Week 2 | Day 2",
+    "section": "8. Web Mercator Projection & Distortion",
+    "text": "8. Web Mercator Projection & Distortion\nAll web tiles use Web Mercator (EPSG:3857), a cylinder projection that:\n\nPreserves shapes locally (locally conformal) — good for navigation\nSeverely distorts high latitudes — Greenland looks huge, Antarctica is cut off\nLatitude limits at ±85° — mathematically, Mercator is undefined at ±90°\n\n\nWhy the distortion?\nMercator inflates distances north-south exponentially with latitude:\n\\[y = \\ln(\\tan(\\pi/4 + \\text{lat}/2))\\]\n\nEquator: 256 pixels ≈ 40,000 km (accurate)\n60° latitude: same 256 pixels ≈ 20,000 km (stretched 2×)\nGreenland (70°): drags to continent size despite being 1/14th of Africa\n\n\n\n\n\n\n\n\n\nImportant\n\n\nWeb Mercator distorts areas, angles, and distances. Never use it for analysis. Use EPSG:5070 (equal-area), UTM (equidistant), or other appropriate CRS for all calculations. Transform to 4326 only at publication."
+  },
+  {
+    "objectID": "slides/week-2-2.html#user-zooming-the-pyramid-in-action",
+    "href": "slides/week-2-2.html#user-zooming-the-pyramid-in-action",
+    "title": "Week 2 | Day 2",
+    "section": "9. User Zooming: The Pyramid in Action",
+    "text": "9. User Zooming: The Pyramid in Action\nWhen a user zooms in:\n\nBrowser requests 4 new tiles to replace the 1 parent tile\nNew tiles are at zoom level Z+1 with finer detail\nProcess repeats smoothly — pan, pinch, scroll wheel\n\n\nWhen a user zooms out:\n\nBrowser requests 1 coarser parent tile (zoom level Z-1)\nOld 4 tiles are discarded\nMap simplifies smoothly\n\n\n\nResult: Users experience seamless, fast panning/zooming because: - Only visible tiles download - Pre-rendered tiles are cached on CDNs - Browser memory is minimal (a few MB of tiles at a time)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#leaflet-in-r-why-how",
+    "href": "slides/week-2-2.html#leaflet-in-r-why-how",
+    "title": "Week 2 | Day 2",
+    "section": "10. Leaflet in R: Why & How",
+    "text": "10. Leaflet in R: Why & How\nLeaflet is built in JavaScript, but the R package leaflet makes it easy:\n\nWrite pure R code — no JavaScript knowledge needed\nWorks in Rmd, Quarto, Shiny, RStudio Viewer\nMaps become interactive HTML objects\nCompatible with sf simple features — pass sf objects directly\n\n\nBuilding blocks (like ggplot2):\n\nlibrary(leaflet)\n\nleaflet(data) |&gt;                    # Initialize\n  addProviderTiles(providers$...) |&gt; # Add basemap\n  addMarkers(popup = ~name) |&gt;       # Add markers\n  addPolygons(color = ~color) |&gt;     # Add shapes\n  setView(lng, lat, zoom)            # Set center"
+  },
+  {
+    "objectID": "slides/week-2-2.html#simple-leaflet-map-code-demo",
+    "href": "slides/week-2-2.html#simple-leaflet-map-code-demo",
+    "title": "Week 2 | Day 2",
+    "section": "11. Simple Leaflet Map: Code & Demo",
+    "text": "11. Simple Leaflet Map: Code & Demo\n\n\nR code:\n\nlibrary(leaflet)\n\nleaflet() |&gt; \n  addProviderTiles(\n    providers$CartoDB.Positron\n  ) |&gt; \n  setView(-105.08, 40.57, zoom = 10) |&gt; \n  addMarkers(\n    lng = -105.0848, \n    lat = 40.5729, \n    popup = \"CSU\"\n  )\n\n\nMap output:\n\nlibrary(leaflet)\n\nleaflet() |&gt; \n  addProviderTiles(providers$CartoDB.Positron) |&gt; \n  setView(-105.08, 40.57, zoom = 10) |&gt; \n  addMarkers(lng = -105.0848, lat = 40.5729, popup = \"CSU, Fort Collins\")"
+  },
+  {
+    "objectID": "slides/week-2-2.html#basemap-tile-providers",
+    "href": "slides/week-2-2.html#basemap-tile-providers",
+    "title": "Week 2 | Day 2",
+    "section": "12. Basemap Tile Providers",
+    "text": "12. Basemap Tile Providers\nLeaflet has dozens of free tile providers via providers$...:\n\nCartoDB.Positron — clean, minimal, data-friendly\nCartoDB.Voyager — colorful reference map\nOpenStreetMap.Mapnik — standard OSM\nEsri.WorldImagery — satellite imagery\nStamen.TonerLite — grayscale background\nStamen.Terrain — hillshade and contours\n\n\n\nleaflet() |&gt;\n  addProviderTiles(providers$Esri.WorldImagery) |&gt;\n  setView(-105.08, 40.57, zoom = 10)\n\nAll providers are pre-rendered on web servers in EPSG:3857 (Web Mercator) for fast streaming."
+  },
+  {
+    "objectID": "slides/week-2-2.html#interactive-features-popups-labels",
+    "href": "slides/week-2-2.html#interactive-features-popups-labels",
+    "title": "Week 2 | Day 2",
+    "section": "13. Interactive Features: Popups & Labels",
+    "text": "13. Interactive Features: Popups & Labels\nPopups appear when users click a marker:\n\nleaflet() |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  addMarkers(\n    lng = -105.08,\n    lat = 40.57,\n    popup = \"CSU Campus\",\n    label = \"Click me!\"  # appear on hover\n  )\n\n\nMarkers support HTML — embed tables, images, links:\n\nleaflet() |&gt;\n  addCircleMarkers(\n    popup = ~paste0(\n      \"&lt;b&gt;\", site_name, \"&lt;/b&gt;&lt;br/&gt;\",\n      \"Flow: \", round(discharge, 2), \" m&lt;sup&gt;3&lt;/sup&gt;/s\"\n    )\n  )"
+  },
+  {
+    "objectID": "slides/week-2-2.html#shapes-color-ramps",
+    "href": "slides/week-2-2.html#shapes-color-ramps",
+    "title": "Week 2 | Day 2",
+    "section": "14. Shapes & Color Ramps",
+    "text": "14. Shapes & Color Ramps\nAdd polygons, polylines from sf objects:\n\nlibrary(sf)\n\n# Read spatial data\nwatersheds &lt;- read_sf(\"watersheds.shp\") |&gt;\n  st_transform(4326)  # ← Always transform to 4326 for leaflet\n\nleaflet(watersheds) |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  addPolygons(\n    color = ~colorFactor(\"RdYlBu\", watershed_type)(watershed_type),\n    fillOpacity = 0.7,\n    popup = ~name\n  )\n\n\nColor functions for continuous & categorical data:\n\ncolorNumeric(palette, domain) — continuous (e.g., elevation, flow)\ncolorFactor(palette, domain) — categories (e.g., land use, watershed type)\ncolorBin(palette, domain, bins) — binned continuous (e.g., temperature ranges)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#demo-earthquakes-with-clustering",
+    "href": "slides/week-2-2.html#demo-earthquakes-with-clustering",
+    "title": "Week 2 | Day 2",
+    "section": "15. Demo: Earthquakes with Clustering",
+    "text": "15. Demo: Earthquakes with Clustering\n\n\nCode:\n\nlibrary(leaflet); library(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(coords = c(\"long\", \"lat\"), \n           crs = 4326)\n\nleaflet(quakes_sf) |&gt;\n  addProviderTiles(\n    providers$CartoDB.Positron\n  ) |&gt;\n  addCircleMarkers(\n    radius = ~pmin(8, mag),\n    color = ~colorFactor(\n      \"RdYlBu\", NULL)(mag),\n    stroke = FALSE,\n    fillOpacity = 0.6,\n    popup = ~paste0(\n      \"Mag: \", mag, \n      \" | Depth: \", depth),\n    clusterOptions = \n      markerClusterOptions()\n  ) |&gt;\n  setView(180, -20, zoom = 3)\n\n\nInteractive map: Click clusters to zoom and drill down\n\nlibrary(leaflet); library(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(coords = c(\"long\", \"lat\"), crs = 4326)\n\nleaflet(quakes_sf) |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  addCircleMarkers(\n    radius = ~pmin(8, mag),\n    color = ~colorFactor(\"RdYlBu\", NULL)(mag),\n    stroke = FALSE,\n    fillOpacity = 0.6,\n    popup = ~paste0(\"Mag: \", mag, \" | Depth: \", depth, \" km\"),\n    clusterOptions = markerClusterOptions()\n  ) |&gt;\n  setView(lng = 180, lat = -20, zoom = 3)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#why-clustering-performance-ux",
+    "href": "slides/week-2-2.html#why-clustering-performance-ux",
+    "title": "Week 2 | Day 2",
+    "section": "16. Why Clustering? Performance & UX",
+    "text": "16. Why Clustering? Performance & UX\nClustering benefits:\n\nReduces clutter — 5k points become 5–10 clusters initially\nEnables drill-down — click clusters to zoom and see child points\nServer-side pre-computation — R calculates once, sends static GeoJSON\nFast at all zoom levels — Leaflet handles aggregation client-side\n\n\nWhen to use:\n\n✅ 5k–20k points, interactive exploration\n✅ Users browse hierarchically (zoom-in behavior)\n❌ 100k+ points (too slow even with clustering; use WebGL or vector tiles)\n❌ Real-time streaming (server-side clustering is static)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#awesome-markers-limas-coffee-in-fort-collins",
+    "href": "slides/week-2-2.html#awesome-markers-limas-coffee-in-fort-collins",
+    "title": "Week 2 | Day 2",
+    "section": "17. Awesome Markers: Lima’s Coffee in Fort Collins",
+    "text": "17. Awesome Markers: Lima’s Coffee in Fort Collins\n\n\nCoffee icon markers with leaflet:\n\nlibrary(leaflet)\n\n# Lima's locations in Fort Collins\ncoffee_shops &lt;- data.frame(\n  name = c(\n    \"Lima - Downtown\",\n    \"Lima - Timberline\",\n    \"Lima - Fossil Creek\"\n  ),\n  lat = c(40.5844, 40.5924, 40.4976),\n  lng = c(-105.0975, -105.0654, -105.0847),\n  rating = c(4.7, 4.6, 4.8)\n)\n\nleaflet(coffee_shops) |&gt;\n  addProviderTiles(\n    providers$CartoDB.Positron\n  ) |&gt;\n  addAwesomeMarkers(\n    lng = ~lng,\n    lat = ~lat,\n    icon = awesomeIcons(\n      icon = \"coffee\",\n      library = \"fa\",\n      markerColor = \"brown\"\n    ),\n    popup = ~paste0(\n      \"&lt;b&gt;\", name, \"&lt;/b&gt;&lt;br/&gt;\",\n      \"Rating: \", rating, \"/5\"\n    ),\n    label = ~name\n  ) |&gt;\n  setView(-105.08, 40.56, zoom = 12)\n\n\nWhy awesome markers?\nFont Awesome icons add semantic meaning: - ☕ Coffee cup says “café” - 📍 Pin says “location” - 🏥 Hospital icon for health facilities - 🚰 Water droplet for gauges\n. . .\nBenefits over circles: - Instantly recognizable - Color-coded by category - Reduces cognitive load (users don’t need legend) - Works for web and print\n. . .\nIn Lab 2: Add location-relevant awesome icons to your dataset."
+  },
+  {
+    "objectID": "slides/week-2-2.html#nextrad-real-time-precipitation-wms",
+    "href": "slides/week-2-2.html#nextrad-real-time-precipitation-wms",
+    "title": "Week 2 | Day 2",
+    "section": "18. NextRAD: Real-Time Precipitation WMS",
+    "text": "18. NextRAD: Real-Time Precipitation WMS\nWMS Tiles are pre-rendered map images from a server. Here we use NOAA/NEXRAD weather radar (Iowa Mesonet Program):\n\nconus = filter(us_states(), !stusps %in% c(\"AK\", \"PR\", \"HI\"))\n\nleaflet() |&gt; \n  addProviderTiles(providers$CartoDB) |&gt; \n  addPolygons(data = st_union(conus), fillColor = \"transparent\",\n              color = \"black\", weight = 1) |&gt; \n  addWMSTiles(\n    \"http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi\",\n    layers = \"nexrad-n0r-900913\",\n    options = WMSTileOptions(format = \"image/png\", transparent = TRUE)\n  )\n\nWhy WMS? Real-time data (precipitation, radar), pre-rendered, responsive on mobile, server handles rendering."
+  },
+  {
+    "objectID": "slides/week-2-2.html#nldi-network-linked-data-index",
+    "href": "slides/week-2-2.html#nldi-network-linked-data-index",
+    "title": "Week 2 | Day 2",
+    "section": "19. NLDI: Network-Linked Data Index",
+    "text": "19. NLDI: Network-Linked Data Index\nNLDI (Network-Linked Data Index) provides hydrographic network geometry. Query upstream/downstream reaches from USGS gauges:\n\nid = \"11120000\"\n\n# base URL from dataRetrieval package\n(base = dataRetrieval:::pkg.env$nldi_base)\n\n# Reading sf objects directly from NLDI API\nleaflet() |&gt; \n  addProviderTiles(providers$CartoDB) |&gt; \n  addPolylines(data = read_sf(paste0(base,'nwissite/USGS-',id,'/navigate/UT'))) |&gt; \n  addPolygons(data =  read_sf(paste0(base,'nwissite/USGS-',id,'/basin')), \n              fillColor =  \"transparent\", color = \"black\")\n\nWhy NLDI? Access USGS water data programmatically; combine with your analysis CRS (e.g., EPSG:5070), then transform back to 4326 for mapping."
+  },
+  {
+    "objectID": "slides/week-2-2.html#leafem-extended-leaflet-leafpop",
+    "href": "slides/week-2-2.html#leafem-extended-leaflet-leafpop",
+    "title": "Week 2 | Day 2",
+    "section": "20. leafem: Extended Leaflet + leafpop",
+    "text": "20. leafem: Extended Leaflet + leafpop\n\n\nAdd interactive popups:\n\nlibrary(leaflet); library(leafpop)\nlibrary(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(\n    coords = c(\"long\", \"lat\"), \n    crs = 4326\n  )\n\nleaflet(quakes_sf) |&gt;\n  addProviderTiles(\n    providers$CartoDB\n  ) |&gt;\n  addCircleMarkers(\n    radius = ~pmin(6, mag),\n    color = \"navy\",\n    popup = leafpop::popupTable(\n      as.data.frame(quakes_sf),\n      zcol = c(\"mag\", \"depth\", \n               \"stations\")\n    ),\n    clusterOptions = \n      markerClusterOptions()\n  ) |&gt;\n  setView(180, -20, 3)\n\n\n\n\n\n\nRich popups with leafpop:\n\nlibrary(leaflet); library(leafpop)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(coords = c(\"long\", \"lat\"), crs = 4326)\n\nleaflet(quakes_sf) |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  addCircleMarkers(\n    radius = ~pmin(6, mag),\n    color = \"darkblue\",\n    fillOpacity = 0.5,\n    popup = leafpop::popupTable(\n      as.data.frame(quakes_sf),\n      zcol = c(\"mag\", \"depth\", \"stations\")\n    ),\n    clusterOptions = markerClusterOptions()\n  ) |&gt;\n  setView(180, -20, 3)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#basemap-options-compare-styles",
+    "href": "slides/week-2-2.html#basemap-options-compare-styles",
+    "title": "Week 2 | Day 2",
+    "section": "21. Basemap Options: Compare Styles",
+    "text": "21. Basemap Options: Compare Styles\n\n\nMultiple basemaps:\n\nleaflet() |&gt;\n  # CartoDB (light)\n  addProviderTiles(\n    providers$CartoDB.Positron,\n    group = \"CartoDB\"\n  ) |&gt;\n  # OpenStreetMap\n  addProviderTiles(\n    providers$OpenStreetMap.Mapnik,\n    group = \"OSM\"\n  ) |&gt;\n  # Imagery\n  addProviderTiles(\n    providers$Esri.WorldImagery,\n    group = \"Imagery\"\n  ) |&gt;\n  # Controls\n  addLayersControl(\n    baseGroups = \n      c(\"CartoDB\", \"OSM\", \"Imagery\")\n  ) |&gt;\n  setView(-105.27, 40.008, 10)\n\n\n\n\n\n\nTry switching basemaps:\n\nleaflet() |&gt;\n  addProviderTiles(providers$CartoDB.Positron, group = \"CartoDB\") |&gt;\n  addProviderTiles(providers$OpenStreetMap.Mapnik, group = \"OSM\") |&gt;\n  addProviderTiles(providers$Esri.WorldImagery, group = \"Imagery\") |&gt;\n  addLayersControl(baseGroups = c(\"CartoDB\", \"OSM\", \"Imagery\"), position = \"topleft\") |&gt;\n  setView(-105.27, 40.008, 10)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#performance-leaflet-vs-leafgl-vs-vector-tiles",
+    "href": "slides/week-2-2.html#performance-leaflet-vs-leafgl-vs-vector-tiles",
+    "title": "Week 2 | Day 2",
+    "section": "22. Performance: Leaflet vs leafgl vs Vector Tiles",
+    "text": "22. Performance: Leaflet vs leafgl vs Vector Tiles\n\n\n\n\n\n\n\n\n\nTool\nApproach\nSweet Spot\nTrade-off\n\n\n\n\nLeaflet + clustering\nDOM rendering\n1–10k points\nSimple but sluggish at 10k+\n\n\nleafgl WebGL\nGPU acceleration\n50–100k points\nFaster, fewer browser freezes\n\n\nVector tiles\nPre-tiled + client style\n1M+ features\nExternal tools (tippecanoe), learning curve\n\n\n\n\nRule of thumb: Start simple (Leaflet + clustering). When users notice lag on 10k+, switch to leafgl. For public, massive datasets, consider vector tiles."
+  },
+  {
+    "objectID": "slides/week-2-2.html#leafgl-webgl-speed-demo",
+    "href": "slides/week-2-2.html#leafgl-webgl-speed-demo",
+    "title": "Week 2 | Day 2",
+    "section": "23. leafgl: WebGL Speed Demo",
+    "text": "23. leafgl: WebGL Speed Demo\n\n\nCode:\n\nlibrary(leafgl)\nlibrary(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(\n    coords = c(\"long\", \"lat\"),\n    crs = 4326\n  )\n\n# WebGL rendering\nleaflet() |&gt;\n  addProviderTiles(\n    providers$CartoDB\n  ) |&gt;\n  leafgl::addGlPoints(\n    data = quakes_sf,\n    color = \"steelblue\",\n    radius = 4,\n    popup = ~paste0(\n      \"Mag: \", mag\n    )\n  ) |&gt;\n  setView(180, -20, 3)\n\n\n\n\n\n\nRendered (GPU-fast):\n\nlibrary(leafgl); library(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(coords = c(\"long\", \"lat\"), crs = 4326)\n\nleaflet() |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  leafgl::addGlPoints(\n    data = quakes_sf,\n    color = \"steelblue\",\n    radius = 4,\n    popup = ~paste0(\"Mag: \", mag)\n  ) |&gt;\n  setView(180, -20, 3)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#vector-tiles-styling-with-freestiler",
+    "href": "slides/week-2-2.html#vector-tiles-styling-with-freestiler",
+    "title": "Week 2 | Day 2",
+    "section": "24. Vector Tiles & Styling with freestiler",
+    "text": "24. Vector Tiles & Styling with freestiler\nWhy vector tiles: client requests small tiles of vector data and applies style client-side — massive datasets become browsable.\nPipeline overview:\n\nPrepare GeoJSON or NDJSON.\nCreate .mbtiles using tippecanoe (OS-level tool).\nOptionally convert .mbtiles → .pmtiles for a single portable file.\nAuthor style JSON using freestiler (R) to produce Mapbox/MapLibre style JSON.\nServe .pmtiles via static hosting or pmtiles-aware server and point MapLibre/Mapbox/leaflet-mapbox-gl.js at the tile endpoint.\n\nCommands (guide only):\n# make mbtiles\ntippecanoe -o cities.mbtiles -Z0 -z14 data/cities.geojson\n\n# convert to pmtiles (requires pmtiles CLI or Python tool)\npmtiles convert cities.mbtiles cities.pmtiles\n\n# serve with a static file server (development)\npython -m http.server 8000\nfreestiler (R) example: produce a Mapbox-style JSON from R objects\n\nlibrary(freestiler)\n# create a basic style and write to file\nstyle &lt;- freestiler::freestile() |&gt; \n  add_background(\"#fff\") |&gt; \n  add_vector_layer(source = \"cities\", paint = list(\"circle-color\" = \"#1f78b4\"))\nwriteLines(jsonlite::toJSON(style, auto_unbox = TRUE, pretty = TRUE), \"style.json\")\n\nClient side: MapLibre or mapbox-gl in the browser reads style.json and tiles endpoint.\nNotes: mapdeck uses deck.gl; for production without Mapbox, serve styles via MapLibre + pmtiles host."
+  },
+  {
+    "objectID": "slides/week-2-2.html#vector-tiles-the-production-path",
+    "href": "slides/week-2-2.html#vector-tiles-the-production-path",
+    "title": "Week 2 | Day 2",
+    "section": "25. Vector Tiles: The Production Path",
+    "text": "25. Vector Tiles: The Production Path"
+  },
+  {
+    "objectID": "slides/week-2-2.html#freestiler-styling-in-depth-paint-layout-properties",
+    "href": "slides/week-2-2.html#freestiler-styling-in-depth-paint-layout-properties",
+    "title": "Week 2 | Day 2",
+    "section": "26. Freestiler Styling in Depth: Paint & Layout Properties",
+    "text": "26. Freestiler Styling in Depth: Paint & Layout Properties\nfreestiler generates Mapbox/MapLibre JSON styles programmatically. Core concepts:\n\nPaint properties: visual appearance (color, opacity, width, blur)\nLayout properties: placement (text direction, icon offset, label positioning)\nData-driven styling: bind colors/sizes to feature properties using interpolation"
+  },
+  {
+    "objectID": "slides/week-2-2.html#resources-installing-tools",
+    "href": "slides/week-2-2.html#resources-installing-tools",
+    "title": "Week 2 | Day 2",
+    "section": "27. Resources & Installing Tools",
+    "text": "27. Resources & Installing Tools"
+  },
+  {
+    "objectID": "slides/week-2-2.html#recap-choose-your-tool",
+    "href": "slides/week-2-2.html#recap-choose-your-tool",
+    "title": "Week 2 | Day 2",
+    "section": "28. Recap: Choose Your Tool",
+    "text": "28. Recap: Choose Your Tool\n\n\n\n\n\n\n\n\n\nDataset Size\nRecommended Tool\nWhy\nExample\n\n\n\n\n&lt; 1k points\nLeaflet markers\nSimple, all platforms\n100 stream gauges\n\n\n1–10k points\nLeaflet + clustering\nZoom-aware aggregation\n5k city points\n\n\n10–100k points\nleafgl WebGL\nGPU rendering, fast\n50k earthquake epicenters\n\n\n100k+, public map\nVector tiles + freestiler\nScalable, styled, professional\nOpenStreetMap alternatives, city planning data\n\n\n\n\n\n\n\n\n\n\nImportant\n\n\nRemember: Always transform analysis work from your chosen CRS (EPSG:5070 for area, local UTM for distance) back to EPSG:4326 at the moment you pass data to a web mapping function. This is the only exception to “always work in your chosen CRS.”"
+  },
+  {
+    "objectID": "slides/week-2-2.html#what-happens-next-lab-2",
+    "href": "slides/week-2-2.html#what-happens-next-lab-2",
+    "title": "Week 2 | Day 2",
+    "section": "29. What Happens Next (Lab 2)",
+    "text": "29. What Happens Next (Lab 2)\n\nLab 2: Spatial joins, measurements, and a small Leaflet + clustering exercise\nWeek 3: Raster data, zonal summaries, raster-vector integration\nFinal project: Students propose and build a geospatial web map or analysis dashboard\n\nGood luck! 🗺️"
+  },
+  {
+    "objectID": "slides/week-2-2.html#going-further-typescript-advanced-web-mapping",
+    "href": "slides/week-2-2.html#going-further-typescript-advanced-web-mapping",
+    "title": "Week 2 | Day 2",
+    "section": "30. Going Further: TypeScript & Advanced Web Mapping",
+    "text": "30. Going Further: TypeScript & Advanced Web Mapping\n\nTypeScript: Type-safe web mapping with Mapbox GL JS, deck.gl, Kepler.gl\nWhy TypeScript? Catch errors at compile time, better IDE support, scalable production code\nReactive + Geo: Combine Svelte/React with Leaflet (or Mapbox GL) for interactive dashboards\nLearning Resource: TypeScript for Geospatial Applications\nFull-stack options: Node.js backend (PostGIS, H3) + TypeScript frontend for professional geo applications"
   }
 ]
