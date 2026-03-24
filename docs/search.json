@@ -963,7 +963,7 @@
     "href": "slides/week-2-2.html#why-vector-tiles",
     "title": "Week 2 | Day 2",
     "section": "Why Vector Tiles?",
-    "text": "Why Vector Tiles?\nRaster tiles (PNG/JPEG basemaps) are pre-computed images — styling is baked in.\nVector tiles are GeoJSON delivered at tile level — styling happens client-side, so:\n\nOne dataset, infinite styling options (day/night, language, theme)\nFile sizes 10–100× smaller than raster tiles\nClient applies filters, clustering, legends on the fly\nStandard format: .mbtiles or .pmtiles\n\n\nUse case: You have 500k city points. Instead of pre-rendering a billion zoom-specific PNGs, ship vector tiles (20MB) + style JSON (5KB) and let the user’s browser render on demand."
+    "text": "Why Vector Tiles?\nRaster tiles (PNG/JPEG basemaps) are pre-computed images — styling is baked in.\nVector tiles are GeoJSON delivered at tile level — styling happens client-side, so:\n\nOne dataset, infinite styling options (day/night, language, theme)\nFile sizes 10–100× smaller than raster tiles\nClient applies filters, clustering, legends on the fly\nStandard format: .mbtiles or .pmtiles\n\nUse case: You have 500k city points. Instead of pre-rendering a billion zoom-specific PNGs, ship vector tiles (20MB) + style JSON (5KB) and let the user’s browser render on demand."
   },
   {
     "objectID": "slides/week-2-2.html#the-pipeline-geojson-tiles-pmtiles-styled-map",
@@ -984,7 +984,7 @@
     "href": "slides/week-2-2.html#example-text-labels-with-layout-properties",
     "title": "Week 2 | Day 2",
     "section": "Example: Text Labels with Layout Properties",
-    "text": "Example: Text Labels with Layout Properties\n\nstyle &lt;- style |&gt; \n  add_vector_layer(\n    id = \"magnitude-labels\",\n    source = \"earthquakes\",\n    type = \"symbol\",\n    layout = list(\n      \"text-field\" = \"{magnitude}\",        # show magnitude value\n      \"text-size\" = 12,\n      \"text-color\" = \"#ffffff\",\n      \"text-font\" = list(\"Open Sans Regular\"), # fallback to system fonts\n      \"text-offset\" = list(0, 0),\n      \"text-allow-overlap\" = FALSE          # prevent label overlap at low zoom\n    ),\n    paint = list(\n      \"text-color\" = \"#ffffff\",\n      \"text-halo-color\" = \"#000000\",        # black outline\n      \"text-halo-width\" = 1\n    ),\n    minzoom = 5   # labels only show at zoom 5+\n  )\n\n\n\n\n\n\n\n\nNote\n\n\nWhen to use which: - Leaflet + colorFactor() → 1–5k points, simple colors by category - Leaflet + clustering → 5–20k points, need interactivity (drill-down) - leafgl + WebGL → 20–100k points, real-time filtering - Vector tiles + freestiler → 100k+, public map, complex styling, and you want professional cartography"
+    "text": "Example: Text Labels with Layout Properties\n\nstyle &lt;- style |&gt; \n  add_vector_layer(\n    id = \"magnitude-labels\",\n    source = \"earthquakes\",\n    type = \"symbol\",\n    layout = list(\n      \"text-field\" = \"{magnitude}\",        # show magnitude value\n      \"text-size\" = 12,\n      \"text-color\" = \"#ffffff\",\n      \"text-font\" = list(\"Open Sans Regular\"), # fallback to system fonts\n      \"text-offset\" = list(0, 0),\n      \"text-allow-overlap\" = FALSE          # prevent label overlap at low zoom\n    ),\n    paint = list(\n      \"text-color\" = \"#ffffff\",\n      \"text-halo-color\" = \"#000000\",        # black outline\n      \"text-halo-width\" = 1\n    ),\n    minzoom = 5   # labels only show at zoom 5+\n  )\n\n\n\n\n\n\n\nNote\n\n\nWhen to use which: - Leaflet + colorFactor() → 1–5k points, simple colors by category - Leaflet + clustering → 5–20k points, need interactivity (drill-down) - leafgl + WebGL → 20–100k points, real-time filtering - Vector tiles + freestiler → 100k+, public map, complex styling, and you want professional cartography"
   },
   {
     "objectID": "slides/week-2-2.html#class-task-10-minutes-live-demo",
@@ -1054,119 +1054,119 @@
     "href": "slides/week-2-2.html#what-is-leaflet",
     "title": "Week 2 | Day 2",
     "section": "1. What is Leaflet?",
-    "text": "1. What is Leaflet?\nLeaflet — open-source JavaScript library for interactive web maps.\nUsed by: New York Times, Washington Post, GitHub, OpenStreetMap, Mapbox, CartoDB, USGS, EPA.\n\nWhy Leaflet (not ArcGIS Online, Mapbox Studio, etc.)?\n\nSimple: Layer-by-layer like ggplot2\nR native: leaflet package — build maps in R code\nFlexible: Works in Rmd, Quarto, Shiny, plain HTML\nFree: No subscriptions, no API keys for basemaps\nFast: Optimized for panning/zooming on mobile\nPlugins: 100+ extensions (clustering, 3D, heatmaps, etc.)"
+    "text": "1. What is Leaflet?\nLeaflet — open-source JavaScript library for interactive web maps.\nUsed by: New York Times, Washington Post, GitHub, OpenStreetMap, Mapbox, CartoDB, USGS, EPA.\nWhy Leaflet (not ArcGIS Online, Mapbox Studio, etc.)?\n\nSimple: Layer-by-layer like ggplot2\nR native: leaflet package — build maps in R code\nFlexible: Works in Rmd, Quarto, Shiny, plain HTML\nFree: No subscriptions, no API keys for basemaps\nFast: Optimized for panning/zooming on mobile\nPlugins: 100+ extensions (clustering, 3D, heatmaps, etc.)"
   },
   {
     "objectID": "slides/week-2-2.html#why-build-maps-in-r",
     "href": "slides/week-2-2.html#why-build-maps-in-r",
     "title": "Week 2 | Day 2",
     "section": "2. Why Build Maps in R?",
-    "text": "2. Why Build Maps in R?\nMaps should be reproducible, version-controlled, scriptable — like all your code.\n\nR advantages: - Maps are code (git-tracked, shareable) - Embed directly in reports (Rmd, Quarto) - Automated updates — rerun code, map updates - Consistency — same CRS handling, styling across all maps - Scalability — generate 100 maps from a loop\n\n\nArcGIS drawbacks for research: - Click-based (hard to reproduce) - Saved as .mxd (proprietary, hard to version) - Sharing requires purchase or web license - Updates are manual reclicks"
+    "text": "2. Why Build Maps in R?\nMaps should be reproducible, version-controlled, scriptable — like all your code.\nR advantages: - Maps are code (git-tracked, shareable) - Embed directly in reports (Rmd, Quarto) - Automated updates — rerun code, map updates - Consistency — same CRS handling, styling across all maps - Scalability — generate 100 maps from a loop\nArcGIS drawbacks for research: - Click-based (hard to reproduce) - Saved as .mxd (proprietary, hard to version) - Sharing requires purchase or web license - Updates are manual reclicks"
   },
   {
     "objectID": "slides/week-2-2.html#map-building-blocks-like-ggplot2",
     "href": "slides/week-2-2.html#map-building-blocks-like-ggplot2",
     "title": "Week 2 | Day 2",
     "section": "3. Map Building Blocks (Like ggplot2)",
-    "text": "3. Map Building Blocks (Like ggplot2)\n\nleaflet() |&gt;                                # Initialize\n  addProviderTiles(providers$CartoDB) |&gt;   # Basemap tile layer\n  addCircleMarkers(data = sites) |&gt;        # Data points (sf object)\n  addPolylines(data = rivers, color = ...) # Lines\n  addPolygons(data = zones) |&gt;             # Polygons (with fill)\n  setView(lng = -105, lat = 40, zoom = 10) # Set center & zoom\n\n\nComponents: - Basemaps: CartoDB, OpenStreetMap, Satellite, Imagery, Terrain - Markers: pins (circles, awesomeIcons, custom images) - Shapes: polylines (rivers, roads), polygons (watersheds, zoning), rectangles - Interactive: Popups (click), labels (hover), clustering, heatmaps - UI: Legend, scale bar, search, draw tools, fullscreen"
+    "text": "3. Map Building Blocks (Like ggplot2)\n\nleaflet() |&gt;                                # Initialize\n  addProviderTiles(providers$CartoDB) |&gt;   # Basemap tile layer\n  addCircleMarkers(data = sites) |&gt;        # Data points (sf object)\n  addPolylines(data = rivers, color = ...) # Lines\n  addPolygons(data = zones) |&gt;             # Polygons (with fill)\n  setView(lng = -105, lat = 40, zoom = 10) # Set center & zoom\n\nComponents: - Basemaps: CartoDB, OpenStreetMap, Satellite, Imagery, Terrain - Markers: pins (circles, awesomeIcons, custom images) - Shapes: polylines (rivers, roads), polygons (watersheds, zoning), rectangles - Interactive: Popups (click), labels (hover), clustering, heatmaps - UI: Legend, scale bar, search, draw tools, fullscreen"
   },
   {
     "objectID": "slides/week-2-2.html#the-crs-constraint-web-maps-are-always-4326",
     "href": "slides/week-2-2.html#the-crs-constraint-web-maps-are-always-4326",
     "title": "Week 2 | Day 2",
     "section": "4. The CRS Constraint: Web Maps Are Always 4326",
-    "text": "4. The CRS Constraint: Web Maps Are Always 4326\nYou learned EPSG:5070 for analysis (equal-area, no distortion).\nWeb browsers have no choice: all maps use WGS84 (EPSG:4326).\n\nWhy? Web tiles are pre-rendered globally in a Mercator grid. Only works in 4326.\n\n\nThe workflow:\n\n## 1. Analyze in EPSG:5070 (accurate areas, distances)\nwatersheds &lt;- st_read(\"shp\") |&gt; st_transform(5070) |&gt; \n  mutate(area_km2 = drop_units(st_area(.) / 1e6))\n\n## 2. Transform to 4326 ONLY when publishing to web\nwatersheds_web &lt;- watersheds |&gt; st_transform(4326)\n\n## 3. Map it\nleaflet(watersheds_web) |&gt; addPolygons(color = ~color_by_area(area_km2))\n\nThis is the ONLY time you transform away from your analysis CRS."
+    "text": "4. The CRS Constraint: Web Maps Are Always 4326\nYou learned EPSG:5070 for analysis (equal-area, no distortion).\nWeb browsers have no choice: all maps use WGS84 (EPSG:4326).\nWhy? Web tiles are pre-rendered globally in a Mercator grid. Only works in 4326.\nThe workflow:\n\n## 1. Analyze in EPSG:5070 (accurate areas, distances)\nwatersheds &lt;- st_read(\"shp\") |&gt; st_transform(5070) |&gt; \n  mutate(area_km2 = drop_units(st_area(.) / 1e6))\n\n## 2. Transform to 4326 ONLY when publishing to web\nwatersheds_web &lt;- watersheds |&gt; st_transform(4326)\n\n## 3. Map it\nleaflet(watersheds_web) |&gt; addPolygons(color = ~color_by_area(area_km2))\n\nThis is the ONLY time you transform away from your analysis CRS."
   },
   {
     "objectID": "slides/week-2-2.html#map-tiles-a-tiled-web-map-slippy-map",
     "href": "slides/week-2-2.html#map-tiles-a-tiled-web-map-slippy-map",
     "title": "Week 2 | Day 2",
     "section": "5. Map Tiles: A Tiled Web Map (Slippy Map)",
-    "text": "5. Map Tiles: A Tiled Web Map (Slippy Map)\nA tiled web map seamlessly joins dozens of 256×256 pixel images streamed over the internet.\n\nGoogle Maps conventions (adopted industry-wide):\n\nEach tile is exactly 256 pixels × 256 pixels\nAt zoom level 0, the entire world fits in one 256px tile\nEach zoom level doubles in both X and Y → replaces 1 tile with 4\nAbout 22 zoom levels are sufficient for Earth to building-level detail\nWeb Mercator projection (EPSG:3857) is standard — includes latitude limits at approximately ±85°\n\n\n\nOpenStreetMap “Slippy Map” standard:\n\nURL format: http://.../{Z}/{X}/{Y}.png\n\nZ = zoom level (0–22)\nX = column index (0 at left, increases rightward)\nY = row index (0 at top, increases downward)\n\nAll tiles are PNG images\nWorldwide coverage at all zoom levels"
+    "text": "5. Map Tiles: A Tiled Web Map (Slippy Map)\nA tiled web map seamlessly joins dozens of 256×256 pixel images streamed over the internet.\nGoogle Maps conventions (adopted industry-wide):\n\nEach tile is exactly 256 pixels × 256 pixels\nAt zoom level 0, the entire world fits in one 256px tile\nEach zoom level doubles in both X and Y → replaces 1 tile with 4\nAbout 22 zoom levels are sufficient for Earth to building-level detail\nWeb Mercator projection (EPSG:3857) is standard — includes latitude limits at approximately ±85°\n\nOpenStreetMap “Slippy Map” standard:\n\nURL format: http://.../{Z}/{X}/{Y}.png\n\nZ = zoom level (0–22)\nX = column index (0 at left, increases rightward)\nY = row index (0 at top, increases downward)\n\nAll tiles are PNG images\nWorldwide coverage at all zoom levels"
   },
   {
     "objectID": "slides/week-2-2.html#zoom-levels-tile-coordinates",
     "href": "slides/week-2-2.html#zoom-levels-tile-coordinates",
     "title": "Week 2 | Day 2",
     "section": "6. Zoom Levels & Tile Coordinates",
-    "text": "6. Zoom Levels & Tile Coordinates\nAt zoom 0, the entire Earth is one 256×256 pixel tile. As you zoom in, tiles split exponentially:\n\nZoom 0: 1 tile (1×1 grid)\nZoom 1: 4 tiles (2×2 grid)\nZoom Z: \\(4^Z\\) tiles total\n\nAt zoom 18 (street-level), there are ~68 billion tiles covering Earth.\n\nTile coordinates & URLs:\nTiles are indexed by (Z, X, Y) with (0,0) at top-left:\nhttps://tile-server.org/{Z}/{X}/{Y}.png\n\n\nExample: UCSB at zoom 18\nhttps://a.tile.openstreetmap.org/18/43803/104352.png\n\nTile column 43803, row 104352 → PNG of UCSB streets\nEach pixel ≈ 1.2 meters on the ground\n\n\n\nKey insight: Each zoom increments X/Y quadrants, so user pans/zooms seamlessly fetch neighboring tiles client-side."
+    "text": "6. Zoom Levels & Tile Coordinates\nAt zoom 0, the entire Earth is one 256×256 pixel tile. As you zoom in, tiles split exponentially:\n\nZoom 0: 1 tile (1×1 grid)\nZoom 1: 4 tiles (2×2 grid)\nZoom Z: \\(4^Z\\) tiles total\n\nAt zoom 18 (street-level), there are ~68 billion tiles covering Earth.\nTile coordinates & URLs:\nTiles are indexed by (Z, X, Y) with (0,0) at top-left:\nhttps://tile-server.org/{Z}/{X}/{Y}.png\nExample: UCSB at zoom 18\nhttps://a.tile.openstreetmap.org/18/43803/104352.png\n\nTile column 43803, row 104352 → PNG of UCSB streets\nEach pixel ≈ 1.2 meters on the ground\n\nKey insight: Each zoom increments X/Y quadrants, so user pans/zooms seamlessly fetch neighboring tiles client-side."
   },
   {
     "objectID": "slides/week-2-2.html#tile-size-resolution-math",
     "href": "slides/week-2-2.html#tile-size-resolution-math",
     "title": "Week 2 | Day 2",
     "section": "7. Tile Size & Resolution Math",
-    "text": "7. Tile Size & Resolution Math\nThe horizontal distance covered by each tile depends on latitude and zoom level:\n\\[S_{tile} = C \\cdot \\cos(latitude) / 2^{zoomlevel}\\]\nwhere \\(C = 2\\pi \\cdot 6,378,137\\) m (Earth’s equatorial circumference).\n\nOne pixel in that tile represents:\n\\[S_{pixel} = S_{tile} / 256\\]\n\n\nExample: UCSB (lat = 34.414°, zoom = 18)\n\nC &lt;- 2 * pi * 6378137.00\nS_tile &lt;- C * cos(34.4140 * pi / 180) / 2^18\nS_pixel &lt;- S_tile / 256\n\ncat(\"Tile covers:\", round(S_tile), \"meters\\n\")\ncat(\"Each pixel:\", round(S_pixel, 2), \"meters\\n\")\n\nAt zoom 18, each pixel is roughly 1.2 meters on the ground — street-level detail."
+    "text": "7. Tile Size & Resolution Math\nThe horizontal distance covered by each tile depends on latitude and zoom level:\n\\[S_{tile} = C \\cdot \\cos(latitude) / 2^{zoomlevel}\\]\nwhere \\(C = 2\\pi \\cdot 6,378,137\\) m (Earth’s equatorial circumference).\nOne pixel in that tile represents:\n\\[S_{pixel} = S_{tile} / 256\\]\nExample: UCSB (lat = 34.414°, zoom = 18)\n\nC &lt;- 2 * pi * 6378137.00\nS_tile &lt;- C * cos(34.4140 * pi / 180) / 2^18\nS_pixel &lt;- S_tile / 256\n\ncat(\"Tile covers:\", round(S_tile), \"meters\\n\")\ncat(\"Each pixel:\", round(S_pixel, 2), \"meters\\n\")\n\nAt zoom 18, each pixel is roughly 1.2 meters on the ground — street-level detail."
   },
   {
     "objectID": "slides/week-2-2.html#web-mercator-projection-distortion",
     "href": "slides/week-2-2.html#web-mercator-projection-distortion",
     "title": "Week 2 | Day 2",
     "section": "8. Web Mercator Projection & Distortion",
-    "text": "8. Web Mercator Projection & Distortion\nAll web tiles use Web Mercator (EPSG:3857), a cylinder projection that:\n\nPreserves shapes locally (locally conformal) — good for navigation\nSeverely distorts high latitudes — Greenland looks huge, Antarctica is cut off\nLatitude limits at ±85° — mathematically, Mercator is undefined at ±90°\n\n\nWhy the distortion?\nMercator inflates distances north-south exponentially with latitude:\n\\[y = \\ln(\\tan(\\pi/4 + \\text{lat}/2))\\]\n\nEquator: 256 pixels ≈ 40,000 km (accurate)\n60° latitude: same 256 pixels ≈ 20,000 km (stretched 2×)\nGreenland (70°): drags to continent size despite being 1/14th of Africa\n\n\n\n\n\n\n\n\n\nImportant\n\n\nWeb Mercator distorts areas, angles, and distances. Never use it for analysis. Use EPSG:5070 (equal-area), UTM (equidistant), or other appropriate CRS for all calculations. Transform to 4326 only at publication."
+    "text": "8. Web Mercator Projection & Distortion\nAll web tiles use Web Mercator (EPSG:3857), a cylinder projection that:\n\nPreserves shapes locally (locally conformal) — good for navigation\nSeverely distorts high latitudes — Greenland looks huge, Antarctica is cut off\nLatitude limits at ±85° — mathematically, Mercator is undefined at ±90°\n\nWhy the distortion?\nMercator inflates distances north-south exponentially with latitude:\n\\[y = \\ln(\\tan(\\pi/4 + \\text{lat}/2))\\]\n\nEquator: 256 pixels ≈ 40,000 km (accurate)\n60° latitude: same 256 pixels ≈ 20,000 km (stretched 2×)\nGreenland (70°): drags to continent size despite being 1/14th of Africa\n\n\n\n\n\n\n\nImportant\n\n\nWeb Mercator distorts areas, angles, and distances. Never use it for analysis. Use EPSG:5070 (equal-area), UTM (equidistant), or other appropriate CRS for all calculations. Transform to 4326 only at publication."
   },
   {
     "objectID": "slides/week-2-2.html#user-zooming-the-pyramid-in-action",
     "href": "slides/week-2-2.html#user-zooming-the-pyramid-in-action",
     "title": "Week 2 | Day 2",
     "section": "9. User Zooming: The Pyramid in Action",
-    "text": "9. User Zooming: The Pyramid in Action\nWhen a user zooms in:\n\nBrowser requests 4 new tiles to replace the 1 parent tile\nNew tiles are at zoom level Z+1 with finer detail\nProcess repeats smoothly — pan, pinch, scroll wheel\n\n\nWhen a user zooms out:\n\nBrowser requests 1 coarser parent tile (zoom level Z-1)\nOld 4 tiles are discarded\nMap simplifies smoothly\n\n\n\nResult: Users experience seamless, fast panning/zooming because: - Only visible tiles download - Pre-rendered tiles are cached on CDNs - Browser memory is minimal (a few MB of tiles at a time)"
+    "text": "9. User Zooming: The Pyramid in Action\nWhen a user zooms in:\n\nBrowser requests 4 new tiles to replace the 1 parent tile\nNew tiles are at zoom level Z+1 with finer detail\nProcess repeats smoothly — pan, pinch, scroll wheel\n\nWhen a user zooms out:\n\nBrowser requests 1 coarser parent tile (zoom level Z-1)\nOld 4 tiles are discarded\nMap simplifies smoothly\n\nResult: Users experience seamless, fast panning/zooming because: - Only visible tiles download - Pre-rendered tiles are cached on CDNs - Browser memory is minimal (a few MB of tiles at a time)"
   },
   {
     "objectID": "slides/week-2-2.html#leaflet-in-r-why-how",
     "href": "slides/week-2-2.html#leaflet-in-r-why-how",
     "title": "Week 2 | Day 2",
     "section": "10. Leaflet in R: Why & How",
-    "text": "10. Leaflet in R: Why & How\nLeaflet is built in JavaScript, but the R package leaflet makes it easy:\n\nWrite pure R code — no JavaScript knowledge needed\nWorks in Rmd, Quarto, Shiny, RStudio Viewer\nMaps become interactive HTML objects\nCompatible with sf simple features — pass sf objects directly\n\n\nBuilding blocks (like ggplot2):\n\nlibrary(leaflet)\n\nleaflet(data) |&gt;                    # Initialize\n  addProviderTiles(providers$...) |&gt; # Add basemap\n  addMarkers(popup = ~name) |&gt;       # Add markers\n  addPolygons(color = ~color) |&gt;     # Add shapes\n  setView(lng, lat, zoom)            # Set center"
+    "text": "10. Leaflet in R: Why & How\nLeaflet is built in JavaScript, but the R package leaflet makes it easy:\n\nWrite pure R code — no JavaScript knowledge needed\nWorks in Rmd, Quarto, Shiny, RStudio Viewer\nMaps become interactive HTML objects\nCompatible with sf simple features — pass sf objects directly\n\nBuilding blocks (like ggplot2):\n\nlibrary(leaflet)\n\nleaflet(data) |&gt;                    # Initialize\n  addProviderTiles(providers$...) |&gt; # Add basemap\n  addMarkers(popup = ~name) |&gt;       # Add markers\n  addPolygons(color = ~color) |&gt;     # Add shapes\n  setView(lng, lat, zoom)            # Set center"
   },
   {
     "objectID": "slides/week-2-2.html#simple-leaflet-map-code-demo",
     "href": "slides/week-2-2.html#simple-leaflet-map-code-demo",
     "title": "Week 2 | Day 2",
     "section": "11. Simple Leaflet Map: Code & Demo",
-    "text": "11. Simple Leaflet Map: Code & Demo\n\n\nR code:\n\nlibrary(leaflet)\n\nleaflet() |&gt; \n  addProviderTiles(\n    providers$CartoDB.Positron\n  ) |&gt; \n  setView(-105.08, 40.57, zoom = 10) |&gt; \n  addMarkers(\n    lng = -105.0848, \n    lat = 40.5729, \n    popup = \"CSU\"\n  )\n\n\nMap output:\n\nlibrary(leaflet)\n\nleaflet() |&gt; \n  addProviderTiles(providers$CartoDB.Positron) |&gt; \n  setView(-105.08, 40.57, zoom = 10) |&gt; \n  addMarkers(lng = -105.0848, lat = 40.5729, popup = \"CSU, Fort Collins\")"
+    "text": "11. Simple Leaflet Map: Code & Demo\n\n\nR code:\n\nlibrary(leaflet)\n\nleaflet() |&gt; \n  addProviderTiles(\n    providers$CartoDB.Positron\n  ) |&gt; \n  setView(-105.08, 40.57, zoom = 10) |&gt; \n  addMarkers(\n    lng = -105.0848, \n    lat = 40.5729, \n    popup = \"CSU\"\n  )\n\n\nMap output:"
   },
   {
     "objectID": "slides/week-2-2.html#basemap-tile-providers",
     "href": "slides/week-2-2.html#basemap-tile-providers",
     "title": "Week 2 | Day 2",
     "section": "12. Basemap Tile Providers",
-    "text": "12. Basemap Tile Providers\nLeaflet has dozens of free tile providers via providers$...:\n\nCartoDB.Positron — clean, minimal, data-friendly\nCartoDB.Voyager — colorful reference map\nOpenStreetMap.Mapnik — standard OSM\nEsri.WorldImagery — satellite imagery\nStamen.TonerLite — grayscale background\nStamen.Terrain — hillshade and contours\n\n\n\nleaflet() |&gt;\n  addProviderTiles(providers$Esri.WorldImagery) |&gt;\n  setView(-105.08, 40.57, zoom = 10)\n\nAll providers are pre-rendered on web servers in EPSG:3857 (Web Mercator) for fast streaming."
+    "text": "12. Basemap Tile Providers\n\n\nLeaflet has dozens of free tile providers via providers$...:\n\nCartoDB.Positron — clean, minimal, data-friendly\nCartoDB.Voyager — colorful reference map\nOpenStreetMap.Mapnik — standard OSM\nEsri.WorldImagery — satellite imagery\nStamen.TonerLite — grayscale background\nStamen.Terrain — hillshade and contours\n\n\nleaflet() |&gt;\n  addProviderTiles(providers$Esri.WorldImagery) |&gt;\n  setView(-105.08, 40.57, zoom = 10)\n\nAll providers are pre-rendered on web servers in EPSG:3857 (Web Mercator) for fast streaming.\n\nSatellite imagery view:"
   },
   {
     "objectID": "slides/week-2-2.html#interactive-features-popups-labels",
     "href": "slides/week-2-2.html#interactive-features-popups-labels",
     "title": "Week 2 | Day 2",
     "section": "13. Interactive Features: Popups & Labels",
-    "text": "13. Interactive Features: Popups & Labels\nPopups appear when users click a marker:\n\nleaflet() |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  addMarkers(\n    lng = -105.08,\n    lat = 40.57,\n    popup = \"CSU Campus\",\n    label = \"Click me!\"  # appear on hover\n  )\n\n\nMarkers support HTML — embed tables, images, links:\n\nleaflet() |&gt;\n  addCircleMarkers(\n    popup = ~paste0(\n      \"&lt;b&gt;\", site_name, \"&lt;/b&gt;&lt;br/&gt;\",\n      \"Flow: \", round(discharge, 2), \" m&lt;sup&gt;3&lt;/sup&gt;/s\"\n    )\n  )"
+    "text": "13. Interactive Features: Popups & Labels\n\n\nPopups appear when users click a marker:\n\nleaflet() |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  addMarkers(\n    lng = -105.08,\n    lat = 40.57,\n    popup = \"CSU Campus\",\n    label = \"Click me!\"  # appear on hover\n  )\n\nMarkers support HTML — embed tables, images, links:\n\nleaflet() |&gt;\n  addCircleMarkers(\n    popup = ~paste0(\n      \"&lt;b&gt;\", site_name, \"&lt;/b&gt;&lt;br/&gt;\",\n      \"Flow: \", round(discharge, 2), \" m&lt;sup&gt;3&lt;/sup&gt;/s\"\n    )\n  )\n\n\nClick marker to see popup:"
   },
   {
     "objectID": "slides/week-2-2.html#shapes-color-ramps",
     "href": "slides/week-2-2.html#shapes-color-ramps",
     "title": "Week 2 | Day 2",
     "section": "14. Shapes & Color Ramps",
-    "text": "14. Shapes & Color Ramps\nAdd polygons, polylines from sf objects:\n\nlibrary(sf)\n\n# Read spatial data\nwatersheds &lt;- read_sf(\"watersheds.shp\") |&gt;\n  st_transform(4326)  # ← Always transform to 4326 for leaflet\n\nleaflet(watersheds) |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  addPolygons(\n    color = ~colorFactor(\"RdYlBu\", watershed_type)(watershed_type),\n    fillOpacity = 0.7,\n    popup = ~name\n  )\n\n\nColor functions for continuous & categorical data:\n\ncolorNumeric(palette, domain) — continuous (e.g., elevation, flow)\ncolorFactor(palette, domain) — categories (e.g., land use, watershed type)\ncolorBin(palette, domain, bins) — binned continuous (e.g., temperature ranges)"
+    "text": "14. Shapes & Color Ramps\n\n\nAdd polygons, polylines from sf objects:\n\nlibrary(sf)\n\n# Read spatial data\nwatersheds &lt;- read_sf(\"watersheds.shp\") |&gt;\n  st_transform(4326)\n\nleaflet(watersheds) |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  addPolygons(\n    color = ~colorFactor(\n      \"RdYlBu\", watershed_type\n    )(watershed_type),\n    fillOpacity = 0.7,\n    popup = ~name\n  )\n\nColor functions:\n\ncolorNumeric(palette, domain) — continuous\ncolorFactor(palette, domain) — categories\ncolorBin(palette, domain, bins) — binned\n\n\nColorado counties colored by elevation zone:"
   },
   {
     "objectID": "slides/week-2-2.html#demo-earthquakes-with-clustering",
     "href": "slides/week-2-2.html#demo-earthquakes-with-clustering",
     "title": "Week 2 | Day 2",
     "section": "15. Demo: Earthquakes with Clustering",
-    "text": "15. Demo: Earthquakes with Clustering\n\n\nCode:\n\nlibrary(leaflet); library(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(coords = c(\"long\", \"lat\"), \n           crs = 4326)\n\nleaflet(quakes_sf) |&gt;\n  addProviderTiles(\n    providers$CartoDB.Positron\n  ) |&gt;\n  addCircleMarkers(\n    radius = ~pmin(8, mag),\n    color = ~colorFactor(\n      \"RdYlBu\", NULL)(mag),\n    stroke = FALSE,\n    fillOpacity = 0.6,\n    popup = ~paste0(\n      \"Mag: \", mag, \n      \" | Depth: \", depth),\n    clusterOptions = \n      markerClusterOptions()\n  ) |&gt;\n  setView(180, -20, zoom = 3)\n\n\nInteractive map: Click clusters to zoom and drill down\n\nlibrary(leaflet); library(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(coords = c(\"long\", \"lat\"), crs = 4326)\n\nleaflet(quakes_sf) |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  addCircleMarkers(\n    radius = ~pmin(8, mag),\n    color = ~colorFactor(\"RdYlBu\", NULL)(mag),\n    stroke = FALSE,\n    fillOpacity = 0.6,\n    popup = ~paste0(\"Mag: \", mag, \" | Depth: \", depth, \" km\"),\n    clusterOptions = markerClusterOptions()\n  ) |&gt;\n  setView(lng = 180, lat = -20, zoom = 3)"
+    "text": "15. Demo: Earthquakes with Clustering\n\n\nCode:\n\nlibrary(leaflet); library(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(coords = c(\"long\", \"lat\"), \n           crs = 4326)\n\nleaflet(quakes_sf) |&gt;\n  addProviderTiles(\n    providers$CartoDB.Positron\n  ) |&gt;\n  addCircleMarkers(\n    radius = ~pmin(8, mag),\n    color = ~colorFactor(\n      \"RdYlBu\", NULL)(mag),\n    stroke = FALSE,\n    fillOpacity = 0.6,\n    popup = ~paste0(\n      \"Mag: \", mag, \n      \" | Depth: \", depth),\n    clusterOptions = \n      markerClusterOptions()\n  ) |&gt;\n  setView(180, -20, zoom = 3)\n\n\nInteractive map: Click clusters to zoom and drill down"
   },
   {
     "objectID": "slides/week-2-2.html#why-clustering-performance-ux",
     "href": "slides/week-2-2.html#why-clustering-performance-ux",
     "title": "Week 2 | Day 2",
     "section": "16. Why Clustering? Performance & UX",
-    "text": "16. Why Clustering? Performance & UX\nClustering benefits:\n\nReduces clutter — 5k points become 5–10 clusters initially\nEnables drill-down — click clusters to zoom and see child points\nServer-side pre-computation — R calculates once, sends static GeoJSON\nFast at all zoom levels — Leaflet handles aggregation client-side\n\n\nWhen to use:\n\n✅ 5k–20k points, interactive exploration\n✅ Users browse hierarchically (zoom-in behavior)\n❌ 100k+ points (too slow even with clustering; use WebGL or vector tiles)\n❌ Real-time streaming (server-side clustering is static)"
+    "text": "16. Why Clustering? Performance & UX\nClustering benefits:\n\nReduces clutter — 5k points become 5–10 clusters initially\nEnables drill-down — click clusters to zoom and see child points\nServer-side pre-computation — R calculates once, sends static GeoJSON\nFast at all zoom levels — Leaflet handles aggregation client-side\n\nWhen to use:\n\n✅ 5k–20k points, interactive exploration\n✅ Users browse hierarchically (zoom-in behavior)\n❌ 100k+ points (too slow even with clustering; use WebGL or vector tiles)\n❌ Real-time streaming (server-side clustering is static)"
   },
   {
     "objectID": "slides/week-2-2.html#awesome-markers-limas-coffee-in-fort-collins",
     "href": "slides/week-2-2.html#awesome-markers-limas-coffee-in-fort-collins",
     "title": "Week 2 | Day 2",
     "section": "17. Awesome Markers: Lima’s Coffee in Fort Collins",
-    "text": "17. Awesome Markers: Lima’s Coffee in Fort Collins\n\n\nCoffee icon markers with leaflet:\n\nlibrary(leaflet)\n\n# Lima's locations in Fort Collins\ncoffee_shops &lt;- data.frame(\n  name = c(\n    \"Lima - Downtown\",\n    \"Lima - Timberline\",\n    \"Lima - Fossil Creek\"\n  ),\n  lat = c(40.5844, 40.5924, 40.4976),\n  lng = c(-105.0975, -105.0654, -105.0847),\n  rating = c(4.7, 4.6, 4.8)\n)\n\nleaflet(coffee_shops) |&gt;\n  addProviderTiles(\n    providers$CartoDB.Positron\n  ) |&gt;\n  addAwesomeMarkers(\n    lng = ~lng,\n    lat = ~lat,\n    icon = awesomeIcons(\n      icon = \"coffee\",\n      library = \"fa\",\n      markerColor = \"brown\"\n    ),\n    popup = ~paste0(\n      \"&lt;b&gt;\", name, \"&lt;/b&gt;&lt;br/&gt;\",\n      \"Rating: \", rating, \"/5\"\n    ),\n    label = ~name\n  ) |&gt;\n  setView(-105.08, 40.56, zoom = 12)\n\n\nWhy awesome markers?\nFont Awesome icons add semantic meaning: - ☕ Coffee cup says “café” - 📍 Pin says “location” - 🏥 Hospital icon for health facilities - 🚰 Water droplet for gauges\n. . .\nBenefits over circles: - Instantly recognizable - Color-coded by category - Reduces cognitive load (users don’t need legend) - Works for web and print\n. . .\nIn Lab 2: Add location-relevant awesome icons to your dataset."
+    "text": "17. Awesome Markers: Lima’s Coffee in Fort Collins\n\n\nCoffee icon markers with leaflet:\n\nlibrary(leaflet)\n\n# Lima's Coffee Roasters locations in Fort Collins\ncoffee_shops &lt;- data.frame(\n  name = c(\n    \"Old Town Coffee Shop\",\n    \"Campus West Coffee Shop\",\n    \"Midtown Coffee Shop & Roastery\"\n  ),\n  lat = c(40.583563, 40.5741309, 40.5292704),\n  lng = c(-105.0767543, -105.097369, -105.0799173),\n  rating = c(4.7, 4.8, 4.7)\n)\n\nleaflet(coffee_shops) |&gt;\n  addProviderTiles(\n    providers$CartoDB.Positron\n  ) |&gt;\n  addAwesomeMarkers(\n    lng = ~lng,\n    lat = ~lat,\n    icon = awesomeIcons(\n      icon = \"coffee\",\n      library = \"fa\",\n      markerColor = \"brown\"\n    ),\n    popup = ~paste0(\n      \"&lt;b&gt;\", name, \"&lt;/b&gt;&lt;br/&gt;\",\n      \"Rating: \", rating, \"/5\"\n    ),\n    label = ~name\n  ) |&gt;\n  setView(-105.08, 40.56, zoom = 12)\n\n\nInteractive Lima’s map:"
   },
   {
     "objectID": "slides/week-2-2.html#nextrad-real-time-precipitation-wms",
@@ -1180,7 +1180,7 @@
     "href": "slides/week-2-2.html#nldi-network-linked-data-index",
     "title": "Week 2 | Day 2",
     "section": "19. NLDI: Network-Linked Data Index",
-    "text": "19. NLDI: Network-Linked Data Index\nNLDI (Network-Linked Data Index) provides hydrographic network geometry. Query upstream/downstream reaches from USGS gauges:\n\nid = \"11120000\"\n\n# base URL from dataRetrieval package\n(base = dataRetrieval:::pkg.env$nldi_base)\n\n# Reading sf objects directly from NLDI API\nleaflet() |&gt; \n  addProviderTiles(providers$CartoDB) |&gt; \n  addPolylines(data = read_sf(paste0(base,'nwissite/USGS-',id,'/navigate/UT'))) |&gt; \n  addPolygons(data =  read_sf(paste0(base,'nwissite/USGS-',id,'/basin')), \n              fillColor =  \"transparent\", color = \"black\")\n\nWhy NLDI? Access USGS water data programmatically; combine with your analysis CRS (e.g., EPSG:5070), then transform back to 4326 for mapping."
+    "text": "19. NLDI: Network-Linked Data Index\n\n\nQuery USGS water networks:\n\nlibrary(nhdplusTools)\nlibrary(leaflet)\n\n# NLDI = Network-Linked Data Index\n# Query upstream/downstream networks\n\nbasin &lt;- nhdplusTools::plot_nhdplus(\n  nwis_site = \"11120000\",\n  plot_config = list(\n    basin = TRUE,\n    network = TRUE,\n    outlets = TRUE\n  )\n)\n\n# Then extract sf and map\n# sf_obj &lt;- get_basin(...)\n# leaflet(sf_obj) |&gt; addPolygons()\n\n\nWater basin example:"
   },
   {
     "objectID": "slides/week-2-2.html#leafem-extended-leaflet-leafpop",
@@ -1194,21 +1194,21 @@
     "href": "slides/week-2-2.html#basemap-options-compare-styles",
     "title": "Week 2 | Day 2",
     "section": "21. Basemap Options: Compare Styles",
-    "text": "21. Basemap Options: Compare Styles\n\n\nMultiple basemaps:\n\nleaflet() |&gt;\n  # CartoDB (light)\n  addProviderTiles(\n    providers$CartoDB.Positron,\n    group = \"CartoDB\"\n  ) |&gt;\n  # OpenStreetMap\n  addProviderTiles(\n    providers$OpenStreetMap.Mapnik,\n    group = \"OSM\"\n  ) |&gt;\n  # Imagery\n  addProviderTiles(\n    providers$Esri.WorldImagery,\n    group = \"Imagery\"\n  ) |&gt;\n  # Controls\n  addLayersControl(\n    baseGroups = \n      c(\"CartoDB\", \"OSM\", \"Imagery\")\n  ) |&gt;\n  setView(-105.27, 40.008, 10)\n\n\n\n\n\n\nTry switching basemaps:\n\nleaflet() |&gt;\n  addProviderTiles(providers$CartoDB.Positron, group = \"CartoDB\") |&gt;\n  addProviderTiles(providers$OpenStreetMap.Mapnik, group = \"OSM\") |&gt;\n  addProviderTiles(providers$Esri.WorldImagery, group = \"Imagery\") |&gt;\n  addLayersControl(baseGroups = c(\"CartoDB\", \"OSM\", \"Imagery\"), position = \"topleft\") |&gt;\n  setView(-105.27, 40.008, 10)"
+    "text": "21. Basemap Options: Compare Styles\n\n\nMultiple basemaps:\n\nleaflet() |&gt;\n  # CartoDB (light)\n  addProviderTiles(\n    providers$CartoDB.Positron,\n    group = \"CartoDB\"\n  ) |&gt;\n  # OpenStreetMap\n  addProviderTiles(\n    providers$OpenStreetMap.Mapnik,\n    group = \"OSM\"\n  ) |&gt;\n  # Imagery\n  addProviderTiles(\n    providers$Esri.WorldImagery,\n    group = \"Imagery\"\n  ) |&gt;\n  # Controls\n  addLayersControl(\n    baseGroups = \n      c(\"CartoDB\", \"OSM\", \"Imagery\")\n  ) |&gt;\n  setView(-105.27, 40.008, 10)\n\n\nTry switching basemaps:"
   },
   {
     "objectID": "slides/week-2-2.html#performance-leaflet-vs-leafgl-vs-vector-tiles",
     "href": "slides/week-2-2.html#performance-leaflet-vs-leafgl-vs-vector-tiles",
     "title": "Week 2 | Day 2",
     "section": "22. Performance: Leaflet vs leafgl vs Vector Tiles",
-    "text": "22. Performance: Leaflet vs leafgl vs Vector Tiles\n\n\n\n\n\n\n\n\n\nTool\nApproach\nSweet Spot\nTrade-off\n\n\n\n\nLeaflet + clustering\nDOM rendering\n1–10k points\nSimple but sluggish at 10k+\n\n\nleafgl WebGL\nGPU acceleration\n50–100k points\nFaster, fewer browser freezes\n\n\nVector tiles\nPre-tiled + client style\n1M+ features\nExternal tools (tippecanoe), learning curve\n\n\n\n\nRule of thumb: Start simple (Leaflet + clustering). When users notice lag on 10k+, switch to leafgl. For public, massive datasets, consider vector tiles."
+    "text": "22. Performance: Leaflet vs leafgl vs Vector Tiles\n\n\n\n\n\n\n\n\n\nTool\nApproach\nSweet Spot\nTrade-off\n\n\n\n\nLeaflet + clustering\nDOM rendering\n1–10k points\nSimple but sluggish at 10k+\n\n\nleafgl WebGL\nGPU acceleration\n50–100k points\nFaster, fewer browser freezes\n\n\nVector tiles\nPre-tiled + client style\n1M+ features\nExternal tools (tippecanoe), learning curve\n\n\n\nRule of thumb: Start simple (Leaflet + clustering). When users notice lag on 10k+, switch to leafgl. For public, massive datasets, consider vector tiles."
   },
   {
     "objectID": "slides/week-2-2.html#leafgl-webgl-speed-demo",
     "href": "slides/week-2-2.html#leafgl-webgl-speed-demo",
     "title": "Week 2 | Day 2",
     "section": "23. leafgl: WebGL Speed Demo",
-    "text": "23. leafgl: WebGL Speed Demo\n\n\nCode:\n\nlibrary(leafgl)\nlibrary(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(\n    coords = c(\"long\", \"lat\"),\n    crs = 4326\n  )\n\n# WebGL rendering\nleaflet() |&gt;\n  addProviderTiles(\n    providers$CartoDB\n  ) |&gt;\n  leafgl::addGlPoints(\n    data = quakes_sf,\n    color = \"steelblue\",\n    radius = 4,\n    popup = ~paste0(\n      \"Mag: \", mag\n    )\n  ) |&gt;\n  setView(180, -20, 3)\n\n\n\n\n\n\nRendered (GPU-fast):\n\nlibrary(leafgl); library(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(coords = c(\"long\", \"lat\"), crs = 4326)\n\nleaflet() |&gt;\n  addProviderTiles(providers$CartoDB.Positron) |&gt;\n  leafgl::addGlPoints(\n    data = quakes_sf,\n    color = \"steelblue\",\n    radius = 4,\n    popup = ~paste0(\"Mag: \", mag)\n  ) |&gt;\n  setView(180, -20, 3)"
+    "text": "23. leafgl: WebGL Speed Demo\n\n\nCode:\n\nlibrary(leafgl)\nlibrary(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(\n    coords = c(\"long\", \"lat\"),\n    crs = 4326\n  )\n\n# WebGL rendering\nleaflet() |&gt;\n  addProviderTiles(\n    providers$CartoDB\n  ) |&gt;\n  leafgl::addGlPoints(\n    data = quakes_sf,\n    color = \"#1f77b4\",\n    radius = 4,\n    popup = ~paste0(\n      \"Mag: \", mag\n    )\n  ) |&gt;\n  setView(180, -20, 3)\n\n\nRendered (GPU-fast):"
   },
   {
     "objectID": "slides/week-2-2.html#vector-tiles-styling-with-freestiler",
@@ -1243,7 +1243,7 @@
     "href": "slides/week-2-2.html#recap-choose-your-tool",
     "title": "Week 2 | Day 2",
     "section": "28. Recap: Choose Your Tool",
-    "text": "28. Recap: Choose Your Tool\n\n\n\n\n\n\n\n\n\nDataset Size\nRecommended Tool\nWhy\nExample\n\n\n\n\n&lt; 1k points\nLeaflet markers\nSimple, all platforms\n100 stream gauges\n\n\n1–10k points\nLeaflet + clustering\nZoom-aware aggregation\n5k city points\n\n\n10–100k points\nleafgl WebGL\nGPU rendering, fast\n50k earthquake epicenters\n\n\n100k+, public map\nVector tiles + freestiler\nScalable, styled, professional\nOpenStreetMap alternatives, city planning data\n\n\n\n\n\n\n\n\n\n\nImportant\n\n\nRemember: Always transform analysis work from your chosen CRS (EPSG:5070 for area, local UTM for distance) back to EPSG:4326 at the moment you pass data to a web mapping function. This is the only exception to “always work in your chosen CRS.”"
+    "text": "28. Recap: Choose Your Tool\n\n\n\n\n\n\n\n\n\nDataset Size\nRecommended Tool\nWhy\nExample\n\n\n\n\n&lt; 1k points\nLeaflet markers\nSimple, all platforms\n100 stream gauges\n\n\n1–10k points\nLeaflet + clustering\nZoom-aware aggregation\n5k city points\n\n\n10–100k points\nleafgl WebGL\nGPU rendering, fast\n50k earthquake epicenters\n\n\n100k+, public map\nVector tiles + freestiler\nScalable, styled, professional\nOpenStreetMap alternatives, city planning data\n\n\n\n\n\n\n\n\n\nImportant\n\n\nRemember: Always transform analysis work from your chosen CRS (EPSG:5070 for area, local UTM for distance) back to EPSG:4326 at the moment you pass data to a web mapping function. This is the only exception to “always work in your chosen CRS.”"
   },
   {
     "objectID": "slides/week-2-2.html#what-happens-next-lab-2",
@@ -1258,5 +1258,103 @@
     "title": "Week 2 | Day 2",
     "section": "30. Going Further: TypeScript & Advanced Web Mapping",
     "text": "30. Going Further: TypeScript & Advanced Web Mapping\n\nTypeScript: Type-safe web mapping with Mapbox GL JS, deck.gl, Kepler.gl\nWhy TypeScript? Catch errors at compile time, better IDE support, scalable production code\nReactive + Geo: Combine Svelte/React with Leaflet (or Mapbox GL) for interactive dashboards\nLearning Resource: TypeScript for Geospatial Applications\nFull-stack options: Node.js backend (PostGIS, H3) + TypeScript frontend for professional geo applications"
+  },
+  {
+    "objectID": "slides/week-2-2.html#layer-controls",
+    "href": "slides/week-2-2.html#layer-controls",
+    "title": "Week 2 | Day 2",
+    "section": "20. Layer Controls",
+    "text": "20. Layer Controls\nUse Leaflet’s built-in layers control to toggle base layers and overlays on/off:\n\nid = \"11120000\"\nbase = dataRetrieval:::pkg.env$nldi_base\n\nleaflet() |&gt;\n  addProviderTiles(providers$CartoDB, group = \"CartoDB\") |&gt;\n  addProviderTiles(providers$Esri.WorldTerrain, group = \"Terrain\") |&gt;\n  addPolylines(data = read_sf(paste0(base, 'nwissite/USGS-', id, '/navigate/UT'))) |&gt;\n  addPolygons(\n    data = read_sf(paste0(base, 'nwissite/USGS-', id, '/basin')),\n    fillColor = \"transparent\",\n    color = \"black\",\n    group = \"Basin\"\n  ) |&gt;\n  addLayersControl(\n    baseGroups = c(\"CartoDB\", \"Terrain\"),\n    overlayGroups = c(\"Basin\"),\n    position = \"topright\"\n  )\n\nBy defining groups, users can toggle layers between base maps and data overlays."
+  },
+  {
+    "objectID": "slides/week-2-2.html#function-ize-reusable-map-code",
+    "href": "slides/week-2-2.html#function-ize-reusable-map-code",
+    "title": "Week 2 | Day 2",
+    "section": "21. Function-ize: Reusable Map Code",
+    "text": "21. Function-ize: Reusable Map Code\nWrap mapping code in functions for reusability across multiple watersheds:\n\nwatershed_map &lt;- function(gage_id) {\n  base &lt;- dataRetrieval:::pkg.env$nldi_base\n\n  leaflet() |&gt;\n    addProviderTiles(providers$CartoDB) |&gt;\n    addPolylines(\n      data = read_sf(paste0(base, 'nwissite/USGS-', gage_id, '/navigate/UT'))\n    ) |&gt;\n    addPolygons(\n      data = read_sf(paste0(base, 'nwissite/USGS-', gage_id, '/basin')),\n      fillColor = \"transparent\",\n      color = \"black\",\n      group = \"Basin\"\n    ) |&gt;\n    addWMSTiles(\n      \"http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi\",\n      layers = \"nexrad-n0r-900913\",\n      options = WMSTileOptions(format = \"image/png\", transparent = TRUE)\n    )\n}\n\nwatershed_map(\"06752260\")\n\nNow one function generates maps for any USGS gauge ID."
+  },
+  {
+    "objectID": "slides/week-2-2.html#adding-map-details-measure-graticule-mini-map",
+    "href": "slides/week-2-2.html#adding-map-details-measure-graticule-mini-map",
+    "title": "Week 2 | Day 2",
+    "section": "22. Adding Map Details: Measure, Graticule, Mini Map",
+    "text": "22. Adding Map Details: Measure, Graticule, Mini Map\nEnhance maps with interactive measurement tools:\n\nwatershed_map(\"06752260\") |&gt;\n  addMeasure() |&gt;\n  addGraticule() |&gt;\n  addMiniMap()\n\nTools added: - addMeasure() — click to measure distances - addGraticule() — lat/lon reference grid - addMiniMap() — small inset map for zoomed-in views"
+  },
+  {
+    "objectID": "slides/week-2-2.html#leafem-home-buttons-mouse-coordinates",
+    "href": "slides/week-2-2.html#leafem-home-buttons-mouse-coordinates",
+    "title": "Week 2 | Day 2",
+    "section": "23. leafem: Home Buttons & Mouse Coordinates",
+    "text": "23. leafem: Home Buttons & Mouse Coordinates\nThe leafem package extends leaflet with navigation utilities:\n\nlibrary(leafem)\n\nwatershed_map(\"06752260\") |&gt;\n  addMeasure() |&gt;\n  addGraticule() |&gt;\n  leafem::addHomeButton(group = \"Basin\") |&gt;\n  leafem::addMouseCoordinates()\n\nFeatures: - addHomeButton() — zoom back to initial extent - addMouseCoordinates() — display lat/lon on cursor movement - Extends leaflet without breaking existing code"
+  },
+  {
+    "objectID": "slides/week-2-2.html#leafpop-interactive-popup-tables",
+    "href": "slides/week-2-2.html#leafpop-interactive-popup-tables",
+    "title": "Week 2 | Day 2",
+    "section": "24. leafpop: Interactive Popup Tables",
+    "text": "24. leafpop: Interactive Popup Tables\nDisplay data tables in popups using leafpop:\n\nlibrary(leafpop)\n\nstarbucks &lt;- read_csv('data/directory.csv') |&gt;\n  filter(City %in% c(\"Fort Collins\", \"Loveland\"), State == \"CO\") |&gt;\n  st_as_sf(coords = c(\"Longitude\", \"Latitude\"), crs = 4326)\n\nleaflet(data = starbucks) |&gt;\n  addProviderTiles(providers$CartoDB) |&gt;\n  addCircleMarkers(\n    color = \"brown\",\n    fillOpacity = 0.7,\n    stroke = FALSE,\n    popup = leafpop::popupTable(\n      st_drop_geometry(starbucks[, 1:5]),\n      feature.id = FALSE,\n      row.numbers = FALSE\n    )\n  )\n\nWhy: Rich, interactive tables in popups make data more accessible to map users."
+  },
+  {
+    "objectID": "slides/week-2-2.html#mapview-quick-interactive-exploration",
+    "href": "slides/week-2-2.html#mapview-quick-interactive-exploration",
+    "title": "Week 2 | Day 2",
+    "section": "25. Mapview: Quick Interactive Exploration",
+    "text": "25. Mapview: Quick Interactive Exploration\nFor rapid exploration, mapview requires minimal code:\n\nlibrary(mapview)\n\nstarbucks &lt;- read_csv('data/directory.csv') |&gt;\n  filter(City %in% c(\"Fort Collins\", \"Loveland\"), State == \"CO\") |&gt;\n  st_as_sf(coords = c(\"Longitude\", \"Latitude\"), crs = 4326)\n\nmapview(starbucks)\n\nmapview advantages: - Lighter syntax than leaflet (2 lines vs. 5+) - Automatic popups with all attributes - Built-in scale, zoom controls - Tradeoff: Less control than leaflet (but great for exploration)"
+  },
+  {
+    "objectID": "slides/week-2-2.html#recap-from-analysis-to-web",
+    "href": "slides/week-2-2.html#recap-from-analysis-to-web",
+    "title": "Week 2 | Day 2",
+    "section": "26. Recap: From Analysis to Web",
+    "text": "26. Recap: From Analysis to Web\nYour mapping workflow:\n\nAnalyze in your native CRS (EPSG:5070 for equal-area)\nTransform to 4326 only when publishing\nChoose your tool:\n\nLeaflet → full control, reproducible, custom styling\nMapview → speed, exploration, minimal code\n\nEnhance with:\n\nleafem: Home buttons, coordinates\nleafpop: Rich tables in popups\nLayer controls: User toggles data on/off\n\nDeploy: Embed in Quarto/Rmd, Shiny apps, or standalone HTML\n\nLab 2: Build a watershed explorer combining your own data with NLDI and WMS tiles. Make it interactive for stakeholders."
+  },
+  {
+    "objectID": "slides/week-2-2.html#wms-tiles",
+    "href": "slides/week-2-2.html#wms-tiles",
+    "title": "Week 2 | Day 2",
+    "section": "18. WMS Tiles",
+    "text": "18. WMS Tiles\n\n\nWMS Tiles & Real-time Data:\n\nlibrary(leaflet)\n\n# WMS = Web Map Service (pre-rendered images)\n# NEXRAD = live weather radar\n\nconus &lt;- filter(us_states(), !stusps %in% c(\"AK\", \"PR\", \"HI\"))\n\nleaflet() |&gt;\n  addProviderTiles(providers$CartoDB) |&gt;\n  addPolygons(\n    data = st_union(conus), \n    fillColor = \"transparent\",\n    color = \"black\", weight = 1\n  ) |&gt;\n  addWMSTiles(\n    \"https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi\",\n    layers = \"nexrad-n0r-900913\",\n    options = WMSTileOptions(\n      format = \"image/png\", \n      transparent = TRUE\n    )\n  )\n\n\nLive WMS overlay:"
+  },
+  {
+    "objectID": "slides/week-2-2.html#web-based-data",
+    "href": "slides/week-2-2.html#web-based-data",
+    "title": "Week 2 | Day 2",
+    "section": "20. Web based data",
+    "text": "20. Web based data\n\n\nAdd interactive popups:\n\nlibrary(leaflet); library(leafpop)\nlibrary(sf)\n\nquakes_sf &lt;- quakes |&gt;\n  st_as_sf(\n    coords = c(\"long\", \"lat\"), \n    crs = 4326\n  )\n\nleaflet(quakes_sf) |&gt;\n  addProviderTiles(\n    providers$CartoDB\n  ) |&gt;\n  addCircleMarkers(\n    radius = ~pmin(6, mag),\n    color = \"navy\",\n    popup = leafpop::popupTable(\n      as.data.frame(quakes_sf),\n      zcol = c(\"mag\", \"depth\", \n               \"stations\")\n    ),\n    clusterOptions = \n      markerClusterOptions()\n  ) |&gt;\n  setView(180, -20, 3)\n\n\nRich popups with leafpop:"
+  },
+  {
+    "objectID": "slides/week-2-2.html#vector-tiles-pmtiles",
+    "href": "slides/week-2-2.html#vector-tiles-pmtiles",
+    "title": "Week 2 | Day 2",
+    "section": "24. Vector Tiles & PMTiles",
+    "text": "24. Vector Tiles & PMTiles\nVector tiles: GeoJSON delivered at tile level—styling happens client-side (1M+ features, 10–100× smaller files than raster).\nQuick pipeline:\n# 1. Create tiles from GeoJSON\ntippecanoe -o data.mbtiles -Z0 -z14 data.geojson\n\n# 2. Convert to PMTiles (single portable file)\npmtiles convert data.mbtiles data.pmtiles\n\n# 3. Serve via static host or Python\npython -m http.server 8000\nIn R with freestiler (style authoring):\n\nlibrary(freestiler)\n\nstyle &lt;- freestile() |&gt;\n  add_background(\"#fff\") |&gt;\n  add_vector_layer(\n    source = \"cities\",\n    type = \"circle\",\n    paint = list(\"circle-color\" = \"#1f77b4\", \"circle-radius\" = 5)\n  )\n\njsonlite::write_json(style, \"style.json\", auto_unbox = TRUE)\n\nWhy PMTiles? Single file, HTTP range requests, portable—host on GitHub Pages or static CDN."
+  },
+  {
+    "objectID": "slides/week-2-2.html#vector-tiles-when-why",
+    "href": "slides/week-2-2.html#vector-tiles-when-why",
+    "title": "Week 2 | Day 2",
+    "section": "25. Vector Tiles: When & Why",
+    "text": "25. Vector Tiles: When & Why\n\n\n\nSize\nTool\nWhy\n\n\n\n\n&lt; 10k\nLeaflet\nSimple, all browsers\n\n\n10–100k\nleafgl WebGL\nGPU acceleration\n\n\n100k+\nVector tiles\nScalable, styled, professional\n\n\n\nClient-side rendering: One dataset, infinite styles (day/night, language, filters)."
+  },
+  {
+    "objectID": "slides/week-2-2.html#resources-tools",
+    "href": "slides/week-2-2.html#resources-tools",
+    "title": "Week 2 | Day 2",
+    "section": "26. Resources & Tools",
+    "text": "26. Resources & Tools\nleaflet      https://rstudio.github.io/leaflet/\nleafgl       https://cran.r-project.org/web/packages/leafgl/\nfreestiler   https://walker-data.com/freestiler/\nMapLibre GL  https://maplibre.org/\ntippecanoe   https://github.com/mapbox/tippecanoe\npmtiles      https://github.com/protomaps/pmtiles"
+  },
+  {
+    "objectID": "slides/week-2-2.html#r-package-installation",
+    "href": "slides/week-2-2.html#r-package-installation",
+    "title": "Week 2 | Day 2",
+    "section": "27. R Package Installation",
+    "text": "27. R Package Installation\ninstall.packages(c(\n  'leaflet',      # classic web maps\n  'leafgl',       # WebGL acceleration\n  'leafpop',      # rich popups\n  'freestiler'    # style authoring\n))\n\n# System tools (macOS)\n# brew install tippecanoe"
+  },
+  {
+    "objectID": "slides/week-2-2.html#choose-your-tool",
+    "href": "slides/week-2-2.html#choose-your-tool",
+    "title": "Week 2 | Day 2",
+    "section": "28. Choose Your Tool",
+    "text": "28. Choose Your Tool\n\n\n\nSize\nTool\nTrade-off\n\n\n\n\n&lt; 10k\nLeaflet + clustering\nSimple but sluggish at 10k+\n\n\n10–100k\nleafgl WebGL\nFaster, fewer freezes\n\n\n100k+\nVector tiles\nScalable, professional\n\n\n\nRemember: Always use EPSG:4326 for web mapping, regardless of your analysis CRS."
   }
 ]

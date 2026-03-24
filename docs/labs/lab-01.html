@@ -199,6 +199,8 @@ window.Quarto = {
   <li><a href="#q3" id="toc-q3" class="nav-link" data-scroll-target="#q3"><strong>Question 3</strong>: Per-Unit-Area Normalization</a></li>
   <li><a href="#q4" id="toc-q4" class="nav-link" data-scroll-target="#q4"><strong>Question 4</strong>: Low-Flow Threshold Monitoring</a></li>
   <li><a href="#q5" id="toc-q5" class="nav-link" data-scroll-target="#q5"><strong>Question 5</strong>: Annual Water Year Summary</a></li>
+  <li><a href="#q6" id="toc-q6" class="nav-link" data-scroll-target="#q6"><strong>Question 6</strong>: Basin-Wide Trend Analysis</a></li>
+  <li><a href="#q7" id="toc-q7" class="nav-link" data-scroll-target="#q7"><strong>Question 7</strong>: The Moving Center of Drought</a></li>
   <li><a href="#q8" id="toc-q8" class="nav-link" data-scroll-target="#q8"><strong>Question 8</strong>: Seasonal Regimes and Peak Timing</a></li>
   <li><a href="#q9" id="toc-q9" class="nav-link" data-scroll-target="#q9"><strong>Question 9</strong>: Predicting Lees Ferry from Upstream Conditions</a>
   <ul class="collapse">
@@ -364,7 +366,7 @@ What does <code>glimpse()</code> tell you?
 <section id="q1" class="level1">
 <h1><strong>Question 1</strong>: Daily Conditions Report</h1>
 <p>You are a water resources analyst. Each morning you deliver a reproducible snapshot of current conditions to Colorado River Compact stakeholders. The analysis must be re-runnable on any date with a single change — that requires building it around <strong>parameter objects</strong> rather than hardcoded values.</p>
-<p><strong>a.</strong> Create a <code>my.date</code> parameter object set to the last day of water year 2023. Ensure it is stored as a proper <code>Date</code> object, not a character string.</p>
+<p><strong>a.</strong> Create a <code>my.date</code> parameter object set to the last day of water year 2023 (September 30, 2023). Ensure it is stored as a proper <code>Date</code> object, not a character string.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -381,40 +383,10 @@ Tip
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>my.date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2023-09-01"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>my.date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2023-09-30"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p><strong>b.</strong> Compute the <strong>day-over-day change in discharge</strong> for each gauge — how much flow rose or fell compared to the previous day. Store this as a new column called <code>flow_delta</code>. This tells you whether conditions are improving or deteriorating, which is often more actionable than the raw level alone.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><code>lag()</code> shifts a vector back by one position, so <code>Flow - lag(Flow)</code> gives today’s flow minus yesterday’s. Because you want to compute this <em>within</em> each gauge, <code>group_by(site_no)</code> first, then <code>arrange(Date)</code> to ensure chronological order before lagging.</p>
-<p>Hint: structure this as: group by <code>site_no</code>, arrange by <code>Date</code>, then use <code>lag()</code> to compute <code>flow_delta</code> (so today’s Flow minus yesterday’s Flow).</p>
-</div>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># student: create two flextables for `my.date`</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g., table1 &lt;- flow |&gt; filter(Date == my.date) |&gt; slice_max(Flow, n = 5)</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># and then pass to `flextable()` with `set_header_labels()` and `autofit()`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># student: compute `flow_delta` within each gauge</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># example: flow &lt;- raw |&gt; group_by(site_no) |&gt; arrange(Date) |&gt; </span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(flow_delta = Flow - lag(Flow)) |&gt; ungroup()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 <p><strong>c.</strong> Filter to <code>my.date</code> and produce <strong>two formatted tables</strong> using <code>flextable</code>:</p>
 <ul>
 <li><strong>Table 1</strong>: The 5 gauges with the <strong>highest discharge</strong> — where is flow greatest right now?</li>
@@ -517,17 +489,17 @@ The four joins — and when to use each
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>site_meta <span class="ot">&lt;-</span> <span class="fu">readNWISsite</span>(gauges<span class="sc">$</span>site_no) <span class="sc">|&gt;</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    site_no,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    drain_area_va,   <span class="co"># drainage area in square miles</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    huc_cd,          <span class="co"># 8-digit HUC watershed code</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    dec_lat_va,      <span class="co"># latitude</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    dec_long_va      <span class="co"># longitude</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Is site_no actually unique? If any row shows n &gt; 1, the join will duplicate rows</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>site_meta <span class="sc">|&gt;</span> <span class="fu">count</span>(site_no) <span class="sc">|&gt;</span> <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>site_meta <span class="ot">&lt;-</span> <span class="fu">readNWISsite</span>(gauges<span class="sc">$</span>site_no) <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    site_no,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    drain_area_va,   <span class="co"># drainage area in square miles</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    huc_cd,          <span class="co"># 8-digit HUC watershed code</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    dec_lat_va,      <span class="co"># latitude</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    dec_long_va      <span class="co"># longitude</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Is site_no actually unique? If any row shows n &gt; 1, the join will duplicate rows</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>site_meta <span class="sc">|&gt;</span> <span class="fu">count</span>(site_no) <span class="sc">|&gt;</span> <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] site_no n      
@@ -553,32 +525,32 @@ Keys: primary and foreign
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># student: join metadata to flow records</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g., flow_meta &lt;- raw |&gt; left_join(site_meta, by = "site_no")</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># then run the verification checks below</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># student: join metadata to flow records</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g., flow_meta &lt;- raw |&gt; left_join(site_meta, by = "site_no")</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># then run the verification checks below</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p><strong>c.</strong> Verify the join — this step is not optional:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 1: row count must be unchanged</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># FALSE means rows were gained (duplicate key) or lost (wrong join type)</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(flow_meta) <span class="sc">==</span> <span class="fu">nrow</span>(flow)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 2: no unexpected NAs in the joined column</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>flow_meta <span class="sc">|&gt;</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_total        =</span> <span class="fu">n</span>(),</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_missing_area =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(drain_area_va)),</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_complete   =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(<span class="sc">!</span><span class="fu">is.na</span>(drain_area_va)), <span class="dv">1</span>)</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 3: spot-check a known value</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Lees Ferry (09380000) should have drain_area_va ≈ 111,800 mi²</span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>flow_meta <span class="sc">|&gt;</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site_no <span class="sc">==</span> <span class="st">"09380000"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(site_no, name, drain_area_va)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 1: row count must be unchanged</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># FALSE means rows were gained (duplicate key) or lost (wrong join type)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(flow_meta) <span class="sc">==</span> <span class="fu">nrow</span>(flow)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 2: no unexpected NAs in the joined column</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>flow_meta <span class="sc">|&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_total        =</span> <span class="fu">n</span>(),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_missing_area =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(drain_area_va)),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_complete   =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(<span class="sc">!</span><span class="fu">is.na</span>(drain_area_va)), <span class="dv">1</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 3: spot-check a known value</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Lees Ferry (09380000) should have drain_area_va ≈ 111,800 mi²</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>flow_meta <span class="sc">|&gt;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site_no <span class="sc">==</span> <span class="st">"09380000"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(site_no, name, drain_area_va)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -655,27 +627,6 @@ Note
 </div>
 </div>
 <p><strong>a.</strong> For each gauge, compute the <strong>7-day rolling mean</strong> of daily discharge. Use <code>zoo::rollmean()</code> with <code>fill = NA</code> and <code>align = "right"</code> so each value represents the average of the current and 6 preceding days.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Hint: compute a 7-day rolling mean inside a within-gauge, chronologically ordered block so each rolling value summarizes the intended window. For graduate-level work, <em>justify</em> your choice of window length and alignment (leading, centered, or trailing), and run a brief sensitivity test (for example, compare k = 7 and k = 14) reporting how threshold exceedances change with window size.</p>
-</div>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># student: compute 7-day rolling mean</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g., flow_meta &lt;- flow_meta |&gt; group_by(site_no) |&gt; arrange(Date) |&gt; </span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(roll7 = zoo::rollmean(Flow, k = 7, fill = NA, align = "right")) |&gt; ungroup()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -690,37 +641,9 @@ Note
 </div>
 </div>
 <p><strong>b.</strong> Define a <strong>low-flow threshold</strong> for each gauge as the 10th percentile of its historical discharge during <strong>1980–2010</strong>. A flow that is critically low for Lees Ferry might be above average for the Little Colorado — thresholds must be site-specific.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Two steps: summarize baselines, then join them back. This is the same join pattern you practiced in Q2 — verify it the same way.</p>
-<p>Hint: summarize the 10th-percentile threshold per gauge over the baseline period, then left-join those thresholds back to the full flow table so every row carries its gauge’s threshold.</p>
-</div>
-</div>
 <p><strong>c.</strong> Add a logical column <code>below_threshold</code> that is <code>TRUE</code> when the 7-day rolling mean is below the gauge’s 10th percentile threshold.</p>
 <p><strong>d.</strong> For <strong>Lees Ferry</strong> (site <code>09380000</code>) — the Compact’s primary accounting point — plot the 7-day rolling mean from 2000–2023. Shade periods below threshold in red and add a dashed horizontal reference line at the threshold.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><code>geom_ribbon()</code> draws a filled band between <code>ymin</code> and <code>ymax</code>. Make the band appear only during below-threshold periods:</p>
-<p>Hint: use <code>geom_ribbon()</code> with <code>ymin</code> at the threshold and <code>ymax</code> set to <code>if_else(below_threshold, roll7, threshold)</code> so the ribbon only appears while the rolling mean is below threshold.</p>
-</div>
-</div>
-<p><strong>e.</strong> How many days per year, on average, did Lees Ferry fall below its low-flow threshold in <strong>2000–2010</strong> vs.&nbsp;<strong>2011–2023</strong>? Produce a small summary table and answer in 2–3 sentences: (1) what direction did the exceedance frequency change? (2) Is this a shift in isolated dry years or a persistent baseline change? (3) What does this imply for Compact delivery obligations?</p>
+<p><strong>e.</strong> How many days per year, on average, did Lees Ferry fall below its low-flow threshold in <strong>2000–2010</strong> vs.&nbsp;<strong>2011–2023</strong>? Produce a small summary table and answer in 2–3 sentences: (1) did below-threshold days increase or decrease? (2) Is this a shift in isolated dry years or a persistent baseline change? (3) What does this imply for Compact delivery obligations?</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -743,17 +666,19 @@ Tip
 <h1><strong>Question 5</strong>: Annual Water Year Summary</h1>
 <p>Calendar years are a poor fit for western US hydrology. The <strong>water year</strong> (October 1 – September 30) captures the full snowmelt cycle: snowpack accumulates through winter, melts in spring, and by September the basin has recharged or drawn down for the year. Water year 2023 = October 1, 2022 through September 30, 2023.</p>
 <p><strong>a.</strong> Add <code>water_year</code> and <code>month</code> columns to your dataset. The water year is the calendar year of the ending September 30 — months October through December belong to the <em>next</em> water year.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip
+Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Hint: derive <code>month</code> from <code>Date</code> and set <code>water_year</code> so Oct–Dec map to the next calendar year (e.g., <code>if_else(month &gt;= 10, year + 1, year)</code>).</p>
+<p>Use <code>if_else()</code> to set <code>water_year</code> for Oct–Dec months as taught in lecture.</p>
+</div>
+</div>
 <p><strong>b.</strong> For each gauge and water year, compute: total annual discharge (<code>sum(Flow)</code>), peak daily discharge (<code>max(Flow)</code>), and number of days below the low-flow threshold (<code>sum(below_threshold)</code>).</p>
 <p><strong>c.</strong> Plot <strong>total annual discharge at Lees Ferry</strong> by water year (1980–2023) as a bar chart. Color bars above the long-term median blue and bars below it red. Add a dashed horizontal reference line at the median.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -774,6 +699,7 @@ Tip
 <p>…</p>
 </blockquote>
 <hr>
+</section>
 <section id="q6" class="level1">
 <h1><strong>Question 6</strong>: Basin-Wide Trend Analysis</h1>
 <p>A single gauge tells you about one location. To understand whether drought is consistent across the entire basin — or whether some tributaries are diverging from the main stem — you need to compare all gauges simultaneously on the same scale.</p>
@@ -834,8 +760,16 @@ Tip
 <p>Hint: join coordinates from <code>site_meta</code> to the annual table, then compute weighted longitude/latitude per year as sum(coord * total_flow) / sum(total_flow). This is your third join — verify row counts, NAs, and spot-check known values.</p>
 </div>
 </div>
-</section>
-</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># student: join coordinates</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g., annual |&gt; left_join(site_meta |&gt; select(site_no, dec_lat_va, dec_long_va), by = "site_no")</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify the join</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># nrow(result) == nrow(annual)?</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># sum(is.na(result$dec_lat_va)) == 0?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>Note: mapping below uses <code>map_data("state")</code>; if <code>map_data()</code> is not available install the <code>maps</code> package (<code>install.packages("maps")</code>) or use <code>ggplot2::map_data("state")</code> which provides equivalent polygons.</p>
 <p><strong>b.</strong> Create a two-panel figure using <code>patchwork</code>:</p>
@@ -883,10 +817,19 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Hint: create <code>season</code> with <code>case_when()</code> mapping month ranges to labels and convert to a factor with hydrological order: Snowmelt, Monsoon, Low-flow, Winter.</p>
+<p>Hint: extract <code>month</code> from <code>Date</code> with <code>month()</code>, create <code>season</code> with <code>case_when()</code> mapping month ranges to labels, then convert to a factor with explicit level ordering:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>data <span class="sc">|&gt;</span> <span class="fu">mutate</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">month =</span> <span class="fu">month</span>(Date),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">case_when</span>(...),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">factor</span>(season, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Snowmelt'</span>, <span class="st">'Monsoon'</span>, <span class="st">'Low-flow'</span>, <span class="st">'Winter'</span>))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </div>
-<p>:::</p>
+</div>
 <p><strong>b.</strong> Group by gauge, water year, and season. Summarize total seasonal discharge and normalized runoff (<code>sum(flow_per_sqmi)</code>) per group.</p>
 <p><strong>c.</strong> For each gauge and water year, identify the <strong>date of peak 7-day mean flow</strong> and convert it to day-of-year. Plot peak day-of-year vs.&nbsp;water year for <strong>Lees Ferry</strong> with a linear trend line.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -914,7 +857,7 @@ Tip
 <p>We’ll build a simple but physically grounded model: can Glenwood Springs (an upper Rocky Mountain gauge) predict Lees Ferry annual flow? Does that relationship change by season?</p>
 <section id="data-preparation" class="level2">
 <h2 class="anchored" data-anchor-id="data-preparation">Data Preparation</h2>
-<p><strong>a.</strong> Build your model dataset through three sequential joins:</p>
+<p><strong>a.</strong> Build your model dataset through four sequential operations:</p>
 <ol type="1">
 <li>Filter <code>annual</code> to Lees Ferry; rename <code>total_flow</code> to <code>lees_flow</code></li>
 <li>Join annual Glenwood Springs flow (site <code>09085000</code>); rename to <code>glenwood_flow</code></li>
@@ -931,8 +874,26 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The dominant season join: filter your seasonal summary to Lees Ferry, then within each water year select the season with the highest total flow: Hint: produce a single-row-per-year table by selecting Lees Ferry annual flows, left-joining Glenwood annual flows by <code>water_year</code>, joining the dominant season for Lees Ferry, and log-transforming the flow columns for modeling.</p>
-<p>This is your fourth join. Verify: the final dataset should have ~44 rows, one per water year.</p>
+<p>The dominant season: within each water year, which season (Snowmelt, Monsoon, Low-flow, Winter) carried the most flow at Lees Ferry? Filter seasonal summaries to Lees Ferry, then <code>group_by(water_year) |&gt; slice_max(total_flow, n = 1)</code> to select one season per year.</p>
+<p>Then join that back to your Lees Ferry &amp; Glenwood annual table by <code>water_year</code>.</p>
+<p>This is your fourth join. <strong>Always verify</strong>: the final dataset should have ~44 rows (one per water year, 1980–2023), zero NAs in flow columns, and log-transformed values should be positive.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>lees_model_data <span class="ot">&lt;-</span> annual <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site_no <span class="sc">==</span> <span class="st">"09380000"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">lees_flow =</span> total_flow) <span class="sc">|&gt;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(annual <span class="sc">|&gt;</span> <span class="fu">filter</span>(site_no <span class="sc">==</span> <span class="st">"09085000"</span>) <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">glenwood_flow =</span> total_flow),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">"water_year"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dominant_season, <span class="at">by =</span> <span class="st">"water_year"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_lees =</span> <span class="fu">log</span>(lees_flow),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">log_glenwood =</span> <span class="fu">log</span>(glenwood_flow))</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify: 44 rows? No NAs in log columns?</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(lees_model_data)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(lees_model_data<span class="sc">$</span>log_lees))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </div>
 </div>
 </section>

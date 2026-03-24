@@ -279,12 +279,7 @@
 <section id="tidy-data-the-assumed-shape" class="slide level2">
 <h2>Tidy Data: The Assumed Shape</h2>
 
-<img data-src="img/tidy-data.png" class="quarto-figure quarto-figure-center r-stretch" width="172"><p>Three rules — every tidyverse tool assumes them:</p>
-<ol type="1">
-<li>Each <strong>variable</strong> has its own column</li>
-<li>Each <strong>observation</strong> has its own row</li>
-<li>Each <strong>value</strong> has its own cell</li>
-</ol>
+<img data-src="img/tidy-data.png" class="quarto-figure quarto-figure-center r-stretch" width="172"><p>Tidy data follows three rules: each <strong>variable</strong> is a column, each <strong>observation</strong> is a row, each <strong>value</strong> is a cell. Every tidyverse tool assumes this shape.</p>
 <p>When your data doesn’t conform, you fix the data — not the tools.</p>
 </section>
 <section id="the-grammar-of-data-manipulation" class="slide level2">
@@ -346,6 +341,7 @@
 </section>
 <section id="a-note-on-subsetting" class="slide level2">
 <h2>A Note on Subsetting</h2>
+<p>Before we use these verbs, let’s ground ourselves in base R subsetting — it’s what dplyr builds on. Understanding the foundation makes the syntax sugar more transparent.</p>
 <p>You already know base R subsetting. Here’s the vocabulary:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">country =</span> <span class="fu">c</span>(<span class="st">"USA"</span>, <span class="st">"Brazil"</span>, <span class="st">"India"</span>),</span>
@@ -377,6 +373,25 @@
 </div>
 </div>
 </div>
+</section>
+<section id="connection-to-sql" class="slide level2">
+<h2>Connection to SQL</h2>
+
+<img data-src="img/sql_example.png" class="quarto-figure quarto-figure-center r-stretch" style="width:75.0%"><div class="fragment">
+<p>You just learned the core concepts of SQL:</p>
+<ul>
+<li><code>filter()</code> = <code>WHERE</code></li>
+<li><code>select()</code> = <code>SELECT</code></li>
+<li><code>mutate()</code> = computed columns</li>
+<li><code>summarize()</code> + <code>group_by()</code> = <code>GROUP BY</code> + aggregate functions</li>
+<li><code>arrange()</code> = <code>ORDER BY</code></li>
+</ul>
+<p>The grammar transfers directly. SQL is the language of databases; dplyr is the language of R data frames. They solve the same class of problems.</p>
+</div>
+</section>
+<section id="now-lets-apply-them" class="slide level2">
+<h2>Now Let’s Apply Them</h2>
+<p>Now let’s walk through each verb with concrete examples. You’ll see how they work in isolation, then how they compose into powerful pipelines.</p>
 </section>
 <section id="filter-keep-rows-by-condition" class="slide level2">
 <h2><code>filter()</code> — Keep Rows by Condition</h2>
@@ -439,100 +454,266 @@
 </div>
 </div>
 </section>
+<section id="how-filter-works-boolean-vectors" class="slide level2">
+<h2>How <code>filter()</code> Works: Boolean Vectors</h2>
+<p>Under the hood, <code>filter()</code> creates a <strong>boolean vector</strong> (all TRUE or FALSE) and keeps only the rows where the condition is TRUE.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="co"># Create a boolean vector</span></span>
+<span id="cb8-2"><a></a>lifeExp_condition <span class="ot">&lt;-</span> gapminder<span class="sc">$</span>lifeExp <span class="sc">&lt;</span> <span class="dv">40</span></span>
+<span id="cb8-3"><a></a></span>
+<span id="cb8-4"><a></a><span class="co"># This is what filter() does internally</span></span>
+<span id="cb8-5"><a></a>gapminder[lifeExp_condition, ]  <span class="co"># base R subsetting with boolean vector</span></span>
+<span id="cb8-6"><a></a><span class="co">#&gt; # A tibble: 124 × 6</span></span>
+<span id="cb8-7"><a></a><span class="co">#&gt;    country     continent  year lifeExp      pop gdpPercap</span></span>
+<span id="cb8-8"><a></a><span class="co">#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></span>
+<span id="cb8-9"><a></a><span class="co">#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.</span></span>
+<span id="cb8-10"><a></a><span class="co">#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.</span></span>
+<span id="cb8-11"><a></a><span class="co">#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.</span></span>
+<span id="cb8-12"><a></a><span class="co">#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.</span></span>
+<span id="cb8-13"><a></a><span class="co">#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.</span></span>
+<span id="cb8-14"><a></a><span class="co">#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.</span></span>
+<span id="cb8-15"><a></a><span class="co">#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.</span></span>
+<span id="cb8-16"><a></a><span class="co">#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.</span></span>
+<span id="cb8-17"><a></a><span class="co">#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.</span></span>
+<span id="cb8-18"><a></a><span class="co">#&gt; 10 Angola      Africa     1962    34    4826015     4269.</span></span>
+<span id="cb8-19"><a></a><span class="co">#&gt; # ℹ 114 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p>Equivalent to:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co"># Using filter()</span></span>
+<span id="cb9-2"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a></a>  <span class="fu">filter</span>(lifeExp <span class="sc">&lt;</span> <span class="dv">40</span>)</span>
+<span id="cb9-4"><a></a><span class="co">#&gt; # A tibble: 124 × 6</span></span>
+<span id="cb9-5"><a></a><span class="co">#&gt;    country     continent  year lifeExp      pop gdpPercap</span></span>
+<span id="cb9-6"><a></a><span class="co">#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></span>
+<span id="cb9-7"><a></a><span class="co">#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.</span></span>
+<span id="cb9-8"><a></a><span class="co">#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.</span></span>
+<span id="cb9-9"><a></a><span class="co">#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.</span></span>
+<span id="cb9-10"><a></a><span class="co">#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.</span></span>
+<span id="cb9-11"><a></a><span class="co">#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.</span></span>
+<span id="cb9-12"><a></a><span class="co">#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.</span></span>
+<span id="cb9-13"><a></a><span class="co">#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.</span></span>
+<span id="cb9-14"><a></a><span class="co">#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.</span></span>
+<span id="cb9-15"><a></a><span class="co">#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.</span></span>
+<span id="cb9-16"><a></a><span class="co">#&gt; 10 Angola      Africa     1962    34    4826015     4269.</span></span>
+<span id="cb9-17"><a></a><span class="co">#&gt; # ℹ 114 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div class="fragment">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p><code>filter()</code> is cleaner and more readable, but it’s doing exactly what base R subsetting does: keeping rows where the condition is TRUE, dropping rows where it’s FALSE or NA.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
 <section id="select-keep-columns-by-name" class="slide level2">
 <h2><code>select()</code> — Keep Columns by Name</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="fu">select</span>(gapminder, country, lifeExp)</span>
-<span id="cb8-2"><a></a><span class="co">#&gt; # A tibble: 1,704 × 2</span></span>
-<span id="cb8-3"><a></a><span class="co">#&gt;    country     lifeExp</span></span>
-<span id="cb8-4"><a></a><span class="co">#&gt;    &lt;fct&gt;         &lt;dbl&gt;</span></span>
-<span id="cb8-5"><a></a><span class="co">#&gt;  1 Afghanistan    28.8</span></span>
-<span id="cb8-6"><a></a><span class="co">#&gt;  2 Afghanistan    30.3</span></span>
-<span id="cb8-7"><a></a><span class="co">#&gt;  3 Afghanistan    32.0</span></span>
-<span id="cb8-8"><a></a><span class="co">#&gt;  4 Afghanistan    34.0</span></span>
-<span id="cb8-9"><a></a><span class="co">#&gt;  5 Afghanistan    36.1</span></span>
-<span id="cb8-10"><a></a><span class="co">#&gt;  6 Afghanistan    38.4</span></span>
-<span id="cb8-11"><a></a><span class="co">#&gt;  7 Afghanistan    39.9</span></span>
-<span id="cb8-12"><a></a><span class="co">#&gt;  8 Afghanistan    40.8</span></span>
-<span id="cb8-13"><a></a><span class="co">#&gt;  9 Afghanistan    41.7</span></span>
-<span id="cb8-14"><a></a><span class="co">#&gt; 10 Afghanistan    41.8</span></span>
-<span id="cb8-15"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">select</span>(gapminder, country, lifeExp)</span>
+<span id="cb10-2"><a></a><span class="co">#&gt; # A tibble: 1,704 × 2</span></span>
+<span id="cb10-3"><a></a><span class="co">#&gt;    country     lifeExp</span></span>
+<span id="cb10-4"><a></a><span class="co">#&gt;    &lt;fct&gt;         &lt;dbl&gt;</span></span>
+<span id="cb10-5"><a></a><span class="co">#&gt;  1 Afghanistan    28.8</span></span>
+<span id="cb10-6"><a></a><span class="co">#&gt;  2 Afghanistan    30.3</span></span>
+<span id="cb10-7"><a></a><span class="co">#&gt;  3 Afghanistan    32.0</span></span>
+<span id="cb10-8"><a></a><span class="co">#&gt;  4 Afghanistan    34.0</span></span>
+<span id="cb10-9"><a></a><span class="co">#&gt;  5 Afghanistan    36.1</span></span>
+<span id="cb10-10"><a></a><span class="co">#&gt;  6 Afghanistan    38.4</span></span>
+<span id="cb10-11"><a></a><span class="co">#&gt;  7 Afghanistan    39.9</span></span>
+<span id="cb10-12"><a></a><span class="co">#&gt;  8 Afghanistan    40.8</span></span>
+<span id="cb10-13"><a></a><span class="co">#&gt;  9 Afghanistan    41.7</span></span>
+<span id="cb10-14"><a></a><span class="co">#&gt; 10 Afghanistan    41.8</span></span>
+<span id="cb10-15"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
 <p>Rename while selecting:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="fu">select</span>(gapminder, country, <span class="at">life_exp =</span> lifeExp)</span>
-<span id="cb9-2"><a></a><span class="co">#&gt; # A tibble: 1,704 × 2</span></span>
-<span id="cb9-3"><a></a><span class="co">#&gt;    country     life_exp</span></span>
-<span id="cb9-4"><a></a><span class="co">#&gt;    &lt;fct&gt;          &lt;dbl&gt;</span></span>
-<span id="cb9-5"><a></a><span class="co">#&gt;  1 Afghanistan     28.8</span></span>
-<span id="cb9-6"><a></a><span class="co">#&gt;  2 Afghanistan     30.3</span></span>
-<span id="cb9-7"><a></a><span class="co">#&gt;  3 Afghanistan     32.0</span></span>
-<span id="cb9-8"><a></a><span class="co">#&gt;  4 Afghanistan     34.0</span></span>
-<span id="cb9-9"><a></a><span class="co">#&gt;  5 Afghanistan     36.1</span></span>
-<span id="cb9-10"><a></a><span class="co">#&gt;  6 Afghanistan     38.4</span></span>
-<span id="cb9-11"><a></a><span class="co">#&gt;  7 Afghanistan     39.9</span></span>
-<span id="cb9-12"><a></a><span class="co">#&gt;  8 Afghanistan     40.8</span></span>
-<span id="cb9-13"><a></a><span class="co">#&gt;  9 Afghanistan     41.7</span></span>
-<span id="cb9-14"><a></a><span class="co">#&gt; 10 Afghanistan     41.8</span></span>
-<span id="cb9-15"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="fu">select</span>(gapminder, country, <span class="at">life_exp =</span> lifeExp)</span>
+<span id="cb11-2"><a></a><span class="co">#&gt; # A tibble: 1,704 × 2</span></span>
+<span id="cb11-3"><a></a><span class="co">#&gt;    country     life_exp</span></span>
+<span id="cb11-4"><a></a><span class="co">#&gt;    &lt;fct&gt;          &lt;dbl&gt;</span></span>
+<span id="cb11-5"><a></a><span class="co">#&gt;  1 Afghanistan     28.8</span></span>
+<span id="cb11-6"><a></a><span class="co">#&gt;  2 Afghanistan     30.3</span></span>
+<span id="cb11-7"><a></a><span class="co">#&gt;  3 Afghanistan     32.0</span></span>
+<span id="cb11-8"><a></a><span class="co">#&gt;  4 Afghanistan     34.0</span></span>
+<span id="cb11-9"><a></a><span class="co">#&gt;  5 Afghanistan     36.1</span></span>
+<span id="cb11-10"><a></a><span class="co">#&gt;  6 Afghanistan     38.4</span></span>
+<span id="cb11-11"><a></a><span class="co">#&gt;  7 Afghanistan     39.9</span></span>
+<span id="cb11-12"><a></a><span class="co">#&gt;  8 Afghanistan     40.8</span></span>
+<span id="cb11-13"><a></a><span class="co">#&gt;  9 Afghanistan     41.7</span></span>
+<span id="cb11-14"><a></a><span class="co">#&gt; 10 Afghanistan     41.8</span></span>
+<span id="cb11-15"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div class="fragment">
 <p>Drop a column with <code>!</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">select</span>(gapminder, <span class="sc">!</span>continent)</span>
-<span id="cb10-2"><a></a><span class="co">#&gt; # A tibble: 1,704 × 5</span></span>
-<span id="cb10-3"><a></a><span class="co">#&gt;    country      year lifeExp      pop gdpPercap</span></span>
-<span id="cb10-4"><a></a><span class="co">#&gt;    &lt;fct&gt;       &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></span>
-<span id="cb10-5"><a></a><span class="co">#&gt;  1 Afghanistan  1952    28.8  8425333      779.</span></span>
-<span id="cb10-6"><a></a><span class="co">#&gt;  2 Afghanistan  1957    30.3  9240934      821.</span></span>
-<span id="cb10-7"><a></a><span class="co">#&gt;  3 Afghanistan  1962    32.0 10267083      853.</span></span>
-<span id="cb10-8"><a></a><span class="co">#&gt;  4 Afghanistan  1967    34.0 11537966      836.</span></span>
-<span id="cb10-9"><a></a><span class="co">#&gt;  5 Afghanistan  1972    36.1 13079460      740.</span></span>
-<span id="cb10-10"><a></a><span class="co">#&gt;  6 Afghanistan  1977    38.4 14880372      786.</span></span>
-<span id="cb10-11"><a></a><span class="co">#&gt;  7 Afghanistan  1982    39.9 12881816      978.</span></span>
-<span id="cb10-12"><a></a><span class="co">#&gt;  8 Afghanistan  1987    40.8 13867957      852.</span></span>
-<span id="cb10-13"><a></a><span class="co">#&gt;  9 Afghanistan  1992    41.7 16317921      649.</span></span>
-<span id="cb10-14"><a></a><span class="co">#&gt; 10 Afghanistan  1997    41.8 22227415      635.</span></span>
-<span id="cb10-15"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="fu">select</span>(gapminder, <span class="sc">!</span>continent)</span>
+<span id="cb12-2"><a></a><span class="co">#&gt; # A tibble: 1,704 × 5</span></span>
+<span id="cb12-3"><a></a><span class="co">#&gt;    country      year lifeExp      pop gdpPercap</span></span>
+<span id="cb12-4"><a></a><span class="co">#&gt;    &lt;fct&gt;       &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></span>
+<span id="cb12-5"><a></a><span class="co">#&gt;  1 Afghanistan  1952    28.8  8425333      779.</span></span>
+<span id="cb12-6"><a></a><span class="co">#&gt;  2 Afghanistan  1957    30.3  9240934      821.</span></span>
+<span id="cb12-7"><a></a><span class="co">#&gt;  3 Afghanistan  1962    32.0 10267083      853.</span></span>
+<span id="cb12-8"><a></a><span class="co">#&gt;  4 Afghanistan  1967    34.0 11537966      836.</span></span>
+<span id="cb12-9"><a></a><span class="co">#&gt;  5 Afghanistan  1972    36.1 13079460      740.</span></span>
+<span id="cb12-10"><a></a><span class="co">#&gt;  6 Afghanistan  1977    38.4 14880372      786.</span></span>
+<span id="cb12-11"><a></a><span class="co">#&gt;  7 Afghanistan  1982    39.9 12881816      978.</span></span>
+<span id="cb12-12"><a></a><span class="co">#&gt;  8 Afghanistan  1987    40.8 13867957      852.</span></span>
+<span id="cb12-13"><a></a><span class="co">#&gt;  9 Afghanistan  1992    41.7 16317921      649.</span></span>
+<span id="cb12-14"><a></a><span class="co">#&gt; 10 Afghanistan  1997    41.8 22227415      635.</span></span>
+<span id="cb12-15"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</section>
+<section id="select-base-r-equivalence" class="slide level2">
+<h2><code>select()</code> — Base R Equivalence</h2>
+<p>Under the hood, <code>select()</code> is doing column subsetting — the same operation as base R.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a><span class="co"># Base R column subsetting</span></span>
+<span id="cb13-2"><a></a>gapminder[, <span class="fu">c</span>(<span class="st">"country"</span>, <span class="st">"lifeExp"</span>)]     <span class="co"># [rows, cols]</span></span>
+<span id="cb13-3"><a></a>gapminder[[<span class="st">"lifeExp"</span>]]                   <span class="co"># extract single column</span></span>
+<span id="cb13-4"><a></a>gapminder<span class="sc">$</span>lifeExp                        <span class="co"># $ shorthand</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p><strong>Using <code>select()</code>:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a></a>  <span class="fu">select</span>(country, lifeExp)</span>
+<span id="cb14-3"><a></a><span class="co">#&gt; # A tibble: 1,704 × 2</span></span>
+<span id="cb14-4"><a></a><span class="co">#&gt;    country     lifeExp</span></span>
+<span id="cb14-5"><a></a><span class="co">#&gt;    &lt;fct&gt;         &lt;dbl&gt;</span></span>
+<span id="cb14-6"><a></a><span class="co">#&gt;  1 Afghanistan    28.8</span></span>
+<span id="cb14-7"><a></a><span class="co">#&gt;  2 Afghanistan    30.3</span></span>
+<span id="cb14-8"><a></a><span class="co">#&gt;  3 Afghanistan    32.0</span></span>
+<span id="cb14-9"><a></a><span class="co">#&gt;  4 Afghanistan    34.0</span></span>
+<span id="cb14-10"><a></a><span class="co">#&gt;  5 Afghanistan    36.1</span></span>
+<span id="cb14-11"><a></a><span class="co">#&gt;  6 Afghanistan    38.4</span></span>
+<span id="cb14-12"><a></a><span class="co">#&gt;  7 Afghanistan    39.9</span></span>
+<span id="cb14-13"><a></a><span class="co">#&gt;  8 Afghanistan    40.8</span></span>
+<span id="cb14-14"><a></a><span class="co">#&gt;  9 Afghanistan    41.7</span></span>
+<span id="cb14-15"><a></a><span class="co">#&gt; 10 Afghanistan    41.8</span></span>
+<span id="cb14-16"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div class="fragment">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p><code>select()</code> is syntactic sugar on top of base R’s column subsetting. It’s more readable and composable with pipes.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="select-helpers-tidyselect-functions" class="slide level2 smaller">
+<h2><code>select()</code> Helpers — <code>tidyselect</code> Functions</h2>
+<p>Beyond explicit column names, use <strong>tidyselect</strong> helpers to match columns by pattern:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a><span class="co"># Select columns starting with a pattern</span></span>
+<span id="cb15-2"><a></a><span class="fu">select</span>(gapminder, <span class="fu">starts_with</span>(<span class="st">"life"</span>))</span>
+<span id="cb15-3"><a></a><span class="co">#&gt; # A tibble: 1,704 × 1</span></span>
+<span id="cb15-4"><a></a><span class="co">#&gt;    lifeExp</span></span>
+<span id="cb15-5"><a></a><span class="co">#&gt;      &lt;dbl&gt;</span></span>
+<span id="cb15-6"><a></a><span class="co">#&gt;  1    28.8</span></span>
+<span id="cb15-7"><a></a><span class="co">#&gt;  2    30.3</span></span>
+<span id="cb15-8"><a></a><span class="co">#&gt;  3    32.0</span></span>
+<span id="cb15-9"><a></a><span class="co">#&gt;  4    34.0</span></span>
+<span id="cb15-10"><a></a><span class="co">#&gt;  5    36.1</span></span>
+<span id="cb15-11"><a></a><span class="co">#&gt;  6    38.4</span></span>
+<span id="cb15-12"><a></a><span class="co">#&gt;  7    39.9</span></span>
+<span id="cb15-13"><a></a><span class="co">#&gt;  8    40.8</span></span>
+<span id="cb15-14"><a></a><span class="co">#&gt;  9    41.7</span></span>
+<span id="cb15-15"><a></a><span class="co">#&gt; 10    41.8</span></span>
+<span id="cb15-16"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span>
+<span id="cb15-17"><a></a></span>
+<span id="cb15-18"><a></a><span class="co"># Select columns ending with a pattern</span></span>
+<span id="cb15-19"><a></a><span class="fu">select</span>(gapminder, <span class="fu">ends_with</span>(<span class="st">"pc"</span>))</span>
+<span id="cb15-20"><a></a><span class="co">#&gt; # A tibble: 1,704 × 0</span></span>
+<span id="cb15-21"><a></a></span>
+<span id="cb15-22"><a></a><span class="co"># Select columns containing a substring</span></span>
+<span id="cb15-23"><a></a><span class="fu">select</span>(gapminder, <span class="fu">contains</span>(<span class="st">"pop"</span>))</span>
+<span id="cb15-24"><a></a><span class="co">#&gt; # A tibble: 1,704 × 1</span></span>
+<span id="cb15-25"><a></a><span class="co">#&gt;         pop</span></span>
+<span id="cb15-26"><a></a><span class="co">#&gt;       &lt;int&gt;</span></span>
+<span id="cb15-27"><a></a><span class="co">#&gt;  1  8425333</span></span>
+<span id="cb15-28"><a></a><span class="co">#&gt;  2  9240934</span></span>
+<span id="cb15-29"><a></a><span class="co">#&gt;  3 10267083</span></span>
+<span id="cb15-30"><a></a><span class="co">#&gt;  4 11537966</span></span>
+<span id="cb15-31"><a></a><span class="co">#&gt;  5 13079460</span></span>
+<span id="cb15-32"><a></a><span class="co">#&gt;  6 14880372</span></span>
+<span id="cb15-33"><a></a><span class="co">#&gt;  7 12881816</span></span>
+<span id="cb15-34"><a></a><span class="co">#&gt;  8 13867957</span></span>
+<span id="cb15-35"><a></a><span class="co">#&gt;  9 16317921</span></span>
+<span id="cb15-36"><a></a><span class="co">#&gt; 10 22227415</span></span>
+<span id="cb15-37"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Tip</strong></p>
+</div>
+<div class="callout-content">
+<p>These patterns are especially useful for <strong>water data</strong> where columns follow naming conventions: <code>site_no</code>, <code>site_name</code>, <code>discharge_cfs</code>, <code>temp_c</code>. You’ll select all temperature columns with <code>starts_with("temp_")</code>.</p>
+</div>
+</div>
 </div>
 </div>
 </section>
 <section id="the-pipe-operator" class="slide level2">
 <h2>The <code>|&gt;</code> Pipe Operator</h2>
 <p>The pipe passes the object on the left into the <strong>first argument</strong> of the function on the right:</p>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="fu">select</span>(gapminder, country, lifeExp)</span>
-<span id="cb11-2"><a></a><span class="co">#&gt; # A tibble: 1,704 × 2</span></span>
-<span id="cb11-3"><a></a><span class="co">#&gt;    country     lifeExp</span></span>
-<span id="cb11-4"><a></a><span class="co">#&gt;    &lt;fct&gt;         &lt;dbl&gt;</span></span>
-<span id="cb11-5"><a></a><span class="co">#&gt;  1 Afghanistan    28.8</span></span>
-<span id="cb11-6"><a></a><span class="co">#&gt;  2 Afghanistan    30.3</span></span>
-<span id="cb11-7"><a></a><span class="co">#&gt;  3 Afghanistan    32.0</span></span>
-<span id="cb11-8"><a></a><span class="co">#&gt;  4 Afghanistan    34.0</span></span>
-<span id="cb11-9"><a></a><span class="co">#&gt;  5 Afghanistan    36.1</span></span>
-<span id="cb11-10"><a></a><span class="co">#&gt;  6 Afghanistan    38.4</span></span>
-<span id="cb11-11"><a></a><span class="co">#&gt;  7 Afghanistan    39.9</span></span>
-<span id="cb11-12"><a></a><span class="co">#&gt;  8 Afghanistan    40.8</span></span>
-<span id="cb11-13"><a></a><span class="co">#&gt;  9 Afghanistan    41.7</span></span>
-<span id="cb11-14"><a></a><span class="co">#&gt; 10 Afghanistan    41.8</span></span>
-<span id="cb11-15"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span>
-<span id="cb11-16"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb11-17"><a></a>  <span class="fu">select</span>(country, lifeExp)</span>
-<span id="cb11-18"><a></a><span class="co">#&gt; # A tibble: 1,704 × 2</span></span>
-<span id="cb11-19"><a></a><span class="co">#&gt;    country     lifeExp</span></span>
-<span id="cb11-20"><a></a><span class="co">#&gt;    &lt;fct&gt;         &lt;dbl&gt;</span></span>
-<span id="cb11-21"><a></a><span class="co">#&gt;  1 Afghanistan    28.8</span></span>
-<span id="cb11-22"><a></a><span class="co">#&gt;  2 Afghanistan    30.3</span></span>
-<span id="cb11-23"><a></a><span class="co">#&gt;  3 Afghanistan    32.0</span></span>
-<span id="cb11-24"><a></a><span class="co">#&gt;  4 Afghanistan    34.0</span></span>
-<span id="cb11-25"><a></a><span class="co">#&gt;  5 Afghanistan    36.1</span></span>
-<span id="cb11-26"><a></a><span class="co">#&gt;  6 Afghanistan    38.4</span></span>
-<span id="cb11-27"><a></a><span class="co">#&gt;  7 Afghanistan    39.9</span></span>
-<span id="cb11-28"><a></a><span class="co">#&gt;  8 Afghanistan    40.8</span></span>
-<span id="cb11-29"><a></a><span class="co">#&gt;  9 Afghanistan    41.7</span></span>
-<span id="cb11-30"><a></a><span class="co">#&gt; 10 Afghanistan    41.8</span></span>
-<span id="cb11-31"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a><span class="fu">select</span>(gapminder, country, lifeExp)</span>
+<span id="cb16-2"><a></a><span class="co">#&gt; # A tibble: 1,704 × 2</span></span>
+<span id="cb16-3"><a></a><span class="co">#&gt;    country     lifeExp</span></span>
+<span id="cb16-4"><a></a><span class="co">#&gt;    &lt;fct&gt;         &lt;dbl&gt;</span></span>
+<span id="cb16-5"><a></a><span class="co">#&gt;  1 Afghanistan    28.8</span></span>
+<span id="cb16-6"><a></a><span class="co">#&gt;  2 Afghanistan    30.3</span></span>
+<span id="cb16-7"><a></a><span class="co">#&gt;  3 Afghanistan    32.0</span></span>
+<span id="cb16-8"><a></a><span class="co">#&gt;  4 Afghanistan    34.0</span></span>
+<span id="cb16-9"><a></a><span class="co">#&gt;  5 Afghanistan    36.1</span></span>
+<span id="cb16-10"><a></a><span class="co">#&gt;  6 Afghanistan    38.4</span></span>
+<span id="cb16-11"><a></a><span class="co">#&gt;  7 Afghanistan    39.9</span></span>
+<span id="cb16-12"><a></a><span class="co">#&gt;  8 Afghanistan    40.8</span></span>
+<span id="cb16-13"><a></a><span class="co">#&gt;  9 Afghanistan    41.7</span></span>
+<span id="cb16-14"><a></a><span class="co">#&gt; 10 Afghanistan    41.8</span></span>
+<span id="cb16-15"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span>
+<span id="cb16-16"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb16-17"><a></a>  <span class="fu">select</span>(country, lifeExp)</span>
+<span id="cb16-18"><a></a><span class="co">#&gt; # A tibble: 1,704 × 2</span></span>
+<span id="cb16-19"><a></a><span class="co">#&gt;    country     lifeExp</span></span>
+<span id="cb16-20"><a></a><span class="co">#&gt;    &lt;fct&gt;         &lt;dbl&gt;</span></span>
+<span id="cb16-21"><a></a><span class="co">#&gt;  1 Afghanistan    28.8</span></span>
+<span id="cb16-22"><a></a><span class="co">#&gt;  2 Afghanistan    30.3</span></span>
+<span id="cb16-23"><a></a><span class="co">#&gt;  3 Afghanistan    32.0</span></span>
+<span id="cb16-24"><a></a><span class="co">#&gt;  4 Afghanistan    34.0</span></span>
+<span id="cb16-25"><a></a><span class="co">#&gt;  5 Afghanistan    36.1</span></span>
+<span id="cb16-26"><a></a><span class="co">#&gt;  6 Afghanistan    38.4</span></span>
+<span id="cb16-27"><a></a><span class="co">#&gt;  7 Afghanistan    39.9</span></span>
+<span id="cb16-28"><a></a><span class="co">#&gt;  8 Afghanistan    40.8</span></span>
+<span id="cb16-29"><a></a><span class="co">#&gt;  9 Afghanistan    41.7</span></span>
+<span id="cb16-30"><a></a><span class="co">#&gt; 10 Afghanistan    41.8</span></span>
+<span id="cb16-31"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="quarto-layout-panel" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="column quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
@@ -547,124 +728,19 @@
 <div class="fragment">
 <p>The pipe is what makes <code>dplyr</code> readable — it lets you build a chain of operations that reads like a sentence:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb12-2"><a></a>  <span class="fu">select</span>(pop, gdpPercap, year, country) <span class="sc">|&gt;</span></span>
-<span id="cb12-3"><a></a>  <span class="fu">filter</span>(pop <span class="sc">&gt;</span> <span class="dv">100000000</span>, gdpPercap <span class="sc">&gt;</span> <span class="dv">5000</span>) <span class="sc">|&gt;</span></span>
-<span id="cb12-4"><a></a>  <span class="fu">filter</span>(year <span class="sc">&gt;</span> <span class="dv">1995</span>) <span class="sc">|&gt;</span></span>
-<span id="cb12-5"><a></a>  <span class="fu">filter</span>(country <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"United States"</span>, <span class="st">"Mexico"</span>))</span>
-<span id="cb12-6"><a></a><span class="co">#&gt; # A tibble: 5 × 4</span></span>
-<span id="cb12-7"><a></a><span class="co">#&gt;         pop gdpPercap  year country      </span></span>
-<span id="cb12-8"><a></a><span class="co">#&gt;       &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;        </span></span>
-<span id="cb12-9"><a></a><span class="co">#&gt; 1 102479927    10742.  2002 Mexico       </span></span>
-<span id="cb12-10"><a></a><span class="co">#&gt; 2 108700891    11978.  2007 Mexico       </span></span>
-<span id="cb12-11"><a></a><span class="co">#&gt; 3 272911760    35767.  1997 United States</span></span>
-<span id="cb12-12"><a></a><span class="co">#&gt; 4 287675526    39097.  2002 United States</span></span>
-<span id="cb12-13"><a></a><span class="co">#&gt; 5 301139947    42952.  2007 United States</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</section>
-<section id="mutate-add-new-columns" class="slide level2">
-<h2><code>mutate()</code> — Add New Columns</h2>
-<p><code>mutate()</code> adds new variables computed from existing ones. New variables are available immediately within the same <code>mutate()</code> call:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb13-2"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap)</span>
-<span id="cb13-3"><a></a><span class="co">#&gt; # A tibble: 1,704 × 7</span></span>
-<span id="cb13-4"><a></a><span class="co">#&gt;    country     continent  year lifeExp      pop gdpPercap          gdp</span></span>
-<span id="cb13-5"><a></a><span class="co">#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;        &lt;dbl&gt;</span></span>
-<span id="cb13-6"><a></a><span class="co">#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.  6567086330.</span></span>
-<span id="cb13-7"><a></a><span class="co">#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.  7585448670.</span></span>
-<span id="cb13-8"><a></a><span class="co">#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.  8758855797.</span></span>
-<span id="cb13-9"><a></a><span class="co">#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.  9648014150.</span></span>
-<span id="cb13-10"><a></a><span class="co">#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.  9678553274.</span></span>
-<span id="cb13-11"><a></a><span class="co">#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786. 11697659231.</span></span>
-<span id="cb13-12"><a></a><span class="co">#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978. 12598563401.</span></span>
-<span id="cb13-13"><a></a><span class="co">#&gt;  8 Afghanistan Asia       1987    40.8 13867957      852. 11820990309.</span></span>
-<span id="cb13-14"><a></a><span class="co">#&gt;  9 Afghanistan Asia       1992    41.7 16317921      649. 10595901589.</span></span>
-<span id="cb13-15"><a></a><span class="co">#&gt; 10 Afghanistan Asia       1997    41.8 22227415      635. 14121995875.</span></span>
-<span id="cb13-16"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="fragment">
-<p>Set a column to <code>NULL</code> to remove it:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb14-2"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap,</span>
-<span id="cb14-3"><a></a>         <span class="at">gdpPercap =</span> <span class="cn">NULL</span>)</span>
-<span id="cb14-4"><a></a><span class="co">#&gt; # A tibble: 1,704 × 6</span></span>
-<span id="cb14-5"><a></a><span class="co">#&gt;    country     continent  year lifeExp      pop          gdp</span></span>
-<span id="cb14-6"><a></a><span class="co">#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;</span></span>
-<span id="cb14-7"><a></a><span class="co">#&gt;  1 Afghanistan Asia       1952    28.8  8425333  6567086330.</span></span>
-<span id="cb14-8"><a></a><span class="co">#&gt;  2 Afghanistan Asia       1957    30.3  9240934  7585448670.</span></span>
-<span id="cb14-9"><a></a><span class="co">#&gt;  3 Afghanistan Asia       1962    32.0 10267083  8758855797.</span></span>
-<span id="cb14-10"><a></a><span class="co">#&gt;  4 Afghanistan Asia       1967    34.0 11537966  9648014150.</span></span>
-<span id="cb14-11"><a></a><span class="co">#&gt;  5 Afghanistan Asia       1972    36.1 13079460  9678553274.</span></span>
-<span id="cb14-12"><a></a><span class="co">#&gt;  6 Afghanistan Asia       1977    38.4 14880372 11697659231.</span></span>
-<span id="cb14-13"><a></a><span class="co">#&gt;  7 Afghanistan Asia       1982    39.9 12881816 12598563401.</span></span>
-<span id="cb14-14"><a></a><span class="co">#&gt;  8 Afghanistan Asia       1987    40.8 13867957 11820990309.</span></span>
-<span id="cb14-15"><a></a><span class="co">#&gt;  9 Afghanistan Asia       1992    41.7 16317921 10595901589.</span></span>
-<span id="cb14-16"><a></a><span class="co">#&gt; 10 Afghanistan Asia       1997    41.8 22227415 14121995875.</span></span>
-<span id="cb14-17"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</section>
-<section id="summarize-collapse-to-a-summary" class="slide level2">
-<h2><code>summarize()</code> — Collapse to a Summary</h2>
-<p><code>summarize()</code> takes n rows and returns 1:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb15-2"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap) <span class="sc">|&gt;</span></span>
-<span id="cb15-3"><a></a>  <span class="fu">summarize</span>(<span class="at">mean_gdp =</span> <span class="fu">mean</span>(gdp),</span>
-<span id="cb15-4"><a></a>            <span class="at">sd_gdp   =</span> <span class="fu">sd</span>(gdp))</span>
-<span id="cb15-5"><a></a><span class="co">#&gt; # A tibble: 1 × 2</span></span>
-<span id="cb15-6"><a></a><span class="co">#&gt;        mean_gdp        sd_gdp</span></span>
-<span id="cb15-7"><a></a><span class="co">#&gt;           &lt;dbl&gt;         &lt;dbl&gt;</span></span>
-<span id="cb15-8"><a></a><span class="co">#&gt; 1 186809560507. 714029666918.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="fragment">
-<p>Useful summary functions: <code>mean()</code>, <code>median()</code>, <code>sd()</code>, <code>min()</code>, <code>max()</code>, <code>sum()</code>, <code>n()</code>, <code>n_distinct()</code>, <code>quantile()</code></p>
-</div>
-</section>
-<section id="arrange-reorder-rows" class="slide level2">
-<h2><code>arrange()</code> — Reorder Rows</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb16-2"><a></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2007</span>) <span class="sc">|&gt;</span></span>
-<span id="cb16-3"><a></a>  <span class="fu">arrange</span>(lifeExp)</span>
-<span id="cb16-4"><a></a><span class="co">#&gt; # A tibble: 142 × 6</span></span>
-<span id="cb16-5"><a></a><span class="co">#&gt;    country                  continent  year lifeExp      pop gdpPercap</span></span>
-<span id="cb16-6"><a></a><span class="co">#&gt;    &lt;fct&gt;                    &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></span>
-<span id="cb16-7"><a></a><span class="co">#&gt;  1 Swaziland                Africa     2007    39.6  1133066     4513.</span></span>
-<span id="cb16-8"><a></a><span class="co">#&gt;  2 Mozambique               Africa     2007    42.1 19951656      824.</span></span>
-<span id="cb16-9"><a></a><span class="co">#&gt;  3 Zambia                   Africa     2007    42.4 11746035     1271.</span></span>
-<span id="cb16-10"><a></a><span class="co">#&gt;  4 Sierra Leone             Africa     2007    42.6  6144562      863.</span></span>
-<span id="cb16-11"><a></a><span class="co">#&gt;  5 Lesotho                  Africa     2007    42.6  2012649     1569.</span></span>
-<span id="cb16-12"><a></a><span class="co">#&gt;  6 Angola                   Africa     2007    42.7 12420476     4797.</span></span>
-<span id="cb16-13"><a></a><span class="co">#&gt;  7 Zimbabwe                 Africa     2007    43.5 12311143      470.</span></span>
-<span id="cb16-14"><a></a><span class="co">#&gt;  8 Afghanistan              Asia       2007    43.8 31889923      975.</span></span>
-<span id="cb16-15"><a></a><span class="co">#&gt;  9 Central African Republic Africa     2007    44.7  4369038      706.</span></span>
-<span id="cb16-16"><a></a><span class="co">#&gt; 10 Liberia                  Africa     2007    45.7  3193942      415.</span></span>
-<span id="cb16-17"><a></a><span class="co">#&gt; # ℹ 132 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="fragment">
-<p>Descending order with <code>-</code>:</p>
-<div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb17-2"><a></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2007</span>) <span class="sc">|&gt;</span></span>
-<span id="cb17-3"><a></a>  <span class="fu">arrange</span>(<span class="sc">-</span>lifeExp)</span>
-<span id="cb17-4"><a></a><span class="co">#&gt; # A tibble: 142 × 6</span></span>
-<span id="cb17-5"><a></a><span class="co">#&gt;    country          continent  year lifeExp       pop gdpPercap</span></span>
-<span id="cb17-6"><a></a><span class="co">#&gt;    &lt;fct&gt;            &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;</span></span>
-<span id="cb17-7"><a></a><span class="co">#&gt;  1 Japan            Asia       2007    82.6 127467972    31656.</span></span>
-<span id="cb17-8"><a></a><span class="co">#&gt;  2 Hong Kong, China Asia       2007    82.2   6980412    39725.</span></span>
-<span id="cb17-9"><a></a><span class="co">#&gt;  3 Iceland          Europe     2007    81.8    301931    36181.</span></span>
-<span id="cb17-10"><a></a><span class="co">#&gt;  4 Switzerland      Europe     2007    81.7   7554661    37506.</span></span>
-<span id="cb17-11"><a></a><span class="co">#&gt;  5 Australia        Oceania    2007    81.2  20434176    34435.</span></span>
-<span id="cb17-12"><a></a><span class="co">#&gt;  6 Spain            Europe     2007    80.9  40448191    28821.</span></span>
-<span id="cb17-13"><a></a><span class="co">#&gt;  7 Sweden           Europe     2007    80.9   9031088    33860.</span></span>
-<span id="cb17-14"><a></a><span class="co">#&gt;  8 Israel           Asia       2007    80.7   6426679    25523.</span></span>
-<span id="cb17-15"><a></a><span class="co">#&gt;  9 France           Europe     2007    80.7  61083916    30470.</span></span>
-<span id="cb17-16"><a></a><span class="co">#&gt; 10 Canada           Americas   2007    80.7  33390141    36319.</span></span>
-<span id="cb17-17"><a></a><span class="co">#&gt; # ℹ 132 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-2"><a></a>  <span class="fu">select</span>(pop, gdpPercap, year, country) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a></a>  <span class="fu">filter</span>(pop <span class="sc">&gt;</span> <span class="dv">100000000</span>, gdpPercap <span class="sc">&gt;</span> <span class="dv">5000</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a></a>  <span class="fu">filter</span>(year <span class="sc">&gt;</span> <span class="dv">1995</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-5"><a></a>  <span class="fu">filter</span>(country <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"United States"</span>, <span class="st">"Mexico"</span>))</span>
+<span id="cb17-6"><a></a><span class="co">#&gt; # A tibble: 5 × 4</span></span>
+<span id="cb17-7"><a></a><span class="co">#&gt;         pop gdpPercap  year country      </span></span>
+<span id="cb17-8"><a></a><span class="co">#&gt;       &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;        </span></span>
+<span id="cb17-9"><a></a><span class="co">#&gt; 1 102479927    10742.  2002 Mexico       </span></span>
+<span id="cb17-10"><a></a><span class="co">#&gt; 2 108700891    11978.  2007 Mexico       </span></span>
+<span id="cb17-11"><a></a><span class="co">#&gt; 3 272911760    35767.  1997 United States</span></span>
+<span id="cb17-12"><a></a><span class="co">#&gt; 4 287675526    39097.  2002 United States</span></span>
+<span id="cb17-13"><a></a><span class="co">#&gt; 5 301139947    42952.  2007 United States</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </section>
@@ -693,6 +769,231 @@
 <span id="cb18-19"><a></a><span class="co">#&gt; # ℹ 132 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+<section id="mutate-add-new-columns" class="slide level2">
+<h2><code>mutate()</code> — Add New Columns</h2>
+<p><code>mutate()</code> adds new variables computed from existing ones. New variables are available immediately within the same <code>mutate()</code> call:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap)</span>
+<span id="cb19-3"><a></a><span class="co">#&gt; # A tibble: 1,704 × 7</span></span>
+<span id="cb19-4"><a></a><span class="co">#&gt;    country     continent  year lifeExp      pop gdpPercap          gdp</span></span>
+<span id="cb19-5"><a></a><span class="co">#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;        &lt;dbl&gt;</span></span>
+<span id="cb19-6"><a></a><span class="co">#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.  6567086330.</span></span>
+<span id="cb19-7"><a></a><span class="co">#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.  7585448670.</span></span>
+<span id="cb19-8"><a></a><span class="co">#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.  8758855797.</span></span>
+<span id="cb19-9"><a></a><span class="co">#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.  9648014150.</span></span>
+<span id="cb19-10"><a></a><span class="co">#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.  9678553274.</span></span>
+<span id="cb19-11"><a></a><span class="co">#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786. 11697659231.</span></span>
+<span id="cb19-12"><a></a><span class="co">#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978. 12598563401.</span></span>
+<span id="cb19-13"><a></a><span class="co">#&gt;  8 Afghanistan Asia       1987    40.8 13867957      852. 11820990309.</span></span>
+<span id="cb19-14"><a></a><span class="co">#&gt;  9 Afghanistan Asia       1992    41.7 16317921      649. 10595901589.</span></span>
+<span id="cb19-15"><a></a><span class="co">#&gt; 10 Afghanistan Asia       1997    41.8 22227415      635. 14121995875.</span></span>
+<span id="cb19-16"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p>Set a column to <code>NULL</code> to remove it:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap,</span>
+<span id="cb20-3"><a></a>         <span class="at">gdpPercap =</span> <span class="cn">NULL</span>)</span>
+<span id="cb20-4"><a></a><span class="co">#&gt; # A tibble: 1,704 × 6</span></span>
+<span id="cb20-5"><a></a><span class="co">#&gt;    country     continent  year lifeExp      pop          gdp</span></span>
+<span id="cb20-6"><a></a><span class="co">#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;</span></span>
+<span id="cb20-7"><a></a><span class="co">#&gt;  1 Afghanistan Asia       1952    28.8  8425333  6567086330.</span></span>
+<span id="cb20-8"><a></a><span class="co">#&gt;  2 Afghanistan Asia       1957    30.3  9240934  7585448670.</span></span>
+<span id="cb20-9"><a></a><span class="co">#&gt;  3 Afghanistan Asia       1962    32.0 10267083  8758855797.</span></span>
+<span id="cb20-10"><a></a><span class="co">#&gt;  4 Afghanistan Asia       1967    34.0 11537966  9648014150.</span></span>
+<span id="cb20-11"><a></a><span class="co">#&gt;  5 Afghanistan Asia       1972    36.1 13079460  9678553274.</span></span>
+<span id="cb20-12"><a></a><span class="co">#&gt;  6 Afghanistan Asia       1977    38.4 14880372 11697659231.</span></span>
+<span id="cb20-13"><a></a><span class="co">#&gt;  7 Afghanistan Asia       1982    39.9 12881816 12598563401.</span></span>
+<span id="cb20-14"><a></a><span class="co">#&gt;  8 Afghanistan Asia       1987    40.8 13867957 11820990309.</span></span>
+<span id="cb20-15"><a></a><span class="co">#&gt;  9 Afghanistan Asia       1992    41.7 16317921 10595901589.</span></span>
+<span id="cb20-16"><a></a><span class="co">#&gt; 10 Afghanistan Asia       1997    41.8 22227415 14121995875.</span></span>
+<span id="cb20-17"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</section>
+<section id="mutate-base-r-equivalence" class="slide level2">
+<h2><code>mutate()</code> — Base R Equivalence</h2>
+<p>Under the hood, <code>mutate()</code> is column assignment — the same operation as base R.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="co"># Base R column assignment</span></span>
+<span id="cb21-2"><a></a>gapminder<span class="sc">$</span>gdp <span class="ot">&lt;-</span> gapminder<span class="sc">$</span>pop <span class="sc">*</span> gapminder<span class="sc">$</span>gdpPercap</span>
+<span id="cb21-3"><a></a></span>
+<span id="cb21-4"><a></a><span class="co"># Remove a column (assign to NULL)</span></span>
+<span id="cb21-5"><a></a>gapminder<span class="sc">$</span>gdpPercap <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p><strong>Using <code>mutate()</code>:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap,</span>
+<span id="cb22-3"><a></a>         <span class="at">gdpPercap =</span> <span class="cn">NULL</span>)</span>
+<span id="cb22-4"><a></a><span class="co">#&gt; # A tibble: 1,704 × 6</span></span>
+<span id="cb22-5"><a></a><span class="co">#&gt;    country     continent  year lifeExp      pop          gdp</span></span>
+<span id="cb22-6"><a></a><span class="co">#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;</span></span>
+<span id="cb22-7"><a></a><span class="co">#&gt;  1 Afghanistan Asia       1952    28.8  8425333  6567086330.</span></span>
+<span id="cb22-8"><a></a><span class="co">#&gt;  2 Afghanistan Asia       1957    30.3  9240934  7585448670.</span></span>
+<span id="cb22-9"><a></a><span class="co">#&gt;  3 Afghanistan Asia       1962    32.0 10267083  8758855797.</span></span>
+<span id="cb22-10"><a></a><span class="co">#&gt;  4 Afghanistan Asia       1967    34.0 11537966  9648014150.</span></span>
+<span id="cb22-11"><a></a><span class="co">#&gt;  5 Afghanistan Asia       1972    36.1 13079460  9678553274.</span></span>
+<span id="cb22-12"><a></a><span class="co">#&gt;  6 Afghanistan Asia       1977    38.4 14880372 11697659231.</span></span>
+<span id="cb22-13"><a></a><span class="co">#&gt;  7 Afghanistan Asia       1982    39.9 12881816 12598563401.</span></span>
+<span id="cb22-14"><a></a><span class="co">#&gt;  8 Afghanistan Asia       1987    40.8 13867957 11820990309.</span></span>
+<span id="cb22-15"><a></a><span class="co">#&gt;  9 Afghanistan Asia       1992    41.7 16317921 10595901589.</span></span>
+<span id="cb22-16"><a></a><span class="co">#&gt; 10 Afghanistan Asia       1997    41.8 22227415 14121995875.</span></span>
+<span id="cb22-17"><a></a><span class="co">#&gt; # ℹ 1,694 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div class="fragment">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p><code>mutate()</code> builds on base R assignment but allows you to chain operations with the pipe and reference newly created columns <em>within the same call</em>.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="transmute-keep-only-new-columns" class="slide level2">
+<h2><code>transmute()</code> — Keep Only New Columns</h2>
+<p><code>transmute()</code> is like <code>mutate()</code>, but it <strong>drops all other columns</strong> — you’re left with only what you explicitly create.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="co"># mutate() keeps everything</span></span>
+<span id="cb23-2"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap) <span class="sc">|&gt;</span></span>
+<span id="cb23-4"><a></a>  <span class="fu">head</span>(<span class="dv">2</span>)</span>
+<span id="cb23-5"><a></a><span class="co">#&gt; # A tibble: 2 × 7</span></span>
+<span id="cb23-6"><a></a><span class="co">#&gt;   country     continent  year lifeExp     pop gdpPercap         gdp</span></span>
+<span id="cb23-7"><a></a><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span id="cb23-8"><a></a><span class="co">#&gt; 1 Afghanistan Asia       1952    28.8 8425333      779. 6567086330.</span></span>
+<span id="cb23-9"><a></a><span class="co">#&gt; 2 Afghanistan Asia       1957    30.3 9240934      821. 7585448670.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="co"># transmute() keeps only the new column</span></span>
+<span id="cb24-2"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a></a>  <span class="fu">transmute</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap) <span class="sc">|&gt;</span></span>
+<span id="cb24-4"><a></a>  <span class="fu">head</span>(<span class="dv">2</span>)</span>
+<span id="cb24-5"><a></a><span class="co">#&gt; # A tibble: 2 × 1</span></span>
+<span id="cb24-6"><a></a><span class="co">#&gt;           gdp</span></span>
+<span id="cb24-7"><a></a><span class="co">#&gt;         &lt;dbl&gt;</span></span>
+<span id="cb24-8"><a></a><span class="co">#&gt; 1 6567086330.</span></span>
+<span id="cb24-9"><a></a><span class="co">#&gt; 2 7585448670.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div class="fragment">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Tip</strong></p>
+</div>
+<div class="callout-content">
+<p>Use <code>transmute()</code> when you want to extract a subset of computed columns in one go — cleaner than <code>mutate()</code> followed by <code>select()</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="conditional-mutations-with-if_else" class="slide level2">
+<h2>Conditional Mutations with <code>if_else()</code></h2>
+<p>When you need to compute values based on a condition, use <code>if_else()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2007</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a></a>  <span class="fu">mutate</span>(<span class="at">income_level =</span> <span class="fu">if_else</span>(gdpPercap <span class="sc">&gt;</span> <span class="dv">10000</span>, <span class="st">"high"</span>, <span class="st">"low"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb25-4"><a></a>  <span class="fu">select</span>(country, gdpPercap, income_level) <span class="sc">|&gt;</span></span>
+<span id="cb25-5"><a></a>  <span class="fu">head</span>(<span class="dv">8</span>)</span>
+<span id="cb25-6"><a></a><span class="co">#&gt; # A tibble: 8 × 3</span></span>
+<span id="cb25-7"><a></a><span class="co">#&gt;   country     gdpPercap income_level</span></span>
+<span id="cb25-8"><a></a><span class="co">#&gt;   &lt;fct&gt;           &lt;dbl&gt; &lt;chr&gt;       </span></span>
+<span id="cb25-9"><a></a><span class="co">#&gt; 1 Afghanistan      975. low         </span></span>
+<span id="cb25-10"><a></a><span class="co">#&gt; 2 Albania         5937. low         </span></span>
+<span id="cb25-11"><a></a><span class="co">#&gt; 3 Algeria         6223. low         </span></span>
+<span id="cb25-12"><a></a><span class="co">#&gt; 4 Angola          4797. low         </span></span>
+<span id="cb25-13"><a></a><span class="co">#&gt; 5 Argentina      12779. high        </span></span>
+<span id="cb25-14"><a></a><span class="co">#&gt; 6 Australia      34435. high        </span></span>
+<span id="cb25-15"><a></a><span class="co">#&gt; 7 Austria        36126. high        </span></span>
+<span id="cb25-16"><a></a><span class="co">#&gt; 8 Bahrain        29796. high</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p><strong>In Lab 1 context</strong>: Flag anomalies in streamflow:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a>flow_data <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a></a>  <span class="fu">mutate</span>(<span class="at">is_low =</span> <span class="fu">if_else</span>(discharge <span class="sc">&lt;</span> <span class="fu">quantile</span>(discharge, <span class="fl">0.1</span>), <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</section>
+<section id="summarize-collapse-to-a-summary" class="slide level2">
+<h2><code>summarize()</code> — Collapse to a Summary</h2>
+<p><code>summarize()</code> takes n rows and returns 1:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap) <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a></a>  <span class="fu">summarize</span>(<span class="at">mean_gdp =</span> <span class="fu">mean</span>(gdp),</span>
+<span id="cb27-4"><a></a>            <span class="at">sd_gdp   =</span> <span class="fu">sd</span>(gdp))</span>
+<span id="cb27-5"><a></a><span class="co">#&gt; # A tibble: 1 × 2</span></span>
+<span id="cb27-6"><a></a><span class="co">#&gt;        mean_gdp        sd_gdp</span></span>
+<span id="cb27-7"><a></a><span class="co">#&gt;           &lt;dbl&gt;         &lt;dbl&gt;</span></span>
+<span id="cb27-8"><a></a><span class="co">#&gt; 1 186809560507. 714029666918.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p>Useful summary functions: <code>mean()</code>, <code>median()</code>, <code>sd()</code>, <code>min()</code>, <code>max()</code>, <code>sum()</code>, <code>n()</code>, <code>n_distinct()</code>, <code>quantile()</code></p>
+</div>
+</section>
+<section id="arrange-reorder-rows" class="slide level2">
+<h2><code>arrange()</code> — Reorder Rows</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb28-2"><a></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2007</span>) <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a></a>  <span class="fu">arrange</span>(lifeExp)</span>
+<span id="cb28-4"><a></a><span class="co">#&gt; # A tibble: 142 × 6</span></span>
+<span id="cb28-5"><a></a><span class="co">#&gt;    country                  continent  year lifeExp      pop gdpPercap</span></span>
+<span id="cb28-6"><a></a><span class="co">#&gt;    &lt;fct&gt;                    &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></span>
+<span id="cb28-7"><a></a><span class="co">#&gt;  1 Swaziland                Africa     2007    39.6  1133066     4513.</span></span>
+<span id="cb28-8"><a></a><span class="co">#&gt;  2 Mozambique               Africa     2007    42.1 19951656      824.</span></span>
+<span id="cb28-9"><a></a><span class="co">#&gt;  3 Zambia                   Africa     2007    42.4 11746035     1271.</span></span>
+<span id="cb28-10"><a></a><span class="co">#&gt;  4 Sierra Leone             Africa     2007    42.6  6144562      863.</span></span>
+<span id="cb28-11"><a></a><span class="co">#&gt;  5 Lesotho                  Africa     2007    42.6  2012649     1569.</span></span>
+<span id="cb28-12"><a></a><span class="co">#&gt;  6 Angola                   Africa     2007    42.7 12420476     4797.</span></span>
+<span id="cb28-13"><a></a><span class="co">#&gt;  7 Zimbabwe                 Africa     2007    43.5 12311143      470.</span></span>
+<span id="cb28-14"><a></a><span class="co">#&gt;  8 Afghanistan              Asia       2007    43.8 31889923      975.</span></span>
+<span id="cb28-15"><a></a><span class="co">#&gt;  9 Central African Republic Africa     2007    44.7  4369038      706.</span></span>
+<span id="cb28-16"><a></a><span class="co">#&gt; 10 Liberia                  Africa     2007    45.7  3193942      415.</span></span>
+<span id="cb28-17"><a></a><span class="co">#&gt; # ℹ 132 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p>Descending order with <code>-</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2007</span>) <span class="sc">|&gt;</span></span>
+<span id="cb29-3"><a></a>  <span class="fu">arrange</span>(<span class="sc">-</span>lifeExp)</span>
+<span id="cb29-4"><a></a><span class="co">#&gt; # A tibble: 142 × 6</span></span>
+<span id="cb29-5"><a></a><span class="co">#&gt;    country          continent  year lifeExp       pop gdpPercap</span></span>
+<span id="cb29-6"><a></a><span class="co">#&gt;    &lt;fct&gt;            &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;</span></span>
+<span id="cb29-7"><a></a><span class="co">#&gt;  1 Japan            Asia       2007    82.6 127467972    31656.</span></span>
+<span id="cb29-8"><a></a><span class="co">#&gt;  2 Hong Kong, China Asia       2007    82.2   6980412    39725.</span></span>
+<span id="cb29-9"><a></a><span class="co">#&gt;  3 Iceland          Europe     2007    81.8    301931    36181.</span></span>
+<span id="cb29-10"><a></a><span class="co">#&gt;  4 Switzerland      Europe     2007    81.7   7554661    37506.</span></span>
+<span id="cb29-11"><a></a><span class="co">#&gt;  5 Australia        Oceania    2007    81.2  20434176    34435.</span></span>
+<span id="cb29-12"><a></a><span class="co">#&gt;  6 Spain            Europe     2007    80.9  40448191    28821.</span></span>
+<span id="cb29-13"><a></a><span class="co">#&gt;  7 Sweden           Europe     2007    80.9   9031088    33860.</span></span>
+<span id="cb29-14"><a></a><span class="co">#&gt;  8 Israel           Asia       2007    80.7   6426679    25523.</span></span>
+<span id="cb29-15"><a></a><span class="co">#&gt;  9 France           Europe     2007    80.7  61083916    30470.</span></span>
+<span id="cb29-16"><a></a><span class="co">#&gt; 10 Canada           Americas   2007    80.7  33390141    36319.</span></span>
+<span id="cb29-17"><a></a><span class="co">#&gt; # ℹ 132 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</section>
 <section id="group_by-summarize-split-apply-combine" class="slide level2">
 <h2><code>group_by()</code> + <code>summarize()</code> — Split-Apply-Combine</h2>
 <p>Have you ever needed:</p>
@@ -704,26 +1005,26 @@
 <div class="fragment">
 <p><code>group_by()</code> adds grouping structure. <code>mutate()</code> and <code>summarize()</code> honor it:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb19-2"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap) <span class="sc">|&gt;</span></span>
-<span id="cb19-3"><a></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span></span>
-<span id="cb19-4"><a></a>  <span class="fu">summarize</span>(<span class="at">mean_gdp =</span> <span class="fu">mean</span>(gdp),</span>
-<span id="cb19-5"><a></a>            <span class="at">sd_gdp   =</span> <span class="fu">sd</span>(gdp))</span>
-<span id="cb19-6"><a></a><span class="co">#&gt; # A tibble: 12 × 3</span></span>
-<span id="cb19-7"><a></a><span class="co">#&gt;     year      mean_gdp  sd_gdp</span></span>
-<span id="cb19-8"><a></a><span class="co">#&gt;    &lt;int&gt;         &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span id="cb19-9"><a></a><span class="co">#&gt;  1  1952  49561190904. 1.97e11</span></span>
-<span id="cb19-10"><a></a><span class="co">#&gt;  2  1957  62649777593. 2.34e11</span></span>
-<span id="cb19-11"><a></a><span class="co">#&gt;  3  1962  77495568413. 2.80e11</span></span>
-<span id="cb19-12"><a></a><span class="co">#&gt;  4  1967 100338690564. 3.60e11</span></span>
-<span id="cb19-13"><a></a><span class="co">#&gt;  5  1972 129728407146. 4.37e11</span></span>
-<span id="cb19-14"><a></a><span class="co">#&gt;  6  1977 157170394501. 5.09e11</span></span>
-<span id="cb19-15"><a></a><span class="co">#&gt;  7  1982 178746382573. 5.66e11</span></span>
-<span id="cb19-16"><a></a><span class="co">#&gt;  8  1987 212202795902. 6.99e11</span></span>
-<span id="cb19-17"><a></a><span class="co">#&gt;  9  1992 242964158844. 8.01e11</span></span>
-<span id="cb19-18"><a></a><span class="co">#&gt; 10  1997 288775189215. 9.46e11</span></span>
-<span id="cb19-19"><a></a><span class="co">#&gt; 11  2002 332861503428. 1.09e12</span></span>
-<span id="cb19-20"><a></a><span class="co">#&gt; 12  2007 409220666999. 1.31e12</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb30-2"><a></a>  <span class="fu">mutate</span>(<span class="at">gdp =</span> pop <span class="sc">*</span> gdpPercap) <span class="sc">|&gt;</span></span>
+<span id="cb30-3"><a></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span></span>
+<span id="cb30-4"><a></a>  <span class="fu">summarize</span>(<span class="at">mean_gdp =</span> <span class="fu">mean</span>(gdp),</span>
+<span id="cb30-5"><a></a>            <span class="at">sd_gdp   =</span> <span class="fu">sd</span>(gdp))</span>
+<span id="cb30-6"><a></a><span class="co">#&gt; # A tibble: 12 × 3</span></span>
+<span id="cb30-7"><a></a><span class="co">#&gt;     year      mean_gdp  sd_gdp</span></span>
+<span id="cb30-8"><a></a><span class="co">#&gt;    &lt;int&gt;         &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span id="cb30-9"><a></a><span class="co">#&gt;  1  1952  49561190904. 1.97e11</span></span>
+<span id="cb30-10"><a></a><span class="co">#&gt;  2  1957  62649777593. 2.34e11</span></span>
+<span id="cb30-11"><a></a><span class="co">#&gt;  3  1962  77495568413. 2.80e11</span></span>
+<span id="cb30-12"><a></a><span class="co">#&gt;  4  1967 100338690564. 3.60e11</span></span>
+<span id="cb30-13"><a></a><span class="co">#&gt;  5  1972 129728407146. 4.37e11</span></span>
+<span id="cb30-14"><a></a><span class="co">#&gt;  6  1977 157170394501. 5.09e11</span></span>
+<span id="cb30-15"><a></a><span class="co">#&gt;  7  1982 178746382573. 5.66e11</span></span>
+<span id="cb30-16"><a></a><span class="co">#&gt;  8  1987 212202795902. 6.99e11</span></span>
+<span id="cb30-17"><a></a><span class="co">#&gt;  9  1992 242964158844. 8.01e11</span></span>
+<span id="cb30-18"><a></a><span class="co">#&gt; 10  1997 288775189215. 9.46e11</span></span>
+<span id="cb30-19"><a></a><span class="co">#&gt; 11  2002 332861503428. 1.09e12</span></span>
+<span id="cb30-20"><a></a><span class="co">#&gt; 12  2007 409220666999. 1.31e12</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </section>
@@ -731,82 +1032,82 @@
 <h2><code>group_by()</code> — More Examples</h2>
 <p>Life expectancy range by year in Europe:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb20-2"><a></a>  <span class="fu">filter</span>(continent <span class="sc">==</span> <span class="st">"Europe"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span></span>
-<span id="cb20-4"><a></a>  <span class="fu">summarize</span>(<span class="at">min_lifeExp =</span> <span class="fu">min</span>(lifeExp),</span>
-<span id="cb20-5"><a></a>            <span class="at">max_lifeExp =</span> <span class="fu">max</span>(lifeExp))</span>
-<span id="cb20-6"><a></a><span class="co">#&gt; # A tibble: 12 × 3</span></span>
-<span id="cb20-7"><a></a><span class="co">#&gt;     year min_lifeExp max_lifeExp</span></span>
-<span id="cb20-8"><a></a><span class="co">#&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;</span></span>
-<span id="cb20-9"><a></a><span class="co">#&gt;  1  1952        43.6        72.7</span></span>
-<span id="cb20-10"><a></a><span class="co">#&gt;  2  1957        48.1        73.5</span></span>
-<span id="cb20-11"><a></a><span class="co">#&gt;  3  1962        52.1        73.7</span></span>
-<span id="cb20-12"><a></a><span class="co">#&gt;  4  1967        54.3        74.2</span></span>
-<span id="cb20-13"><a></a><span class="co">#&gt;  5  1972        57.0        74.7</span></span>
-<span id="cb20-14"><a></a><span class="co">#&gt;  6  1977        59.5        76.1</span></span>
-<span id="cb20-15"><a></a><span class="co">#&gt;  7  1982        61.0        77.0</span></span>
-<span id="cb20-16"><a></a><span class="co">#&gt;  8  1987        63.1        77.4</span></span>
-<span id="cb20-17"><a></a><span class="co">#&gt;  9  1992        66.1        78.8</span></span>
-<span id="cb20-18"><a></a><span class="co">#&gt; 10  1997        68.8        79.4</span></span>
-<span id="cb20-19"><a></a><span class="co">#&gt; 11  2002        70.8        80.6</span></span>
-<span id="cb20-20"><a></a><span class="co">#&gt; 12  2007        71.8        81.8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb31-2"><a></a>  <span class="fu">filter</span>(continent <span class="sc">==</span> <span class="st">"Europe"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb31-3"><a></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span></span>
+<span id="cb31-4"><a></a>  <span class="fu">summarize</span>(<span class="at">min_lifeExp =</span> <span class="fu">min</span>(lifeExp),</span>
+<span id="cb31-5"><a></a>            <span class="at">max_lifeExp =</span> <span class="fu">max</span>(lifeExp))</span>
+<span id="cb31-6"><a></a><span class="co">#&gt; # A tibble: 12 × 3</span></span>
+<span id="cb31-7"><a></a><span class="co">#&gt;     year min_lifeExp max_lifeExp</span></span>
+<span id="cb31-8"><a></a><span class="co">#&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span id="cb31-9"><a></a><span class="co">#&gt;  1  1952        43.6        72.7</span></span>
+<span id="cb31-10"><a></a><span class="co">#&gt;  2  1957        48.1        73.5</span></span>
+<span id="cb31-11"><a></a><span class="co">#&gt;  3  1962        52.1        73.7</span></span>
+<span id="cb31-12"><a></a><span class="co">#&gt;  4  1967        54.3        74.2</span></span>
+<span id="cb31-13"><a></a><span class="co">#&gt;  5  1972        57.0        74.7</span></span>
+<span id="cb31-14"><a></a><span class="co">#&gt;  6  1977        59.5        76.1</span></span>
+<span id="cb31-15"><a></a><span class="co">#&gt;  7  1982        61.0        77.0</span></span>
+<span id="cb31-16"><a></a><span class="co">#&gt;  8  1987        63.1        77.4</span></span>
+<span id="cb31-17"><a></a><span class="co">#&gt;  9  1992        66.1        78.8</span></span>
+<span id="cb31-18"><a></a><span class="co">#&gt; 10  1997        68.8        79.4</span></span>
+<span id="cb31-19"><a></a><span class="co">#&gt; 11  2002        70.8        80.6</span></span>
+<span id="cb31-20"><a></a><span class="co">#&gt; 12  2007        71.8        81.8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="group_by-mutate-within-group-calculations" class="slide level2">
 <h2><code>group_by()</code> + <code>mutate()</code> — Within-Group Calculations</h2>
 <p><code>lag()</code> within groups — life expectancy gain since baseline year:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb21-2"><a></a>  <span class="fu">filter</span>(continent <span class="sc">==</span> <span class="st">"Europe"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb21-3"><a></a>  <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span></span>
-<span id="cb21-4"><a></a>  <span class="fu">arrange</span>(year) <span class="sc">|&gt;</span></span>
-<span id="cb21-5"><a></a>  <span class="fu">mutate</span>(<span class="at">lifeExp_gain =</span> lifeExp <span class="sc">-</span> <span class="fu">first</span>(lifeExp)) <span class="sc">|&gt;</span></span>
-<span id="cb21-6"><a></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">|&gt;</span></span>
-<span id="cb21-7"><a></a>  <span class="fu">arrange</span>(<span class="sc">-</span>lifeExp_gain)</span>
-<span id="cb21-8"><a></a><span class="co">#&gt; # A tibble: 30 × 7</span></span>
-<span id="cb21-9"><a></a><span class="co">#&gt; # Groups:   country [30]</span></span>
-<span id="cb21-10"><a></a><span class="co">#&gt;    country                continent  year lifeExp     pop gdpPercap lifeExp_gain</span></span>
-<span id="cb21-11"><a></a><span class="co">#&gt;    &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;        &lt;dbl&gt;</span></span>
-<span id="cb21-12"><a></a><span class="co">#&gt;  1 Turkey                 Europe     2007    71.8  7.12e7     8458.         28.2</span></span>
-<span id="cb21-13"><a></a><span class="co">#&gt;  2 Albania                Europe     2007    76.4  3.60e6     5937.         21.2</span></span>
-<span id="cb21-14"><a></a><span class="co">#&gt;  3 Bosnia and Herzegovina Europe     2007    74.9  4.55e6     7446.         21.0</span></span>
-<span id="cb21-15"><a></a><span class="co">#&gt;  4 Portugal               Europe     2007    78.1  1.06e7    20510.         18.3</span></span>
-<span id="cb21-16"><a></a><span class="co">#&gt;  5 Serbia                 Europe     2007    74.0  1.02e7     9787.         16.0</span></span>
-<span id="cb21-17"><a></a><span class="co">#&gt;  6 Spain                  Europe     2007    80.9  4.04e7    28821.         16.0</span></span>
-<span id="cb21-18"><a></a><span class="co">#&gt;  7 Montenegro             Europe     2007    74.5  6.85e5     9254.         15.4</span></span>
-<span id="cb21-19"><a></a><span class="co">#&gt;  8 Italy                  Europe     2007    80.5  5.81e7    28570.         14.6</span></span>
-<span id="cb21-20"><a></a><span class="co">#&gt;  9 Croatia                Europe     2007    75.7  4.49e6    14619.         14.5</span></span>
-<span id="cb21-21"><a></a><span class="co">#&gt; 10 Poland                 Europe     2007    75.6  3.85e7    15390.         14.3</span></span>
-<span id="cb21-22"><a></a><span class="co">#&gt; # ℹ 20 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb32-2"><a></a>  <span class="fu">filter</span>(continent <span class="sc">==</span> <span class="st">"Europe"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb32-3"><a></a>  <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span></span>
+<span id="cb32-4"><a></a>  <span class="fu">arrange</span>(year) <span class="sc">|&gt;</span></span>
+<span id="cb32-5"><a></a>  <span class="fu">mutate</span>(<span class="at">lifeExp_gain =</span> lifeExp <span class="sc">-</span> <span class="fu">first</span>(lifeExp)) <span class="sc">|&gt;</span></span>
+<span id="cb32-6"><a></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">|&gt;</span></span>
+<span id="cb32-7"><a></a>  <span class="fu">arrange</span>(<span class="sc">-</span>lifeExp_gain)</span>
+<span id="cb32-8"><a></a><span class="co">#&gt; # A tibble: 30 × 7</span></span>
+<span id="cb32-9"><a></a><span class="co">#&gt; # Groups:   country [30]</span></span>
+<span id="cb32-10"><a></a><span class="co">#&gt;    country                continent  year lifeExp     pop gdpPercap lifeExp_gain</span></span>
+<span id="cb32-11"><a></a><span class="co">#&gt;    &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;        &lt;dbl&gt;</span></span>
+<span id="cb32-12"><a></a><span class="co">#&gt;  1 Turkey                 Europe     2007    71.8  7.12e7     8458.         28.2</span></span>
+<span id="cb32-13"><a></a><span class="co">#&gt;  2 Albania                Europe     2007    76.4  3.60e6     5937.         21.2</span></span>
+<span id="cb32-14"><a></a><span class="co">#&gt;  3 Bosnia and Herzegovina Europe     2007    74.9  4.55e6     7446.         21.0</span></span>
+<span id="cb32-15"><a></a><span class="co">#&gt;  4 Portugal               Europe     2007    78.1  1.06e7    20510.         18.3</span></span>
+<span id="cb32-16"><a></a><span class="co">#&gt;  5 Serbia                 Europe     2007    74.0  1.02e7     9787.         16.0</span></span>
+<span id="cb32-17"><a></a><span class="co">#&gt;  6 Spain                  Europe     2007    80.9  4.04e7    28821.         16.0</span></span>
+<span id="cb32-18"><a></a><span class="co">#&gt;  7 Montenegro             Europe     2007    74.5  6.85e5     9254.         15.4</span></span>
+<span id="cb32-19"><a></a><span class="co">#&gt;  8 Italy                  Europe     2007    80.5  5.81e7    28570.         14.6</span></span>
+<span id="cb32-20"><a></a><span class="co">#&gt;  9 Croatia                Europe     2007    75.7  4.49e6    14619.         14.5</span></span>
+<span id="cb32-21"><a></a><span class="co">#&gt; 10 Poland                 Europe     2007    75.6  3.85e7    15390.         14.3</span></span>
+<span id="cb32-22"><a></a><span class="co">#&gt; # ℹ 20 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="worst-single-year-drop-in-life-expectancy" class="slide level2">
 <h2>Worst Single-Year Drop in Life Expectancy</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb22-2"><a></a>  <span class="fu">select</span>(country, year, continent, lifeExp) <span class="sc">|&gt;</span></span>
-<span id="cb22-3"><a></a>  <span class="fu">group_by</span>(country, continent) <span class="sc">|&gt;</span></span>
-<span id="cb22-4"><a></a>  <span class="fu">arrange</span>(year) <span class="sc">|&gt;</span></span>
-<span id="cb22-5"><a></a>  <span class="fu">mutate</span>(<span class="at">le_delta =</span> lifeExp <span class="sc">-</span> <span class="fu">lag</span>(lifeExp)) <span class="sc">|&gt;</span></span>
-<span id="cb22-6"><a></a>  <span class="fu">summarize</span>(<span class="at">worst_drop =</span> <span class="fu">min</span>(le_delta, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb22-7"><a></a>  <span class="fu">slice_min</span>(worst_drop, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
-<span id="cb22-8"><a></a>  <span class="fu">arrange</span>(worst_drop)</span>
-<span id="cb22-9"><a></a><span class="co">#&gt; # A tibble: 142 × 3</span></span>
-<span id="cb22-10"><a></a><span class="co">#&gt; # Groups:   country [142]</span></span>
-<span id="cb22-11"><a></a><span class="co">#&gt;    country      continent worst_drop</span></span>
-<span id="cb22-12"><a></a><span class="co">#&gt;    &lt;fct&gt;        &lt;fct&gt;          &lt;dbl&gt;</span></span>
-<span id="cb22-13"><a></a><span class="co">#&gt;  1 Rwanda       Africa        -20.4 </span></span>
-<span id="cb22-14"><a></a><span class="co">#&gt;  2 Zimbabwe     Africa        -13.6 </span></span>
-<span id="cb22-15"><a></a><span class="co">#&gt;  3 Lesotho      Africa        -11.0 </span></span>
-<span id="cb22-16"><a></a><span class="co">#&gt;  4 Swaziland    Africa        -10.4 </span></span>
-<span id="cb22-17"><a></a><span class="co">#&gt;  5 Botswana     Africa        -10.2 </span></span>
-<span id="cb22-18"><a></a><span class="co">#&gt;  6 Cambodia     Asia           -9.10</span></span>
-<span id="cb22-19"><a></a><span class="co">#&gt;  7 Namibia      Africa         -7.43</span></span>
-<span id="cb22-20"><a></a><span class="co">#&gt;  8 South Africa Africa         -6.87</span></span>
-<span id="cb22-21"><a></a><span class="co">#&gt;  9 China        Asia           -6.05</span></span>
-<span id="cb22-22"><a></a><span class="co">#&gt; 10 Zambia       Africa         -5.86</span></span>
-<span id="cb22-23"><a></a><span class="co">#&gt; # ℹ 132 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a></a>  <span class="fu">select</span>(country, year, continent, lifeExp) <span class="sc">|&gt;</span></span>
+<span id="cb33-3"><a></a>  <span class="fu">group_by</span>(country, continent) <span class="sc">|&gt;</span></span>
+<span id="cb33-4"><a></a>  <span class="fu">arrange</span>(year) <span class="sc">|&gt;</span></span>
+<span id="cb33-5"><a></a>  <span class="fu">mutate</span>(<span class="at">le_delta =</span> lifeExp <span class="sc">-</span> <span class="fu">lag</span>(lifeExp)) <span class="sc">|&gt;</span></span>
+<span id="cb33-6"><a></a>  <span class="fu">summarize</span>(<span class="at">worst_drop =</span> <span class="fu">min</span>(le_delta, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb33-7"><a></a>  <span class="fu">slice_min</span>(worst_drop, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb33-8"><a></a>  <span class="fu">arrange</span>(worst_drop)</span>
+<span id="cb33-9"><a></a><span class="co">#&gt; # A tibble: 142 × 3</span></span>
+<span id="cb33-10"><a></a><span class="co">#&gt; # Groups:   country [142]</span></span>
+<span id="cb33-11"><a></a><span class="co">#&gt;    country      continent worst_drop</span></span>
+<span id="cb33-12"><a></a><span class="co">#&gt;    &lt;fct&gt;        &lt;fct&gt;          &lt;dbl&gt;</span></span>
+<span id="cb33-13"><a></a><span class="co">#&gt;  1 Rwanda       Africa        -20.4 </span></span>
+<span id="cb33-14"><a></a><span class="co">#&gt;  2 Zimbabwe     Africa        -13.6 </span></span>
+<span id="cb33-15"><a></a><span class="co">#&gt;  3 Lesotho      Africa        -11.0 </span></span>
+<span id="cb33-16"><a></a><span class="co">#&gt;  4 Swaziland    Africa        -10.4 </span></span>
+<span id="cb33-17"><a></a><span class="co">#&gt;  5 Botswana     Africa        -10.2 </span></span>
+<span id="cb33-18"><a></a><span class="co">#&gt;  6 Cambodia     Asia           -9.10</span></span>
+<span id="cb33-19"><a></a><span class="co">#&gt;  7 Namibia      Africa         -7.43</span></span>
+<span id="cb33-20"><a></a><span class="co">#&gt;  8 South Africa Africa         -6.87</span></span>
+<span id="cb33-21"><a></a><span class="co">#&gt;  9 China        Asia           -6.05</span></span>
+<span id="cb33-22"><a></a><span class="co">#&gt; 10 Zambia       Africa         -5.86</span></span>
+<span id="cb33-23"><a></a><span class="co">#&gt; # ℹ 132 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -823,21 +1124,6 @@
 </div>
 </div>
 </div>
-</section>
-<section id="connection-to-sql" class="slide level2">
-<h2>Connection to SQL</h2>
-
-<img data-src="img/sql_example.png" class="quarto-figure quarto-figure-center r-stretch" style="width:75.0%"><div class="fragment">
-<p>You just learned the core concepts of SQL:</p>
-<ul>
-<li><code>filter()</code> = <code>WHERE</code></li>
-<li><code>select()</code> = <code>SELECT</code></li>
-<li><code>mutate()</code> = computed columns</li>
-<li><code>summarize()</code> + <code>group_by()</code> = <code>GROUP BY</code> + aggregate functions</li>
-<li><code>arrange()</code> = <code>ORDER BY</code></li>
-</ul>
-<p>The grammar transfers directly. SQL is the language of databases; dplyr is the language of R data frames. They solve the same class of problems.</p>
-</div>
 </section></section>
 <section>
 <section id="part-2-data-visualization" class="title-slide slide level1 center" data-background-color="#1E4D2B">
@@ -848,7 +1134,8 @@
 <h2>Why Visualization?</h2>
 <p>Data without visualization is just numbers. Before building any model or writing any interpretation, plot your data. Always.</p>
 <div class="fragment">
-<p><code>ggplot2</code> is built on the <strong>Grammar of Graphics</strong> — the idea that every chart can be described by the same small set of components:</p>
+<p><code>ggplot2</code> is built on a consistent grammar — the same recipe works for scatter plots, line charts, heatmaps, and beyond. This systematic grammar is what makes ggplot2 powerful: once you learn the components, you can build <em>any</em> visualization.</p>
+<p>The <strong>Grammar of Graphics</strong> says every chart is built from the same small set of components:</p>
 <ol type="1">
 <li><strong>Data</strong> — what are we visualizing?</li>
 <li><strong>Aesthetic mappings</strong> — which variables map to which visual properties?</li>
@@ -861,12 +1148,12 @@
 <h2>The ggplot2 Workflow</h2>
 <p>Building a plot is additive — you layer components with <code>+</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a>DATA <span class="sc">|&gt;</span></span>
-<span id="cb23-2"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> VAR1, <span class="at">y =</span> VAR2)) <span class="sc">+</span></span>
-<span id="cb23-3"><a></a>  <span class="fu">GEOM_FUNCTION</span>() <span class="sc">+</span></span>
-<span id="cb23-4"><a></a>  LABELS <span class="sc">+</span></span>
-<span id="cb23-5"><a></a>  FACETS <span class="sc">+</span></span>
-<span id="cb23-6"><a></a>  THEME</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a>DATA <span class="sc">|&gt;</span></span>
+<span id="cb34-2"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> VAR1, <span class="at">y =</span> VAR2)) <span class="sc">+</span></span>
+<span id="cb34-3"><a></a>  <span class="fu">GEOM_FUNCTION</span>() <span class="sc">+</span></span>
+<span id="cb34-4"><a></a>  LABELS <span class="sc">+</span></span>
+<span id="cb34-5"><a></a>  FACETS <span class="sc">+</span></span>
+<span id="cb34-6"><a></a>  THEME</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
 <div class="callout callout-tip callout-titled callout-style-default">
@@ -884,41 +1171,28 @@
 </div>
 </div>
 </section>
-<section id="step-1-the-canvas" class="slide level2">
-<h2>Step 1: The Canvas</h2>
+<section id="building-a-plot-data-aesthetics-geom" class="slide level2">
+<h2>Building a Plot: Data → Aesthetics → Geom</h2>
+<p>All ggplot2 plots follow the same structure: data + aesthetics (which variables to visual properties) + geometry (what shape).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a>gm2007 <span class="ot">&lt;-</span> <span class="fu">filter</span>(gapminder, year <span class="sc">==</span> <span class="dv">2007</span>)</span>
-<span id="cb24-2"><a></a></span>
-<span id="cb24-3"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>gm2007 <span class="ot">&lt;-</span> <span class="fu">filter</span>(gapminder, year <span class="sc">==</span> <span class="dv">2007</span>)</span>
+<span id="cb35-2"><a></a></span>
+<span id="cb35-3"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb35-4"><a></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-29-1.png" width="576" class="r-stretch"></section>
-<section id="step-1-add-aesthetic-mappings" class="slide level2">
-<h2>Step 1: Add Aesthetic Mappings</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007,</span>
-<span id="cb25-2"><a></a>       <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
+<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-39-1.png" width="576" class="r-stretch"><div class="fragment">
+<p><strong>Key point</strong>: Aesthetic mappings in <code>aes()</code> describe how variables are <strong>visualized</strong> — placed in <code>ggplot()</code>, they apply globally to all layers.</p>
 </div>
-<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-30-1.png" width="576" class="r-stretch"><p>Aesthetic mappings describe how variables in the data are <strong>visualized</strong>. Placed in <code>ggplot()</code>, they apply globally to all layers.</p>
 </section>
-<section id="step-2-add-a-geometry" class="slide level2">
-<h2>Step 2: Add a Geometry</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007,</span>
-<span id="cb26-2"><a></a>       <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
-<span id="cb26-3"><a></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
-</div>
-<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-31-1.png" width="576" class="r-stretch"></section>
 <section id="fixed-vs.-data-driven-aesthetics" class="slide level2">
 <h2>Fixed vs.&nbsp;Data-Driven Aesthetics</h2>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007,</span>
-<span id="cb27-2"><a></a>       <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
-<span id="cb27-3"><a></a>  <span class="fu">geom_point</span>(<span class="at">col =</span> <span class="st">"red"</span>)</span>
-<span id="cb27-4"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007,</span>
-<span id="cb27-5"><a></a>       <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
-<span id="cb27-6"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">col =</span> continent))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007,</span>
+<span id="cb36-2"><a></a>       <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb36-3"><a></a>  <span class="fu">geom_point</span>(<span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb36-4"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007,</span>
+<span id="cb36-5"><a></a>       <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb36-6"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">col =</span> continent))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="quarto-layout-panel" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="column quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
@@ -927,7 +1201,7 @@
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-32-1.png" width="576"></p>
+<p><img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-40-1.png" width="576"></p>
 </figure>
 </div>
 </div>
@@ -938,7 +1212,7 @@
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-33-1.png" width="576"></p>
+<p><img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-41-1.png" width="576"></p>
 </figure>
 </div>
 </div>
@@ -950,42 +1224,42 @@
 <h2>Multiple Geoms</h2>
 <p>Layers compose — each <code>+</code> adds a new geometric object:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007,</span>
-<span id="cb28-2"><a></a>       <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
-<span id="cb28-3"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
-<span id="cb28-4"><a></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb28-5"><a></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">mean</span>(gm2007<span class="sc">$</span>lifeExp), <span class="at">color =</span> <span class="st">"gray50"</span>) <span class="sc">+</span></span>
-<span id="cb28-6"><a></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">mean</span>(gm2007<span class="sc">$</span>gdpPercap), <span class="at">color =</span> <span class="st">"gray50"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007,</span>
+<span id="cb37-2"><a></a>       <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb37-3"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
+<span id="cb37-4"><a></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb37-5"><a></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">mean</span>(gm2007<span class="sc">$</span>lifeExp), <span class="at">color =</span> <span class="st">"gray50"</span>) <span class="sc">+</span></span>
+<span id="cb37-6"><a></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">mean</span>(gm2007<span class="sc">$</span>gdpPercap), <span class="at">color =</span> <span class="st">"gray50"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-34-1.png" width="576" class="r-stretch"></section>
+<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-42-1.png" width="576" class="r-stretch"></section>
 <section id="step-3-labels" class="slide level2">
 <h2>Step 3: Labels</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
-<span id="cb29-2"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
-<span id="cb29-3"><a></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">linewidth =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb29-4"><a></a>  <span class="fu">labs</span>(<span class="at">title    =</span> <span class="st">"Per capita GDP vs. life expectancy (2007)"</span>,</span>
-<span id="cb29-5"><a></a>       <span class="at">x        =</span> <span class="st">"Per Capita GDP (USD)"</span>,</span>
-<span id="cb29-6"><a></a>       <span class="at">y        =</span> <span class="st">"Life Expectancy (years)"</span>,</span>
-<span id="cb29-7"><a></a>       <span class="at">subtitle =</span> <span class="st">"Source: Gapminder"</span>,</span>
-<span id="cb29-8"><a></a>       <span class="at">color    =</span> <span class="st">""</span>,</span>
-<span id="cb29-9"><a></a>       <span class="at">size     =</span> <span class="st">"Population"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb38-2"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
+<span id="cb38-3"><a></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">linewidth =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb38-4"><a></a>  <span class="fu">labs</span>(<span class="at">title    =</span> <span class="st">"Per capita GDP vs. life expectancy (2007)"</span>,</span>
+<span id="cb38-5"><a></a>       <span class="at">x        =</span> <span class="st">"Per Capita GDP (USD)"</span>,</span>
+<span id="cb38-6"><a></a>       <span class="at">y        =</span> <span class="st">"Life Expectancy (years)"</span>,</span>
+<span id="cb38-7"><a></a>       <span class="at">subtitle =</span> <span class="st">"Source: Gapminder"</span>,</span>
+<span id="cb38-8"><a></a>       <span class="at">color    =</span> <span class="st">""</span>,</span>
+<span id="cb38-9"><a></a>       <span class="at">size     =</span> <span class="st">"Population"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-35-1.png" width="576" class="r-stretch"></section>
+<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-43-1.png" width="576" class="r-stretch"></section>
 <section id="step-4-facets" class="slide level2">
 <h2>Step 4: Facets</h2>
 <p>Split one plot into many by a categorical variable:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
-<span id="cb30-2"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
-<span id="cb30-3"><a></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">linewidth =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb30-4"><a></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Per Capita GDP"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy"</span>) <span class="sc">+</span></span>
-<span id="cb30-5"><a></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>continent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb39-2"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
+<span id="cb39-3"><a></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">linewidth =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb39-4"><a></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Per Capita GDP"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy"</span>) <span class="sc">+</span></span>
+<span id="cb39-5"><a></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>continent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-36-1.png" width="576" class="r-stretch"></section>
+<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-44-1.png" width="576" class="r-stretch"></section>
 <section id="facet_wrap-vs.-facet_grid" class="slide level2">
 <h2><code>facet_wrap()</code> vs.&nbsp;<code>facet_grid()</code></h2>
 
@@ -999,14 +1273,14 @@
 <h2>Step 5: Themes</h2>
 <p>Themes control all non-data visual elements:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
-<span id="cb31-2"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
-<span id="cb31-3"><a></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Per Capita GDP"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy"</span>,</span>
-<span id="cb31-4"><a></a>       <span class="at">title =</span> <span class="st">"GDP vs. Life Expectancy (2007)"</span>) <span class="sc">+</span></span>
-<span id="cb31-5"><a></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> gm2007, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb40-2"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
+<span id="cb40-3"><a></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Per Capita GDP"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy"</span>,</span>
+<span id="cb40-4"><a></a>       <span class="at">title =</span> <span class="st">"GDP vs. Life Expectancy (2007)"</span>) <span class="sc">+</span></span>
+<span id="cb40-5"><a></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-38-1.png" width="576" class="r-stretch"><div class="fragment">
+<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-46-1.png" width="576" class="r-stretch"><div class="fragment">
 <p>Built-in themes: <code>theme_bw()</code>, <code>theme_minimal()</code>, <code>theme_light()</code>, <code>theme_dark()</code>, <code>theme_classic()</code></p>
 <p>The <code>ggthemes</code> package adds Economist, WSJ, FiveThirtyEight, and many more.</p>
 </div>
@@ -1015,15 +1289,15 @@
 <h2>Saving Plots</h2>
 <p>ggplot outputs are objects — assign them, then save:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> gm2007, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
-<span id="cb32-2"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
-<span id="cb32-3"><a></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb32-4"><a></a></span>
-<span id="cb32-5"><a></a><span class="fu">ggsave</span>(p,</span>
-<span id="cb32-6"><a></a>       <span class="at">file   =</span> <span class="st">"img/gdp-lifeexp-2007.png"</span>,</span>
-<span id="cb32-7"><a></a>       <span class="at">width  =</span> <span class="dv">8</span>,</span>
-<span id="cb32-8"><a></a>       <span class="at">height =</span> <span class="dv">5</span>,</span>
-<span id="cb32-9"><a></a>       <span class="at">units  =</span> <span class="st">"in"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> gm2007, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span></span>
+<span id="cb41-2"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> continent, <span class="at">size =</span> pop)) <span class="sc">+</span></span>
+<span id="cb41-3"><a></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb41-4"><a></a></span>
+<span id="cb41-5"><a></a><span class="fu">ggsave</span>(p,</span>
+<span id="cb41-6"><a></a>       <span class="at">file   =</span> <span class="st">"img/gdp-lifeexp-2007.png"</span>,</span>
+<span id="cb41-7"><a></a>       <span class="at">width  =</span> <span class="dv">8</span>,</span>
+<span id="cb41-8"><a></a>       <span class="at">height =</span> <span class="dv">5</span>,</span>
+<span id="cb41-9"><a></a>       <span class="at">units  =</span> <span class="st">"in"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
 <div class="callout callout-tip callout-titled callout-style-default">
@@ -1045,19 +1319,19 @@
 <h2>ggplot in a Pipeline</h2>
 <p>ggplot integrates naturally with dplyr — pipe your wrangled data straight into a plot:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb33-2"><a></a>  <span class="fu">filter</span>(continent <span class="sc">==</span> <span class="st">"Europe"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb33-3"><a></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span></span>
-<span id="cb33-4"><a></a>  <span class="fu">summarize</span>(<span class="at">mean_lifeExp =</span> <span class="fu">mean</span>(lifeExp)) <span class="sc">|&gt;</span></span>
-<span id="cb33-5"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> mean_lifeExp)) <span class="sc">+</span></span>
-<span id="cb33-6"><a></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb33-7"><a></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb33-8"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mean Life Expectancy in Europe Over Time"</span>,</span>
-<span id="cb33-9"><a></a>       <span class="at">x =</span> <span class="st">"Year"</span>, <span class="at">y =</span> <span class="st">"Mean Life Expectancy"</span>) <span class="sc">+</span></span>
-<span id="cb33-10"><a></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb42-2"><a></a>  <span class="fu">filter</span>(continent <span class="sc">==</span> <span class="st">"Europe"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb42-3"><a></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span></span>
+<span id="cb42-4"><a></a>  <span class="fu">summarize</span>(<span class="at">mean_lifeExp =</span> <span class="fu">mean</span>(lifeExp)) <span class="sc">|&gt;</span></span>
+<span id="cb42-5"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> mean_lifeExp)) <span class="sc">+</span></span>
+<span id="cb42-6"><a></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb42-7"><a></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb42-8"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mean Life Expectancy in Europe Over Time"</span>,</span>
+<span id="cb42-9"><a></a>       <span class="at">x =</span> <span class="st">"Year"</span>, <span class="at">y =</span> <span class="st">"Mean Life Expectancy"</span>) <span class="sc">+</span></span>
+<span id="cb42-10"><a></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-40-1.png" width="576" class="r-stretch"></section></section>
+<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-48-1.png" width="576" class="r-stretch"></section></section>
 <section>
 <section id="part-3-relational-data" class="title-slide slide level1 center" data-background-color="#1E4D2B">
 <h1>Part 3: Relational Data</h1>
@@ -1093,21 +1367,21 @@
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb34-2"><a></a>band_members</span>
-<span id="cb34-3"><a></a><span class="co">#&gt; # A tibble: 3 × 2</span></span>
-<span id="cb34-4"><a></a><span class="co">#&gt;   name  band   </span></span>
-<span id="cb34-5"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;  </span></span>
-<span id="cb34-6"><a></a><span class="co">#&gt; 1 Mick  Stones </span></span>
-<span id="cb34-7"><a></a><span class="co">#&gt; 2 John  Beatles</span></span>
-<span id="cb34-8"><a></a><span class="co">#&gt; 3 Paul  Beatles</span></span>
-<span id="cb34-9"><a></a>band_instruments</span>
-<span id="cb34-10"><a></a><span class="co">#&gt; # A tibble: 3 × 2</span></span>
-<span id="cb34-11"><a></a><span class="co">#&gt;   name  plays </span></span>
-<span id="cb34-12"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; </span></span>
-<span id="cb34-13"><a></a><span class="co">#&gt; 1 John  guitar</span></span>
-<span id="cb34-14"><a></a><span class="co">#&gt; 2 Paul  bass  </span></span>
-<span id="cb34-15"><a></a><span class="co">#&gt; 3 Keith guitar</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb43-2"><a></a>band_members</span>
+<span id="cb43-3"><a></a><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span id="cb43-4"><a></a><span class="co">#&gt;   name  band   </span></span>
+<span id="cb43-5"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;  </span></span>
+<span id="cb43-6"><a></a><span class="co">#&gt; 1 Mick  Stones </span></span>
+<span id="cb43-7"><a></a><span class="co">#&gt; 2 John  Beatles</span></span>
+<span id="cb43-8"><a></a><span class="co">#&gt; 3 Paul  Beatles</span></span>
+<span id="cb43-9"><a></a>band_instruments</span>
+<span id="cb43-10"><a></a><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span id="cb43-11"><a></a><span class="co">#&gt;   name  plays </span></span>
+<span id="cb43-12"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; </span></span>
+<span id="cb43-13"><a></a><span class="co">#&gt; 1 John  guitar</span></span>
+<span id="cb43-14"><a></a><span class="co">#&gt; 2 Paul  bass  </span></span>
+<span id="cb43-15"><a></a><span class="co">#&gt; 3 Keith guitar</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><code>name</code> is the primary key in both tables and the foreign key that connects them.</p>
 </div>
@@ -1151,12 +1425,12 @@
 <h2>Inner Join</h2>
 <p>Returns only rows with matches in <strong>both</strong> tables:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a><span class="fu">inner_join</span>(band_members, band_instruments, <span class="at">by =</span> <span class="st">"name"</span>)</span>
-<span id="cb35-2"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
-<span id="cb35-3"><a></a><span class="co">#&gt;   name  band    plays </span></span>
-<span id="cb35-4"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span></span>
-<span id="cb35-5"><a></a><span class="co">#&gt; 1 John  Beatles guitar</span></span>
-<span id="cb35-6"><a></a><span class="co">#&gt; 2 Paul  Beatles bass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="fu">inner_join</span>(band_members, band_instruments, <span class="at">by =</span> <span class="st">"name"</span>)</span>
+<span id="cb44-2"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span id="cb44-3"><a></a><span class="co">#&gt;   name  band    plays </span></span>
+<span id="cb44-4"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span></span>
+<span id="cb44-5"><a></a><span class="co">#&gt; 1 John  Beatles guitar</span></span>
+<span id="cb44-6"><a></a><span class="co">#&gt; 2 Paul  Beatles bass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Mick has no instrument record → dropped. Keith has no band record → dropped.</p>
 </section>
@@ -1164,13 +1438,13 @@
 <h2>Left Join</h2>
 <p>Returns <strong>all rows from the left table</strong>, NAs where no match in right:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="fu">left_join</span>(band_members, band_instruments, <span class="at">by =</span> <span class="st">"name"</span>)</span>
-<span id="cb36-2"><a></a><span class="co">#&gt; # A tibble: 3 × 3</span></span>
-<span id="cb36-3"><a></a><span class="co">#&gt;   name  band    plays </span></span>
-<span id="cb36-4"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span></span>
-<span id="cb36-5"><a></a><span class="co">#&gt; 1 Mick  Stones  &lt;NA&gt;  </span></span>
-<span id="cb36-6"><a></a><span class="co">#&gt; 2 John  Beatles guitar</span></span>
-<span id="cb36-7"><a></a><span class="co">#&gt; 3 Paul  Beatles bass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a><span class="fu">left_join</span>(band_members, band_instruments, <span class="at">by =</span> <span class="st">"name"</span>)</span>
+<span id="cb45-2"><a></a><span class="co">#&gt; # A tibble: 3 × 3</span></span>
+<span id="cb45-3"><a></a><span class="co">#&gt;   name  band    plays </span></span>
+<span id="cb45-4"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span></span>
+<span id="cb45-5"><a></a><span class="co">#&gt; 1 Mick  Stones  &lt;NA&gt;  </span></span>
+<span id="cb45-6"><a></a><span class="co">#&gt; 2 John  Beatles guitar</span></span>
+<span id="cb45-7"><a></a><span class="co">#&gt; 3 Paul  Beatles bass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Mick kept, <code>plays</code> is <code>NA</code>. Keith dropped (not in left table).</p>
 </section>
@@ -1178,27 +1452,27 @@
 <h2>Right Join</h2>
 <p>Returns <strong>all rows from the right table</strong>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a><span class="fu">right_join</span>(band_members, band_instruments, <span class="at">by =</span> <span class="st">"name"</span>)</span>
-<span id="cb37-2"><a></a><span class="co">#&gt; # A tibble: 3 × 3</span></span>
-<span id="cb37-3"><a></a><span class="co">#&gt;   name  band    plays </span></span>
-<span id="cb37-4"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span></span>
-<span id="cb37-5"><a></a><span class="co">#&gt; 1 John  Beatles guitar</span></span>
-<span id="cb37-6"><a></a><span class="co">#&gt; 2 Paul  Beatles bass  </span></span>
-<span id="cb37-7"><a></a><span class="co">#&gt; 3 Keith &lt;NA&gt;    guitar</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a></a><span class="fu">right_join</span>(band_members, band_instruments, <span class="at">by =</span> <span class="st">"name"</span>)</span>
+<span id="cb46-2"><a></a><span class="co">#&gt; # A tibble: 3 × 3</span></span>
+<span id="cb46-3"><a></a><span class="co">#&gt;   name  band    plays </span></span>
+<span id="cb46-4"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span></span>
+<span id="cb46-5"><a></a><span class="co">#&gt; 1 John  Beatles guitar</span></span>
+<span id="cb46-6"><a></a><span class="co">#&gt; 2 Paul  Beatles bass  </span></span>
+<span id="cb46-7"><a></a><span class="co">#&gt; 3 Keith &lt;NA&gt;    guitar</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="full-join" class="slide level2">
 <h2>Full Join</h2>
 <p>Returns <strong>all rows from both tables</strong>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a><span class="fu">full_join</span>(band_members, band_instruments, <span class="at">by =</span> <span class="st">"name"</span>)</span>
-<span id="cb38-2"><a></a><span class="co">#&gt; # A tibble: 4 × 3</span></span>
-<span id="cb38-3"><a></a><span class="co">#&gt;   name  band    plays </span></span>
-<span id="cb38-4"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span></span>
-<span id="cb38-5"><a></a><span class="co">#&gt; 1 Mick  Stones  &lt;NA&gt;  </span></span>
-<span id="cb38-6"><a></a><span class="co">#&gt; 2 John  Beatles guitar</span></span>
-<span id="cb38-7"><a></a><span class="co">#&gt; 3 Paul  Beatles bass  </span></span>
-<span id="cb38-8"><a></a><span class="co">#&gt; 4 Keith &lt;NA&gt;    guitar</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a></a><span class="fu">full_join</span>(band_members, band_instruments, <span class="at">by =</span> <span class="st">"name"</span>)</span>
+<span id="cb47-2"><a></a><span class="co">#&gt; # A tibble: 4 × 3</span></span>
+<span id="cb47-3"><a></a><span class="co">#&gt;   name  band    plays </span></span>
+<span id="cb47-4"><a></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; </span></span>
+<span id="cb47-5"><a></a><span class="co">#&gt; 1 Mick  Stones  &lt;NA&gt;  </span></span>
+<span id="cb47-6"><a></a><span class="co">#&gt; 2 John  Beatles guitar</span></span>
+<span id="cb47-7"><a></a><span class="co">#&gt; 3 Paul  Beatles bass  </span></span>
+<span id="cb47-8"><a></a><span class="co">#&gt; 4 Keith &lt;NA&gt;    guitar</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Everyone is kept. NAs fill missing values on either side.</p>
 </section>
@@ -1224,14 +1498,14 @@ If the key column is not actually unique in one of the tables, every matching ro
 <div class="fragment">
 <p><strong>Always verify after joining:</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a><span class="co"># 1. Row count unchanged</span></span>
-<span id="cb39-2"><a></a><span class="fu">nrow</span>(result) <span class="sc">==</span> <span class="fu">nrow</span>(left_table)</span>
-<span id="cb39-3"><a></a></span>
-<span id="cb39-4"><a></a><span class="co"># 2. No unexpected NAs in joined columns</span></span>
-<span id="cb39-5"><a></a><span class="fu">sum</span>(<span class="fu">is.na</span>(result<span class="sc">$</span>new_column))</span>
-<span id="cb39-6"><a></a></span>
-<span id="cb39-7"><a></a><span class="co"># 3. Spot-check a known value</span></span>
-<span id="cb39-8"><a></a>result <span class="sc">|&gt;</span> <span class="fu">filter</span>(key <span class="sc">==</span> <span class="st">"known_value"</span>) <span class="sc">|&gt;</span> <span class="fu">distinct</span>(key, new_column)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a></a><span class="co"># 1. Row count unchanged</span></span>
+<span id="cb48-2"><a></a><span class="fu">nrow</span>(result) <span class="sc">==</span> <span class="fu">nrow</span>(left_table)</span>
+<span id="cb48-3"><a></a></span>
+<span id="cb48-4"><a></a><span class="co"># 2. No unexpected NAs in joined columns</span></span>
+<span id="cb48-5"><a></a><span class="fu">sum</span>(<span class="fu">is.na</span>(result<span class="sc">$</span>new_column))</span>
+<span id="cb48-6"><a></a></span>
+<span id="cb48-7"><a></a><span class="co"># 3. Spot-check a known value</span></span>
+<span id="cb48-8"><a></a>result <span class="sc">|&gt;</span> <span class="fu">filter</span>(key <span class="sc">==</span> <span class="st">"known_value"</span>) <span class="sc">|&gt;</span> <span class="fu">distinct</span>(key, new_column)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </section>
@@ -1239,37 +1513,37 @@ If the key column is not actually unique in one of the tables, every matching ro
 <h2>Surrogate Keys</h2>
 <p>Sometimes a table has no natural primary key. Create one with <code>row_number()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb40-2"><a></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) <span class="sc">|&gt;</span></span>
-<span id="cb40-3"><a></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>())</span>
-<span id="cb40-4"><a></a><span class="co">#&gt; # A tibble: 5 × 7</span></span>
-<span id="cb40-5"><a></a><span class="co">#&gt;   country     continent  year lifeExp      pop gdpPercap    id</span></span>
-<span id="cb40-6"><a></a><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt; &lt;int&gt;</span></span>
-<span id="cb40-7"><a></a><span class="co">#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.     1</span></span>
-<span id="cb40-8"><a></a><span class="co">#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.     2</span></span>
-<span id="cb40-9"><a></a><span class="co">#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.     3</span></span>
-<span id="cb40-10"><a></a><span class="co">#&gt; 4 Afghanistan Asia       1967    34.0 11537966      836.     4</span></span>
-<span id="cb40-11"><a></a><span class="co">#&gt; 5 Afghanistan Asia       1972    36.1 13079460      740.     5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb49-2"><a></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb49-3"><a></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>())</span>
+<span id="cb49-4"><a></a><span class="co">#&gt; # A tibble: 5 × 7</span></span>
+<span id="cb49-5"><a></a><span class="co">#&gt;   country     continent  year lifeExp      pop gdpPercap    id</span></span>
+<span id="cb49-6"><a></a><span class="co">#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt; &lt;int&gt;</span></span>
+<span id="cb49-7"><a></a><span class="co">#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.     1</span></span>
+<span id="cb49-8"><a></a><span class="co">#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.     2</span></span>
+<span id="cb49-9"><a></a><span class="co">#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.     3</span></span>
+<span id="cb49-10"><a></a><span class="co">#&gt; 4 Afghanistan Asia       1967    34.0 11537966      836.     4</span></span>
+<span id="cb49-11"><a></a><span class="co">#&gt; 5 Afghanistan Asia       1972    36.1 13079460      740.     5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This is called a <strong>surrogate key</strong> — it has no real-world meaning but uniquely identifies each row for joining purposes.</p>
 </section>
 <section id="real-example-nwis-flow-site-metadata" class="slide level2">
 <h2>Real Example: NWIS Flow + Site Metadata</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a><span class="co"># Two tables, one key</span></span>
-<span id="cb41-2"><a></a>flow      <span class="co"># site_no appears thousands of times (foreign key)</span></span>
-<span id="cb41-3"><a></a>site_meta <span class="co"># site_no appears once per gauge (primary key)</span></span>
-<span id="cb41-4"><a></a></span>
-<span id="cb41-5"><a></a><span class="co"># One-to-many join: one site_meta row fans out to thousands of flow rows</span></span>
-<span id="cb41-6"><a></a>flow_meta <span class="ot">&lt;-</span> flow <span class="sc">|&gt;</span></span>
-<span id="cb41-7"><a></a>  <span class="fu">left_join</span>(site_meta, <span class="at">by =</span> <span class="st">"site_no"</span>)</span>
-<span id="cb41-8"><a></a></span>
-<span id="cb41-9"><a></a><span class="co"># Verify</span></span>
-<span id="cb41-10"><a></a><span class="fu">nrow</span>(flow_meta) <span class="sc">==</span> <span class="fu">nrow</span>(flow)                    <span class="co"># row count unchanged?</span></span>
-<span id="cb41-11"><a></a><span class="fu">sum</span>(<span class="fu">is.na</span>(flow_meta<span class="sc">$</span>drain_area_va)) <span class="sc">==</span> <span class="dv">0</span>          <span class="co"># no missing area values?</span></span>
-<span id="cb41-12"><a></a>flow_meta <span class="sc">|&gt;</span>                                      <span class="co"># known value check</span></span>
-<span id="cb41-13"><a></a>  <span class="fu">filter</span>(site_no <span class="sc">==</span> <span class="st">"09380000"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb41-14"><a></a>  <span class="fu">distinct</span>(site_no, drain_area_va)               <span class="co"># should be ~111,800 mi²</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a></a><span class="co"># Two tables, one key</span></span>
+<span id="cb50-2"><a></a>flow      <span class="co"># site_no appears thousands of times (foreign key)</span></span>
+<span id="cb50-3"><a></a>site_meta <span class="co"># site_no appears once per gauge (primary key)</span></span>
+<span id="cb50-4"><a></a></span>
+<span id="cb50-5"><a></a><span class="co"># One-to-many join: one site_meta row fans out to thousands of flow rows</span></span>
+<span id="cb50-6"><a></a>flow_meta <span class="ot">&lt;-</span> flow <span class="sc">|&gt;</span></span>
+<span id="cb50-7"><a></a>  <span class="fu">left_join</span>(site_meta, <span class="at">by =</span> <span class="st">"site_no"</span>)</span>
+<span id="cb50-8"><a></a></span>
+<span id="cb50-9"><a></a><span class="co"># Verify</span></span>
+<span id="cb50-10"><a></a><span class="fu">nrow</span>(flow_meta) <span class="sc">==</span> <span class="fu">nrow</span>(flow)                    <span class="co"># row count unchanged?</span></span>
+<span id="cb50-11"><a></a><span class="fu">sum</span>(<span class="fu">is.na</span>(flow_meta<span class="sc">$</span>drain_area_va)) <span class="sc">==</span> <span class="dv">0</span>          <span class="co"># no missing area values?</span></span>
+<span id="cb50-12"><a></a>flow_meta <span class="sc">|&gt;</span>                                      <span class="co"># known value check</span></span>
+<span id="cb50-13"><a></a>  <span class="fu">filter</span>(site_no <span class="sc">==</span> <span class="st">"09380000"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb50-14"><a></a>  <span class="fu">distinct</span>(site_no, drain_area_va)               <span class="co"># should be ~111,800 mi²</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This is exactly the join you will perform in Lab 1.</p>
 </section></section>
@@ -1343,43 +1617,43 @@ If the key column is not actually unique in one of the tables, every matching ro
 <p>When column names are actually <em>values</em> of a variable, pivot longer:</p>
 
 <img data-src="img/07-longer.png" class="quarto-figure quarto-figure-center r-stretch" width="448"><div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a>lifeExp_wide <span class="ot">&lt;-</span> gapminder <span class="sc">|&gt;</span></span>
-<span id="cb44-2"><a></a>  <span class="fu">filter</span>(country <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"India"</span>, <span class="st">"Brazil"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb44-3"><a></a>  <span class="fu">select</span>(country, year, lifeExp) <span class="sc">|&gt;</span></span>
-<span id="cb44-4"><a></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, <span class="at">values_from =</span> lifeExp)</span>
-<span id="cb44-5"><a></a></span>
-<span id="cb44-6"><a></a>lifeExp_wide</span>
-<span id="cb44-7"><a></a><span class="co">#&gt; # A tibble: 2 × 13</span></span>
-<span id="cb44-8"><a></a><span class="co">#&gt;   country `1952` `1957` `1962` `1967` `1972` `1977` `1982` `1987` `1992` `1997`</span></span>
-<span id="cb44-9"><a></a><span class="co">#&gt;   &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb44-10"><a></a><span class="co">#&gt; 1 Brazil    50.9   53.3   55.7   57.6   59.5   61.5   63.3   65.2   67.1   69.4</span></span>
-<span id="cb44-11"><a></a><span class="co">#&gt; 2 India     37.4   40.2   43.6   47.2   50.7   54.2   56.6   58.6   60.2   61.8</span></span>
-<span id="cb44-12"><a></a><span class="co">#&gt; # ℹ 2 more variables: `2002` &lt;dbl&gt;, `2007` &lt;dbl&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a></a>lifeExp_wide <span class="ot">&lt;-</span> gapminder <span class="sc">|&gt;</span></span>
+<span id="cb53-2"><a></a>  <span class="fu">filter</span>(country <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"India"</span>, <span class="st">"Brazil"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb53-3"><a></a>  <span class="fu">select</span>(country, year, lifeExp) <span class="sc">|&gt;</span></span>
+<span id="cb53-4"><a></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> year, <span class="at">values_from =</span> lifeExp)</span>
+<span id="cb53-5"><a></a></span>
+<span id="cb53-6"><a></a>lifeExp_wide</span>
+<span id="cb53-7"><a></a><span class="co">#&gt; # A tibble: 2 × 13</span></span>
+<span id="cb53-8"><a></a><span class="co">#&gt;   country `1952` `1957` `1962` `1967` `1972` `1977` `1982` `1987` `1992` `1997`</span></span>
+<span id="cb53-9"><a></a><span class="co">#&gt;   &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span id="cb53-10"><a></a><span class="co">#&gt; 1 Brazil    50.9   53.3   55.7   57.6   59.5   61.5   63.3   65.2   67.1   69.4</span></span>
+<span id="cb53-11"><a></a><span class="co">#&gt; 2 India     37.4   40.2   43.6   47.2   50.7   54.2   56.6   58.6   60.2   61.8</span></span>
+<span id="cb53-12"><a></a><span class="co">#&gt; # ℹ 2 more variables: `2002` &lt;dbl&gt;, `2007` &lt;dbl&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="pivot_longer-in-action" class="slide level2">
 <h2><code>pivot_longer()</code> in Action</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a>lifeExp_wide <span class="sc">|&gt;</span></span>
-<span id="cb45-2"><a></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb45-3"><a></a>    <span class="at">cols      =</span> <span class="sc">-</span>country,         <span class="co"># pivot everything except country</span></span>
-<span id="cb45-4"><a></a>    <span class="at">names_to  =</span> <span class="st">"year"</span>,</span>
-<span id="cb45-5"><a></a>    <span class="at">values_to =</span> <span class="st">"lifeExp"</span></span>
-<span id="cb45-6"><a></a>  )</span>
-<span id="cb45-7"><a></a><span class="co">#&gt; # A tibble: 24 × 3</span></span>
-<span id="cb45-8"><a></a><span class="co">#&gt;    country year  lifeExp</span></span>
-<span id="cb45-9"><a></a><span class="co">#&gt;    &lt;fct&gt;   &lt;chr&gt;   &lt;dbl&gt;</span></span>
-<span id="cb45-10"><a></a><span class="co">#&gt;  1 Brazil  1952     50.9</span></span>
-<span id="cb45-11"><a></a><span class="co">#&gt;  2 Brazil  1957     53.3</span></span>
-<span id="cb45-12"><a></a><span class="co">#&gt;  3 Brazil  1962     55.7</span></span>
-<span id="cb45-13"><a></a><span class="co">#&gt;  4 Brazil  1967     57.6</span></span>
-<span id="cb45-14"><a></a><span class="co">#&gt;  5 Brazil  1972     59.5</span></span>
-<span id="cb45-15"><a></a><span class="co">#&gt;  6 Brazil  1977     61.5</span></span>
-<span id="cb45-16"><a></a><span class="co">#&gt;  7 Brazil  1982     63.3</span></span>
-<span id="cb45-17"><a></a><span class="co">#&gt;  8 Brazil  1987     65.2</span></span>
-<span id="cb45-18"><a></a><span class="co">#&gt;  9 Brazil  1992     67.1</span></span>
-<span id="cb45-19"><a></a><span class="co">#&gt; 10 Brazil  1997     69.4</span></span>
-<span id="cb45-20"><a></a><span class="co">#&gt; # ℹ 14 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a></a>lifeExp_wide <span class="sc">|&gt;</span></span>
+<span id="cb54-2"><a></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb54-3"><a></a>    <span class="at">cols      =</span> <span class="sc">-</span>country,         <span class="co"># pivot everything except country</span></span>
+<span id="cb54-4"><a></a>    <span class="at">names_to  =</span> <span class="st">"year"</span>,</span>
+<span id="cb54-5"><a></a>    <span class="at">values_to =</span> <span class="st">"lifeExp"</span></span>
+<span id="cb54-6"><a></a>  )</span>
+<span id="cb54-7"><a></a><span class="co">#&gt; # A tibble: 24 × 3</span></span>
+<span id="cb54-8"><a></a><span class="co">#&gt;    country year  lifeExp</span></span>
+<span id="cb54-9"><a></a><span class="co">#&gt;    &lt;fct&gt;   &lt;chr&gt;   &lt;dbl&gt;</span></span>
+<span id="cb54-10"><a></a><span class="co">#&gt;  1 Brazil  1952     50.9</span></span>
+<span id="cb54-11"><a></a><span class="co">#&gt;  2 Brazil  1957     53.3</span></span>
+<span id="cb54-12"><a></a><span class="co">#&gt;  3 Brazil  1962     55.7</span></span>
+<span id="cb54-13"><a></a><span class="co">#&gt;  4 Brazil  1967     57.6</span></span>
+<span id="cb54-14"><a></a><span class="co">#&gt;  5 Brazil  1972     59.5</span></span>
+<span id="cb54-15"><a></a><span class="co">#&gt;  6 Brazil  1977     61.5</span></span>
+<span id="cb54-16"><a></a><span class="co">#&gt;  7 Brazil  1982     63.3</span></span>
+<span id="cb54-17"><a></a><span class="co">#&gt;  8 Brazil  1987     65.2</span></span>
+<span id="cb54-18"><a></a><span class="co">#&gt;  9 Brazil  1992     67.1</span></span>
+<span id="cb54-19"><a></a><span class="co">#&gt; 10 Brazil  1997     69.4</span></span>
+<span id="cb54-20"><a></a><span class="co">#&gt; # ℹ 14 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="pivot_wider-long-to-wide" class="slide level2">
@@ -1387,32 +1661,32 @@ If the key column is not actually unique in one of the tables, every matching ro
 <p>When one observation is scattered across multiple rows, pivot wider:</p>
 
 <img data-src="img/07-wider.png" class="quarto-figure quarto-figure-center r-stretch" width="448"><div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a></a>table_long <span class="sc">|&gt;</span></span>
-<span id="cb46-2"><a></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from  =</span> metric,</span>
-<span id="cb46-3"><a></a>              <span class="at">values_from =</span> value)</span>
-<span id="cb46-4"><a></a><span class="co">#&gt; # A tibble: 4 × 4</span></span>
-<span id="cb46-5"><a></a><span class="co">#&gt;   country  year lifeExp gdpPercap</span></span>
-<span id="cb46-6"><a></a><span class="co">#&gt;   &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;</span></span>
-<span id="cb46-7"><a></a><span class="co">#&gt; 1 Brazil   1952    50.9     2109.</span></span>
-<span id="cb46-8"><a></a><span class="co">#&gt; 2 Brazil   2007    72.4     9066.</span></span>
-<span id="cb46-9"><a></a><span class="co">#&gt; 3 India    1952    37.4      547.</span></span>
-<span id="cb46-10"><a></a><span class="co">#&gt; 4 India    2007    64.7     2452.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a></a>table_long <span class="sc">|&gt;</span></span>
+<span id="cb55-2"><a></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from  =</span> metric,</span>
+<span id="cb55-3"><a></a>              <span class="at">values_from =</span> value)</span>
+<span id="cb55-4"><a></a><span class="co">#&gt; # A tibble: 4 × 4</span></span>
+<span id="cb55-5"><a></a><span class="co">#&gt;   country  year lifeExp gdpPercap</span></span>
+<span id="cb55-6"><a></a><span class="co">#&gt;   &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span id="cb55-7"><a></a><span class="co">#&gt; 1 Brazil   1952    50.9     2109.</span></span>
+<span id="cb55-8"><a></a><span class="co">#&gt; 2 Brazil   2007    72.4     9066.</span></span>
+<span id="cb55-9"><a></a><span class="co">#&gt; 3 India    1952    37.4      547.</span></span>
+<span id="cb55-10"><a></a><span class="co">#&gt; 4 India    2007    64.7     2452.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="when-to-use-each-format" class="slide level2">
 <h2>When to Use Each Format</h2>
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a></a>table_long <span class="sc">|&gt;</span></span>
-<span id="cb47-2"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> value, <span class="at">color =</span> country)) <span class="sc">+</span></span>
-<span id="cb47-3"><a></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb47-4"><a></a>  <span class="fu">facet_grid</span>(metric <span class="sc">~</span> country, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb47-5"><a></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb47-6"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
-<span id="cb47-7"><a></a>table_wide <span class="sc">|&gt;</span></span>
-<span id="cb47-8"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> gdpPercap, <span class="at">color =</span> country)) <span class="sc">+</span></span>
-<span id="cb47-9"><a></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb47-10"><a></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>country) <span class="sc">+</span></span>
-<span id="cb47-11"><a></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb47-12"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a></a>table_long <span class="sc">|&gt;</span></span>
+<span id="cb56-2"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> value, <span class="at">color =</span> country)) <span class="sc">+</span></span>
+<span id="cb56-3"><a></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb56-4"><a></a>  <span class="fu">facet_grid</span>(metric <span class="sc">~</span> country, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb56-5"><a></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb56-6"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb56-7"><a></a>table_wide <span class="sc">|&gt;</span></span>
+<span id="cb56-8"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> gdpPercap, <span class="at">color =</span> country)) <span class="sc">+</span></span>
+<span id="cb56-9"><a></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb56-10"><a></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>country) <span class="sc">+</span></span>
+<span id="cb56-11"><a></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb56-12"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="quarto-layout-panel" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="column quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
@@ -1427,7 +1701,7 @@ If the key column is not actually unique in one of the tables, every matching ro
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-60-1.png" width="576"></p>
+<p><img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-68-1.png" width="576"></p>
 </figure>
 </div>
 </div>
@@ -1444,7 +1718,7 @@ If the key column is not actually unique in one of the tables, every matching ro
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-61-1.png" width="576"></p>
+<p><img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-69-1.png" width="576"></p>
 </figure>
 </div>
 </div>
@@ -1456,26 +1730,129 @@ If the key column is not actually unique in one of the tables, every matching ro
 <h2>Pivot Within a Pipeline</h2>
 <p>The real power: wrangling shape and visualization in one chain:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
-<span id="cb48-2"><a></a>  <span class="fu">filter</span>(country <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Canada"</span>, <span class="st">"United States"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb48-3"><a></a>  <span class="fu">select</span>(country, year, lifeExp, gdpPercap) <span class="sc">|&gt;</span></span>
-<span id="cb48-4"><a></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(lifeExp, gdpPercap),</span>
-<span id="cb48-5"><a></a>               <span class="at">names_to  =</span> <span class="st">"metric"</span>,</span>
-<span id="cb48-6"><a></a>               <span class="at">values_to =</span> <span class="st">"value"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb48-7"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> value)) <span class="sc">+</span></span>
-<span id="cb48-8"><a></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"gray80"</span>) <span class="sc">+</span></span>
-<span id="cb48-9"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> country)) <span class="sc">+</span></span>
-<span id="cb48-10"><a></a>  <span class="fu">facet_grid</span>(metric <span class="sc">~</span> country, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb48-11"><a></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>,</span>
-<span id="cb48-12"><a></a>       <span class="at">title    =</span> <span class="st">"North America: GDP &amp; Life Expectancy"</span>,</span>
-<span id="cb48-13"><a></a>       <span class="at">subtitle =</span> <span class="st">"1950–2007"</span>,</span>
-<span id="cb48-14"><a></a>       <span class="at">caption  =</span> <span class="st">"Data: Gapminder R package"</span>) <span class="sc">+</span></span>
-<span id="cb48-15"><a></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
-<span id="cb48-16"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>,</span>
-<span id="cb48-17"><a></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">face =</span> <span class="st">"bold"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a></a>gapminder <span class="sc">|&gt;</span></span>
+<span id="cb57-2"><a></a>  <span class="fu">filter</span>(country <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Canada"</span>, <span class="st">"United States"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb57-3"><a></a>  <span class="fu">select</span>(country, year, lifeExp, gdpPercap) <span class="sc">|&gt;</span></span>
+<span id="cb57-4"><a></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(lifeExp, gdpPercap),</span>
+<span id="cb57-5"><a></a>               <span class="at">names_to  =</span> <span class="st">"metric"</span>,</span>
+<span id="cb57-6"><a></a>               <span class="at">values_to =</span> <span class="st">"value"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb57-7"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb57-8"><a></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"gray80"</span>) <span class="sc">+</span></span>
+<span id="cb57-9"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> country)) <span class="sc">+</span></span>
+<span id="cb57-10"><a></a>  <span class="fu">facet_grid</span>(metric <span class="sc">~</span> country, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb57-11"><a></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>,</span>
+<span id="cb57-12"><a></a>       <span class="at">title    =</span> <span class="st">"North America: GDP &amp; Life Expectancy"</span>,</span>
+<span id="cb57-13"><a></a>       <span class="at">subtitle =</span> <span class="st">"1950–2007"</span>,</span>
+<span id="cb57-14"><a></a>       <span class="at">caption  =</span> <span class="st">"Data: Gapminder R package"</span>) <span class="sc">+</span></span>
+<span id="cb57-15"><a></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb57-16"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>,</span>
+<span id="cb57-17"><a></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">face =</span> <span class="st">"bold"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-62-1.png" width="576" class="r-stretch"></section></section>
+<img data-src="week-1-2_files/figure-revealjs/unnamed-chunk-70-1.png" width="576" class="r-stretch"></section></section>
+<section>
+<section id="quarto-scientific-authoring-for-the-modern-era" class="title-slide slide level1 center" data-background-color="#1E4D2B">
+<h1>Quarto: Scientific Authoring for the Modern Era</h1>
+
+</section>
+<section id="what-is-quarto" class="slide level2">
+<h2>What is Quarto?</h2>
+<p>Quarto is the evolution of R Markdown — same authoring paradigm, modernized syntax and expanded scope:</p>
+<ul>
+<li><strong>R Markdown</strong> (2014–): Documents combining code + prose, renders to HTML/PDF/Word</li>
+<li><strong>Quarto</strong> (2022–): Same concept, better syntax, works with R, Python, Julia, Observable</li>
+</ul>
+<p>Everything you did in lab 0 still applies. Three things changed:</p>
+<ol type="1">
+<li><strong>Code chunk options</strong>: New YAML-style syntax</li>
+<li><strong>Callout blocks</strong>: Native features, simpler markup</li>
+<li><strong>Rendering</strong>: Universal command-line tool</li>
+</ol>
+</section>
+<section id="old-vs.-new-chunk-options" class="slide level2">
+<h2>Old vs.&nbsp;New: Chunk Options</h2>
+<p><strong>R Markdown syntax:</strong></p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb58-1"><a></a><span class="in">`{r echo=FALSE, fig.width=6}`</span></span>
+<span id="cb58-2"><a></a>plot(1:10)</span>
+<span id="cb58-3"><a></a><span class="in">`{}`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p><strong>Quarto syntax:</strong></p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb59-1"><a></a><span class="in">`{r}`</span></span>
+<span id="cb59-2"><a></a>#| echo: false</span>
+<span id="cb59-3"><a></a>#| fig-width: 6</span>
+<span id="cb59-4"><a></a>plot(1:10)</span>
+<span id="cb59-5"><a></a><span class="in">`{}`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p>Quarto uses <strong>YAML-style options</strong> — one per <code>#|</code> line. Clearer, easier to scan.</p>
+</div>
+</section>
+<section id="built-in-formatting-callouts" class="slide level2">
+<h2>Built-in Formatting: Callouts</h2>
+<p><strong>Old way</strong> (complicated divs):</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb60-1"><a></a>:::{.callout-note}</span>
+<span id="cb60-2"><a></a>This is a note.</span>
+<span id="cb60-3"><a></a>:::</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Quarto way</strong> (same syntax, more types):</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb61-1"><a></a>:::{.callout-tip}</span>
+<span id="cb61-2"><a></a>This is a tip.</span>
+<span id="cb61-3"><a></a>:::</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>Types: <code>callout-note</code>, <code>callout-tip</code>, <code>callout-warning</code>, <code>callout-important</code>, <code>callout-caution</code></p>
+<p>We’ve been using these all along — now you know how to author them.</p>
+</div>
+</section>
+<section id="how-to-render-preview" class="slide level2">
+<h2>How to Render &amp; Preview</h2>
+<p><strong>Preview live</strong> (auto-reload on save):</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb62-1"><a></a><span class="ex">quarto</span> preview slides/week-1-2.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Output opens in your browser.</p>
+<div class="fragment">
+<p><strong>Render to static HTML:</strong></p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb63-1"><a></a><span class="ex">quarto</span> render slides/week-1-2.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Output lands in <code>docs/</code> and is ready to share.</p>
+</div>
+<div class="fragment">
+<p>In RStudio: click <strong>Render</strong> button → preview in Viewer pane.</p>
+</div>
+</section>
+<section id="the-key-takeaway" class="slide level2">
+<h2>The Key Takeaway</h2>
+<p>You will author and submit assignments in Quarto. The workflow:</p>
+<ol type="1">
+<li>Header (YAML) → sets title, output format, theme</li>
+<li>Code chunks → execute, embed output, with <code>#|</code> options</li>
+<li>Callouts → highlight key points</li>
+<li>Prose → explains the data story</li>
+</ol>
+<p>This deck is a Quarto reveal.js presentation. Lab assignments are Quarto HTML documents. <strong>Same tool, different output format.</strong></p>
+</section>
+<section id="project-configuration-_quarto.yml" class="slide level2">
+<h2>Project Configuration: _quarto.yml</h2>
+<p>Every Quarto project has a <code>_quarto.yml</code> file that sets global defaults.</p>
+<p>Here’s the one for this course:</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb64-1"><a></a><span class="fu">project</span><span class="kw">:</span></span>
+<span id="cb64-2"><a></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> website</span></span>
+<span id="cb64-3"><a></a><span class="at">  </span></span>
+<span id="cb64-4"><a></a><span class="fu">website</span><span class="kw">:</span></span>
+<span id="cb64-5"><a></a><span class="at">  </span><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"ESS 523c: Environmental Data Science"</span></span>
+<span id="cb64-6"><a></a><span class="at">  </span><span class="fu">site-url</span><span class="kw">:</span><span class="at"> https://github.com/mikejohnson51/csu-ess-523c</span></span>
+<span id="cb64-7"><a></a><span class="at">  </span><span class="fu">navbar</span><span class="kw">:</span></span>
+<span id="cb64-8"><a></a><span class="at">    </span><span class="fu">left</span><span class="kw">:</span></span>
+<span id="cb64-9"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">href</span><span class="kw">:</span><span class="at"> index.qmd</span></span>
+<span id="cb64-10"><a></a><span class="at">        </span><span class="fu">text</span><span class="kw">:</span><span class="at"> Home</span></span>
+<span id="cb64-11"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">href</span><span class="kw">:</span><span class="at"> labs/lab-01.qmd</span></span>
+<span id="cb64-12"><a></a><span class="at">        </span><span class="fu">text</span><span class="kw">:</span><span class="at"> Lab 1</span></span>
+<span id="cb64-13"><a></a></span>
+<span id="cb64-14"><a></a><span class="fu">format</span><span class="kw">:</span></span>
+<span id="cb64-15"><a></a><span class="at">  </span><span class="fu">html</span><span class="kw">:</span></span>
+<span id="cb64-16"><a></a><span class="at">    </span><span class="fu">theme</span><span class="kw">:</span><span class="at"> cosmo</span></span>
+<span id="cb64-17"><a></a><span class="at">    </span><span class="fu">toc</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb64-18"><a></a><span class="at">    </span><span class="fu">code-fold</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>You won’t edit this — I maintain it. But when you <code>quarto render</code>, it reads these defaults and applies them to every <code>.qmd</code> file in the project.</p>
+</div>
+</section></section>
 <section>
 <section id="connecting-to-lab-1" class="title-slide slide level1 center" data-background-color="#1E4D2B">
 <h1>Connecting to Lab 1</h1>

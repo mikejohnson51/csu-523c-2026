@@ -132,7 +132,7 @@ Before doing anything with a new dataset, always check: Does the row count make 
 
 You are a water resources analyst. Each morning you deliver a reproducible snapshot of current conditions to Colorado River Compact stakeholders. The analysis must be re-runnable on any date with a single change — that requires building it around **parameter objects** rather than hardcoded values.
 
-**a.** Create a `my.date` parameter object set to the last day of water year 2023. Ensure it is stored as a proper `Date` object, not a character string.
+**a.** Create a `my.date` parameter object set to the last day of water year 2023 (September 30, 2023). Ensure it is stored as a proper `Date` object, not a character string.
 
 ::: callout-tip
 `as.Date()` converts a character string to a Date. R stores dates internally as days since 1970-01-01, enabling date arithmetic (`my.date - 7` = one week earlier) and use in `filter()` comparisons.
@@ -140,31 +140,13 @@ Hint: use `as.Date()` to convert strings to `Date` objects and confirm with `cla
 :::
 
 ```{r}
-my.date <- as.Date("2023-09-01")
+my.date <- as.Date("2023-09-30")
 ```
 
 **b.** Compute the **day-over-day change in discharge** for each gauge — how much flow rose or fell compared to the previous day. Store this as a new column called `flow_delta`. This tells you whether conditions are improving or deteriorating, which is often more actionable than the raw level alone.
 
-::: callout-tip
-`lag()` shifts a vector back by one position, so `Flow - lag(Flow)` gives today's flow minus yesterday's. Because you want to compute this *within* each gauge, `group_by(site_no)` first, then `arrange(Date)` to ensure chronological order before lagging.
-
-Hint: structure this as: group by `site_no`, arrange by `Date`, then use `lag()` to compute `flow_delta` (so today's Flow minus yesterday's Flow).
-:::
-
 ```{r}
 
-```
-
-```{r}
-# student: create two flextables for `my.date`
-# e.g., table1 <- flow |> filter(Date == my.date) |> slice_max(Flow, n = 5)
-# and then pass to `flextable()` with `set_header_labels()` and `autofit()`
-```
-
-```{r}
-# student: compute `flow_delta` within each gauge
-# example: flow <- raw |> group_by(site_no) |> arrange(Date) |> 
-#   mutate(flow_delta = Flow - lag(Flow)) |> ungroup()
 ```
 
 **c.** Filter to `my.date` and produce **two formatted tables** using `flextable`:
@@ -185,20 +167,9 @@ Hint: use `flextable()` with `set_header_labels()`, `set_caption()`, and `autofi
 
 ```
 
-```{r}
-#| eval: false
-# Concrete `flextable` example (student-visible):
-example_table <- tibble(
-  Gauge = c("Lees Ferry", "Glenwood Springs", "San Juan Bluff"),
-  Flow  = c(12345.6, 2345.2, 987.4)
-) |> mutate(Flow = round(Flow, 0))
-
-example_table |>
-  flextable() |>
-  set_header_labels(Gauge = "Gauge", Flow = "Flow (cfs)") |>
-  set_caption("Example: current flows (rounded)") |>
-  autofit()
-```
+::: callout-note
+Instructor-only: a concrete `flextable()` example has been moved to the instructor solutions file (`labs/keys/lab-01-solutions.qmd`). Implement your tables by selecting top rows with `slice_max()`, rounding numeric columns, then using `flextable()` with `set_header_labels()`, `set_caption()`, and `autofit()`.
+:::
 
 ---
 
@@ -230,7 +201,7 @@ Before writing a single `_join()` call, answer three questions:
 
 **The second most common mistake**: joining on a key that is not unique in one of the tables. If `site_no` appears twice in `site_meta`, every matching row in your flow data will be **duplicated** — your dataset grows and you may not notice.
 
-Both failures are invisible without explicit verification.
+Both failures are invisible without explicit verification. For graduate-level work, in your write-up briefly justify the join type you chose, quantify any unmatched keys or duplicates you observed, and discuss possible data provenance reasons for mismatches.
 :::
 
 **a.** Pull site metadata for all 7 gauges. Before joining, verify that `site_no` is actually unique in `site_meta` — a duplicated key will silently inflate your row count.
@@ -307,6 +278,19 @@ flow_meta |>
 These checks cost 30 seconds and catch errors that would otherwise corrupt every downstream calculation silently. You will join data in every lab this semester. Build the habit now.
 :::
 
+---
+
+## Graduate expectations (applies to this lab)
+
+This course is at the graduate level. In addition to producing correct code and outputs, your submission should:
+
+- Briefly justify methodological choices (e.g., window lengths, alignment for rolling statistics, normalization approaches, and model structure). A short 3–5 sentence justification is sufficient.
+- Include a simple sensitivity or validation check where appropriate (e.g., compare 7-day vs 14-day rolling windows; use leave-one-year-out cross-validation for the predictive model and report RMSE or MAE).
+- Report basic uncertainty/robustness: how sensitive are your central conclusions to small changes in preprocessing or parameter choices?
+- Cite one relevant source (paper, USGS stat documentation, or authoritative report) if you reference an established hydrological statistic (e.g., 7Q10 logic) or external dataset.
+
+TA guidance: award partial credit within existing rubric for evidence of methodological justification and sensitivity checks even when minor numeric differences exist — the goal at this level is defensible, reproducible analysis, not only exact matches.
+
 ```{r}
 
 ```
@@ -350,48 +334,15 @@ The USGS computes official low-flow statistics — including the 7Q10 — and ma
 
 **a.** For each gauge, compute the **7-day rolling mean** of daily discharge. Use `zoo::rollmean()` with `fill = NA` and `align = "right"` so each value represents the average of the current and 6 preceding days.
 
-::: callout-tip
-Hint: compute a 7-day rolling mean (e.g., `roll7`) with `zoo::rollmean(..., k = 7, fill = NA, align = "right")` inside a `group_by(site_no)` + `arrange(Date)` block.
+```{r}
+
+```
+
+::: callout-note
+Instructor-only: an hourly (8-hour) `zoo::rollmean()` example has been moved to the instructor solutions file (`labs/keys/lab-01-solutions.qmd`). For students, compute 7-day rolling means with `zoo::rollmean(..., k = 7, fill = NA, align = "right")` inside a per-gauge chronological grouping.
 :::
-
-```{r}
-
-```
-
-```{r}
-# student: compute 7-day rolling mean
-# e.g., flow_meta <- flow_meta |> group_by(site_no) |> arrange(Date) |> 
-#   mutate(roll7 = zoo::rollmean(Flow, k = 7, fill = NA, align = "right")) |> ungroup()
-```
-
-```{r}
-#| eval: false
-# Optional concrete example: 8-hour rolling mean using `zoo::rollmean`
-# If you have *hourly* discharge data with a POSIXct `DateTime` column,
-# compute an 8-hour rolling mean like so (align = "right" uses the
-# current hour plus the previous 7 hours):
-#
-# library(zoo)
-# flow_hourly <- tibble(
-#   DateTime = seq.POSIXt(as.POSIXct("2023-01-01 00:00", tz = "UTC"), by = "hour", length.out = 48),
-#   Flow = c(rnorm(24, 100, 10), rnorm(24, 80, 12))
-# )
-#
-# flow_hourly <- flow_hourly |> 
-#   arrange(DateTime) |> 
-#   mutate(mean8 = zoo::rollmean(Flow, k = 8, fill = NA, align = "right"))
-#
-# # show the first rows with the new 8-hour mean
-# head(flow_hourly, 12)
-```
 
 **b.** Define a **low-flow threshold** for each gauge as the 10th percentile of its historical discharge during **1980–2010**. A flow that is critically low for Lees Ferry might be above average for the Little Colorado — thresholds must be site-specific.
-
-::: callout-tip
-Two steps: summarize baselines, then join them back. This is the same join pattern you practiced in Q2 — verify it the same way.
-
-Hint: summarize the 10th-percentile threshold per gauge over the baseline period, then left-join those thresholds back to the full flow table so every row carries its gauge's threshold.
-:::
 
 ```{r}
 
@@ -405,17 +356,11 @@ Hint: summarize the 10th-percentile threshold per gauge over the baseline period
 
 **d.** For **Lees Ferry** (site `09380000`) — the Compact's primary accounting point — plot the 7-day rolling mean from 2000–2023. Shade periods below threshold in red and add a dashed horizontal reference line at the threshold.
 
-::: callout-tip
-`geom_ribbon()` draws a filled band between `ymin` and `ymax`. Make the band appear only during below-threshold periods:
-
-Hint: use `geom_ribbon()` with `ymin` at the threshold and `ymax` set to `if_else(below_threshold, roll7, threshold)` so the ribbon only appears while the rolling mean is below threshold.
-:::
-
 ```{r}
 
 ```
 
-**e.** How many days per year, on average, did Lees Ferry fall below its low-flow threshold in **2000–2010** vs. **2011–2023**? Produce a small summary table and answer in 2–3 sentences: (1) what direction did the exceedance frequency change? (2) Is this a shift in isolated dry years or a persistent baseline change? (3) What does this imply for Compact delivery obligations?
+**e.** How many days per year, on average, did Lees Ferry fall below its low-flow threshold in **2000–2010** vs. **2011–2023**? Produce a small summary table and answer in 2–3 sentences: (1) did below-threshold days increase or decrease? (2) Is this a shift in isolated dry years or a persistent baseline change? (3) What does this imply for Compact delivery obligations?
 
 ::: callout-tip
 `n_distinct(year(Date))` counts unique years in a group — useful for computing per-year averages across a multi-year period.
@@ -435,8 +380,9 @@ Calendar years are a poor fit for western US hydrology. The **water year** (Octo
 
 **a.** Add `water_year` and `month` columns to your dataset. The water year is the calendar year of the ending September 30 — months October through December belong to the *next* water year.
 
-::: callout-tip
-Hint: derive `month` from `Date` and set `water_year` so Oct–Dec map to the next calendar year (e.g., `if_else(month >= 10, year + 1, year)`).
+::: callout-note
+Use `if_else()` to set `water_year` for Oct–Dec months as taught in lecture.
+:::
 
 **b.** For each gauge and water year, compute: total annual discharge (`sum(Flow)`), peak daily discharge (`max(Flow)`), and number of days below the low-flow threshold (`sum(below_threshold)`).
 
@@ -511,7 +457,15 @@ $$\bar{X}_{year} = \frac{\sum (lon_i \times Q_i)}{\sum Q_i} \qquad \bar{Y}_{year
 ::: callout-tip
 Hint: join coordinates from `site_meta` to the annual table, then compute weighted longitude/latitude per year as sum(coord * total_flow) / sum(total_flow). This is your third join — verify row counts, NAs, and spot-check known values.
 :::
-:::
+
+```{r}
+# student: join coordinates
+# e.g., annual |> left_join(site_meta |> select(site_no, dec_lat_va, dec_long_va), by = "site_no")
+
+# Verify the join
+# nrow(result) == nrow(annual)?
+# sum(is.na(result$dec_lat_va)) == 0?
+```
 
 Note: mapping below uses `map_data("state")`; if `map_data()` is not available install the `maps` package (`install.packages("maps")`) or use `ggplot2::map_data("state")` which provides equivalent polygons.
 
@@ -552,9 +506,16 @@ Annual totals mask important seasonal structure. The Colorado Basin has two dist
 Make `season` a factor with levels in hydrological order: Snowmelt, Monsoon, Low-flow, Winter.
 
 ::: callout-tip
-Hint: create `season` with `case_when()` mapping month ranges to labels and convert to a factor with hydrological order: Snowmelt, Monsoon, Low-flow, Winter.
+Hint: extract `month` from `Date` with `month()`, create `season` with `case_when()` mapping month ranges to labels, then convert to a factor with explicit level ordering:
 
-:::
+```{r}
+#| eval: false
+data |> mutate(
+  month = month(Date),
+  season = case_when(...),
+  season = factor(season, levels = c('Snowmelt', 'Monsoon', 'Low-flow', 'Winter'))
+)
+```
 :::
 
 ```{r}
@@ -591,7 +552,7 @@ We'll build a simple but physically grounded model: can Glenwood Springs (an upp
 
 ## Data Preparation
 
-**a.** Build your model dataset through three sequential joins:
+**a.** Build your model dataset through four sequential operations:
 
 1. Filter `annual` to Lees Ferry; rename `total_flow` to `lees_flow`
 2. Join annual Glenwood Springs flow (site `09085000`); rename to `glenwood_flow`
@@ -599,10 +560,27 @@ We'll build a simple but physically grounded model: can Glenwood Springs (an upp
 4. Log-transform both flow variables
 
 ::: callout-tip
-The dominant season join: filter your seasonal summary to Lees Ferry, then within each water year select the season with the highest total flow:
-Hint: produce a single-row-per-year table by selecting Lees Ferry annual flows, left-joining Glenwood annual flows by `water_year`, joining the dominant season for Lees Ferry, and log-transforming the flow columns for modeling.
+The dominant season: within each water year, which season (Snowmelt, Monsoon, Low-flow, Winter) carried the most flow at Lees Ferry? Filter seasonal summaries to Lees Ferry, then `group_by(water_year) |> slice_max(total_flow, n = 1)` to select one season per year.
 
-This is your fourth join. Verify: the final dataset should have ~44 rows, one per water year.
+Then join that back to your Lees Ferry & Glenwood annual table by `water_year`.
+
+This is your fourth join. **Always verify**: the final dataset should have ~44 rows (one per water year, 1980–2023), zero NAs in flow columns, and log-transformed values should be positive.
+
+```{r}
+#| eval: false
+lees_model_data <- annual |>
+  filter(site_no == "09380000") |>
+  rename(lees_flow = total_flow) |>
+  left_join(annual |> filter(site_no == "09085000") |> rename(glenwood_flow = total_flow),
+            by = "water_year") |>
+  left_join(dominant_season, by = "water_year") |>
+  mutate(log_lees = log(lees_flow),
+         log_glenwood = log(glenwood_flow))
+
+# Verify: 44 rows? No NAs in log columns?
+nrow(lees_model_data)
+sum(is.na(lees_model_data$log_lees))
+```
 :::
 
 ```{r}

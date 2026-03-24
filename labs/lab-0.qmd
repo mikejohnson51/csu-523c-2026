@@ -166,7 +166,7 @@ If you don't yet have a GitHub account, create one at [github.com](https://githu
 Once you have an account:
 
 1. Complete your profile: name, location, a short bio, and a profile photo — doesn't need to be personal, but shouldn't be the default avatar
-2. Search for **`mikejohnson51/csu-ess-523c-2026`** and **star** the repository — this bookmarks it for you and helps me find your account
+2. Search for **`mikejohnson51/csu-523c-2026`** and **star** the repository — this bookmarks it for you and helps me find your account
 
 ---
 
@@ -245,7 +245,7 @@ Screenshot tips:
 - Windows: press `Win+Shift+S` to use the Snip & Sketch tool
 - Linux: use `PrtSc` or your desktop environment's screenshot tool
 
-## Publish via GitHub Pages (recommended: simple main → docs workflow)
+## Notes: Publish via GitHub Pages (recommended: simple main → docs workflow)
 
 Preferred workflow (concise): students create their *own* GitHub repository, configure Quarto to render into a `docs/` folder, push `main`, enable Pages, and submit the Pages URL. This keeps the course repo untouched and makes grading easy.
 
@@ -258,27 +258,25 @@ _quarto.yml (minimal):_
 ```yaml
 project:
   type: website
-
 website:
   title: "csu-523c"
   output-dir: docs
 ```
 
 - Add or copy the lab QMD(s) into the repo and render:
+
 ```bash
 quarto render lab-01.qmd    # outputs go to docs/
 ```
+
 - Commit & push `main`:
+
 ```bash
 git add .
 git commit -m "Add Lab 1 and site config"
 git push origin main
 ```
 - Enable GitHub Pages: **Settings → Pages → Deploy from branch → main / folder: /docs**. Submit the resulting Pages URL (e.g., `https://YOURUSERNAME.github.io/YOURREPO/lab-01.html`) to Canvas.
-
-Notes:
-- Do not push student work to the instructor's repo — use your own repo and `main` branch.
-- If you cannot publish to Pages, upload a ZIP containing `lab-01.html`, `data/`, `images/`, `session-info.txt`, and `README.md` instead.
 
 ---
 
