@@ -39,7 +39,7 @@
     "href": "slides/week-1-2.html#filter-keep-rows-by-condition",
     "title": "Week 1 | Day 2",
     "section": "filter() — Keep Rows by Condition",
-    "text": "filter() — Keep Rows by Condition\nfilter() takes logical expressions and returns rows where all conditions are TRUE. It never touches columns.\n\nfilter(gapminder, lifeExp &lt; 40)\n#&gt; # A tibble: 124 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.\n#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.\n#&gt; 10 Angola      Africa     1962    34    4826015     4269.\n#&gt; # ℹ 114 more rows"
+    "text": "filter() — Keep Rows by Condition\nfilter() takes logical expressions and returns rows where all conditions are TRUE. It never touches columns.\n\nfilter(gapminder, lifeExp &lt; 40) |&gt; head(5)\n#&gt; # A tibble: 5 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; 4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt; 5 Afghanistan Asia       1972    36.1 13079460      740."
   },
   {
     "objectID": "slides/week-1-2.html#filter-multiple-conditions",
@@ -60,7 +60,7 @@
     "href": "slides/week-1-2.html#select-keep-columns-by-name",
     "title": "Week 1 | Day 2",
     "section": "select() — Keep Columns by Name",
-    "text": "select() — Keep Columns by Name\n\nselect(gapminder, country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     lifeExp\n#&gt;    &lt;fct&gt;         &lt;dbl&gt;\n#&gt;  1 Afghanistan    28.8\n#&gt;  2 Afghanistan    30.3\n#&gt;  3 Afghanistan    32.0\n#&gt;  4 Afghanistan    34.0\n#&gt;  5 Afghanistan    36.1\n#&gt;  6 Afghanistan    38.4\n#&gt;  7 Afghanistan    39.9\n#&gt;  8 Afghanistan    40.8\n#&gt;  9 Afghanistan    41.7\n#&gt; 10 Afghanistan    41.8\n#&gt; # ℹ 1,694 more rows\n\n\nRename while selecting:\n\nselect(gapminder, country, life_exp = lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     life_exp\n#&gt;    &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Afghanistan     28.8\n#&gt;  2 Afghanistan     30.3\n#&gt;  3 Afghanistan     32.0\n#&gt;  4 Afghanistan     34.0\n#&gt;  5 Afghanistan     36.1\n#&gt;  6 Afghanistan     38.4\n#&gt;  7 Afghanistan     39.9\n#&gt;  8 Afghanistan     40.8\n#&gt;  9 Afghanistan     41.7\n#&gt; 10 Afghanistan     41.8\n#&gt; # ℹ 1,694 more rows\n\n\n\nDrop a column with !:\n\nselect(gapminder, !continent)\n#&gt; # A tibble: 1,704 × 5\n#&gt;    country      year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952    28.8  8425333      779.\n#&gt;  2 Afghanistan  1957    30.3  9240934      821.\n#&gt;  3 Afghanistan  1962    32.0 10267083      853.\n#&gt;  4 Afghanistan  1967    34.0 11537966      836.\n#&gt;  5 Afghanistan  1972    36.1 13079460      740.\n#&gt;  6 Afghanistan  1977    38.4 14880372      786.\n#&gt;  7 Afghanistan  1982    39.9 12881816      978.\n#&gt;  8 Afghanistan  1987    40.8 13867957      852.\n#&gt;  9 Afghanistan  1992    41.7 16317921      649.\n#&gt; 10 Afghanistan  1997    41.8 22227415      635.\n#&gt; # ℹ 1,694 more rows"
+    "text": "select() — Keep Columns by Name\n\n\nSelect columns:\n\nselect(gapminder, country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     lifeExp\n#&gt;    &lt;fct&gt;         &lt;dbl&gt;\n#&gt;  1 Afghanistan    28.8\n#&gt;  2 Afghanistan    30.3\n#&gt;  3 Afghanistan    32.0\n#&gt;  4 Afghanistan    34.0\n#&gt;  5 Afghanistan    36.1\n#&gt;  6 Afghanistan    38.4\n#&gt;  7 Afghanistan    39.9\n#&gt;  8 Afghanistan    40.8\n#&gt;  9 Afghanistan    41.7\n#&gt; 10 Afghanistan    41.8\n#&gt; # ℹ 1,694 more rows\n\n\nRename while selecting:\n\nselect(gapminder, \n       country, \n       life_exp = lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     life_exp\n#&gt;    &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Afghanistan     28.8\n#&gt;  2 Afghanistan     30.3\n#&gt;  3 Afghanistan     32.0\n#&gt;  4 Afghanistan     34.0\n#&gt;  5 Afghanistan     36.1\n#&gt;  6 Afghanistan     38.4\n#&gt;  7 Afghanistan     39.9\n#&gt;  8 Afghanistan     40.8\n#&gt;  9 Afghanistan     41.7\n#&gt; 10 Afghanistan     41.8\n#&gt; # ℹ 1,694 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#the-pipe-operator",
@@ -74,7 +74,7 @@
     "href": "slides/week-1-2.html#mutate-add-new-columns",
     "title": "Week 1 | Day 2",
     "section": "mutate() — Add New Columns",
-    "text": "mutate() — Add New Columns\nmutate() adds new variables computed from existing ones. New variables are available immediately within the same mutate() call:\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap)\n#&gt; # A tibble: 1,704 × 7\n#&gt;    country     continent  year lifeExp      pop gdpPercap          gdp\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;        &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.  6567086330.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.  7585448670.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.  8758855797.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.  9648014150.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.  9678553274.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786. 11697659231.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978. 12598563401.\n#&gt;  8 Afghanistan Asia       1987    40.8 13867957      852. 11820990309.\n#&gt;  9 Afghanistan Asia       1992    41.7 16317921      649. 10595901589.\n#&gt; 10 Afghanistan Asia       1997    41.8 22227415      635. 14121995875.\n#&gt; # ℹ 1,694 more rows\n\n\nSet a column to NULL to remove it:\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap,\n         gdpPercap = NULL)\n#&gt; # A tibble: 1,704 × 6\n#&gt;    country     continent  year lifeExp      pop          gdp\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333  6567086330.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934  7585448670.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083  8758855797.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966  9648014150.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460  9678553274.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372 11697659231.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816 12598563401.\n#&gt;  8 Afghanistan Asia       1987    40.8 13867957 11820990309.\n#&gt;  9 Afghanistan Asia       1992    41.7 16317921 10595901589.\n#&gt; 10 Afghanistan Asia       1997    41.8 22227415 14121995875.\n#&gt; # ℹ 1,694 more rows"
+    "text": "mutate() — Add New Columns\nmutate() adds new variables computed from existing ones. New variables are available immediately within the same mutate() call:\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap) |&gt;\n  head(3)\n#&gt; # A tibble: 3 × 7\n#&gt;   country     continent  year lifeExp      pop gdpPercap         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779. 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821. 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853. 8758855797.\n\n\nSet a column to NULL to remove it:\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap,\n         gdpPercap = NULL) |&gt;\n  head(3)\n#&gt; # A tibble: 3 × 6\n#&gt;   country     continent  year lifeExp      pop         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083 8758855797."
   },
   {
     "objectID": "slides/week-1-2.html#summarize-collapse-to-a-summary",
@@ -88,7 +88,7 @@
     "href": "slides/week-1-2.html#arrange-reorder-rows",
     "title": "Week 1 | Day 2",
     "section": "arrange() — Reorder Rows",
-    "text": "arrange() — Reorder Rows\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  arrange(lifeExp)\n#&gt; # A tibble: 142 × 6\n#&gt;    country                  continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;                    &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Swaziland                Africa     2007    39.6  1133066     4513.\n#&gt;  2 Mozambique               Africa     2007    42.1 19951656      824.\n#&gt;  3 Zambia                   Africa     2007    42.4 11746035     1271.\n#&gt;  4 Sierra Leone             Africa     2007    42.6  6144562      863.\n#&gt;  5 Lesotho                  Africa     2007    42.6  2012649     1569.\n#&gt;  6 Angola                   Africa     2007    42.7 12420476     4797.\n#&gt;  7 Zimbabwe                 Africa     2007    43.5 12311143      470.\n#&gt;  8 Afghanistan              Asia       2007    43.8 31889923      975.\n#&gt;  9 Central African Republic Africa     2007    44.7  4369038      706.\n#&gt; 10 Liberia                  Africa     2007    45.7  3193942      415.\n#&gt; # ℹ 132 more rows\n\n\nDescending order with -:\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  arrange(-lifeExp)\n#&gt; # A tibble: 142 × 6\n#&gt;    country          continent  year lifeExp       pop gdpPercap\n#&gt;    &lt;fct&gt;            &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Japan            Asia       2007    82.6 127467972    31656.\n#&gt;  2 Hong Kong, China Asia       2007    82.2   6980412    39725.\n#&gt;  3 Iceland          Europe     2007    81.8    301931    36181.\n#&gt;  4 Switzerland      Europe     2007    81.7   7554661    37506.\n#&gt;  5 Australia        Oceania    2007    81.2  20434176    34435.\n#&gt;  6 Spain            Europe     2007    80.9  40448191    28821.\n#&gt;  7 Sweden           Europe     2007    80.9   9031088    33860.\n#&gt;  8 Israel           Asia       2007    80.7   6426679    25523.\n#&gt;  9 France           Europe     2007    80.7  61083916    30470.\n#&gt; 10 Canada           Americas   2007    80.7  33390141    36319.\n#&gt; # ℹ 132 more rows"
+    "text": "arrange() — Reorder Rows\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  arrange(lifeExp) |&gt;\n  head(5)\n#&gt; # A tibble: 5 × 6\n#&gt;   country      continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;        &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Swaziland    Africa     2007    39.6  1133066     4513.\n#&gt; 2 Mozambique   Africa     2007    42.1 19951656      824.\n#&gt; 3 Zambia       Africa     2007    42.4 11746035     1271.\n#&gt; 4 Sierra Leone Africa     2007    42.6  6144562      863.\n#&gt; 5 Lesotho      Africa     2007    42.6  2012649     1569.\n\n\nDescending order with -:\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  arrange(-lifeExp) |&gt;\n  head(5)\n#&gt; # A tibble: 5 × 6\n#&gt;   country          continent  year lifeExp       pop gdpPercap\n#&gt;   &lt;fct&gt;            &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Japan            Asia       2007    82.6 127467972    31656.\n#&gt; 2 Hong Kong, China Asia       2007    82.2   6980412    39725.\n#&gt; 3 Iceland          Europe     2007    81.8    301931    36181.\n#&gt; 4 Switzerland      Europe     2007    81.7   7554661    37506.\n#&gt; 5 Australia        Oceania    2007    81.2  20434176    34435."
   },
   {
     "objectID": "slides/week-1-2.html#combining-verbs",
@@ -116,14 +116,14 @@
     "href": "slides/week-1-2.html#group_by-mutate-within-group-calculations",
     "title": "Week 1 | Day 2",
     "section": "group_by() + mutate() — Within-Group Calculations",
-    "text": "group_by() + mutate() — Within-Group Calculations\nlag() within groups — life expectancy gain since baseline year:\n\ngapminder |&gt;\n  filter(continent == \"Europe\") |&gt;\n  group_by(country) |&gt;\n  arrange(year) |&gt;\n  mutate(lifeExp_gain = lifeExp - first(lifeExp)) |&gt;\n  filter(year == max(year)) |&gt;\n  arrange(-lifeExp_gain)\n#&gt; # A tibble: 30 × 7\n#&gt; # Groups:   country [30]\n#&gt;    country                continent  year lifeExp     pop gdpPercap lifeExp_gain\n#&gt;    &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;        &lt;dbl&gt;\n#&gt;  1 Turkey                 Europe     2007    71.8  7.12e7     8458.         28.2\n#&gt;  2 Albania                Europe     2007    76.4  3.60e6     5937.         21.2\n#&gt;  3 Bosnia and Herzegovina Europe     2007    74.9  4.55e6     7446.         21.0\n#&gt;  4 Portugal               Europe     2007    78.1  1.06e7    20510.         18.3\n#&gt;  5 Serbia                 Europe     2007    74.0  1.02e7     9787.         16.0\n#&gt;  6 Spain                  Europe     2007    80.9  4.04e7    28821.         16.0\n#&gt;  7 Montenegro             Europe     2007    74.5  6.85e5     9254.         15.4\n#&gt;  8 Italy                  Europe     2007    80.5  5.81e7    28570.         14.6\n#&gt;  9 Croatia                Europe     2007    75.7  4.49e6    14619.         14.5\n#&gt; 10 Poland                 Europe     2007    75.6  3.85e7    15390.         14.3\n#&gt; # ℹ 20 more rows"
+    "text": "group_by() + mutate() — Within-Group Calculations\nlag() within groups — life expectancy gain since baseline year:\n\ngapminder |&gt;\n  filter(continent == \"Europe\") |&gt;\n  group_by(country) |&gt;\n  arrange(year) |&gt;\n  mutate(lifeExp_gain = lifeExp - first(lifeExp)) |&gt;\n  filter(year == max(year)) |&gt;\n  arrange(-lifeExp_gain) |&gt;\n  head(10)\n#&gt; # A tibble: 10 × 7\n#&gt; # Groups:   country [10]\n#&gt;    country                continent  year lifeExp     pop gdpPercap lifeExp_gain\n#&gt;    &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;        &lt;dbl&gt;\n#&gt;  1 Turkey                 Europe     2007    71.8  7.12e7     8458.         28.2\n#&gt;  2 Albania                Europe     2007    76.4  3.60e6     5937.         21.2\n#&gt;  3 Bosnia and Herzegovina Europe     2007    74.9  4.55e6     7446.         21.0\n#&gt;  4 Portugal               Europe     2007    78.1  1.06e7    20510.         18.3\n#&gt;  5 Serbia                 Europe     2007    74.0  1.02e7     9787.         16.0\n#&gt;  6 Spain                  Europe     2007    80.9  4.04e7    28821.         16.0\n#&gt;  7 Montenegro             Europe     2007    74.5  6.85e5     9254.         15.4\n#&gt;  8 Italy                  Europe     2007    80.5  5.81e7    28570.         14.6\n#&gt;  9 Croatia                Europe     2007    75.7  4.49e6    14619.         14.5\n#&gt; 10 Poland                 Europe     2007    75.6  3.85e7    15390.         14.3"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy",
     "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy",
     "title": "Week 1 | Day 2",
     "section": "Worst Single-Year Drop in Life Expectancy",
-    "text": "Worst Single-Year Drop in Life Expectancy\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE)) |&gt;\n  slice_min(worst_drop, n = 5) |&gt;\n  arrange(worst_drop)\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;    country      continent worst_drop\n#&gt;    &lt;fct&gt;        &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Rwanda       Africa        -20.4 \n#&gt;  2 Zimbabwe     Africa        -13.6 \n#&gt;  3 Lesotho      Africa        -11.0 \n#&gt;  4 Swaziland    Africa        -10.4 \n#&gt;  5 Botswana     Africa        -10.2 \n#&gt;  6 Cambodia     Asia           -9.10\n#&gt;  7 Namibia      Africa         -7.43\n#&gt;  8 South Africa Africa         -6.87\n#&gt;  9 China        Asia           -6.05\n#&gt; 10 Zambia       Africa         -5.86\n#&gt; # ℹ 132 more rows\n\n\n\n\n\n\n\n\nNote\n\n\nThis is dplyr doing in 8 lines what would take 30+ lines of base R. The verbs compose — every operation is readable, every result is auditable."
+    "text": "Worst Single-Year Drop in Life Expectancy"
   },
   {
     "objectID": "slides/week-1-2.html#connection-to-sql",
@@ -179,7 +179,7 @@
     "href": "slides/week-1-2.html#multiple-geoms",
     "title": "Week 1 | Day 2",
     "section": "Multiple Geoms",
-    "text": "Multiple Geoms\nLayers compose — each + adds a new geometric object:\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\") +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray50\") +\n  geom_vline(xintercept = mean(gm2007$gdpPercap), color = \"gray50\")"
+    "text": "Multiple Geoms\nLayers compose — each + adds a new geometric object:"
   },
   {
     "objectID": "slides/week-1-2.html#step-3-labels",
@@ -837,7 +837,7 @@
     "href": "slides/week-1-2.html#select-helpers-tidyselect-functions",
     "title": "Week 1 | Day 2",
     "section": "select() Helpers — tidyselect Functions",
-    "text": "select() Helpers — tidyselect Functions\nBeyond explicit column names, use tidyselect helpers to match columns by pattern:\n\n# Select columns starting with a pattern\nselect(gapminder, starts_with(\"life\"))\n#&gt; # A tibble: 1,704 × 1\n#&gt;    lifeExp\n#&gt;      &lt;dbl&gt;\n#&gt;  1    28.8\n#&gt;  2    30.3\n#&gt;  3    32.0\n#&gt;  4    34.0\n#&gt;  5    36.1\n#&gt;  6    38.4\n#&gt;  7    39.9\n#&gt;  8    40.8\n#&gt;  9    41.7\n#&gt; 10    41.8\n#&gt; # ℹ 1,694 more rows\n\n# Select columns ending with a pattern\nselect(gapminder, ends_with(\"pc\"))\n#&gt; # A tibble: 1,704 × 0\n\n# Select columns containing a substring\nselect(gapminder, contains(\"pop\"))\n#&gt; # A tibble: 1,704 × 1\n#&gt;         pop\n#&gt;       &lt;int&gt;\n#&gt;  1  8425333\n#&gt;  2  9240934\n#&gt;  3 10267083\n#&gt;  4 11537966\n#&gt;  5 13079460\n#&gt;  6 14880372\n#&gt;  7 12881816\n#&gt;  8 13867957\n#&gt;  9 16317921\n#&gt; 10 22227415\n#&gt; # ℹ 1,694 more rows\n\n\n\n\n\n\n\n\nTip\n\n\nThese patterns are especially useful for water data where columns follow naming conventions: site_no, site_name, discharge_cfs, temp_c. You’ll select all temperature columns with starts_with(\"temp_\")."
+    "text": "select() Helpers — tidyselect Functions\nBeyond explicit column names, use tidyselect helpers to match columns by pattern:\n\n# Select columns starting with a pattern\nselect(gapminder, starts_with(\"life\")) |&gt; head(3)\n#&gt; # A tibble: 3 × 1\n#&gt;   lifeExp\n#&gt;     &lt;dbl&gt;\n#&gt; 1    28.8\n#&gt; 2    30.3\n#&gt; 3    32.0\n\n# Select columns ending with a pattern\nselect(gapminder, ends_with(\"pc\"))\n#&gt; # A tibble: 1,704 × 0\n\n# Select columns containing a substring\nselect(gapminder, contains(\"pop\")) |&gt; head(3)\n#&gt; # A tibble: 3 × 1\n#&gt;        pop\n#&gt;      &lt;int&gt;\n#&gt; 1  8425333\n#&gt; 2  9240934\n#&gt; 3 10267083\n\n\n\n\n\n\n\n\nTip\n\n\nThese patterns are especially useful for water data where columns follow naming conventions: site_no, site_name, discharge_cfs, temp_c. You’ll select all temperature columns with starts_with(\"temp_\")."
   },
   {
     "objectID": "slides/week-1-2.html#transmute-keep-only-new-columns",
@@ -907,21 +907,21 @@
     "href": "slides/week-1-2.html#how-filter-works-boolean-vectors",
     "title": "Week 1 | Day 2",
     "section": "How filter() Works: Boolean Vectors",
-    "text": "How filter() Works: Boolean Vectors\nUnder the hood, filter() creates a boolean vector (all TRUE or FALSE) and keeps only the rows where the condition is TRUE.\n\n# Create a boolean vector\nlifeExp_condition &lt;- gapminder$lifeExp &lt; 40\n\n# This is what filter() does internally\ngapminder[lifeExp_condition, ]  # base R subsetting with boolean vector\n#&gt; # A tibble: 124 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.\n#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.\n#&gt; 10 Angola      Africa     1962    34    4826015     4269.\n#&gt; # ℹ 114 more rows\n\n\nEquivalent to:\n\n# Using filter()\ngapminder |&gt;\n  filter(lifeExp &lt; 40)\n#&gt; # A tibble: 124 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.\n#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.\n#&gt; 10 Angola      Africa     1962    34    4826015     4269.\n#&gt; # ℹ 114 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nfilter() is cleaner and more readable, but it’s doing exactly what base R subsetting does: keeping rows where the condition is TRUE, dropping rows where it’s FALSE or NA."
+    "text": "How filter() Works: Boolean Vectors\nUnder the hood, filter() creates a boolean vector (all TRUE or FALSE) and keeps only the rows where the condition is TRUE.\n\n\nBase R subsetting:\n\n# Create a boolean vector\nlifeExp_condition &lt;- gapminder$lifeExp &lt; 40\n\n# This is what filter() does internally\ngapminder[lifeExp_condition, ]\n#&gt; # A tibble: 124 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.\n#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.\n#&gt; 10 Angola      Africa     1962    34    4826015     4269.\n#&gt; # ℹ 114 more rows\n\n\nUsing filter():\n\n# Much cleaner syntax\ngapminder |&gt;\n  filter(lifeExp &lt; 40)\n#&gt; # A tibble: 124 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.\n#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.\n#&gt; 10 Angola      Africa     1962    34    4826015     4269.\n#&gt; # ℹ 114 more rows\n\n\n\n\n\n\n\n\nNote\n\n\nfilter() is cleaner and more readable, but it’s doing exactly what base R subsetting does: keeping rows where the condition is TRUE, dropping rows where it’s FALSE or NA."
   },
   {
     "objectID": "slides/week-1-2.html#select-base-r-equivalence",
     "href": "slides/week-1-2.html#select-base-r-equivalence",
     "title": "Week 1 | Day 2",
     "section": "select() — Base R Equivalence",
-    "text": "select() — Base R Equivalence\nUnder the hood, select() is doing column subsetting — the same operation as base R.\n\n# Base R column subsetting\ngapminder[, c(\"country\", \"lifeExp\")]     # [rows, cols]\ngapminder[[\"lifeExp\"]]                   # extract single column\ngapminder$lifeExp                        # $ shorthand\n\n\nUsing select():\n\ngapminder |&gt;\n  select(country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     lifeExp\n#&gt;    &lt;fct&gt;         &lt;dbl&gt;\n#&gt;  1 Afghanistan    28.8\n#&gt;  2 Afghanistan    30.3\n#&gt;  3 Afghanistan    32.0\n#&gt;  4 Afghanistan    34.0\n#&gt;  5 Afghanistan    36.1\n#&gt;  6 Afghanistan    38.4\n#&gt;  7 Afghanistan    39.9\n#&gt;  8 Afghanistan    40.8\n#&gt;  9 Afghanistan    41.7\n#&gt; 10 Afghanistan    41.8\n#&gt; # ℹ 1,694 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nselect() is syntactic sugar on top of base R’s column subsetting. It’s more readable and composable with pipes."
+    "text": "select() — Base R Equivalence\nUnder the hood, select() is doing column subsetting — the same operation as base R.\n\n\nBase R column subsetting:\n\n# Bracket notation [rows, cols]\ngapminder[, c(\"country\", \"lifeExp\")]\n\n# Extract single column\ngapminder[[\"lifeExp\"]]\n\n# Dollar sign shorthand\ngapminder$lifeExp\n\n\nUsing select():\n\n# Much cleaner syntax\ngapminder |&gt;\n  select(country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     lifeExp\n#&gt;    &lt;fct&gt;         &lt;dbl&gt;\n#&gt;  1 Afghanistan    28.8\n#&gt;  2 Afghanistan    30.3\n#&gt;  3 Afghanistan    32.0\n#&gt;  4 Afghanistan    34.0\n#&gt;  5 Afghanistan    36.1\n#&gt;  6 Afghanistan    38.4\n#&gt;  7 Afghanistan    39.9\n#&gt;  8 Afghanistan    40.8\n#&gt;  9 Afghanistan    41.7\n#&gt; 10 Afghanistan    41.8\n#&gt; # ℹ 1,694 more rows\n\n\n\n\n\n\n\n\nNote\n\n\nselect() is syntactic sugar on top of base R’s column subsetting. It’s more readable and composable with pipes."
   },
   {
     "objectID": "slides/week-1-2.html#mutate-base-r-equivalence",
     "href": "slides/week-1-2.html#mutate-base-r-equivalence",
     "title": "Week 1 | Day 2",
     "section": "mutate() — Base R Equivalence",
-    "text": "mutate() — Base R Equivalence\nUnder the hood, mutate() is column assignment — the same operation as base R.\n\n# Base R column assignment\ngapminder$gdp &lt;- gapminder$pop * gapminder$gdpPercap\n\n# Remove a column (assign to NULL)\ngapminder$gdpPercap &lt;- NULL\n\n\nUsing mutate():\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap,\n         gdpPercap = NULL)\n#&gt; # A tibble: 1,704 × 6\n#&gt;    country     continent  year lifeExp      pop          gdp\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;        &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333  6567086330.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934  7585448670.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083  8758855797.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966  9648014150.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460  9678553274.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372 11697659231.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816 12598563401.\n#&gt;  8 Afghanistan Asia       1987    40.8 13867957 11820990309.\n#&gt;  9 Afghanistan Asia       1992    41.7 16317921 10595901589.\n#&gt; 10 Afghanistan Asia       1997    41.8 22227415 14121995875.\n#&gt; # ℹ 1,694 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nmutate() builds on base R assignment but allows you to chain operations with the pipe and reference newly created columns within the same call."
+    "text": "mutate() — Base R Equivalence\nUnder the hood, mutate() is column assignment — the same operation as base R.\n\n# Base R column assignment\ngapminder$gdp &lt;- gapminder$pop * gapminder$gdpPercap\n\n# Remove a column (assign to NULL)\ngapminder$gdpPercap &lt;- NULL\n\n\nUsing mutate():\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap,\n         gdpPercap = NULL) |&gt;\n  head(3)\n#&gt; # A tibble: 3 × 6\n#&gt;   country     continent  year lifeExp      pop         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083 8758855797.\n\n\n\n\n\n\n\n\n\nNote\n\n\nmutate() builds on base R assignment but allows you to chain operations with the pipe and reference newly created columns within the same call."
   },
   {
     "objectID": "slides/week-1-2.html#now-lets-apply-them",
@@ -1356,5 +1356,131 @@
     "title": "Week 2 | Day 2",
     "section": "28. Choose Your Tool",
     "text": "28. Choose Your Tool\n\n\n\nSize\nTool\nTrade-off\n\n\n\n\n&lt; 10k\nLeaflet + clustering\nSimple but sluggish at 10k+\n\n\n10–100k\nleafgl WebGL\nFaster, fewer freezes\n\n\n100k+\nVector tiles\nScalable, professional\n\n\n\nRemember: Always use EPSG:4326 for web mapping, regardless of your analysis CRS."
+  },
+  {
+    "objectID": "slides/week-1-2.html#select-drop-pattern-matching",
+    "href": "slides/week-1-2.html#select-drop-pattern-matching",
+    "title": "Week 1 | Day 2",
+    "section": "select() — Drop & Pattern Matching",
+    "text": "select() — Drop & Pattern Matching\n\n\nDrop a column:\n\nselect(gapminder, !continent)\n#&gt; # A tibble: 1,704 × 5\n#&gt;    country      year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952    28.8  8425333      779.\n#&gt;  2 Afghanistan  1957    30.3  9240934      821.\n#&gt;  3 Afghanistan  1962    32.0 10267083      853.\n#&gt;  4 Afghanistan  1967    34.0 11537966      836.\n#&gt;  5 Afghanistan  1972    36.1 13079460      740.\n#&gt;  6 Afghanistan  1977    38.4 14880372      786.\n#&gt;  7 Afghanistan  1982    39.9 12881816      978.\n#&gt;  8 Afghanistan  1987    40.8 13867957      852.\n#&gt;  9 Afghanistan  1992    41.7 16317921      649.\n#&gt; 10 Afghanistan  1997    41.8 22227415      635.\n#&gt; # ℹ 1,694 more rows\n\n\nMatch by pattern:\n\n# Start with \"life\"\nselect(gapminder, \n       starts_with(\"life\")) |&gt; head(3)\n#&gt; # A tibble: 3 × 1\n#&gt;   lifeExp\n#&gt;     &lt;dbl&gt;\n#&gt; 1    28.8\n#&gt; 2    30.3\n#&gt; 3    32.0\n\n# Contain \"pop\"\nselect(gapminder, \n       contains(\"pop\")) |&gt; head(3)\n#&gt; # A tibble: 3 × 1\n#&gt;        pop\n#&gt;      &lt;int&gt;\n#&gt; 1  8425333\n#&gt; 2  9240934\n#&gt; 3 10267083"
+  },
+  {
+    "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-1",
+    "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-1",
+    "title": "Week 1 | Day 2",
+    "section": "Worst Single-Year Drop in Life Expectancy",
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Afghanistan Asia       1987    40.8 13867957      852.\n#&gt;  9 Afghanistan Asia       1992    41.7 16317921      649.\n#&gt; 10 Afghanistan Asia       1997    41.8 22227415      635.\n#&gt; # ℹ 1,694 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-2",
+    "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-2",
+    "title": "Week 1 | Day 2",
+    "section": "Worst Single-Year Drop in Life Expectancy",
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt;    country      year continent lifeExp\n#&gt;    &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952 Asia         28.8\n#&gt;  2 Afghanistan  1957 Asia         30.3\n#&gt;  3 Afghanistan  1962 Asia         32.0\n#&gt;  4 Afghanistan  1967 Asia         34.0\n#&gt;  5 Afghanistan  1972 Asia         36.1\n#&gt;  6 Afghanistan  1977 Asia         38.4\n#&gt;  7 Afghanistan  1982 Asia         39.9\n#&gt;  8 Afghanistan  1987 Asia         40.8\n#&gt;  9 Afghanistan  1992 Asia         41.7\n#&gt; 10 Afghanistan  1997 Asia         41.8\n#&gt; # ℹ 1,694 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-3",
+    "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-3",
+    "title": "Week 1 | Day 2",
+    "section": "Worst Single-Year Drop in Life Expectancy",
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt; # Groups:   country, continent [142]\n#&gt;    country      year continent lifeExp\n#&gt;    &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952 Asia         28.8\n#&gt;  2 Afghanistan  1957 Asia         30.3\n#&gt;  3 Afghanistan  1962 Asia         32.0\n#&gt;  4 Afghanistan  1967 Asia         34.0\n#&gt;  5 Afghanistan  1972 Asia         36.1\n#&gt;  6 Afghanistan  1977 Asia         38.4\n#&gt;  7 Afghanistan  1982 Asia         39.9\n#&gt;  8 Afghanistan  1987 Asia         40.8\n#&gt;  9 Afghanistan  1992 Asia         41.7\n#&gt; 10 Afghanistan  1997 Asia         41.8\n#&gt; # ℹ 1,694 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-4",
+    "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-4",
+    "title": "Week 1 | Day 2",
+    "section": "Worst Single-Year Drop in Life Expectancy",
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt; # Groups:   country, continent [142]\n#&gt;    country      year continent lifeExp\n#&gt;    &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952 Asia         28.8\n#&gt;  2 Albania      1952 Europe       55.2\n#&gt;  3 Algeria      1952 Africa       43.1\n#&gt;  4 Angola       1952 Africa       30.0\n#&gt;  5 Argentina    1952 Americas     62.5\n#&gt;  6 Australia    1952 Oceania      69.1\n#&gt;  7 Austria      1952 Europe       66.8\n#&gt;  8 Bahrain      1952 Asia         50.9\n#&gt;  9 Bangladesh   1952 Asia         37.5\n#&gt; 10 Belgium      1952 Europe       68  \n#&gt; # ℹ 1,694 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-5",
+    "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-5",
+    "title": "Week 1 | Day 2",
+    "section": "Worst Single-Year Drop in Life Expectancy",
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp))\n\n\n\n#&gt; # A tibble: 1,704 × 5\n#&gt; # Groups:   country, continent [142]\n#&gt;    country      year continent lifeExp le_delta\n#&gt;    &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;    &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952 Asia         28.8       NA\n#&gt;  2 Albania      1952 Europe       55.2       NA\n#&gt;  3 Algeria      1952 Africa       43.1       NA\n#&gt;  4 Angola       1952 Africa       30.0       NA\n#&gt;  5 Argentina    1952 Americas     62.5       NA\n#&gt;  6 Australia    1952 Oceania      69.1       NA\n#&gt;  7 Austria      1952 Europe       66.8       NA\n#&gt;  8 Bahrain      1952 Asia         50.9       NA\n#&gt;  9 Bangladesh   1952 Asia         37.5       NA\n#&gt; 10 Belgium      1952 Europe       68         NA\n#&gt; # ℹ 1,694 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-6",
+    "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-6",
+    "title": "Week 1 | Day 2",
+    "section": "Worst Single-Year Drop in Life Expectancy",
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE))\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;    country     continent worst_drop\n#&gt;    &lt;fct&gt;       &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia          0.0890\n#&gt;  2 Albania     Europe       -0.419 \n#&gt;  3 Algeria     Africa        1.31  \n#&gt;  4 Angola      Africa       -0.0360\n#&gt;  5 Argentina   Americas      0.492 \n#&gt;  6 Australia   Oceania       0.170 \n#&gt;  7 Austria     Europe        0.490 \n#&gt;  8 Bahrain     Asia          0.840 \n#&gt;  9 Bangladesh  Asia          1.67  \n#&gt; 10 Belgium     Europe        0.5   \n#&gt; # ℹ 132 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-7",
+    "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-7",
+    "title": "Week 1 | Day 2",
+    "section": "Worst Single-Year Drop in Life Expectancy",
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE)) |&gt;\n  slice_min(worst_drop, n = 5)\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;    country     continent worst_drop\n#&gt;    &lt;fct&gt;       &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia          0.0890\n#&gt;  2 Albania     Europe       -0.419 \n#&gt;  3 Algeria     Africa        1.31  \n#&gt;  4 Angola      Africa       -0.0360\n#&gt;  5 Argentina   Americas      0.492 \n#&gt;  6 Australia   Oceania       0.170 \n#&gt;  7 Austria     Europe        0.490 \n#&gt;  8 Bahrain     Asia          0.840 \n#&gt;  9 Bangladesh  Asia          1.67  \n#&gt; 10 Belgium     Europe        0.5   \n#&gt; # ℹ 132 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-8",
+    "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-8",
+    "title": "Week 1 | Day 2",
+    "section": "Worst Single-Year Drop in Life Expectancy",
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE)) |&gt;\n  slice_min(worst_drop, n = 5) |&gt;\n  arrange(worst_drop)\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;    country      continent worst_drop\n#&gt;    &lt;fct&gt;        &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Rwanda       Africa        -20.4 \n#&gt;  2 Zimbabwe     Africa        -13.6 \n#&gt;  3 Lesotho      Africa        -11.0 \n#&gt;  4 Swaziland    Africa        -10.4 \n#&gt;  5 Botswana     Africa        -10.2 \n#&gt;  6 Cambodia     Asia           -9.10\n#&gt;  7 Namibia      Africa         -7.43\n#&gt;  8 South Africa Africa         -6.87\n#&gt;  9 China        Asia           -6.05\n#&gt; 10 Zambia       Africa         -5.86\n#&gt; # ℹ 132 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nThis is dplyr doing in 8 lines what would take 30+ lines of base R. The verbs compose — every operation is readable, every result is auditable."
+  },
+  {
+    "objectID": "slides/week-1-2.html#multiple-geoms-1",
+    "href": "slides/week-1-2.html#multiple-geoms-1",
+    "title": "Week 1 | Day 2",
+    "section": "Multiple Geoms",
+    "text": "Multiple Geoms\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#multiple-geoms-2",
+    "href": "slides/week-1-2.html#multiple-geoms-2",
+    "title": "Week 1 | Day 2",
+    "section": "Multiple Geoms",
+    "text": "Multiple Geoms\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#multiple-geoms-3",
+    "href": "slides/week-1-2.html#multiple-geoms-3",
+    "title": "Week 1 | Day 2",
+    "section": "Multiple Geoms",
+    "text": "Multiple Geoms\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\") +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray50\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#multiple-geoms-4",
+    "href": "slides/week-1-2.html#multiple-geoms-4",
+    "title": "Week 1 | Day 2",
+    "section": "Multiple Geoms",
+    "text": "Multiple Geoms\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\") +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray50\") +\n  geom_vline(xintercept = mean(gm2007$gdpPercap), color = \"gray50\")\n\n\n\n\n\n\n\n\n\n\n\n\nLayers compose — each + adds a new geometric object:"
+  },
+  {
+    "objectID": "slides/week-1-2.html#section",
+    "href": "slides/week-1-2.html#section",
+    "title": "Week 1 | Day 2",
+    "section": "",
+    "text": "ggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#section-1",
+    "href": "slides/week-1-2.html#section-1",
+    "title": "Week 1 | Day 2",
+    "section": "",
+    "text": "ggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#section-2",
+    "href": "slides/week-1-2.html#section-2",
+    "title": "Week 1 | Day 2",
+    "section": "",
+    "text": "ggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#section-3",
+    "href": "slides/week-1-2.html#section-3",
+    "title": "Week 1 | Day 2",
+    "section": "",
+    "text": "ggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\") +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray50\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#section-4",
+    "href": "slides/week-1-2.html#section-4",
+    "title": "Week 1 | Day 2",
+    "section": "",
+    "text": "ggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\") +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray50\") +\n  geom_vline(xintercept = mean(gm2007$gdpPercap), color = \"gray50\")"
   }
 ]

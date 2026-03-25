@@ -392,7 +392,7 @@ Tip
 <li><strong>Table 1</strong>: The 5 gauges with the <strong>highest discharge</strong> — where is flow greatest right now?</li>
 <li><strong>Table 2</strong>: The 5 gauges with the <strong>greatest day-over-day increase</strong> — where is flow rising fastest?</li>
 </ul>
-<p>Both tables should have clear column names, rounded numbers, and descriptive captions.</p>
+<p>Both tables should have clear column names, rounded numbers, and descriptive captions using <code>flextable</code> (see tip).</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -405,19 +405,6 @@ Introducing <code>flextable</code>
 <div class="callout-body-container callout-body">
 <p><code>flextable</code> creates publication-quality HTML tables directly from data frames.</p>
 <p>Hint: use <code>flextable()</code> with <code>set_header_labels()</code>, <code>set_caption()</code>, and <code>autofit()</code> for clean tables. Use <code>slice_max()</code> to select top <code>n</code> rows and <code>round()</code> to tidy numeric columns before rendering.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Instructor-only: a concrete <code>flextable()</code> example has been moved to the instructor solutions file (<code>labs/keys/lab-01-solutions.qmd</code>). Implement your tables by selecting top rows with <code>slice_max()</code>, rounding numeric columns, then using <code>flextable()</code> with <code>set_header_labels()</code>, <code>set_caption()</code>, and <code>autofit()</code>.</p>
 </div>
 </div>
 <hr>
@@ -627,19 +614,6 @@ Note
 </div>
 </div>
 <p><strong>a.</strong> For each gauge, compute the <strong>7-day rolling mean</strong> of daily discharge. Use <code>zoo::rollmean()</code> with <code>fill = NA</code> and <code>align = "right"</code> so each value represents the average of the current and 6 preceding days.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Instructor-only: an hourly (8-hour) <code>zoo::rollmean()</code> example has been moved to the instructor solutions file (<code>labs/keys/lab-01-solutions.qmd</code>). For students, compute 7-day rolling means with <code>zoo::rollmean(..., k = 7, fill = NA, align = "right")</code> inside a per-gauge chronological grouping.</p>
-</div>
-</div>
 <p><strong>b.</strong> Define a <strong>low-flow threshold</strong> for each gauge as the 10th percentile of its historical discharge during <strong>1980–2010</strong>. A flow that is critically low for Lees Ferry might be above average for the Little Colorado — thresholds must be site-specific.</p>
 <p><strong>c.</strong> Add a logical column <code>below_threshold</code> that is <code>TRUE</code> when the 7-day rolling mean is below the gauge’s 10th percentile threshold.</p>
 <p><strong>d.</strong> For <strong>Lees Ferry</strong> (site <code>09380000</code>) — the Compact’s primary accounting point — plot the 7-day rolling mean from 2000–2023. Shade periods below threshold in red and add a dashed horizontal reference line at the threshold.</p>
