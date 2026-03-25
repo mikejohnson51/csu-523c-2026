@@ -361,25 +361,25 @@ Labs - with the exception of Lab 0 - are assigned on Wednesdays and due the foll
       <div class="item-icon icon-lecture">🎓</div>
       <div class="item-type">Lecture</div>
       <div class="item-link"><a href="slides/week-1-1.html">Day 1: Digital Environment — Files, Paths, URLs &amp; Git</a></div>
-      <span class="badge-new">new</span>
+      <span class="badge-old">complete</span>
     </div>
     <div class="week-item">
       <div class="item-icon icon-hw">📝</div>
       <div class="item-type">HW</div>
       <div class="item-link"><a href="labs/lab-0.html">Lab 0: Verify Your Environment + Meet Your Tools</a></div>
-      <span class="badge-new">new</span>
+      <span class="badge-old">complete</span>
     </div>
     <div class="week-item">
       <div class="item-icon icon-tech">⚙️</div>
       <div class="item-type">Tech Talk</div>
       <div class="item-link"><a href="slides/week-1-2.html">Day 2: Data Manipulation, Visualization &amp; Relational Data</a></div>
-      <span class="badge-soon">next time</span>
+      <span class="badge-new">new</span>
     </div>
     <div class="week-item">
       <div class="item-icon icon-lab">🔬</div>
       <div class="item-type">Lab</div>
       <div class="item-link"><a href="labs/lab-01.html">Lab 1: Streamflow Across the Colorado River Basin</a></div>
-      <span class="badge-soon">next time</span>
+      <span class="badge-new">new</span>
     </div>
   </div>
 </div>
