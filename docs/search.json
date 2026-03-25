@@ -25,21 +25,21 @@
     "href": "slides/week-1-2.html#the-grammar-of-data-manipulation",
     "title": "Week 1 | Day 2",
     "section": "The Grammar of Data Manipulation",
-    "text": "The Grammar of Data Manipulation\n\n\n\n\n\n\ndplyr provides a consistent set of verbs for data manipulation:\n\n\n\nVerb\nDoes\n\n\n\n\nfilter()\nKeep rows matching a condition\n\n\nselect()\nKeep or drop columns\n\n\nmutate()\nAdd or transform columns\n\n\nsummarize()\nCollapse rows to a summary\n\n\narrange()\nReorder rows\n\n\ngroup_by()\nApply operations by group\n\n\n\nThese all combine naturally. Learning the verbs is learning the language."
+    "text": "The Grammar of Data Manipulation\n\n\n\n\n\n\ndplyr provides a consistent set of verbs for data manipulation:\n\n\n\nVerb\nDoes\n\n\n\n\nselect()\nPicks variables based on their names.\n\n\nfilter()\nPicks cases based on their values.\n\n\nmutate()\nAdd or transform columns\n\n\nsummarize()\nReduces multiple values down to a single summary.\n\n\narrange()\nReorder rows\n\n\ngroup_by()\nApply operations by group\n\n\n\nThese all combine naturally. Learning the verbs is learning the language."
   },
   {
     "objectID": "slides/week-1-2.html#a-note-on-subsetting",
     "href": "slides/week-1-2.html#a-note-on-subsetting",
     "title": "Week 1 | Day 2",
     "section": "A Note on Subsetting",
-    "text": "A Note on Subsetting\nBefore we use these verbs, let’s ground ourselves in base R subsetting — it’s what dplyr builds on. Understanding the foundation makes the syntax sugar more transparent.\nYou already know base R subsetting. Here’s the vocabulary:\n\ndf &lt;- data.frame(country = c(\"USA\", \"Brazil\", \"India\"),\n                 pop     = c(300e6, 200e6, 1.4e9))\n\ndf[1, 2]          # row 1, col 2 — matrix style\n#&gt; [1] 3e+08\ndf[[\"pop\"]]       # column by name — list style\n#&gt; [1] 3.0e+08 2.0e+08 1.4e+09\ndf$pop            # column shorthand\n#&gt; [1] 3.0e+08 2.0e+08 1.4e+09\n\n\n\n\n\n\n\n\nImportant\n\n\nNever subset by row number in a script:\n\ngapminder[19:70, ]   # ❌ not self-documenting, breaks if data changes\n\nAlways subset by condition — it is explicit, readable, and robust."
+    "text": "A Note on Subsetting\nBefore we use these verbs, let’s ground ourselves in base R subsetting — it’s what dplyr builds on. Understanding the foundation makes the syntax sugar more transparent.\nYou already know base R subsetting. Here’s the vocabulary:\n\ndf &lt;- data.frame(country = c(\"USA\", \"Brazil\", \"India\"),\n                 pop     = c(3e6, 2e6, 1.4e9))\n\ndf[1, 2]          # row 1, col 2 — matrix style\n#&gt; [1] 3e+06\ndf[[\"pop\"]]       # column by name — list style\n#&gt; [1] 3.0e+06 2.0e+06 1.4e+09\ndf$pop            # column shorthand\n#&gt; [1] 3.0e+06 2.0e+06 1.4e+09\n\n\n\n\n\n\n\n\nImportant\n\n\nNever subset by row number in a script:\n\ngapminder[19:70, ]   # ❌ not self-documenting, breaks if data changes\n\nAlways subset by condition — it is explicit, readable, and robust."
   },
   {
     "objectID": "slides/week-1-2.html#filter-keep-rows-by-condition",
     "href": "slides/week-1-2.html#filter-keep-rows-by-condition",
     "title": "Week 1 | Day 2",
     "section": "filter() — Keep Rows by Condition",
-    "text": "filter() — Keep Rows by Condition\nfilter() takes logical expressions and returns rows where all conditions are TRUE. It never touches columns.\n\nfilter(gapminder, lifeExp &lt; 40) |&gt; head(5)\n#&gt; # A tibble: 5 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; 4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt; 5 Afghanistan Asia       1972    36.1 13079460      740."
+    "text": "filter() — Keep Rows by Condition\n\nfilter() takes logical (binary) expressions and returns the rows in which all conditions are TRUE.\nfilter() does NOT impact columns\nthe data.frame is ALWAYS the fist argument\nLets find all rows in gapminder that in which the life expectancy is less then 40\n\n\n\nfilter(gapminder, lifeExp &lt; 40)\n#&gt; # A tibble: 124 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 121 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#filter-multiple-conditions",
@@ -53,28 +53,28 @@
     "href": "slides/week-1-2.html#filter-the-in-operator",
     "title": "Week 1 | Day 2",
     "section": "filter() — The %in% Operator",
-    "text": "filter() — The %in% Operator\n\nfilter(gapminder,\n       country %in% c(\"Iraq\", \"Iran\", \"Afghanistan\"),\n       year &gt; 2005)\n#&gt; # A tibble: 3 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       2007    43.8 31889923      975.\n#&gt; 2 Iran        Asia       2007    71.0 69453570    11606.\n#&gt; 3 Iraq        Asia       2007    59.5 27499638     4471.\n\n\n\n\n\n\n\n\nTip\n\n\n%in% tests membership in a vector — much cleaner than chaining | (OR) conditions. You’ll use it constantly with site numbers, HUC codes, and state names in water resources work."
+    "text": "filter() — The %in% Operator\n\nfilter(gapminder,\n       country %in% c(\"Iraq\", \"Iran\", \"Afghanistan\"),\n       year &gt; 2005)\n#&gt; # A tibble: 3 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       2007    43.8 31889923      975.\n#&gt; 2 Iran        Asia       2007    71.0 69453570    11606.\n#&gt; 3 Iraq        Asia       2007    59.5 27499638     4471.\n\n\n\n\n\n\n\n\nTip\n\n\n%in% tests membership in a vector — much cleaner than chaining | (OR) conditions. You’ll use it constantly with site numbers, HUC codes, and state names in water resources work. %in% maps directly to SQL IN."
   },
   {
     "objectID": "slides/week-1-2.html#select-keep-columns-by-name",
     "href": "slides/week-1-2.html#select-keep-columns-by-name",
     "title": "Week 1 | Day 2",
     "section": "select() — Keep Columns by Name",
-    "text": "select() — Keep Columns by Name\n\n\nSelect columns:\n\nselect(gapminder, country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     lifeExp\n#&gt;    &lt;fct&gt;         &lt;dbl&gt;\n#&gt;  1 Afghanistan    28.8\n#&gt;  2 Afghanistan    30.3\n#&gt;  3 Afghanistan    32.0\n#&gt;  4 Afghanistan    34.0\n#&gt;  5 Afghanistan    36.1\n#&gt;  6 Afghanistan    38.4\n#&gt;  7 Afghanistan    39.9\n#&gt;  8 Afghanistan    40.8\n#&gt;  9 Afghanistan    41.7\n#&gt; 10 Afghanistan    41.8\n#&gt; # ℹ 1,694 more rows\n\n\nRename while selecting:\n\nselect(gapminder, \n       country, \n       life_exp = lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     life_exp\n#&gt;    &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Afghanistan     28.8\n#&gt;  2 Afghanistan     30.3\n#&gt;  3 Afghanistan     32.0\n#&gt;  4 Afghanistan     34.0\n#&gt;  5 Afghanistan     36.1\n#&gt;  6 Afghanistan     38.4\n#&gt;  7 Afghanistan     39.9\n#&gt;  8 Afghanistan     40.8\n#&gt;  9 Afghanistan     41.7\n#&gt; 10 Afghanistan     41.8\n#&gt; # ℹ 1,694 more rows"
+    "text": "select() — Keep Columns by Name\nselect() can be used to remove columns. The ! negates a selection\n\n\nSelect columns:\n\nselect(gapminder, country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;   country     lifeExp\n#&gt;   &lt;fct&gt;         &lt;dbl&gt;\n#&gt; 1 Afghanistan    28.8\n#&gt; 2 Afghanistan    30.3\n#&gt; 3 Afghanistan    32.0\n#&gt; # ℹ 1,701 more rows\n\n\nRename while selecting:\n\nselect(gapminder, country, life_exp = lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;   country     life_exp\n#&gt;   &lt;fct&gt;          &lt;dbl&gt;\n#&gt; 1 Afghanistan     28.8\n#&gt; 2 Afghanistan     30.3\n#&gt; 3 Afghanistan     32.0\n#&gt; # ℹ 1,701 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#the-pipe-operator",
     "href": "slides/week-1-2.html#the-pipe-operator",
     "title": "Week 1 | Day 2",
     "section": "The |> Pipe Operator",
-    "text": "The |&gt; Pipe Operator\nThe pipe passes the object on the left into the first argument of the function on the right:\nselect(gapminder, country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     lifeExp\n#&gt;    &lt;fct&gt;         &lt;dbl&gt;\n#&gt;  1 Afghanistan    28.8\n#&gt;  2 Afghanistan    30.3\n#&gt;  3 Afghanistan    32.0\n#&gt;  4 Afghanistan    34.0\n#&gt;  5 Afghanistan    36.1\n#&gt;  6 Afghanistan    38.4\n#&gt;  7 Afghanistan    39.9\n#&gt;  8 Afghanistan    40.8\n#&gt;  9 Afghanistan    41.7\n#&gt; 10 Afghanistan    41.8\n#&gt; # ℹ 1,694 more rows\ngapminder |&gt;\n  select(country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     lifeExp\n#&gt;    &lt;fct&gt;         &lt;dbl&gt;\n#&gt;  1 Afghanistan    28.8\n#&gt;  2 Afghanistan    30.3\n#&gt;  3 Afghanistan    32.0\n#&gt;  4 Afghanistan    34.0\n#&gt;  5 Afghanistan    36.1\n#&gt;  6 Afghanistan    38.4\n#&gt;  7 Afghanistan    39.9\n#&gt;  8 Afghanistan    40.8\n#&gt;  9 Afghanistan    41.7\n#&gt; 10 Afghanistan    41.8\n#&gt; # ℹ 1,694 more rows\n\n\n\nWithout pipe:\n\nWith pipe:\n\n\n\nKeyboard shortcut: Cmd+Shift+M (Mac) / Ctrl+Shift+M (Windows)\n\n\nThe pipe is what makes dplyr readable — it lets you build a chain of operations that reads like a sentence:\n\ngapminder |&gt;\n  select(pop, gdpPercap, year, country) |&gt;\n  filter(pop &gt; 100000000, gdpPercap &gt; 5000) |&gt;\n  filter(year &gt; 1995) |&gt;\n  filter(country %in% c(\"United States\", \"Mexico\"))\n#&gt; # A tibble: 5 × 4\n#&gt;         pop gdpPercap  year country      \n#&gt;       &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;        \n#&gt; 1 102479927    10742.  2002 Mexico       \n#&gt; 2 108700891    11978.  2007 Mexico       \n#&gt; 3 272911760    35767.  1997 United States\n#&gt; 4 287675526    39097.  2002 United States\n#&gt; 5 301139947    42952.  2007 United States"
+    "text": "The |&gt; Pipe Operator\nThe pipe passes the object on the left into the first argument of the function on the right:\n\n\nWithout pipe:\n\nselect(gapminder, country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;   country     lifeExp\n#&gt;   &lt;fct&gt;         &lt;dbl&gt;\n#&gt; 1 Afghanistan    28.8\n#&gt; 2 Afghanistan    30.3\n#&gt; 3 Afghanistan    32.0\n#&gt; # ℹ 1,701 more rows\n\n\nWith pipe:\n\ngapminder |&gt;\n  select(country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;   country     lifeExp\n#&gt;   &lt;fct&gt;         &lt;dbl&gt;\n#&gt; 1 Afghanistan    28.8\n#&gt; 2 Afghanistan    30.3\n#&gt; 3 Afghanistan    32.0\n#&gt; # ℹ 1,701 more rows\n\n\n\nKeyboard shortcut: Cmd+Shift+M (Mac) / Ctrl+Shift+M (Windows)\nThe pipe is what makes dplyr readable — it lets you build a chain of operations that reads like a sentence:"
   },
   {
     "objectID": "slides/week-1-2.html#mutate-add-new-columns",
     "href": "slides/week-1-2.html#mutate-add-new-columns",
     "title": "Week 1 | Day 2",
     "section": "mutate() — Add New Columns",
-    "text": "mutate() — Add New Columns\nmutate() adds new variables computed from existing ones. New variables are available immediately within the same mutate() call:\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap) |&gt;\n  head(3)\n#&gt; # A tibble: 3 × 7\n#&gt;   country     continent  year lifeExp      pop gdpPercap         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779. 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821. 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853. 8758855797.\n\n\nSet a column to NULL to remove it:\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap,\n         gdpPercap = NULL) |&gt;\n  head(3)\n#&gt; # A tibble: 3 × 6\n#&gt;   country     continent  year lifeExp      pop         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083 8758855797."
+    "text": "mutate() — Add New Columns\n\nmutate() defines and inserts new variables into a existing data.frame\nmutate() builds new variables sequentially so you can reference earlier ones when defining later ones\nIn the gapminder dataset we have a population and gdp per capita variable. Lets calculate the GDP of each county"
   },
   {
     "objectID": "slides/week-1-2.html#summarize-collapse-to-a-summary",
@@ -88,35 +88,35 @@
     "href": "slides/week-1-2.html#arrange-reorder-rows",
     "title": "Week 1 | Day 2",
     "section": "arrange() — Reorder Rows",
-    "text": "arrange() — Reorder Rows\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  arrange(lifeExp) |&gt;\n  head(5)\n#&gt; # A tibble: 5 × 6\n#&gt;   country      continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;        &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Swaziland    Africa     2007    39.6  1133066     4513.\n#&gt; 2 Mozambique   Africa     2007    42.1 19951656      824.\n#&gt; 3 Zambia       Africa     2007    42.4 11746035     1271.\n#&gt; 4 Sierra Leone Africa     2007    42.6  6144562      863.\n#&gt; 5 Lesotho      Africa     2007    42.6  2012649     1569.\n\n\nDescending order with -:\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  arrange(-lifeExp) |&gt;\n  head(5)\n#&gt; # A tibble: 5 × 6\n#&gt;   country          continent  year lifeExp       pop gdpPercap\n#&gt;   &lt;fct&gt;            &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Japan            Asia       2007    82.6 127467972    31656.\n#&gt; 2 Hong Kong, China Asia       2007    82.2   6980412    39725.\n#&gt; 3 Iceland          Europe     2007    81.8    301931    36181.\n#&gt; 4 Switzerland      Europe     2007    81.7   7554661    37506.\n#&gt; 5 Australia        Oceania    2007    81.2  20434176    34435."
+    "text": "arrange() — Reorder Rows\n\norders the rows of a data.frame rows by the values of selected columns."
   },
   {
     "objectID": "slides/week-1-2.html#combining-verbs",
     "href": "slides/week-1-2.html#combining-verbs",
     "title": "Week 1 | Day 2",
     "section": "Combining Verbs",
-    "text": "Combining Verbs\nThe pipe lets you chain as many operations as needed:\n\ngapminder |&gt;\n  select(year, country, gdpPercap) |&gt;\n  filter(year == max(year)) |&gt;\n  arrange(-gdpPercap) |&gt;\n  mutate(rank = 1:n())\n#&gt; # A tibble: 142 × 4\n#&gt;     year country          gdpPercap  rank\n#&gt;    &lt;int&gt; &lt;fct&gt;                &lt;dbl&gt; &lt;int&gt;\n#&gt;  1  2007 Norway              49357.     1\n#&gt;  2  2007 Kuwait              47307.     2\n#&gt;  3  2007 Singapore           47143.     3\n#&gt;  4  2007 United States       42952.     4\n#&gt;  5  2007 Ireland             40676.     5\n#&gt;  6  2007 Hong Kong, China    39725.     6\n#&gt;  7  2007 Switzerland         37506.     7\n#&gt;  8  2007 Netherlands         36798.     8\n#&gt;  9  2007 Canada              36319.     9\n#&gt; 10  2007 Iceland             36181.    10\n#&gt; # ℹ 132 more rows"
+    "text": "Combining Verbs\nThe pipe lets you chain as many operations as needed:\n\ngapminder |&gt;\n  select(year, country, gdpPercap) |&gt;\n  filter(year == max(year)) |&gt;\n  arrange(-gdpPercap) |&gt;\n  mutate(rank = 1:n())\n#&gt; # A tibble: 142 × 4\n#&gt;    year country   gdpPercap  rank\n#&gt;   &lt;int&gt; &lt;fct&gt;         &lt;dbl&gt; &lt;int&gt;\n#&gt; 1  2007 Norway       49357.     1\n#&gt; 2  2007 Kuwait       47307.     2\n#&gt; 3  2007 Singapore    47143.     3\n#&gt; # ℹ 139 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#group_by-summarize-split-apply-combine",
     "href": "slides/week-1-2.html#group_by-summarize-split-apply-combine",
     "title": "Week 1 | Day 2",
     "section": "group_by() + summarize() — Split-Apply-Combine",
-    "text": "group_by() + summarize() — Split-Apply-Combine\nHave you ever needed:\n\nMean wind speed by storm type?\nAverage discharge by HUC?\nCase counts by state?\n\n\ngroup_by() adds grouping structure. mutate() and summarize() honor it:\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap) |&gt;\n  group_by(year) |&gt;\n  summarize(mean_gdp = mean(gdp),\n            sd_gdp   = sd(gdp))\n#&gt; # A tibble: 12 × 3\n#&gt;     year      mean_gdp  sd_gdp\n#&gt;    &lt;int&gt;         &lt;dbl&gt;   &lt;dbl&gt;\n#&gt;  1  1952  49561190904. 1.97e11\n#&gt;  2  1957  62649777593. 2.34e11\n#&gt;  3  1962  77495568413. 2.80e11\n#&gt;  4  1967 100338690564. 3.60e11\n#&gt;  5  1972 129728407146. 4.37e11\n#&gt;  6  1977 157170394501. 5.09e11\n#&gt;  7  1982 178746382573. 5.66e11\n#&gt;  8  1987 212202795902. 6.99e11\n#&gt;  9  1992 242964158844. 8.01e11\n#&gt; 10  1997 288775189215. 9.46e11\n#&gt; 11  2002 332861503428. 1.09e12\n#&gt; 12  2007 409220666999. 1.31e12"
+    "text": "group_by() + summarize() — Split-Apply-Combine\nHave you ever needed:\n\nMean wind speed by storm type?\nAverage discharge by HUC?\nCase counts by state?\n\n\ngroup_by() adds grouping structure. mutate() and summarize() honor it:\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap) |&gt;\n  group_by(year) |&gt;\n  summarize(mean_gdp = mean(gdp),\n            sd_gdp   = sd(gdp))\n#&gt; # A tibble: 12 × 3\n#&gt;    year     mean_gdp        sd_gdp\n#&gt;   &lt;int&gt;        &lt;dbl&gt;         &lt;dbl&gt;\n#&gt; 1  1952 49561190904. 197218416124.\n#&gt; 2  1957 62649777593. 233501965317.\n#&gt; 3  1962 77495568413. 279956456279.\n#&gt; # ℹ 9 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#group_by-more-examples",
     "href": "slides/week-1-2.html#group_by-more-examples",
     "title": "Week 1 | Day 2",
     "section": "group_by() — More Examples",
-    "text": "group_by() — More Examples\nLife expectancy range by year in Europe:\n\ngapminder |&gt;\n  filter(continent == \"Europe\") |&gt;\n  group_by(year) |&gt;\n  summarize(min_lifeExp = min(lifeExp),\n            max_lifeExp = max(lifeExp))\n#&gt; # A tibble: 12 × 3\n#&gt;     year min_lifeExp max_lifeExp\n#&gt;    &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;\n#&gt;  1  1952        43.6        72.7\n#&gt;  2  1957        48.1        73.5\n#&gt;  3  1962        52.1        73.7\n#&gt;  4  1967        54.3        74.2\n#&gt;  5  1972        57.0        74.7\n#&gt;  6  1977        59.5        76.1\n#&gt;  7  1982        61.0        77.0\n#&gt;  8  1987        63.1        77.4\n#&gt;  9  1992        66.1        78.8\n#&gt; 10  1997        68.8        79.4\n#&gt; 11  2002        70.8        80.6\n#&gt; 12  2007        71.8        81.8"
+    "text": "group_by() — More Examples\nLife expectancy range by year in Europe:\n\ngapminder |&gt;\n  filter(continent == \"Europe\") |&gt;\n  group_by(year) |&gt;\n  summarize(min_lifeExp = min(lifeExp),\n            max_lifeExp = max(lifeExp))\n#&gt; # A tibble: 12 × 3\n#&gt;    year min_lifeExp max_lifeExp\n#&gt;   &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;\n#&gt; 1  1952        43.6        72.7\n#&gt; 2  1957        48.1        73.5\n#&gt; 3  1962        52.1        73.7\n#&gt; # ℹ 9 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#group_by-mutate-within-group-calculations",
     "href": "slides/week-1-2.html#group_by-mutate-within-group-calculations",
     "title": "Week 1 | Day 2",
     "section": "group_by() + mutate() — Within-Group Calculations",
-    "text": "group_by() + mutate() — Within-Group Calculations\nlag() within groups — life expectancy gain since baseline year:\n\ngapminder |&gt;\n  filter(continent == \"Europe\") |&gt;\n  group_by(country) |&gt;\n  arrange(year) |&gt;\n  mutate(lifeExp_gain = lifeExp - first(lifeExp)) |&gt;\n  filter(year == max(year)) |&gt;\n  arrange(-lifeExp_gain) |&gt;\n  head(10)\n#&gt; # A tibble: 10 × 7\n#&gt; # Groups:   country [10]\n#&gt;    country                continent  year lifeExp     pop gdpPercap lifeExp_gain\n#&gt;    &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;        &lt;dbl&gt;\n#&gt;  1 Turkey                 Europe     2007    71.8  7.12e7     8458.         28.2\n#&gt;  2 Albania                Europe     2007    76.4  3.60e6     5937.         21.2\n#&gt;  3 Bosnia and Herzegovina Europe     2007    74.9  4.55e6     7446.         21.0\n#&gt;  4 Portugal               Europe     2007    78.1  1.06e7    20510.         18.3\n#&gt;  5 Serbia                 Europe     2007    74.0  1.02e7     9787.         16.0\n#&gt;  6 Spain                  Europe     2007    80.9  4.04e7    28821.         16.0\n#&gt;  7 Montenegro             Europe     2007    74.5  6.85e5     9254.         15.4\n#&gt;  8 Italy                  Europe     2007    80.5  5.81e7    28570.         14.6\n#&gt;  9 Croatia                Europe     2007    75.7  4.49e6    14619.         14.5\n#&gt; 10 Poland                 Europe     2007    75.6  3.85e7    15390.         14.3"
+    "text": "group_by() + mutate() — Within-Group Calculations\nlag() within groups — life expectancy gain since baseline year:\n\ngapminder |&gt;\n  filter(continent == \"Europe\") |&gt;\n  group_by(country) |&gt;\n  arrange(year) |&gt;\n  mutate(lifeExp_gain = lifeExp - first(lifeExp)) |&gt;\n  filter(year == max(year)) |&gt;\n  arrange(-lifeExp_gain) |&gt;\n  head(10)\n#&gt; # A tibble: 10 × 7\n#&gt; # Groups:   country [10]\n#&gt;   country                continent  year lifeExp      pop gdpPercap lifeExp_gain\n#&gt;   &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;        &lt;dbl&gt;\n#&gt; 1 Turkey                 Europe     2007    71.8 71158647     8458.         28.2\n#&gt; 2 Albania                Europe     2007    76.4  3600523     5937.         21.2\n#&gt; 3 Bosnia and Herzegovina Europe     2007    74.9  4552198     7446.         21.0\n#&gt; # ℹ 7 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy",
@@ -130,7 +130,7 @@
     "href": "slides/week-1-2.html#connection-to-sql",
     "title": "Week 1 | Day 2",
     "section": "Connection to SQL",
-    "text": "Connection to SQL\n\n\nYou just learned the core concepts of SQL:\n\nfilter() = WHERE\nselect() = SELECT\nmutate() = computed columns\nsummarize() + group_by() = GROUP BY + aggregate functions\narrange() = ORDER BY\n\nThe grammar transfers directly. SQL is the language of databases; dplyr is the language of R data frames. They solve the same class of problems."
+    "text": "Connection to SQL\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSQL (Structured Query Language) provides a language for databases to store, retrieve, and manage data.\nUsed in all major databases – PostgreSQL, MySQL, SQL Server, and more.\nEssential for data jobs – Analysts, scientists, and engineers rely on it.\nUtilized everywhere in business & tech – From small apps to big companies to governments"
   },
   {
     "objectID": "slides/week-1-2.html#why-visualization",
@@ -144,7 +144,7 @@
     "href": "slides/week-1-2.html#the-ggplot2-workflow",
     "title": "Week 1 | Day 2",
     "section": "The ggplot2 Workflow",
-    "text": "The ggplot2 Workflow\nBuilding a plot is additive — you layer components with +:\n\nDATA |&gt;\n  ggplot(aes(x = VAR1, y = VAR2)) +\n  GEOM_FUNCTION() +\n  LABELS +\n  FACETS +\n  THEME\n\n\n\n\n\n\n\n\nTip\n\n\nNotice the switch from |&gt; (pipe) to + (plus) when you enter ggplot. The pipe passes data into ggplot(); the plus adds layers within the plot. This is the most common source of syntax errors when learning ggplot."
+    "text": "The ggplot2 Workflow\nBuilding a plot is additive — you layer components with +:\n\nDATA |&gt;\n  ggplot(aes(x = VAR1, y = VAR2)) +\n  GEOM_FUNCTION() +\n  ... +\n  LABELS +\n  FACETS +\n  THEME\n\n\n\n\n\n\n\n\nTip\n\n\nNotice the switch from |&gt; (pipe) to + (plus) when you enter ggplot. The pipe passes data into ggplot(); the plus adds layers within the plot. This is the most common source of syntax errors when learning ggplot."
   },
   {
     "objectID": "slides/week-1-2.html#step-1-the-canvas",
@@ -172,28 +172,28 @@
     "href": "slides/week-1-2.html#fixed-vs.-data-driven-aesthetics",
     "title": "Week 1 | Day 2",
     "section": "Fixed vs. Data-Driven Aesthetics",
-    "text": "Fixed vs. Data-Driven Aesthetics\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(col = \"red\")\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(col = continent))\n\n\n\nFixed — set outside aes(), applies to all points:\n\n\n\n\n\n\n\n\n\n\nData-driven — set inside aes(), varies by data:"
+    "text": "Fixed vs. Data-Driven Aesthetics\n\n\nFixed — set outside aes(), applies to all points:\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(col = \"red\")\n\n\n\n\n\n\n\n\n\nData-driven — set inside aes(), varies by data:\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(col = continent))"
   },
   {
     "objectID": "slides/week-1-2.html#multiple-geoms",
     "href": "slides/week-1-2.html#multiple-geoms",
     "title": "Week 1 | Day 2",
     "section": "Multiple Geoms",
-    "text": "Multiple Geoms\nLayers compose — each + adds a new geometric object:"
+    "text": "Multiple Geoms\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp))"
   },
   {
     "objectID": "slides/week-1-2.html#step-3-labels",
     "href": "slides/week-1-2.html#step-3-labels",
     "title": "Week 1 | Day 2",
     "section": "Step 3: Labels",
-    "text": "Step 3: Labels\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\", linewidth = .5) +\n  labs(title    = \"Per capita GDP vs. life expectancy (2007)\",\n       x        = \"Per Capita GDP (USD)\",\n       y        = \"Life Expectancy (years)\",\n       subtitle = \"Source: Gapminder\",\n       color    = \"\",\n       size     = \"Population\")"
+    "text": "Step 3: Labels\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp))"
   },
   {
     "objectID": "slides/week-1-2.html#step-4-facets",
     "href": "slides/week-1-2.html#step-4-facets",
     "title": "Week 1 | Day 2",
     "section": "Step 4: Facets",
-    "text": "Step 4: Facets\nSplit one plot into many by a categorical variable:\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\", linewidth = .5) +\n  labs(x = \"Per Capita GDP\", y = \"Life Expectancy\") +\n  facet_wrap(~continent)"
+    "text": "Step 4: Facets\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp))"
   },
   {
     "objectID": "slides/week-1-2.html#facet_wrap-vs.-facet_grid",
@@ -242,7 +242,7 @@
     "href": "slides/week-1-2.html#keys",
     "title": "Week 1 | Day 2",
     "section": "Keys",
-    "text": "Keys\nA key is the variable (or set of variables) that uniquely identifies an observation:\n\nPrimary key: uniquely identifies rows in its own table\nForeign key: uniquely identifies rows in another table\n\n\n\nlibrary(dplyr)\nband_members\n#&gt; # A tibble: 3 × 2\n#&gt;   name  band   \n#&gt;   &lt;chr&gt; &lt;chr&gt;  \n#&gt; 1 Mick  Stones \n#&gt; 2 John  Beatles\n#&gt; 3 Paul  Beatles\nband_instruments\n#&gt; # A tibble: 3 × 2\n#&gt;   name  plays \n#&gt;   &lt;chr&gt; &lt;chr&gt; \n#&gt; 1 John  guitar\n#&gt; 2 Paul  bass  \n#&gt; 3 Keith guitar\n\nname is the primary key in both tables and the foreign key that connects them."
+    "text": "Keys\nA key is the variable (or set of variables) that uniquely identifies an observation:\n\nPrimary key: uniquely identifies rows in its own table\nForeign key: uniquely identifies rows in another table\n\n\n\n\n\nband_members\n#&gt; # A tibble: 3 × 2\n#&gt;   name  band   \n#&gt;   &lt;chr&gt; &lt;chr&gt;  \n#&gt; 1 Mick  Stones \n#&gt; 2 John  Beatles\n#&gt; 3 Paul  Beatles\n\n\n\n\nband_instruments\n#&gt; # A tibble: 3 × 2\n#&gt;   name  plays \n#&gt;   &lt;chr&gt; &lt;chr&gt; \n#&gt; 1 John  guitar\n#&gt; 2 Paul  bass  \n#&gt; 3 Keith guitar\n\n\nname is the primary key in both tables and the foreign key that connects them."
   },
   {
     "objectID": "slides/week-1-2.html#the-four-joins",
@@ -256,28 +256,28 @@
     "href": "slides/week-1-2.html#inner-join",
     "title": "Week 1 | Day 2",
     "section": "Inner Join",
-    "text": "Inner Join\nReturns only rows with matches in both tables:\n\ninner_join(band_members, band_instruments, by = \"name\")\n#&gt; # A tibble: 2 × 3\n#&gt;   name  band    plays \n#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; \n#&gt; 1 John  Beatles guitar\n#&gt; 2 Paul  Beatles bass\n\nMick has no instrument record → dropped. Keith has no band record → dropped."
+    "text": "Inner Join\nReturns only rows with matches in both tables:\n\ninner_join(band_members, band_instruments, by = \"name\")\n#&gt; # A tibble: 2 × 3\n#&gt;   name  band    plays \n#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; \n#&gt; 1 John  Beatles guitar\n#&gt; 2 Paul  Beatles bass\n\n\n\n\n\n\n\n\nname\nband\n\n\n\n\nMick\nStones\n\n\nJohn\nBeatles\n\n\nPaul\nBeatles\n\n\n\n\n\n\n\n\n\n\n\n\n\nname\nplays\n\n\n\n\nJohn\nguitar\n\n\nPaul\nbass\n\n\nKeith\nguitar\n\n\n\n\n\n\n\n\n\n\n\n\n\nname\nband\nplays\n\n\n\n\nJohn\nBeatles\nguitar\n\n\nPaul\nBeatles\nbass\n\n\n\n\n\n\n\nMick has no instrument record → dropped. Keith has no band record → dropped."
   },
   {
     "objectID": "slides/week-1-2.html#left-join",
     "href": "slides/week-1-2.html#left-join",
     "title": "Week 1 | Day 2",
     "section": "Left Join",
-    "text": "Left Join\nReturns all rows from the left table, NAs where no match in right:\n\nleft_join(band_members, band_instruments, by = \"name\")\n#&gt; # A tibble: 3 × 3\n#&gt;   name  band    plays \n#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; \n#&gt; 1 Mick  Stones  &lt;NA&gt;  \n#&gt; 2 John  Beatles guitar\n#&gt; 3 Paul  Beatles bass\n\nMick kept, plays is NA. Keith dropped (not in left table)."
+    "text": "Left Join\nReturns all rows from the left table, NAs where no match in right:\n\nleft_join(band_members, band_instruments, by = \"name\")\n#&gt; # A tibble: 3 × 3\n#&gt;   name  band    plays \n#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; \n#&gt; 1 Mick  Stones  &lt;NA&gt;  \n#&gt; 2 John  Beatles guitar\n#&gt; 3 Paul  Beatles bass\n\n\n\n\n\n\n\n\nname\nband\n\n\n\n\nMick\nStones\n\n\nJohn\nBeatles\n\n\nPaul\nBeatles\n\n\n\n\n\n\n\n\n\n\n\n\n\nname\nplays\n\n\n\n\nJohn\nguitar\n\n\nPaul\nbass\n\n\nKeith\nguitar\n\n\n\n\n\n\n\n\n\n\n\n\n\nname\nband\nplays\n\n\n\n\nMick\nStones\nNA\n\n\nJohn\nBeatles\nguitar\n\n\nPaul\nBeatles\nbass\n\n\n\n\n\n\n\nMick kept, plays is NA. Keith dropped (not in left table)."
   },
   {
     "objectID": "slides/week-1-2.html#right-join",
     "href": "slides/week-1-2.html#right-join",
     "title": "Week 1 | Day 2",
     "section": "Right Join",
-    "text": "Right Join\nReturns all rows from the right table:\n\nright_join(band_members, band_instruments, by = \"name\")\n#&gt; # A tibble: 3 × 3\n#&gt;   name  band    plays \n#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; \n#&gt; 1 John  Beatles guitar\n#&gt; 2 Paul  Beatles bass  \n#&gt; 3 Keith &lt;NA&gt;    guitar"
+    "text": "Right Join\nReturns all rows from the right table:\n\nright_join(band_members, band_instruments, by = \"name\")\n#&gt; # A tibble: 3 × 3\n#&gt;   name  band    plays \n#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; \n#&gt; 1 John  Beatles guitar\n#&gt; 2 Paul  Beatles bass  \n#&gt; 3 Keith &lt;NA&gt;    guitar\n\n\n\n\n\n\n\n\nname\nband\n\n\n\n\nMick\nStones\n\n\nJohn\nBeatles\n\n\nPaul\nBeatles\n\n\n\n\n\n\n\n\n\n\n\n\n\nname\nplays\n\n\n\n\nJohn\nguitar\n\n\nPaul\nbass\n\n\nKeith\nguitar\n\n\n\n\n\n\n\n\n\n\n\n\n\nname\nband\nplays\n\n\n\n\nJohn\nBeatles\nguitar\n\n\nPaul\nBeatles\nbass\n\n\nKeith\nNA\nguitar"
   },
   {
     "objectID": "slides/week-1-2.html#full-join",
     "href": "slides/week-1-2.html#full-join",
     "title": "Week 1 | Day 2",
     "section": "Full Join",
-    "text": "Full Join\nReturns all rows from both tables:\n\nfull_join(band_members, band_instruments, by = \"name\")\n#&gt; # A tibble: 4 × 3\n#&gt;   name  band    plays \n#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; \n#&gt; 1 Mick  Stones  &lt;NA&gt;  \n#&gt; 2 John  Beatles guitar\n#&gt; 3 Paul  Beatles bass  \n#&gt; 4 Keith &lt;NA&gt;    guitar\n\nEveryone is kept. NAs fill missing values on either side."
+    "text": "Full Join\nReturns all rows from both tables:\n\nfull_join(band_members, band_instruments, by = \"name\")\n#&gt; # A tibble: 4 × 3\n#&gt;   name  band    plays \n#&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; \n#&gt; 1 Mick  Stones  &lt;NA&gt;  \n#&gt; 2 John  Beatles guitar\n#&gt; 3 Paul  Beatles bass  \n#&gt; # ℹ 1 more row\n\n\n\n\n\n\n\n\nname\nband\n\n\n\n\nMick\nStones\n\n\nJohn\nBeatles\n\n\nPaul\nBeatles\n\n\n\n\n\n\n\n\n\n\n\n\n\nname\nplays\n\n\n\n\nJohn\nguitar\n\n\nPaul\nbass\n\n\nKeith\nguitar\n\n\n\n\n\n\n\n\n\n\n\n\n\nname\nband\nplays\n\n\n\n\nMick\nStones\nNA\n\n\nJohn\nBeatles\nguitar\n\n\nPaul\nBeatles\nbass\n\n\nKeith\nNA\nguitar\n\n\n\n\n\n\n\nEveryone is kept. NAs fill missing values on either side."
   },
   {
     "objectID": "slides/week-1-2.html#the-silent-failure-modes",
@@ -291,7 +291,7 @@
     "href": "slides/week-1-2.html#surrogate-keys",
     "title": "Week 1 | Day 2",
     "section": "Surrogate Keys",
-    "text": "Surrogate Keys\nSometimes a table has no natural primary key. Create one with row_number():\n\ngapminder |&gt;\n  slice(1:5) |&gt;\n  mutate(id = row_number())\n#&gt; # A tibble: 5 × 7\n#&gt;   country     continent  year lifeExp      pop gdpPercap    id\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.     1\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.     2\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.     3\n#&gt; 4 Afghanistan Asia       1967    34.0 11537966      836.     4\n#&gt; 5 Afghanistan Asia       1972    36.1 13079460      740.     5\n\nThis is called a surrogate key — it has no real-world meaning but uniquely identifies each row for joining purposes."
+    "text": "Surrogate Keys\nSometimes a table has no natural primary key. Create one with row_number():\n\ngapminder |&gt;\n  slice(1:5) |&gt;\n  mutate(id = row_number())\n#&gt; # A tibble: 5 × 7\n#&gt;   country     continent  year lifeExp      pop gdpPercap    id\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.     1\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.     2\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.     3\n#&gt; # ℹ 2 more rows\n\nThis is called a surrogate key — it has no real-world meaning but uniquely identifies each row for joining purposes."
   },
   {
     "objectID": "slides/week-1-2.html#real-example-nwis-flow-site-metadata",
@@ -305,7 +305,7 @@
     "href": "slides/week-1-2.html#the-same-data-many-shapes",
     "title": "Week 1 | Day 2",
     "section": "The Same Data, Many Shapes",
-    "text": "The Same Data, Many Shapes\nThe same underlying data can be stored in multiple ways. Which is easiest to work with depends on what you want to do:\n\n\n\n\n\n\nWide format — one row per country:\n\n#&gt; # A tibble: 4 × 4\n#&gt;   country  year lifeExp gdpPercap\n#&gt;   &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;\n#&gt; 1 Brazil   1952    50.9     2109.\n#&gt; 2 Brazil   2007    72.4     9066.\n#&gt; 3 India    1952    37.4      547.\n#&gt; 4 India    2007    64.7     2452.\n\n\nLong format — one row per country-year-metric:\n\n#&gt; # A tibble: 8 × 4\n#&gt;   country  year metric     value\n#&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;\n#&gt; 1 Brazil   1952 lifeExp     50.9\n#&gt; 2 Brazil   1952 gdpPercap 2109. \n#&gt; 3 Brazil   2007 lifeExp     72.4\n#&gt; 4 Brazil   2007 gdpPercap 9066. \n#&gt; 5 India    1952 lifeExp     37.4\n#&gt; 6 India    1952 gdpPercap  547. \n#&gt; 7 India    2007 lifeExp     64.7\n#&gt; 8 India    2007 gdpPercap 2452."
+    "text": "The Same Data, Many Shapes\nThe same underlying data can be stored in multiple ways. Which is easiest to work with depends on what you want to do:\n\n\n\n\n\n\nWide format — one row per country:\n\n#&gt; # A tibble: 4 × 4\n#&gt;   country  year lifeExp gdpPercap\n#&gt;   &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;\n#&gt; 1 Brazil   1952    50.9     2109.\n#&gt; 2 Brazil   2007    72.4     9066.\n#&gt; 3 India    1952    37.4      547.\n#&gt; # ℹ 1 more row\n\n\nLong format — one row per country-year-metric:\n\n#&gt; # A tibble: 8 × 4\n#&gt;   country  year metric     value\n#&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;\n#&gt; 1 Brazil   1952 lifeExp     50.9\n#&gt; 2 Brazil   1952 gdpPercap 2109. \n#&gt; 3 Brazil   2007 lifeExp     72.4\n#&gt; # ℹ 5 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#tidy-data-the-standard",
@@ -333,28 +333,28 @@
     "href": "slides/week-1-2.html#pivot_longer-in-action",
     "title": "Week 1 | Day 2",
     "section": "pivot_longer() in Action",
-    "text": "pivot_longer() in Action\n\nlifeExp_wide |&gt;\n  pivot_longer(\n    cols      = -country,         # pivot everything except country\n    names_to  = \"year\",\n    values_to = \"lifeExp\"\n  )\n#&gt; # A tibble: 24 × 3\n#&gt;    country year  lifeExp\n#&gt;    &lt;fct&gt;   &lt;chr&gt;   &lt;dbl&gt;\n#&gt;  1 Brazil  1952     50.9\n#&gt;  2 Brazil  1957     53.3\n#&gt;  3 Brazil  1962     55.7\n#&gt;  4 Brazil  1967     57.6\n#&gt;  5 Brazil  1972     59.5\n#&gt;  6 Brazil  1977     61.5\n#&gt;  7 Brazil  1982     63.3\n#&gt;  8 Brazil  1987     65.2\n#&gt;  9 Brazil  1992     67.1\n#&gt; 10 Brazil  1997     69.4\n#&gt; # ℹ 14 more rows"
+    "text": "pivot_longer() in Action\n\nlifeExp_wide |&gt;\n  pivot_longer(\n    cols      = -country,         # pivot everything except country\n    names_to  = \"year\",\n    values_to = \"lifeExp\"\n  )\n#&gt; # A tibble: 24 × 3\n#&gt;   country year  lifeExp\n#&gt;   &lt;fct&gt;   &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1 Brazil  1952     50.9\n#&gt; 2 Brazil  1957     53.3\n#&gt; 3 Brazil  1962     55.7\n#&gt; # ℹ 21 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#pivot_wider-long-to-wide",
     "href": "slides/week-1-2.html#pivot_wider-long-to-wide",
     "title": "Week 1 | Day 2",
     "section": "pivot_wider() — Long to Wide",
-    "text": "pivot_wider() — Long to Wide\nWhen one observation is scattered across multiple rows, pivot wider:\n\n\ntable_long |&gt;\n  pivot_wider(names_from  = metric,\n              values_from = value)\n#&gt; # A tibble: 4 × 4\n#&gt;   country  year lifeExp gdpPercap\n#&gt;   &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;\n#&gt; 1 Brazil   1952    50.9     2109.\n#&gt; 2 Brazil   2007    72.4     9066.\n#&gt; 3 India    1952    37.4      547.\n#&gt; 4 India    2007    64.7     2452."
+    "text": "pivot_wider() — Long to Wide\nWhen one observation is scattered across multiple rows, pivot wider:\n\n\ntable_long |&gt;\n  pivot_wider(names_from  = metric,\n              values_from = value)\n#&gt; # A tibble: 4 × 4\n#&gt;   country  year lifeExp gdpPercap\n#&gt;   &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;\n#&gt; 1 Brazil   1952    50.9     2109.\n#&gt; 2 Brazil   2007    72.4     9066.\n#&gt; 3 India    1952    37.4      547.\n#&gt; # ℹ 1 more row"
   },
   {
     "objectID": "slides/week-1-2.html#when-to-use-each-format",
     "href": "slides/week-1-2.html#when-to-use-each-format",
     "title": "Week 1 | Day 2",
     "section": "When to Use Each Format",
-    "text": "When to Use Each Format\ntable_long |&gt;\n  ggplot(aes(x = year, y = value, color = country)) +\n  geom_line() +\n  facet_grid(metric ~ country, scales = \"free_y\") +\n  theme_bw() +\n  theme(legend.position = \"none\")\ntable_wide |&gt;\n  ggplot(aes(x = year, y = gdpPercap, color = country)) +\n  geom_line() +\n  facet_wrap(~country) +\n  theme_bw() +\n  theme(legend.position = \"none\")\n\n\n\nLong format is better for:\n\nggplot2 — it expects one row per observation\ngroup_by() + summarize() — aggregating over a variable\nTime series with multiple variables\nRepeated measures data\n\n\n\n\n\n\n\n\n\n\n\nWide format is better for:\n\nLinear models where each variable is a predictor\nSharing data with non-technical audiences\nCorrelation matrices\nWhen few variables and many observations"
+    "text": "When to Use Each Format\n\n\nLong format is better for:\n\nggplot2 — it expects one row per observation\ngroup_by() + summarize() — aggregating over a variable\nTime series with multiple variables\nRepeated measures data\n\n\nWide format is better for:\n\nLinear models where each variable is a predictor\nSharing data with non-technical audiences\nCorrelation matrices\nWhen few variables and many observations"
   },
   {
     "objectID": "slides/week-1-2.html#pivot-within-a-pipeline",
     "href": "slides/week-1-2.html#pivot-within-a-pipeline",
     "title": "Week 1 | Day 2",
     "section": "Pivot Within a Pipeline",
-    "text": "Pivot Within a Pipeline\nThe real power: wrangling shape and visualization in one chain:\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\") |&gt;\n  ggplot(aes(x = year, y = value)) +\n  geom_line(color = \"gray80\") +\n  geom_point(aes(color = country)) +\n  facet_grid(metric ~ country, scales = \"free_y\") +\n  labs(x = \"\", y = \"\",\n       title    = \"North America: GDP & Life Expectancy\",\n       subtitle = \"1950–2007\",\n       caption  = \"Data: Gapminder R package\") +\n  theme_linedraw() +\n  theme(legend.position = \"none\",\n        axis.text.x = element_text(angle = 90, face = \"bold\"))"
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 1,701 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#everything-you-just-learned-applied",
@@ -368,7 +368,7 @@
     "href": "slides/week-1-2.html#before-next-class",
     "title": "Week 1 | Day 2",
     "section": "Before Next Class",
-    "text": "Before Next Class\n\n\n\n\n\n\nLab 1 is due next Wednesday\n\nLab 1: Streamflow Across the Colorado River Basin\n\nAll the tools are now in your hands. The data is live. Start early — the data pull takes a few minutes the first time.\nNext Topic\nWeek 2: Vector Spatial Data\nYou will apply these same wrangling skills to geometries — points, lines, polygons, watershed boundaries, and the river network that connects them.\nThe sf package treats spatial features as data frames. Everything you learned today still applies.\n\n\n\n\n\n\nArtwork by @allison_horst"
+    "text": "Before Next Class\n\n\nLab 1 is due next Wednesday\n\nLab 1: Streamflow Across the Colorado River Basin\n\nAll the tools are now in your hands. The data is live. Start early — the data pull takes a few minutes the first time.\nNext Topic\nWeek 2: Vector Spatial Data\nYou will apply these same wrangling skills to geometries and spatial features. The sf package treats spatial features as data frames. Everything you learned today will carry through!\n\n\n\n\n\n\nArtwork by @allison_horst"
   },
   {
     "objectID": "slides/week-1-1.html#todays-flow-1-hr-50-min",
@@ -837,28 +837,28 @@
     "href": "slides/week-1-2.html#select-helpers-tidyselect-functions",
     "title": "Week 1 | Day 2",
     "section": "select() Helpers — tidyselect Functions",
-    "text": "select() Helpers — tidyselect Functions\nBeyond explicit column names, use tidyselect helpers to match columns by pattern:\n\n# Select columns starting with a pattern\nselect(gapminder, starts_with(\"life\")) |&gt; head(3)\n#&gt; # A tibble: 3 × 1\n#&gt;   lifeExp\n#&gt;     &lt;dbl&gt;\n#&gt; 1    28.8\n#&gt; 2    30.3\n#&gt; 3    32.0\n\n# Select columns ending with a pattern\nselect(gapminder, ends_with(\"pc\"))\n#&gt; # A tibble: 1,704 × 0\n\n# Select columns containing a substring\nselect(gapminder, contains(\"pop\")) |&gt; head(3)\n#&gt; # A tibble: 3 × 1\n#&gt;        pop\n#&gt;      &lt;int&gt;\n#&gt; 1  8425333\n#&gt; 2  9240934\n#&gt; 3 10267083\n\n\n\n\n\n\n\n\nTip\n\n\nThese patterns are especially useful for water data where columns follow naming conventions: site_no, site_name, discharge_cfs, temp_c. You’ll select all temperature columns with starts_with(\"temp_\")."
+    "text": "select() Helpers — tidyselect Functions\nBeyond explicit column names, use tidyselect helpers to match columns by pattern:\n\n\n\n# Select columns starting with a pattern\nselect(gapminder, starts_with(\"life\"))\n#&gt; # A tibble: 1,704 × 1\n#&gt;   lifeExp\n#&gt;     &lt;dbl&gt;\n#&gt; 1    28.8\n#&gt; 2    30.3\n#&gt; 3    32.0\n#&gt; # ℹ 1,701 more rows\n\n# Select columns ending with a pattern\nselect(gapminder, ends_with(\"cap\"))\n#&gt; # A tibble: 1,704 × 1\n#&gt;   gdpPercap\n#&gt;       &lt;dbl&gt;\n#&gt; 1      779.\n#&gt; 2      821.\n#&gt; 3      853.\n#&gt; # ℹ 1,701 more rows\n\n# Select columns containing a substring\nselect(gapminder, contains(\"pop\"))\n#&gt; # A tibble: 1,704 × 1\n#&gt;        pop\n#&gt;      &lt;int&gt;\n#&gt; 1  8425333\n#&gt; 2  9240934\n#&gt; 3 10267083\n#&gt; # ℹ 1,701 more rows\n\n\n\n\n\n\n\n\nTip\n\n\nThese patterns are especially useful for water data where columns follow naming conventions: site_no, site_name, discharge_cfs, temp_c. You’ll select all temperature columns with starts_with(\"temp_\"). You can select all of a year with contains(1991). Use this to your advantage when naming things!!"
   },
   {
     "objectID": "slides/week-1-2.html#transmute-keep-only-new-columns",
     "href": "slides/week-1-2.html#transmute-keep-only-new-columns",
     "title": "Week 1 | Day 2",
     "section": "transmute() — Keep Only New Columns",
-    "text": "transmute() — Keep Only New Columns\ntransmute() is like mutate(), but it drops all other columns — you’re left with only what you explicitly create.\n\n# mutate() keeps everything\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap) |&gt;\n  head(2)\n#&gt; # A tibble: 2 × 7\n#&gt;   country     continent  year lifeExp     pop gdpPercap         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8 8425333      779. 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3 9240934      821. 7585448670.\n\n\n\n# transmute() keeps only the new column\ngapminder |&gt;\n  transmute(gdp = pop * gdpPercap) |&gt;\n  head(2)\n#&gt; # A tibble: 2 × 1\n#&gt;           gdp\n#&gt;         &lt;dbl&gt;\n#&gt; 1 6567086330.\n#&gt; 2 7585448670.\n\n\n\n\n\n\n\n\n\nTip\n\n\nUse transmute() when you want to extract a subset of computed columns in one go — cleaner than mutate() followed by select()."
+    "text": "transmute() — Keep Only New Columns\ntransmute() is like mutate(), but it drops all other columns — you’re left with only what you explicitly create.\n\n# mutate() keeps everything\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap) \n#&gt; # A tibble: 1,704 × 7\n#&gt;   country     continent  year lifeExp      pop gdpPercap         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779. 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821. 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853. 8758855797.\n#&gt; # ℹ 1,701 more rows\n\n\n\n# transmute() keeps only the new column\ngapminder |&gt;\n  transmute(gdp = pop * gdpPercap) \n#&gt; # A tibble: 1,704 × 1\n#&gt;           gdp\n#&gt;         &lt;dbl&gt;\n#&gt; 1 6567086330.\n#&gt; 2 7585448670.\n#&gt; 3 8758855797.\n#&gt; # ℹ 1,701 more rows\n\n\n\n\n\n\n\n\n\nTip\n\n\nUse transmute() when you want to extract a subset of computed columns in one go — cleaner than mutate() followed by select()."
   },
   {
     "objectID": "slides/week-1-2.html#conditional-mutations-with-if_else",
     "href": "slides/week-1-2.html#conditional-mutations-with-if_else",
     "title": "Week 1 | Day 2",
     "section": "Conditional Mutations with if_else()",
-    "text": "Conditional Mutations with if_else()\nWhen you need to compute values based on a condition, use if_else():\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  mutate(income_level = if_else(gdpPercap &gt; 10000, \"high\", \"low\")) |&gt;\n  select(country, gdpPercap, income_level) |&gt;\n  head(8)\n#&gt; # A tibble: 8 × 3\n#&gt;   country     gdpPercap income_level\n#&gt;   &lt;fct&gt;           &lt;dbl&gt; &lt;chr&gt;       \n#&gt; 1 Afghanistan      975. low         \n#&gt; 2 Albania         5937. low         \n#&gt; 3 Algeria         6223. low         \n#&gt; 4 Angola          4797. low         \n#&gt; 5 Argentina      12779. high        \n#&gt; 6 Australia      34435. high        \n#&gt; 7 Austria        36126. high        \n#&gt; 8 Bahrain        29796. high\n\n\nIn Lab 1 context: Flag anomalies in streamflow:\n\nflow_data |&gt;\n  mutate(is_low = if_else(discharge &lt; quantile(discharge, 0.1), TRUE, FALSE))"
+    "text": "Conditional Mutations with if_else()\nWhen you need to compute values based on a condition, use if_else():\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  mutate(income_level = if_else(gdpPercap &gt; 10000, \"high\", \"low\")) |&gt;\n  select(country, gdpPercap, income_level) |&gt;\n  head(8)\n#&gt; # A tibble: 8 × 3\n#&gt;   country     gdpPercap income_level\n#&gt;   &lt;fct&gt;           &lt;dbl&gt; &lt;chr&gt;       \n#&gt; 1 Afghanistan      975. low         \n#&gt; 2 Albania         5937. low         \n#&gt; 3 Algeria         6223. low         \n#&gt; # ℹ 5 more rows\n\n\nIn Lab 1 context: Flag anomalies in streamflow:\n\nflow_data |&gt;\n  mutate(is_low = if_else(discharge &lt; quantile(discharge, 0.1), TRUE, FALSE))"
   },
   {
     "objectID": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom",
     "href": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom",
     "title": "Week 1 | Day 2",
     "section": "Building a Plot: Data → Aesthetics → Geom",
-    "text": "Building a Plot: Data → Aesthetics → Geom\nAll ggplot2 plots follow the same structure: data + aesthetics (which variables to visual properties) + geometry (what shape).\n\ngm2007 &lt;- filter(gapminder, year == 2007)\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point()\n\n\n\nKey point: Aesthetic mappings in aes() describe how variables are visualized — placed in ggplot(), they apply globally to all layers."
+    "text": "Building a Plot: Data → Aesthetics → Geom\n\n\n\ngm2007 &lt;- filter(gapminder, year == 2007)"
   },
   {
     "objectID": "slides/week-1-2.html#what-is-quarto",
@@ -900,35 +900,35 @@
     "href": "slides/week-1-2.html#project-configuration-_quarto.yml",
     "title": "Week 1 | Day 2",
     "section": "Project Configuration: _quarto.yml",
-    "text": "Project Configuration: _quarto.yml\nEvery Quarto project has a _quarto.yml file that sets global defaults.\nHere’s the one for this course:\nproject:\n  type: website\n  \nwebsite:\n  title: \"ESS 523c: Environmental Data Science\"\n  site-url: https://github.com/mikejohnson51/csu-ess-523c\n  navbar:\n    left:\n      - href: index.qmd\n        text: Home\n      - href: labs/lab-01.qmd\n        text: Lab 1\n\nformat:\n  html:\n    theme: cosmo\n    toc: true\n    code-fold: false\n\nYou won’t edit this — I maintain it. But when you quarto render, it reads these defaults and applies them to every .qmd file in the project."
+    "text": "Project Configuration: _quarto.yml\nEvery Quarto project has a _quarto.yml file that sets global defaults.\nHere’s the one for this course:\nproject:\n  type: website\n  \nwebsite:\n  title: \"ESS 523c: Environmental Data Science\"\n  site-url: https://github.com/mikejohnson51/csu-ess-523c\n  navbar:\n    left:\n      - href: index.qmd\n        text: Home\n      - href: labs/lab-01.qmd\n        text: Lab 1\n\nformat:\n  html:\n    theme: cosmo\n    toc: true\n    code-fold: false\n\nWhen you quarto render, it reads these defaults and applies them to every .qmd file in the project."
   },
   {
     "objectID": "slides/week-1-2.html#how-filter-works-boolean-vectors",
     "href": "slides/week-1-2.html#how-filter-works-boolean-vectors",
     "title": "Week 1 | Day 2",
     "section": "How filter() Works: Boolean Vectors",
-    "text": "How filter() Works: Boolean Vectors\nUnder the hood, filter() creates a boolean vector (all TRUE or FALSE) and keeps only the rows where the condition is TRUE.\n\n\nBase R subsetting:\n\n# Create a boolean vector\nlifeExp_condition &lt;- gapminder$lifeExp &lt; 40\n\n# This is what filter() does internally\ngapminder[lifeExp_condition, ]\n#&gt; # A tibble: 124 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.\n#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.\n#&gt; 10 Angola      Africa     1962    34    4826015     4269.\n#&gt; # ℹ 114 more rows\n\n\nUsing filter():\n\n# Much cleaner syntax\ngapminder |&gt;\n  filter(lifeExp &lt; 40)\n#&gt; # A tibble: 124 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Angola      Africa     1952    30.0  4232095     3521.\n#&gt;  9 Angola      Africa     1957    32.0  4561361     3828.\n#&gt; 10 Angola      Africa     1962    34    4826015     4269.\n#&gt; # ℹ 114 more rows\n\n\n\n\n\n\n\n\nNote\n\n\nfilter() is cleaner and more readable, but it’s doing exactly what base R subsetting does: keeping rows where the condition is TRUE, dropping rows where it’s FALSE or NA."
+    "text": "How filter() Works: Boolean Vectors\nUnder the hood, filter() creates a boolean vector (all TRUE or FALSE) and keeps only the rows where the condition is TRUE.\n\n\nBase R subsetting:\n\n# Create a boolean vector\nlifeExp_condition &lt;- gapminder$lifeExp &lt; 40\ntable(lifeExp_condition)\n#&gt; lifeExp_condition\n#&gt; FALSE  TRUE \n#&gt;  1580   124\n\n# This is what filter() does internally\nhead(gapminder[lifeExp_condition, ])\n#&gt; # A tibble: 6 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 3 more rows\n\n\nUsing filter():\n\n# Much cleaner syntax\nfilter(gapminder, lifeExp &lt; 40)\n#&gt; # A tibble: 124 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 121 more rows\n\n\n\n\n\n\n\n\nNote\n\n\nfilter() is cleaner and more readable, but it’s doing exactly what base R subsetting does: keeping rows where the condition is TRUE, dropping rows where it’s FALSE or NA."
   },
   {
     "objectID": "slides/week-1-2.html#select-base-r-equivalence",
     "href": "slides/week-1-2.html#select-base-r-equivalence",
     "title": "Week 1 | Day 2",
     "section": "select() — Base R Equivalence",
-    "text": "select() — Base R Equivalence\nUnder the hood, select() is doing column subsetting — the same operation as base R.\n\n\nBase R column subsetting:\n\n# Bracket notation [rows, cols]\ngapminder[, c(\"country\", \"lifeExp\")]\n\n# Extract single column\ngapminder[[\"lifeExp\"]]\n\n# Dollar sign shorthand\ngapminder$lifeExp\n\n\nUsing select():\n\n# Much cleaner syntax\ngapminder |&gt;\n  select(country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;    country     lifeExp\n#&gt;    &lt;fct&gt;         &lt;dbl&gt;\n#&gt;  1 Afghanistan    28.8\n#&gt;  2 Afghanistan    30.3\n#&gt;  3 Afghanistan    32.0\n#&gt;  4 Afghanistan    34.0\n#&gt;  5 Afghanistan    36.1\n#&gt;  6 Afghanistan    38.4\n#&gt;  7 Afghanistan    39.9\n#&gt;  8 Afghanistan    40.8\n#&gt;  9 Afghanistan    41.7\n#&gt; 10 Afghanistan    41.8\n#&gt; # ℹ 1,694 more rows\n\n\n\n\n\n\n\n\nNote\n\n\nselect() is syntactic sugar on top of base R’s column subsetting. It’s more readable and composable with pipes."
+    "text": "select() — Base R Equivalence\nUnder the hood, select() is doing column subsetting — the same operation as base R.\n\n\nBase R column subsetting:\n\n# Bracket notation [rows, cols]\ngapminder[, c(\"country\", \"lifeExp\")]\n\n# Extract single column\ngapminder[[\"lifeExp\"]]\n\n# Dollar sign shorthand\ngapminder$lifeExp\n\n\nUsing select():\n\n# Much cleaner syntax\ngapminder |&gt;\n  select(country, lifeExp)\n#&gt; # A tibble: 1,704 × 2\n#&gt;   country     lifeExp\n#&gt;   &lt;fct&gt;         &lt;dbl&gt;\n#&gt; 1 Afghanistan    28.8\n#&gt; 2 Afghanistan    30.3\n#&gt; 3 Afghanistan    32.0\n#&gt; # ℹ 1,701 more rows\n\n\n\n\n\n\n\n\nNote\n\n\nselect() is syntactic layer on top of base R’s column subsetting. It’s more readable and composable with pipes."
   },
   {
     "objectID": "slides/week-1-2.html#mutate-base-r-equivalence",
     "href": "slides/week-1-2.html#mutate-base-r-equivalence",
     "title": "Week 1 | Day 2",
     "section": "mutate() — Base R Equivalence",
-    "text": "mutate() — Base R Equivalence\nUnder the hood, mutate() is column assignment — the same operation as base R.\n\n# Base R column assignment\ngapminder$gdp &lt;- gapminder$pop * gapminder$gdpPercap\n\n# Remove a column (assign to NULL)\ngapminder$gdpPercap &lt;- NULL\n\n\nUsing mutate():\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap,\n         gdpPercap = NULL) |&gt;\n  head(3)\n#&gt; # A tibble: 3 × 6\n#&gt;   country     continent  year lifeExp      pop         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083 8758855797.\n\n\n\n\n\n\n\n\n\nNote\n\n\nmutate() builds on base R assignment but allows you to chain operations with the pipe and reference newly created columns within the same call."
+    "text": "mutate() — Base R Equivalence\nUnder the hood, mutate() is column assignment — the same operation as base R.\n\n# Base R column assignment\ngapminder$gdp &lt;- gapminder$pop * gapminder$gdpPercap\n\n# Remove a column (assign to NULL)\ngapminder$gdpPercap &lt;- NULL\n\n\nUsing mutate():\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap,\n         gdpPercap = NULL) \n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083 8758855797.\n#&gt; # ℹ 1,701 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nmutate() builds on base R assignment but allows you to chain operations with the pipe and reference newly created columns within the same call."
   },
   {
     "objectID": "slides/week-1-2.html#now-lets-apply-them",
     "href": "slides/week-1-2.html#now-lets-apply-them",
     "title": "Week 1 | Day 2",
     "section": "Now Let’s Apply Them",
-    "text": "Now Let’s Apply Them\nNow let’s walk through each verb with concrete examples. You’ll see how they work in isolation, then how they compose into powerful pipelines."
+    "text": "Now Let’s Apply Them\nWe’ll cover the core concepts of SQL indirectly:\n\nfilter() = WHERE\nselect() = SELECT\nmutate() = computed columns\nsummarize() + group_by() = GROUP BY + aggregate functions\narrange() = ORDER BY\n\nThe grammar transfers directly. SQL is the language of databases; dplyr is the language of R data frames. They solve the same class of problems.\n\nNow let’s walk through each verb with concrete examples. You’ll see how they work in isolation, then how they compose into powerful pipelines."
   },
   {
     "objectID": "slides/week-2-2.html#pattern-1-basic-markers-popups",
@@ -1362,63 +1362,63 @@
     "href": "slides/week-1-2.html#select-drop-pattern-matching",
     "title": "Week 1 | Day 2",
     "section": "select() — Drop & Pattern Matching",
-    "text": "select() — Drop & Pattern Matching\n\n\nDrop a column:\n\nselect(gapminder, !continent)\n#&gt; # A tibble: 1,704 × 5\n#&gt;    country      year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952    28.8  8425333      779.\n#&gt;  2 Afghanistan  1957    30.3  9240934      821.\n#&gt;  3 Afghanistan  1962    32.0 10267083      853.\n#&gt;  4 Afghanistan  1967    34.0 11537966      836.\n#&gt;  5 Afghanistan  1972    36.1 13079460      740.\n#&gt;  6 Afghanistan  1977    38.4 14880372      786.\n#&gt;  7 Afghanistan  1982    39.9 12881816      978.\n#&gt;  8 Afghanistan  1987    40.8 13867957      852.\n#&gt;  9 Afghanistan  1992    41.7 16317921      649.\n#&gt; 10 Afghanistan  1997    41.8 22227415      635.\n#&gt; # ℹ 1,694 more rows\n\n\nMatch by pattern:\n\n# Start with \"life\"\nselect(gapminder, \n       starts_with(\"life\")) |&gt; head(3)\n#&gt; # A tibble: 3 × 1\n#&gt;   lifeExp\n#&gt;     &lt;dbl&gt;\n#&gt; 1    28.8\n#&gt; 2    30.3\n#&gt; 3    32.0\n\n# Contain \"pop\"\nselect(gapminder, \n       contains(\"pop\")) |&gt; head(3)\n#&gt; # A tibble: 3 × 1\n#&gt;        pop\n#&gt;      &lt;int&gt;\n#&gt; 1  8425333\n#&gt; 2  9240934\n#&gt; 3 10267083"
+    "text": "select() — Drop & Pattern Matching\n\n\nDrop a column:\n\nselect(gapminder, !continent)\n#&gt; # A tibble: 1,704 × 5\n#&gt;   country      year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan  1952    28.8  8425333      779.\n#&gt; 2 Afghanistan  1957    30.3  9240934      821.\n#&gt; 3 Afghanistan  1962    32.0 10267083      853.\n#&gt; # ℹ 1,701 more rows\n\n\nMatch by pattern (1):\n\n# Start with \"life\"\nselect(gapminder,  starts_with(\"life\"))\n#&gt; # A tibble: 1,704 × 1\n#&gt;   lifeExp\n#&gt;     &lt;dbl&gt;\n#&gt; 1    28.8\n#&gt; 2    30.3\n#&gt; 3    32.0\n#&gt; # ℹ 1,701 more rows\n\n# Contain \"pop\"\nselect(gapminder,  contains(\"pop\"))\n#&gt; # A tibble: 1,704 × 1\n#&gt;        pop\n#&gt;      &lt;int&gt;\n#&gt; 1  8425333\n#&gt; 2  9240934\n#&gt; 3 10267083\n#&gt; # ℹ 1,701 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-1",
     "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-1",
     "title": "Week 1 | Day 2",
     "section": "Worst Single-Year Drop in Life Expectancy",
-    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;    country     continent  year lifeExp      pop gdpPercap\n#&gt;    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt;  2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt;  3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt;  4 Afghanistan Asia       1967    34.0 11537966      836.\n#&gt;  5 Afghanistan Asia       1972    36.1 13079460      740.\n#&gt;  6 Afghanistan Asia       1977    38.4 14880372      786.\n#&gt;  7 Afghanistan Asia       1982    39.9 12881816      978.\n#&gt;  8 Afghanistan Asia       1987    40.8 13867957      852.\n#&gt;  9 Afghanistan Asia       1992    41.7 16317921      649.\n#&gt; 10 Afghanistan Asia       1997    41.8 22227415      635.\n#&gt; # ℹ 1,694 more rows"
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 1,701 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-2",
     "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-2",
     "title": "Week 1 | Day 2",
     "section": "Worst Single-Year Drop in Life Expectancy",
-    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt;    country      year continent lifeExp\n#&gt;    &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952 Asia         28.8\n#&gt;  2 Afghanistan  1957 Asia         30.3\n#&gt;  3 Afghanistan  1962 Asia         32.0\n#&gt;  4 Afghanistan  1967 Asia         34.0\n#&gt;  5 Afghanistan  1972 Asia         36.1\n#&gt;  6 Afghanistan  1977 Asia         38.4\n#&gt;  7 Afghanistan  1982 Asia         39.9\n#&gt;  8 Afghanistan  1987 Asia         40.8\n#&gt;  9 Afghanistan  1992 Asia         41.7\n#&gt; 10 Afghanistan  1997 Asia         41.8\n#&gt; # ℹ 1,694 more rows"
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt;   country      year continent lifeExp\n#&gt;   &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan  1952 Asia         28.8\n#&gt; 2 Afghanistan  1957 Asia         30.3\n#&gt; 3 Afghanistan  1962 Asia         32.0\n#&gt; # ℹ 1,701 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-3",
     "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-3",
     "title": "Week 1 | Day 2",
     "section": "Worst Single-Year Drop in Life Expectancy",
-    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt; # Groups:   country, continent [142]\n#&gt;    country      year continent lifeExp\n#&gt;    &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952 Asia         28.8\n#&gt;  2 Afghanistan  1957 Asia         30.3\n#&gt;  3 Afghanistan  1962 Asia         32.0\n#&gt;  4 Afghanistan  1967 Asia         34.0\n#&gt;  5 Afghanistan  1972 Asia         36.1\n#&gt;  6 Afghanistan  1977 Asia         38.4\n#&gt;  7 Afghanistan  1982 Asia         39.9\n#&gt;  8 Afghanistan  1987 Asia         40.8\n#&gt;  9 Afghanistan  1992 Asia         41.7\n#&gt; 10 Afghanistan  1997 Asia         41.8\n#&gt; # ℹ 1,694 more rows"
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt; # Groups:   country, continent [142]\n#&gt;   country      year continent lifeExp\n#&gt;   &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan  1952 Asia         28.8\n#&gt; 2 Afghanistan  1957 Asia         30.3\n#&gt; 3 Afghanistan  1962 Asia         32.0\n#&gt; # ℹ 1,701 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-4",
     "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-4",
     "title": "Week 1 | Day 2",
     "section": "Worst Single-Year Drop in Life Expectancy",
-    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt; # Groups:   country, continent [142]\n#&gt;    country      year continent lifeExp\n#&gt;    &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952 Asia         28.8\n#&gt;  2 Albania      1952 Europe       55.2\n#&gt;  3 Algeria      1952 Africa       43.1\n#&gt;  4 Angola       1952 Africa       30.0\n#&gt;  5 Argentina    1952 Americas     62.5\n#&gt;  6 Australia    1952 Oceania      69.1\n#&gt;  7 Austria      1952 Europe       66.8\n#&gt;  8 Bahrain      1952 Asia         50.9\n#&gt;  9 Bangladesh   1952 Asia         37.5\n#&gt; 10 Belgium      1952 Europe       68  \n#&gt; # ℹ 1,694 more rows"
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt; # Groups:   country, continent [142]\n#&gt;   country      year continent lifeExp\n#&gt;   &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan  1952 Asia         28.8\n#&gt; 2 Albania      1952 Europe       55.2\n#&gt; 3 Algeria      1952 Africa       43.1\n#&gt; # ℹ 1,701 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-5",
     "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-5",
     "title": "Week 1 | Day 2",
     "section": "Worst Single-Year Drop in Life Expectancy",
-    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp))\n\n\n\n#&gt; # A tibble: 1,704 × 5\n#&gt; # Groups:   country, continent [142]\n#&gt;    country      year continent lifeExp le_delta\n#&gt;    &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;    &lt;dbl&gt;\n#&gt;  1 Afghanistan  1952 Asia         28.8       NA\n#&gt;  2 Albania      1952 Europe       55.2       NA\n#&gt;  3 Algeria      1952 Africa       43.1       NA\n#&gt;  4 Angola       1952 Africa       30.0       NA\n#&gt;  5 Argentina    1952 Americas     62.5       NA\n#&gt;  6 Australia    1952 Oceania      69.1       NA\n#&gt;  7 Austria      1952 Europe       66.8       NA\n#&gt;  8 Bahrain      1952 Asia         50.9       NA\n#&gt;  9 Bangladesh   1952 Asia         37.5       NA\n#&gt; 10 Belgium      1952 Europe       68         NA\n#&gt; # ℹ 1,694 more rows"
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp))\n\n\n\n#&gt; # A tibble: 1,704 × 5\n#&gt; # Groups:   country, continent [142]\n#&gt;   country      year continent lifeExp le_delta\n#&gt;   &lt;fct&gt;       &lt;int&gt; &lt;fct&gt;       &lt;dbl&gt;    &lt;dbl&gt;\n#&gt; 1 Afghanistan  1952 Asia         28.8       NA\n#&gt; 2 Albania      1952 Europe       55.2       NA\n#&gt; 3 Algeria      1952 Africa       43.1       NA\n#&gt; # ℹ 1,701 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-6",
     "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-6",
     "title": "Week 1 | Day 2",
     "section": "Worst Single-Year Drop in Life Expectancy",
-    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE))\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;    country     continent worst_drop\n#&gt;    &lt;fct&gt;       &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia          0.0890\n#&gt;  2 Albania     Europe       -0.419 \n#&gt;  3 Algeria     Africa        1.31  \n#&gt;  4 Angola      Africa       -0.0360\n#&gt;  5 Argentina   Americas      0.492 \n#&gt;  6 Australia   Oceania       0.170 \n#&gt;  7 Austria     Europe        0.490 \n#&gt;  8 Bahrain     Asia          0.840 \n#&gt;  9 Bangladesh  Asia          1.67  \n#&gt; 10 Belgium     Europe        0.5   \n#&gt; # ℹ 132 more rows"
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE))\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;   country     continent worst_drop\n#&gt;   &lt;fct&gt;       &lt;fct&gt;          &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia          0.0890\n#&gt; 2 Albania     Europe       -0.419 \n#&gt; 3 Algeria     Africa        1.31  \n#&gt; # ℹ 139 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-7",
     "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-7",
     "title": "Week 1 | Day 2",
     "section": "Worst Single-Year Drop in Life Expectancy",
-    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE)) |&gt;\n  slice_min(worst_drop, n = 5)\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;    country     continent worst_drop\n#&gt;    &lt;fct&gt;       &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Afghanistan Asia          0.0890\n#&gt;  2 Albania     Europe       -0.419 \n#&gt;  3 Algeria     Africa        1.31  \n#&gt;  4 Angola      Africa       -0.0360\n#&gt;  5 Argentina   Americas      0.492 \n#&gt;  6 Australia   Oceania       0.170 \n#&gt;  7 Austria     Europe        0.490 \n#&gt;  8 Bahrain     Asia          0.840 \n#&gt;  9 Bangladesh  Asia          1.67  \n#&gt; 10 Belgium     Europe        0.5   \n#&gt; # ℹ 132 more rows"
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE)) |&gt;\n  slice_min(worst_drop, n = 5)\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;   country     continent worst_drop\n#&gt;   &lt;fct&gt;       &lt;fct&gt;          &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia          0.0890\n#&gt; 2 Albania     Europe       -0.419 \n#&gt; 3 Algeria     Africa        1.31  \n#&gt; # ℹ 139 more rows"
   },
   {
     "objectID": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-8",
     "href": "slides/week-1-2.html#worst-single-year-drop-in-life-expectancy-8",
     "title": "Week 1 | Day 2",
     "section": "Worst Single-Year Drop in Life Expectancy",
-    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE)) |&gt;\n  slice_min(worst_drop, n = 5) |&gt;\n  arrange(worst_drop)\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;    country      continent worst_drop\n#&gt;    &lt;fct&gt;        &lt;fct&gt;          &lt;dbl&gt;\n#&gt;  1 Rwanda       Africa        -20.4 \n#&gt;  2 Zimbabwe     Africa        -13.6 \n#&gt;  3 Lesotho      Africa        -11.0 \n#&gt;  4 Swaziland    Africa        -10.4 \n#&gt;  5 Botswana     Africa        -10.2 \n#&gt;  6 Cambodia     Asia           -9.10\n#&gt;  7 Namibia      Africa         -7.43\n#&gt;  8 South Africa Africa         -6.87\n#&gt;  9 China        Asia           -6.05\n#&gt; 10 Zambia       Africa         -5.86\n#&gt; # ℹ 132 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nThis is dplyr doing in 8 lines what would take 30+ lines of base R. The verbs compose — every operation is readable, every result is auditable."
+    "text": "Worst Single-Year Drop in Life Expectancy\n\n\n\ngapminder |&gt;\n  select(country, year, continent, lifeExp) |&gt;\n  group_by(country, continent) |&gt;\n  arrange(year) |&gt;\n  mutate(le_delta = lifeExp - lag(lifeExp)) |&gt;\n  summarize(worst_drop = min(le_delta, na.rm = TRUE)) |&gt;\n  slice_min(worst_drop, n = 5) |&gt;\n  arrange(worst_drop)\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt; # Groups:   country [142]\n#&gt;   country  continent worst_drop\n#&gt;   &lt;fct&gt;    &lt;fct&gt;          &lt;dbl&gt;\n#&gt; 1 Rwanda   Africa         -20.4\n#&gt; 2 Zimbabwe Africa         -13.6\n#&gt; 3 Lesotho  Africa         -11.0\n#&gt; # ℹ 139 more rows\n\n\n\n\n\n\n\n\n\nNote\n\n\nThis is dplyr doing in 8 lines what would take 30+ lines of base R. The verbs compose — every operation is readable, every result is auditable."
   },
   {
     "objectID": "slides/week-1-2.html#multiple-geoms-1",
@@ -1481,7 +1481,7 @@
     "href": "slides/week-1-2.html#section-4",
     "title": "Week 1 | Day 2",
     "section": "",
-    "text": "ggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\") +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray50\") +\n  geom_vline(xintercept = mean(gm2007$gdpPercap), color = \"gray50\")"
+    "text": "ggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\") +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray50\") +\n  geom_vline(xintercept = mean(gm2007$gdpPercap), color = \"gray50\")\n\n\n\n\n\n\n\n\n\n\n\n\nLayers compose — each + adds a new geometric object:"
   },
   {
     "objectID": "labs/lab-01.html#graduate-expectations",
@@ -1489,5 +1489,600 @@
     "title": "Lab 1: Data Science Tools",
     "section": "Graduate expectations",
     "text": "Graduate expectations\nThis course is at the graduate level. In addition to producing correct code and outputs, your submission should:\n\nBriefly justify methodological choices (e.g., window lengths, alignment for rolling statistics, normalization approaches, and model structure). A short 3–5 sentence justification is sufficient.\nInclude a simple sensitivity or validation check where appropriate (e.g., compare 7-day vs 14-day rolling windows; use leave-one-year-out cross-validation for the predictive model and report RMSE or MAE).\nReport basic uncertainty/robustness: how sensitive are your central conclusions to small changes in preprocessing or parameter choices?\nCite one relevant source (paper, USGS stat documentation, or authoritative report) if you reference an established hydrological statistic (e.g., 7Q10 logic) or external dataset."
+  },
+  {
+    "objectID": "slides/week-1-2.html#gapminder-data",
+    "href": "slides/week-1-2.html#gapminder-data",
+    "title": "Week 1 | Day 2",
+    "section": "Gapminder Data",
+    "text": "Gapminder Data\n\n\n\n\n\n\nGapminder Data\n\n\n“Gapminder Foundation is a non-profit venture registered in Stockholm, Sweden, that promotes sustainable global development and achievement of the United Nations Millennium Development Goals by increased use and understanding of statistics and other information about social, economic and environmental development at local, national and global levels.”\n\n\n\n\nlibrary(tidyverse)\nlibrary(gapminder)\n\nclass(gapminder)\n#&gt; [1] \"tbl_df\"     \"tbl\"        \"data.frame\"\ndim(gapminder)\n#&gt; [1] 1704    6\nrange(gapminder$year)\n#&gt; [1] 1952 2007\nlength(unique(gapminder$country))\n#&gt; [1] 142\n\n\n\nglimpse(gapminder)\n#&gt; Rows: 1,704\n#&gt; Columns: 6\n#&gt; $ country   &lt;fct&gt; \"Afghanistan\", \"Afghanistan\", \"Afghanistan\", \"Afghanistan\", …\n#&gt; $ continent &lt;fct&gt; Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, …\n#&gt; $ year      &lt;int&gt; 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, …\n#&gt; $ lifeExp   &lt;dbl&gt; 28.801, 30.332, 31.997, 34.020, 36.088, 38.438, 39.854, 40.8…\n#&gt; $ pop       &lt;int&gt; 8425333, 9240934, 10267083, 11537966, 13079460, 14880372, 12…\n#&gt; $ gdpPercap &lt;dbl&gt; 779.4453, 820.8530, 853.1007, 836.1971, 739.9811, 786.1134, …"
+  },
+  {
+    "objectID": "slides/week-1-2.html#subsetting-rows-by-conditions",
+    "href": "slides/week-1-2.html#subsetting-rows-by-conditions",
+    "title": "Week 1 | Day 2",
+    "section": "Subsetting rows by conditions",
+    "text": "Subsetting rows by conditions\n\nLets find all observations in gapminder where the year is 2007, and the life expectancy is less then 40:\n\n\n\nfilter(gapminder, lifeExp &lt; 40, year == 2007)\n#&gt; # A tibble: 1 × 6\n#&gt;   country   continent  year lifeExp     pop gdpPercap\n#&gt;   &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Swaziland Africa     2007    39.6 1133066     4513."
+  },
+  {
+    "objectID": "slides/week-1-2.html#across-verbs",
+    "href": "slides/week-1-2.html#across-verbs",
+    "title": "Week 1 | Day 2",
+    "section": "|> across verbs",
+    "text": "|&gt; across verbs\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#across-verbs-1",
+    "href": "slides/week-1-2.html#across-verbs-1",
+    "title": "Week 1 | Day 2",
+    "section": "|> across verbs",
+    "text": "|&gt; across verbs\n\n\n\ngapminder |&gt;\n  select(pop, gdpPercap, year, country)\n\n\n\n#&gt; # A tibble: 1,704 × 4\n#&gt;        pop gdpPercap  year country    \n#&gt;      &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;      \n#&gt; 1  8425333      779.  1952 Afghanistan\n#&gt; 2  9240934      821.  1957 Afghanistan\n#&gt; 3 10267083      853.  1962 Afghanistan\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#across-verbs-2",
+    "href": "slides/week-1-2.html#across-verbs-2",
+    "title": "Week 1 | Day 2",
+    "section": "|> across verbs",
+    "text": "|&gt; across verbs\n\n\n\ngapminder |&gt;\n  select(pop, gdpPercap, year, country) |&gt;\n  filter(pop &gt; 100000000, gdpPercap &gt; 5000)\n\n\n\n#&gt; # A tibble: 30 × 4\n#&gt;         pop gdpPercap  year country\n#&gt;       &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;  \n#&gt; 1 114313951     6660.  1977 Brazil \n#&gt; 2 128962939     7031.  1982 Brazil \n#&gt; 3 142938076     7807.  1987 Brazil \n#&gt; # ℹ 27 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#across-verbs-3",
+    "href": "slides/week-1-2.html#across-verbs-3",
+    "title": "Week 1 | Day 2",
+    "section": "|> across verbs",
+    "text": "|&gt; across verbs\n\n\n\ngapminder |&gt;\n  select(pop, gdpPercap, year, country) |&gt;\n  filter(pop &gt; 100000000, gdpPercap &gt; 5000) |&gt;\n  filter(year &gt; 1995)\n\n\n\n#&gt; # A tibble: 11 × 4\n#&gt;         pop gdpPercap  year country\n#&gt;       &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;  \n#&gt; 1 168546719     7958.  1997 Brazil \n#&gt; 2 179914212     8131.  2002 Brazil \n#&gt; 3 190010647     9066.  2007 Brazil \n#&gt; # ℹ 8 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#across-verbs-4",
+    "href": "slides/week-1-2.html#across-verbs-4",
+    "title": "Week 1 | Day 2",
+    "section": "|> across verbs",
+    "text": "|&gt; across verbs\n\n\n\ngapminder |&gt;\n  select(pop, gdpPercap, year, country) |&gt;\n  filter(pop &gt; 100000000, gdpPercap &gt; 5000) |&gt;\n  filter(year &gt; 1995) |&gt;\n  filter(country %in% c(\"United States\", \"Mexico\"))\n\n\n\n#&gt; # A tibble: 5 × 4\n#&gt;         pop gdpPercap  year country      \n#&gt;       &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;        \n#&gt; 1 102479927    10742.  2002 Mexico       \n#&gt; 2 108700891    11978.  2007 Mexico       \n#&gt; 3 272911760    35767.  1997 United States\n#&gt; # ℹ 2 more rows\n\n\n\ngapminder |&gt;\n  select(pop, gdpPercap, year, country) |&gt;\n  filter(pop &gt; 100000000, gdpPercap &gt; 5000) |&gt;\n  filter(year &gt; 1995) |&gt;\n  filter(country %in% c(\"United States\", \"Mexico\"))\n#&gt; # A tibble: 5 × 4\n#&gt;         pop gdpPercap  year country      \n#&gt;       &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;        \n#&gt; 1 102479927    10742.  2002 Mexico       \n#&gt; 2 108700891    11978.  2007 Mexico       \n#&gt; 3 272911760    35767.  1997 United States\n#&gt; # ℹ 2 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#mutate",
+    "href": "slides/week-1-2.html#mutate",
+    "title": "Week 1 | Day 2",
+    "section": "Mutate",
+    "text": "Mutate\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#mutate-1",
+    "href": "slides/week-1-2.html#mutate-1",
+    "title": "Week 1 | Day 2",
+    "section": "Mutate",
+    "text": "Mutate\n\n\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap)\n\n\n\n#&gt; # A tibble: 1,704 × 7\n#&gt;   country     continent  year lifeExp      pop gdpPercap         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779. 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821. 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853. 8758855797.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#mutate-2",
+    "href": "slides/week-1-2.html#mutate-2",
+    "title": "Week 1 | Day 2",
+    "section": "Mutate",
+    "text": "Mutate\n\n\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap) |&gt;\n  mutate(gdpPercap = NULL)\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083 8758855797.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#use-sumarize-to-reduce-a-data.set",
+    "href": "slides/week-1-2.html#use-sumarize-to-reduce-a-data.set",
+    "title": "Week 1 | Day 2",
+    "section": "Use sumarize() to reduce a data.set",
+    "text": "Use sumarize() to reduce a data.set\n\nsummarize() takes a dataset with n observations, computes requested values, and returns a dataset with 1 observation.\nsummarize() can compute summary statistics for one or more columns in a data.frame.\nThe first argument in summarize() is the data.frame."
+  },
+  {
+    "objectID": "slides/week-1-2.html#summarize",
+    "href": "slides/week-1-2.html#summarize",
+    "title": "Week 1 | Day 2",
+    "section": "summarize",
+    "text": "summarize\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#summarize-1",
+    "href": "slides/week-1-2.html#summarize-1",
+    "title": "Week 1 | Day 2",
+    "section": "summarize",
+    "text": "summarize\n\n\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap)\n\n\n\n#&gt; # A tibble: 1,704 × 7\n#&gt;   country     continent  year lifeExp      pop gdpPercap         gdp\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;       &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779. 6567086330.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821. 7585448670.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853. 8758855797.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#summarize-2",
+    "href": "slides/week-1-2.html#summarize-2",
+    "title": "Week 1 | Day 2",
+    "section": "summarize",
+    "text": "summarize\n\n\n\ngapminder |&gt;\n  mutate(gdp = pop * gdpPercap) |&gt;\n  summarize(gpd = mean(gdp), sd = sd(gdp))\n\n\n\n#&gt; # A tibble: 1 × 2\n#&gt;             gpd            sd\n#&gt;           &lt;dbl&gt;         &lt;dbl&gt;\n#&gt; 1 186809560507. 714029666918.\n\n\n\nUseful summary functions: mean(), median(), sd(), min(), max(), sum(), n(), n_distinct(), quantile()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#decreasing-or-increasing",
+    "href": "slides/week-1-2.html#decreasing-or-increasing",
+    "title": "Week 1 | Day 2",
+    "section": "Decreasing or Increasing?",
+    "text": "Decreasing or Increasing?\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#decreasing-or-increasing-1",
+    "href": "slides/week-1-2.html#decreasing-or-increasing-1",
+    "title": "Week 1 | Day 2",
+    "section": "Decreasing or Increasing?",
+    "text": "Decreasing or Increasing?\n\n\n\ngapminder |&gt;\n  filter(year == 2007)\n\n\n\n#&gt; # A tibble: 142 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       2007    43.8 31889923      975.\n#&gt; 2 Albania     Europe     2007    76.4  3600523     5937.\n#&gt; 3 Algeria     Africa     2007    72.3 33333216     6223.\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#decreasing-or-increasing-2",
+    "href": "slides/week-1-2.html#decreasing-or-increasing-2",
+    "title": "Week 1 | Day 2",
+    "section": "Decreasing or Increasing?",
+    "text": "Decreasing or Increasing?\n\n\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  arrange(lifeExp)\n\n\n\n#&gt; # A tibble: 142 × 6\n#&gt;   country    continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;      &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Swaziland  Africa     2007    39.6  1133066     4513.\n#&gt; 2 Mozambique Africa     2007    42.1 19951656      824.\n#&gt; 3 Zambia     Africa     2007    42.4 11746035     1271.\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#decreasing-or-increasing-3",
+    "href": "slides/week-1-2.html#decreasing-or-increasing-3",
+    "title": "Week 1 | Day 2",
+    "section": "Decreasing or Increasing?",
+    "text": "Decreasing or Increasing?\n\n\n\ngapminder |&gt;\n  filter(year == 2007) |&gt;\n  arrange(lifeExp) |&gt;\n  arrange(-lifeExp)\n\n\n\n#&gt; # A tibble: 142 × 6\n#&gt;   country          continent  year lifeExp       pop gdpPercap\n#&gt;   &lt;fct&gt;            &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Japan            Asia       2007    82.6 127467972    31656.\n#&gt; 2 Hong Kong, China Asia       2007    82.2   6980412    39725.\n#&gt; 3 Iceland          Europe     2007    81.8    301931    36181.\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#multi-sort-order-matters",
+    "href": "slides/week-1-2.html#multi-sort-order-matters",
+    "title": "Week 1 | Day 2",
+    "section": "Multi sort (order matters)",
+    "text": "Multi sort (order matters)\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#multi-sort-order-matters-1",
+    "href": "slides/week-1-2.html#multi-sort-order-matters-1",
+    "title": "Week 1 | Day 2",
+    "section": "Multi sort (order matters)",
+    "text": "Multi sort (order matters)\n\n\n\ngapminder |&gt;\n  select(country, year, pop)\n\n\n\n#&gt; # A tibble: 1,704 × 3\n#&gt;   country      year      pop\n#&gt;   &lt;fct&gt;       &lt;int&gt;    &lt;int&gt;\n#&gt; 1 Afghanistan  1952  8425333\n#&gt; 2 Afghanistan  1957  9240934\n#&gt; 3 Afghanistan  1962 10267083\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#multi-sort-order-matters-2",
+    "href": "slides/week-1-2.html#multi-sort-order-matters-2",
+    "title": "Week 1 | Day 2",
+    "section": "Multi sort (order matters)",
+    "text": "Multi sort (order matters)\n\n\n\ngapminder |&gt;\n  select(country, year, pop) |&gt;\n  arrange(year, country)\n\n\n\n#&gt; # A tibble: 1,704 × 3\n#&gt;   country      year     pop\n#&gt;   &lt;fct&gt;       &lt;int&gt;   &lt;int&gt;\n#&gt; 1 Afghanistan  1952 8425333\n#&gt; 2 Albania      1952 1282697\n#&gt; 3 Algeria      1952 9279525\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#multi-sort-order-matters-3",
+    "href": "slides/week-1-2.html#multi-sort-order-matters-3",
+    "title": "Week 1 | Day 2",
+    "section": "Multi sort (order matters)",
+    "text": "Multi sort (order matters)\n\n\n\ngapminder |&gt;\n  select(country, year, pop) |&gt;\n  arrange(year, country) |&gt;\n  arrange(country, year)\n\n\n\n#&gt; # A tibble: 1,704 × 3\n#&gt;   country      year      pop\n#&gt;   &lt;fct&gt;       &lt;int&gt;    &lt;int&gt;\n#&gt; 1 Afghanistan  1952  8425333\n#&gt; 2 Afghanistan  1957  9240934\n#&gt; 3 Afghanistan  1962 10267083\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#combining-operations",
+    "href": "slides/week-1-2.html#combining-operations",
+    "title": "Week 1 | Day 2",
+    "section": "Combining operations",
+    "text": "Combining operations\n\n\n\ngapminder\n\n\n\n#&gt; # A tibble: 1,704 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       1952    28.8  8425333      779.\n#&gt; 2 Afghanistan Asia       1957    30.3  9240934      821.\n#&gt; 3 Afghanistan Asia       1962    32.0 10267083      853.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#combining-operations-1",
+    "href": "slides/week-1-2.html#combining-operations-1",
+    "title": "Week 1 | Day 2",
+    "section": "Combining operations",
+    "text": "Combining operations\n\n\n\ngapminder |&gt;\n  select(year, country, gdpPercap)\n\n\n\n#&gt; # A tibble: 1,704 × 3\n#&gt;    year country     gdpPercap\n#&gt;   &lt;int&gt; &lt;fct&gt;           &lt;dbl&gt;\n#&gt; 1  1952 Afghanistan      779.\n#&gt; 2  1957 Afghanistan      821.\n#&gt; 3  1962 Afghanistan      853.\n#&gt; # ℹ 1,701 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#combining-operations-2",
+    "href": "slides/week-1-2.html#combining-operations-2",
+    "title": "Week 1 | Day 2",
+    "section": "Combining operations",
+    "text": "Combining operations\n\n\n\ngapminder |&gt;\n  select(year, country, gdpPercap) |&gt;\n  filter(year == max(year))\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt;    year country     gdpPercap\n#&gt;   &lt;int&gt; &lt;fct&gt;           &lt;dbl&gt;\n#&gt; 1  2007 Afghanistan      975.\n#&gt; 2  2007 Albania         5937.\n#&gt; 3  2007 Algeria         6223.\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#combining-operations-3",
+    "href": "slides/week-1-2.html#combining-operations-3",
+    "title": "Week 1 | Day 2",
+    "section": "Combining operations",
+    "text": "Combining operations\n\n\n\ngapminder |&gt;\n  select(year, country, gdpPercap) |&gt;\n  filter(year == max(year)) |&gt;\n  arrange(-gdpPercap)\n\n\n\n#&gt; # A tibble: 142 × 3\n#&gt;    year country   gdpPercap\n#&gt;   &lt;int&gt; &lt;fct&gt;         &lt;dbl&gt;\n#&gt; 1  2007 Norway       49357.\n#&gt; 2  2007 Kuwait       47307.\n#&gt; 3  2007 Singapore    47143.\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#combining-operations-4",
+    "href": "slides/week-1-2.html#combining-operations-4",
+    "title": "Week 1 | Day 2",
+    "section": "Combining operations",
+    "text": "Combining operations\n\n\n\ngapminder |&gt;\n  select(year, country, gdpPercap) |&gt;\n  filter(year == max(year)) |&gt;\n  arrange(-gdpPercap) |&gt;\n  mutate(rank = 1:n())\n\n\n\n#&gt; # A tibble: 142 × 4\n#&gt;    year country   gdpPercap  rank\n#&gt;   &lt;int&gt; &lt;fct&gt;         &lt;dbl&gt; &lt;int&gt;\n#&gt; 1  2007 Norway       49357.     1\n#&gt; 2  2007 Kuwait       47307.     2\n#&gt; 3  2007 Singapore    47143.     3\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom-1",
+    "href": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom-1",
+    "title": "Week 1 | Day 2",
+    "section": "Building a Plot: Data → Aesthetics → Geom",
+    "text": "Building a Plot: Data → Aesthetics → Geom\n\n\n\ngm2007 &lt;- filter(gapminder, year == 2007)\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom-2",
+    "href": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom-2",
+    "title": "Week 1 | Day 2",
+    "section": "Building a Plot: Data → Aesthetics → Geom",
+    "text": "Building a Plot: Data → Aesthetics → Geom\n\n\n\ngm2007 &lt;- filter(gapminder, year == 2007)\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point()\n\n\n\n\n\n\n\n\n\n\n\n\nAll ggplot2 plots follow the same structure: data + aesthetics (which variables to visual properties) + geometry (what shape).\n\nKey point: Aesthetic mappings in aes() describe how variables are visualized — placed in ggplot(), they apply globally to all layers."
+  },
+  {
+    "objectID": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom-3",
+    "href": "slides/week-1-2.html#building-a-plot-data-aesthetics-geom-3",
+    "title": "Week 1 | Day 2",
+    "section": "Building a Plot: Data → Aesthetics → Geom",
+    "text": "Building a Plot: Data → Aesthetics → Geom\n\n\n\ngm2007 &lt;- filter(gapminder, year == 2007)\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point()\n\n\n\n\n\n\n\n\n\n\n\n\n\ngm2007 &lt;- filter(gapminder, year == 2007)\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point()\n\n\n\n\n\n\n\n\n\nKey point: Aesthetic mappings in aes() describe how variables are visualized — placed in ggplot(), they apply globally to all layers."
+  },
+  {
+    "objectID": "slides/week-1-2.html#building-a-plot-dataaesgeom",
+    "href": "slides/week-1-2.html#building-a-plot-dataaesgeom",
+    "title": "Week 1 | Day 2",
+    "section": "Building a Plot: Data→Aes→Geom",
+    "text": "Building a Plot: Data→Aes→Geom\n\n\n\n(gm2007 &lt;- filter(gapminder, year == 2007))\n\n\n\n#&gt; # A tibble: 142 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       2007    43.8 31889923      975.\n#&gt; 2 Albania     Europe     2007    76.4  3600523     5937.\n#&gt; 3 Algeria     Africa     2007    72.3 33333216     6223.\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#building-a-plot-dataaesgeom-1",
+    "href": "slides/week-1-2.html#building-a-plot-dataaesgeom-1",
+    "title": "Week 1 | Day 2",
+    "section": "Building a Plot: Data→Aes→Geom",
+    "text": "Building a Plot: Data→Aes→Geom\n\n\n\n(gm2007 &lt;- filter(gapminder, year == 2007))\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp))\n\n\n\n#&gt; # A tibble: 142 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       2007    43.8 31889923      975.\n#&gt; 2 Albania     Europe     2007    76.4  3600523     5937.\n#&gt; 3 Algeria     Africa     2007    72.3 33333216     6223.\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#building-a-plot-dataaesgeom-2",
+    "href": "slides/week-1-2.html#building-a-plot-dataaesgeom-2",
+    "title": "Week 1 | Day 2",
+    "section": "Building a Plot: Data→Aes→Geom",
+    "text": "Building a Plot: Data→Aes→Geom\n\n\n\n(gm2007 &lt;- filter(gapminder, year == 2007))\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point()\n\n\n\n#&gt; # A tibble: 142 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       2007    43.8 31889923      975.\n#&gt; 2 Albania     Europe     2007    76.4  3600523     5937.\n#&gt; 3 Algeria     Africa     2007    72.3 33333216     6223.\n#&gt; # ℹ 139 more rows\n\n\n\n\n\n\n\n\n\nAll ggplot2 plots follow the same structure: data + aesthetics (which variables to visual properties) + geometry (what shape).\n\nKey point: Aesthetic mappings in aes() describe how variables are visualized — placed in ggplot(), they apply globally to all layers."
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-2-layers",
+    "href": "slides/week-1-2.html#step-2-layers",
+    "title": "Week 1 | Day 2",
+    "section": "Step 2: Layers",
+    "text": "Step 2: Layers\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-2-layers-1",
+    "href": "slides/week-1-2.html#step-2-layers-1",
+    "title": "Week 1 | Day 2",
+    "section": "Step 2: Layers",
+    "text": "Step 2: Layers\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-2-layers-2",
+    "href": "slides/week-1-2.html#step-2-layers-2",
+    "title": "Week 1 | Day 2",
+    "section": "Step 2: Layers",
+    "text": "Step 2: Layers\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-2-layers-3",
+    "href": "slides/week-1-2.html#step-2-layers-3",
+    "title": "Week 1 | Day 2",
+    "section": "Step 2: Layers",
+    "text": "Step 2: Layers\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\") +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray50\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-2-layers-4",
+    "href": "slides/week-1-2.html#step-2-layers-4",
+    "title": "Week 1 | Day 2",
+    "section": "Step 2: Layers",
+    "text": "Step 2: Layers\n\n\n\nggplot(data = gm2007,\n       aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\") +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray50\") +\n  geom_vline(xintercept = mean(gm2007$gdpPercap), color = \"gray50\")\n\n\n\n\n\n\n\n\n\n\n\n\nLayers compose — each + adds a new geometric object:"
+  },
+  {
+    "objectID": "slides/week-1-2.html#labels",
+    "href": "slides/week-1-2.html#labels",
+    "title": "Week 1 | Day 2",
+    "section": "3. Labels",
+    "text": "3. Labels"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-3-labels-1",
+    "href": "slides/week-1-2.html#step-3-labels-1",
+    "title": "Week 1 | Day 2",
+    "section": "Step 3: Labels",
+    "text": "Step 3: Labels\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-3-labels-2",
+    "href": "slides/week-1-2.html#step-3-labels-2",
+    "title": "Week 1 | Day 2",
+    "section": "Step 3: Labels",
+    "text": "Step 3: Labels\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\", size = .5)"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-3-labels-3",
+    "href": "slides/week-1-2.html#step-3-labels-3",
+    "title": "Week 1 | Day 2",
+    "section": "Step 3: Labels",
+    "text": "Step 3: Labels\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\", size = .5) +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-3-labels-4",
+    "href": "slides/week-1-2.html#step-3-labels-4",
+    "title": "Week 1 | Day 2",
+    "section": "Step 3: Labels",
+    "text": "Step 3: Labels\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\", size = .5) +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray\") +\n  geom_vline(xintercept = mean(gm2007$gdpPercap), color = \"gray\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-3-labels-5",
+    "href": "slides/week-1-2.html#step-3-labels-5",
+    "title": "Week 1 | Day 2",
+    "section": "Step 3: Labels",
+    "text": "Step 3: Labels\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\", size = .5) +\n  geom_hline(yintercept = mean(gm2007$lifeExp), color = \"gray\") +\n  geom_vline(xintercept = mean(gm2007$gdpPercap), color = \"gray\") +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\")\n\n\n\n\n\n\n\n\n\n\n\n\n\nNow that you have drawn the main parts of the graph. You might want to add labs that clarify what is being shown."
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-4-facets-1",
+    "href": "slides/week-1-2.html#step-4-facets-1",
+    "title": "Week 1 | Day 2",
+    "section": "Step 4: Facets",
+    "text": "Step 4: Facets\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-4-facets-2",
+    "href": "slides/week-1-2.html#step-4-facets-2",
+    "title": "Week 1 | Day 2",
+    "section": "Step 4: Facets",
+    "text": "Step 4: Facets\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\", linewidth = .5)"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-4-facets-3",
+    "href": "slides/week-1-2.html#step-4-facets-3",
+    "title": "Week 1 | Day 2",
+    "section": "Step 4: Facets",
+    "text": "Step 4: Facets\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\", linewidth = .5) +\n  labs(x = \"Per Capita GDP\", y = \"Life Expectancy\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#step-4-facets-4",
+    "href": "slides/week-1-2.html#step-4-facets-4",
+    "title": "Week 1 | Day 2",
+    "section": "Step 4: Facets",
+    "text": "Step 4: Facets\n\n\n\nggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  geom_smooth(color = \"black\", linewidth = .5) +\n  labs(x = \"Per Capita GDP\", y = \"Life Expectancy\") +\n  facet_wrap(~continent)\n\n\n\n\n\n\n\n\n\n\n\n\nSplit one plot into many by a categorical variable:"
+  },
+  {
+    "objectID": "slides/week-1-2.html#theme",
+    "href": "slides/week-1-2.html#theme",
+    "title": "Week 1 | Day 2",
+    "section": "5. Theme",
+    "text": "5. Theme\n\nGreat! Now we just need to polish our plots…\nggplot offers a themeing system:\n\nelements specify the non-data elements that you can control. For example,\n\n\nplot.title controls the appearance of the plot title;\naxis.ticks.x controls the ticks on the x axis;\nlegend.key.height, controls the height of the keys in the legend.\n\n\nEach element is associated with an element function, which describes the visual properties. For example,\n\n\nelement_text() sets the font size, color and face of text elements like plot.title.\n\n\nThe theme() function which allows you to override default elements:\n\n\nFor example theme(plot.title = element_text(color = \"red\"))."
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes",
+    "href": "slides/week-1-2.html#built-in-themes",
+    "title": "Week 1 | Day 2",
+    "section": "Built in themes",
+    "text": "Built in themes\nWow! That’s a lot :) Fortunately, ggplot comes with many default themes that set all of the theme elements to values designed to work together harmoniously.\n\n#&gt;  [1] \"theme_bw\"              \"theme_classic\"         \"theme_dark\"           \n#&gt;  [4] \"theme_get\"             \"theme_gray\"            \"theme_grey\"           \n#&gt;  [7] \"theme_light\"           \"theme_linedraw\"        \"theme_minimal\"        \n#&gt; [10] \"theme_replace\"         \"theme_set\"             \"theme_sub_axis\"       \n#&gt; [13] \"theme_sub_axis_bottom\" \"theme_sub_axis_left\"   \"theme_sub_axis_right\" \n#&gt; [16] \"theme_sub_axis_top\"    \"theme_sub_axis_x\"      \"theme_sub_axis_y\"     \n#&gt; [19] \"theme_sub_legend\"      \"theme_sub_panel\"       \"theme_sub_plot\"       \n#&gt; [22] \"theme_sub_strip\"       \"theme_test\"            \"theme_update\"         \n#&gt; [25] \"theme_void\""
+  },
+  {
+    "objectID": "slides/week-1-2.html#theme_bw",
+    "href": "slides/week-1-2.html#theme_bw",
+    "title": "Week 1 | Day 2",
+    "section": "theme_bw()",
+    "text": "theme_bw()\n\nAll themes are functions_ that “precan” a specified set of rules:\n\n\ntheme_bw\n#&gt; function (base_size = 11, base_family = \"\", header_family = NULL, \n#&gt;     base_line_size = base_size/22, base_rect_size = base_size/22, \n#&gt;     ink = \"black\", paper = \"white\", accent = \"#3366FF\") \n#&gt; {\n#&gt;     theme_grey(base_size = base_size, base_family = base_family, \n#&gt;         header_family = header_family, base_line_size = base_line_size, \n#&gt;         base_rect_size = base_rect_size, ink = ink, paper = paper, \n#&gt;         accent = accent) %+replace% theme(panel.background = element_rect(fill = paper, \n#&gt;         colour = NA), panel.border = element_rect(colour = col_mix(ink, \n#&gt;         paper, 0.2)), panel.grid = element_line(colour = col_mix(ink, \n#&gt;         paper, 0.92)), panel.grid.minor = element_line(linewidth = rel(0.5)), \n#&gt;         strip.background = element_rect(fill = col_mix(ink, paper, \n#&gt;             0.851), colour = col_mix(ink, paper, 0.2)), complete = TRUE)\n#&gt; }\n#&gt; &lt;bytecode: 0x117d76af0&gt;\n#&gt; &lt;environment: namespace:ggplot2&gt;"
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes-1",
+    "href": "slides/week-1-2.html#built-in-themes-1",
+    "title": "Week 1 | Day 2",
+    "section": "Built in Themes…",
+    "text": "Built in Themes…\n\n\n\ngm2007\n\n\n\n#&gt; # A tibble: 142 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       2007    43.8 31889923      975.\n#&gt; 2 Albania     Europe     2007    76.4  3600523     5937.\n#&gt; 3 Algeria     Africa     2007    72.3 33333216     6223.\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes-2",
+    "href": "slides/week-1-2.html#built-in-themes-2",
+    "title": "Week 1 | Day 2",
+    "section": "Built in Themes…",
+    "text": "Built in Themes…\n\n\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes-3",
+    "href": "slides/week-1-2.html#built-in-themes-3",
+    "title": "Week 1 | Day 2",
+    "section": "Built in Themes…",
+    "text": "Built in Themes…\n\n\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes-4",
+    "href": "slides/week-1-2.html#built-in-themes-4",
+    "title": "Week 1 | Day 2",
+    "section": "Built in Themes…",
+    "text": "Built in Themes…\n\n\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes-5",
+    "href": "slides/week-1-2.html#built-in-themes-5",
+    "title": "Week 1 | Day 2",
+    "section": "Built in Themes…",
+    "text": "Built in Themes…\n\n\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  theme_bw()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes-6",
+    "href": "slides/week-1-2.html#built-in-themes-6",
+    "title": "Week 1 | Day 2",
+    "section": "Built in Themes…",
+    "text": "Built in Themes…\n\n\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  theme_bw() +\n  theme_dark()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes-7",
+    "href": "slides/week-1-2.html#built-in-themes-7",
+    "title": "Week 1 | Day 2",
+    "section": "Built in Themes…",
+    "text": "Built in Themes…\n\n\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  theme_bw() +\n  theme_dark() +\n  theme_gray()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes-8",
+    "href": "slides/week-1-2.html#built-in-themes-8",
+    "title": "Week 1 | Day 2",
+    "section": "Built in Themes…",
+    "text": "Built in Themes…\n\n\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  theme_bw() +\n  theme_dark() +\n  theme_gray() +\n  theme_minimal()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#built-in-themes-9",
+    "href": "slides/week-1-2.html#built-in-themes-9",
+    "title": "Week 1 | Day 2",
+    "section": "Built in Themes…",
+    "text": "Built in Themes…\n\n\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  theme_bw() +\n  theme_dark() +\n  theme_gray() +\n  theme_minimal() +\n  theme_light()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package",
+    "href": "slides/week-1-2.html#ggtheme-package",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-1",
+    "href": "slides/week-1-2.html#ggtheme-package-1",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007\n\n\n\n#&gt; # A tibble: 142 × 6\n#&gt;   country     continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Afghanistan Asia       2007    43.8 31889923      975.\n#&gt; 2 Albania     Europe     2007    76.4  3600523     5937.\n#&gt; 3 Algeria     Africa     2007    72.3 33333216     6223.\n#&gt; # ℹ 139 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-2",
+    "href": "slides/week-1-2.html#ggtheme-package-2",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-3",
+    "href": "slides/week-1-2.html#ggtheme-package-3",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-4",
+    "href": "slides/week-1-2.html#ggtheme-package-4",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-5",
+    "href": "slides/week-1-2.html#ggtheme-package-5",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  ggthemes::theme_stata()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-6",
+    "href": "slides/week-1-2.html#ggtheme-package-6",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  ggthemes::theme_stata() +\n  ggthemes::theme_economist()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-7",
+    "href": "slides/week-1-2.html#ggtheme-package-7",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  ggthemes::theme_stata() +\n  ggthemes::theme_economist() +\n  ggthemes::theme_economist_white()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-8",
+    "href": "slides/week-1-2.html#ggtheme-package-8",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  ggthemes::theme_stata() +\n  ggthemes::theme_economist() +\n  ggthemes::theme_economist_white() +\n  ggthemes::theme_fivethirtyeight()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-9",
+    "href": "slides/week-1-2.html#ggtheme-package-9",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  ggthemes::theme_stata() +\n  ggthemes::theme_economist() +\n  ggthemes::theme_economist_white() +\n  ggthemes::theme_fivethirtyeight() +\n  ggthemes::theme_gdocs()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-10",
+    "href": "slides/week-1-2.html#ggtheme-package-10",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  ggthemes::theme_stata() +\n  ggthemes::theme_economist() +\n  ggthemes::theme_economist_white() +\n  ggthemes::theme_fivethirtyeight() +\n  ggthemes::theme_gdocs() +\n  ggthemes::theme_excel()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-11",
+    "href": "slides/week-1-2.html#ggtheme-package-11",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  ggthemes::theme_stata() +\n  ggthemes::theme_economist() +\n  ggthemes::theme_economist_white() +\n  ggthemes::theme_fivethirtyeight() +\n  ggthemes::theme_gdocs() +\n  ggthemes::theme_excel() +\n  ggthemes::theme_wsj()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#ggtheme-package-12",
+    "href": "slides/week-1-2.html#ggtheme-package-12",
+    "title": "Week 1 | Day 2",
+    "section": "ggtheme package…",
+    "text": "ggtheme package…\n\n\n\nlibrary(ggthemes)\n\ngm2007 %&gt;%\n  ggplot(aes(x = gdpPercap, y = lifeExp)) +\n  geom_point(aes(color = continent, size = pop)) +\n  labs(title = \"Per capita GDP versus life expectency in 2007\",\n       x = \"Per Capita GDP\",\n       y = \"Life Expectancy\",\n       caption = \"Based on Hans Rosling Plots\",\n       subtitle = 'Data Source: Gapminder',\n       color = \"\",\n       size = \"Population\") +\n  ggthemes::theme_stata() +\n  ggthemes::theme_economist() +\n  ggthemes::theme_economist_white() +\n  ggthemes::theme_fivethirtyeight() +\n  ggthemes::theme_gdocs() +\n  ggthemes::theme_excel() +\n  ggthemes::theme_wsj() +\n  ggthemes::theme_hc()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#the-four-primary-joins",
+    "href": "slides/week-1-2.html#the-four-primary-joins",
+    "title": "Week 1 | Day 2",
+    "section": "The Four (primary) Joins",
+    "text": "The Four (primary) Joins\n\n\n\n\nFunction\nKeeps rows from…\nNon-matches\n\n\n\n\nleft_join(x, y)\nAll of x\ny columns → NA\n\n\nright_join(x, y)\nAll of y\nx columns → NA\n\n\ninner_join(x, y)\nOnly rows matching in both\nDropped\n\n\nfull_join(x, y)\nBoth tables\nNAs on whichever side has no match"
+  },
+  {
+    "objectID": "slides/week-1-2.html#todays-data",
+    "href": "slides/week-1-2.html#todays-data",
+    "title": "Week 1 | Day 2",
+    "section": "Today’s Data:",
+    "text": "Today’s Data:\n\n\n\n\nband_members\n#&gt; # A tibble: 3 × 2\n#&gt;   name  band   \n#&gt;   &lt;chr&gt; &lt;chr&gt;  \n#&gt; 1 Mick  Stones \n#&gt; 2 John  Beatles\n#&gt; 3 Paul  Beatles\n\n\n\nband_instruments\n#&gt; # A tibble: 3 × 2\n#&gt;   name  plays \n#&gt;   &lt;chr&gt; &lt;chr&gt; \n#&gt; 1 John  guitar\n#&gt; 2 Paul  bass  \n#&gt; 3 Keith guitar"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-1",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-1",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\"))\n\n\n\n#&gt; # A tibble: 24 × 6\n#&gt;   country continent  year lifeExp      pop gdpPercap\n#&gt;   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n#&gt; 1 Canada  Americas   1952    68.8 14785584    11367.\n#&gt; 2 Canada  Americas   1957    70.0 17010154    12490.\n#&gt; 3 Canada  Americas   1962    71.3 18985849    13462.\n#&gt; # ℹ 21 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-2",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-2",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap)\n\n\n\n#&gt; # A tibble: 24 × 4\n#&gt;   country  year lifeExp gdpPercap\n#&gt;   &lt;fct&gt;   &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;\n#&gt; 1 Canada   1952    68.8    11367.\n#&gt; 2 Canada   1957    70.0    12490.\n#&gt; 3 Canada   1962    71.3    13462.\n#&gt; # ℹ 21 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-3",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-3",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\")\n\n\n\n#&gt; # A tibble: 48 × 4\n#&gt;   country  year metric      value\n#&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;       &lt;dbl&gt;\n#&gt; 1 Canada   1952 lifeExp      68.8\n#&gt; 2 Canada   1952 gdpPercap 11367. \n#&gt; 3 Canada   1957 lifeExp      70.0\n#&gt; # ℹ 45 more rows"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-4",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-4",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\") |&gt;\n  ggplot(aes(x = year, y = value))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-5",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-5",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\") |&gt;\n  ggplot(aes(x = year, y = value)) +\n  geom_line(color = \"gray80\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-6",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-6",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\") |&gt;\n  ggplot(aes(x = year, y = value)) +\n  geom_line(color = \"gray80\") +\n  geom_point(aes(color = country))"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-7",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-7",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\") |&gt;\n  ggplot(aes(x = year, y = value)) +\n  geom_line(color = \"gray80\") +\n  geom_point(aes(color = country)) +\n  facet_grid(metric ~ country, scales = \"free_y\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-8",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-8",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\") |&gt;\n  ggplot(aes(x = year, y = value)) +\n  geom_line(color = \"gray80\") +\n  geom_point(aes(color = country)) +\n  facet_grid(metric ~ country, scales = \"free_y\") +\n  labs(x = \"\", y = \"\",\n       title    = \"North America: GDP & Life Expectancy\",\n       subtitle = \"1950–2007\",\n       caption  = \"Data: Gapminder R package\")"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-9",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-9",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\") |&gt;\n  ggplot(aes(x = year, y = value)) +\n  geom_line(color = \"gray80\") +\n  geom_point(aes(color = country)) +\n  facet_grid(metric ~ country, scales = \"free_y\") +\n  labs(x = \"\", y = \"\",\n       title    = \"North America: GDP & Life Expectancy\",\n       subtitle = \"1950–2007\",\n       caption  = \"Data: Gapminder R package\") +\n  theme_linedraw()"
+  },
+  {
+    "objectID": "slides/week-1-2.html#pivot-within-a-pipeline-10",
+    "href": "slides/week-1-2.html#pivot-within-a-pipeline-10",
+    "title": "Week 1 | Day 2",
+    "section": "Pivot Within a Pipeline",
+    "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\") |&gt;\n  ggplot(aes(x = year, y = value)) +\n  geom_line(color = \"gray80\") +\n  geom_point(aes(color = country)) +\n  facet_grid(metric ~ country, scales = \"free_y\") +\n  labs(x = \"\", y = \"\",\n       title    = \"North America: GDP & Life Expectancy\",\n       subtitle = \"1950–2007\",\n       caption  = \"Data: Gapminder R package\") +\n  theme_linedraw() +\n  theme(legend.position = \"none\",\n        axis.text.x = element_text(angle = 90, face = \"bold\"))\n\n\n\n\n\n\n\n\n\n\n\n\nThe real power: wrangling shape and visualization in one chain:"
   }
 ]

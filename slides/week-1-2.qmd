@@ -39,6 +39,12 @@ library(gapminder)
 library(flextable)
 library(dataRetrieval)
 library(lubridate)
+library(flipbookr)
+library(kableExtra)
+
+options(tibble.print_min = 3, tibble.print_max = 3)
+col1 = "navy"
+col2 = "yellow"
 ```
 
 # Today's Arc {background-color="#1E4D2B"}
@@ -63,7 +69,14 @@ Three interconnected topics, one dataset throughout:
 
 We'll use **gapminder** for most examples — clean, familiar, and ships with R. Every technique applies directly to the USGS streamflow data in Lab 1.
 
-## The Dataset We'll Use
+## Gapminder Data
+
+::: {.callout-tip}
+## Gapminder Data
+
+_"Gapminder Foundation is a non-profit venture registered in Stockholm, Sweden, that promotes sustainable global development and achievement of the United Nations Millennium Development Goals by increased use and understanding of statistics and other information about social, economic and environmental development at local, national and global levels."_
+:::
+
 
 ```{r}
 library(tidyverse)
@@ -80,6 +93,7 @@ length(unique(gapminder$country))
 ```{r}
 glimpse(gapminder)
 ```
+
 
 # Part 1: Data Manipulation {background-color="#1E4D2B"}
 
@@ -104,10 +118,10 @@ When your data doesn't conform, you fix the data — not the tools.
 
 | Verb | Does |
 |------|------|
-| `filter()` | Keep rows matching a condition |
-| `select()` | Keep or drop columns |
+| `select()` | Picks variables based on their names. |
+| `filter()` | Picks cases based on their values. |
 | `mutate()` | Add or transform columns |
-| `summarize()` | Collapse rows to a summary |
+| `summarize()` | Reduces multiple values down to a single summary. |
 | `arrange()` | Reorder rows |
 | `group_by()` | Apply operations by group |
 
@@ -134,7 +148,7 @@ You already know base R subsetting. Here's the vocabulary:
 
 ```{r}
 df <- data.frame(country = c("USA", "Brazil", "India"),
-                 pop     = c(300e6, 200e6, 1.4e9))
+                 pop     = c(3e6, 2e6, 1.4e9))
 
 df[1, 2]          # row 1, col 2 — matrix style
 df[["pop"]]       # column by name — list style
@@ -154,18 +168,38 @@ gapminder[19:70, ]   # ❌ not self-documenting, breaks if data changes
 Always subset by **condition** — it is explicit, readable, and robust.
 :::
 
-## Connection to SQL
+## Connection to SQL {.smaller}
+
+::: {layout-ncol=2}
+
+::: {.column}
 
 ```{r}
 #| echo: false
 #| fig-align: center
-#| out.width: "75%"
+#| out.width: "100%"
 knitr::include_graphics('img/sql_example.png')
 ```
 
-. . .
 
-You just learned the core concepts of SQL:
+:::
+
+::: {.column}
+
+- SQL (Structured Query Language) provides a language for databases to store, retrieve, and manage data.
+
+- Used in all major databases – PostgreSQL, MySQL, SQL Server, and more.
+
+- Essential for data jobs – Analysts, scientists, and engineers rely on it.
+
+- Utilized everywhere in business & tech – From small apps to big companies to governments
+
+:::
+:::
+
+## Now Let's Apply Them
+
+We'll cover the core concepts of SQL indirectly:
 
 - `filter()` = `WHERE`
 - `select()` = `SELECT`
@@ -175,27 +209,36 @@ You just learned the core concepts of SQL:
 
 The grammar transfers directly. SQL is the language of databases; dplyr is the language of R data frames. They solve the same class of problems.
 
----
-
-## Now Let's Apply Them
+. . . 
 
 Now let's walk through each verb with concrete examples. You'll see how they work in isolation, then how they compose into powerful pipelines.
 
 ## `filter()` — Keep Rows by Condition
 
-`filter()` takes logical expressions and returns rows where all conditions are `TRUE`. It never touches columns.
+- `filter()` takes logical (binary) expressions and returns the rows in which all conditions are TRUE.
+
+- `filter()` does NOT impact columns
+
+- the `data.frame` is ALWAYS the fist argument
+
+- Lets find all rows in `gapminder` that in which the life expectancy is less then 40
+
+. . . 
 
 ```{r}
 filter(gapminder, lifeExp < 40)
 ```
 
-## `filter()` — Multiple Conditions
+## Subsetting rows by conditions
 
-Comma-separated conditions are treated as AND:
+- Lets find all observations in `gapminder` where the year is 2007, and the life expectancy is less then 40:
+
+. . . 
 
 ```{r}
 filter(gapminder, lifeExp < 40, year == 2007)
 ```
+
 
 ## `filter()` — The `%in%` Operator
 
@@ -208,32 +251,33 @@ filter(gapminder,
 . . .
 
 ::: callout-tip
-`%in%` tests membership in a vector — much cleaner than chaining `|` (OR) conditions. You'll use it constantly with site numbers, HUC codes, and state names in water resources work.
+`%in%` tests membership in a vector — much cleaner than chaining `|` (OR) conditions. You'll use it constantly with site numbers, HUC codes, and state names in water resources work. %in% maps directly to SQL `IN`. 
 :::
 
 ## How `filter()` Works: Boolean Vectors
 
 Under the hood, `filter()` creates a **boolean vector** (all TRUE or FALSE) and keeps only the rows where the condition is TRUE.
 
+:::: {.columns}
+::: {.column width="50%"}
+**Base R subsetting:**
 ```{r}
 # Create a boolean vector
 lifeExp_condition <- gapminder$lifeExp < 40
+table(lifeExp_condition)
 
 # This is what filter() does internally
-gapminder[lifeExp_condition, ]  # base R subsetting with boolean vector
+head(gapminder[lifeExp_condition, ])
 ```
-
-. . .
-
-Equivalent to:
-
+:::
+::: {.column width="50%"}
+**Using filter():**
 ```{r}
-# Using filter()
-gapminder |>
-  filter(lifeExp < 40)
+# Much cleaner syntax
+filter(gapminder, lifeExp < 40)
 ```
-
-. . .
+:::
+::::
 
 ::: callout-note
 `filter()` is cleaner and more readable, but it's doing exactly what base R subsetting does: keeping rows where the condition is TRUE, dropping rows where it's FALSE or NA.
@@ -241,80 +285,107 @@ gapminder |>
 
 ## `select()` — Keep Columns by Name
 
+`select()` can be used to remove columns. The ! negates a selection
+
+:::: {.columns}
+::: {.column width="50%"}
+**Select columns:**
 ```{r}
 select(gapminder, country, lifeExp)
 ```
-
-. . .
-
-Rename while selecting:
-
+:::
+::: {.column width="50%"}
+**Rename while selecting:**
 ```{r}
 select(gapminder, country, life_exp = lifeExp)
 ```
+:::
+::::
 
-. . .
+## `select()` — Drop & Pattern Matching
 
-Drop a column with `!`:
-
+:::: {.columns}
+::: {.column width="50%"}
+**Drop a column:**
 ```{r}
 select(gapminder, !continent)
 ```
+:::
+::: {.column width="50%"}
+**Match by pattern (1):**
+```{r}
+# Start with "life"
+select(gapminder,  starts_with("life"))
+
+# Contain "pop"
+select(gapminder,  contains("pop"))
+```
+:::
+::::
 
 ## `select()` — Base R Equivalence
 
 Under the hood, `select()` is doing column subsetting — the same operation as base R.
 
+:::: {.columns}
+::: {.column width="50%"}
+**Base R column subsetting:**
 ```{r}
 #| eval: false
-# Base R column subsetting
-gapminder[, c("country", "lifeExp")]     # [rows, cols]
-gapminder[["lifeExp"]]                   # extract single column
-gapminder$lifeExp                        # $ shorthand
+# Bracket notation [rows, cols]
+gapminder[, c("country", "lifeExp")]
+
+# Extract single column
+gapminder[["lifeExp"]]
+
+# Dollar sign shorthand
+gapminder$lifeExp
 ```
-
-. . .
-
+:::
+::: {.column width="50%"}
 **Using `select()`:**
-
 ```{r}
+# Much cleaner syntax
 gapminder |>
   select(country, lifeExp)
 ```
-
-. . .
+:::
+::::
 
 ::: callout-note
-`select()` is syntactic sugar on top of base R's column subsetting. It's more readable and composable with pipes.
+`select()` is syntactic layer on top of base R's column subsetting. It's more readable and composable with pipes.
 :::
 
 ## `select()` Helpers — `tidyselect` Functions {.smaller}
 
 Beyond explicit column names, use **tidyselect** helpers to match columns by pattern:
 
+::: {.columns}
+::: {.column width="50%"}
 ```{r}
 # Select columns starting with a pattern
 select(gapminder, starts_with("life"))
 
 # Select columns ending with a pattern
-select(gapminder, ends_with("pc"))
+select(gapminder, ends_with("cap"))
 
 # Select columns containing a substring
 select(gapminder, contains("pop"))
 ```
-
-. . .
+::: 
+::: {.column width="50%"}
 
 ::: callout-tip
-These patterns are especially useful for **water data** where columns follow naming conventions: `site_no`, `site_name`, `discharge_cfs`, `temp_c`. You'll select all temperature columns with `starts_with("temp_")`.
+These patterns are especially useful for **water data** where columns follow naming conventions: `site_no`, `site_name`, `discharge_cfs`, `temp_c`. You'll select all temperature columns with `starts_with("temp_")`. You can select all of a year with `contains(1991)`. Use this to your advantage when naming things!!
+:::
+:::
 :::
 
 ## The `|>` Pipe Operator
 
 The pipe passes the object on the left into the **first argument** of the function on the right:
 
-::: {layout-ncol=2}
-
+::: {columns}
 ::: {.column}
 **Without pipe:**
 
@@ -322,7 +393,6 @@ The pipe passes the object on the left into the **first argument** of the functi
 select(gapminder, country, lifeExp)
 ```
 :::
-
 ::: {.column}
 **With pipe:**
 
@@ -331,18 +401,20 @@ gapminder |>
   select(country, lifeExp)
 ```
 :::
-
 :::
 
 . . .
 
 **Keyboard shortcut**: `Cmd+Shift+M` (Mac) / `Ctrl+Shift+M` (Windows)
 
-. . .
-
 The pipe is what makes `dplyr` readable — it lets you build a chain of operations that reads like a sentence:
 
+`r flipbookr::chunq_reveal("plot", title = "|>  across verbs", lcolw = '50', rcolw = '50')`
+
 ```{r}
+#| label: plot
+#| inclue: false
+
 gapminder |>
   select(pop, gdpPercap, year, country) |>
   filter(pop > 100000000, gdpPercap > 5000) |>
@@ -350,35 +422,18 @@ gapminder |>
   filter(country %in% c("United States", "Mexico"))
 ```
 
-## Combining Verbs
-
-The pipe lets you chain as many operations as needed:
-
-```{r}
-gapminder |>
-  select(year, country, gdpPercap) |>
-  filter(year == max(year)) |>
-  arrange(-gdpPercap) |>
-  mutate(rank = 1:n())
-```
-
 ## `mutate()` — Add New Columns
 
-`mutate()` adds new variables computed from existing ones. New variables are available immediately within the same `mutate()` call:
+- `mutate()` defines and inserts new variables into a existing `data.frame`
+- `mutate()` builds new variables sequentially so you can reference earlier ones  when defining later ones 
+- In the `gapminder` dataset we have a population and gdp per capita variable. Lets calculate the GDP of each county
 
-```{r}
+`r flipbookr::chunq_reveal("mutate", title="Mutate")`
+
+```{r mutate, include = F}
 gapminder |>
-  mutate(gdp = pop * gdpPercap)
-```
-
-. . .
-
-Set a column to `NULL` to remove it:
-
-```{r}
-gapminder |>
-  mutate(gdp = pop * gdpPercap,
-         gdpPercap = NULL)
+  mutate(gdp = pop * gdpPercap) |> 
+  mutate(gdpPercap = NULL)
 ```
 
 ## `mutate()` — Base R Equivalence
@@ -401,7 +456,7 @@ gapminder$gdpPercap <- NULL
 ```{r}
 gapminder |>
   mutate(gdp = pop * gdpPercap,
-         gdpPercap = NULL)
+         gdpPercap = NULL) 
 ```
 
 . . .
@@ -417,8 +472,7 @@ gapminder |>
 ```{r}
 # mutate() keeps everything
 gapminder |>
-  mutate(gdp = pop * gdpPercap) |>
-  head(2)
+  mutate(gdp = pop * gdpPercap) 
 ```
 
 . . .
@@ -426,8 +480,7 @@ gapminder |>
 ```{r}
 # transmute() keeps only the new column
 gapminder |>
-  transmute(gdp = pop * gdpPercap) |>
-  head(2)
+  transmute(gdp = pop * gdpPercap) 
 ```
 
 . . .
@@ -458,15 +511,18 @@ flow_data |>
   mutate(is_low = if_else(discharge < quantile(discharge, 0.1), TRUE, FALSE))
 ```
 
-## `summarize()` — Collapse to a Summary
+## Use `sumarize()` to reduce a data.set
 
-`summarize()` takes n rows and returns 1:
+- `summarize()` takes a dataset with n observations, computes requested values, and returns a dataset with 1 observation.
+- `summarize()` can compute summary statistics for one or more columns in a `data.frame`. 
+- The first argument in `summarize()` is the data.frame.
 
-```{r}
+`r flipbookr::chunq_reveal("summarize", title="summarize")`
+
+```{r summarize, include = F}
 gapminder |>
-  mutate(gdp = pop * gdpPercap) |>
-  summarize(mean_gdp = mean(gdp),
-            sd_gdp   = sd(gdp))
+  mutate(gdp = pop * gdpPercap) |> 
+  summarize(gpd = mean(gdp), sd = sd(gdp)) 
 ```
 
 . . .
@@ -475,20 +531,34 @@ Useful summary functions: `mean()`, `median()`, `sd()`, `min()`, `max()`, `sum()
 
 ## `arrange()` — Reorder Rows
 
-```{r}
+- orders the rows of a `data.frame` rows by the values of selected columns.
+
+`r flipbookr::chunq_reveal("arrange", title="Decreasing or Increasing?")`
+
+```{r arrange, include = F}
 gapminder |>
   filter(year == 2007) |>
-  arrange(lifeExp)
+  arrange(lifeExp) |> 
+  arrange(-lifeExp)
 ```
 
-. . .
+`r flipbookr::chunq_reveal("arrange2", title="Multi sort (order matters)")`
 
-Descending order with `-`:
+```{r arrange2, include = F}
+gapminder |> 
+  select(country, year, pop) |> 
+  arrange(year, country) |> 
+  arrange(country, year) 
+```
 
-```{r}
+`r flipbookr::chunq_reveal("mutate2", title="Combining operations")`
+
+```{r mutate2, include = F}
 gapminder |>
-  filter(year == 2007) |>
-  arrange(-lifeExp)
+  select(year, country, gdpPercap) |> 
+  filter(year == max(year)) |> 
+  arrange(-gdpPercap) |> 
+  mutate(rank = 1:n())
 ```
 
 ## `group_by()` + `summarize()` — Split-Apply-Combine
@@ -534,12 +604,17 @@ gapminder |>
   arrange(year) |>
   mutate(lifeExp_gain = lifeExp - first(lifeExp)) |>
   filter(year == max(year)) |>
-  arrange(-lifeExp_gain)
+  arrange(-lifeExp_gain) |>
+  head(10)
 ```
 
 ## Worst Single-Year Drop in Life Expectancy
 
 ```{r}
+#| label: worst
+#| echo: false
+#| eval: false
+
 gapminder |>
   select(country, year, continent, lifeExp) |>
   group_by(country, continent) |>
@@ -549,6 +624,9 @@ gapminder |>
   slice_min(worst_drop, n = 5) |>
   arrange(worst_drop)
 ```
+
+`r flipbookr:::chunq_reveal("worst", title = "Worst Single-Year Drop in Life Expectancy", lcolw = "60", rcolw = "40")`
+
 
 . . .
 
@@ -564,7 +642,7 @@ Data without visualization is just numbers. Before building any model or writing
 
 . . .
 
-`ggplot2` is built on a consistent grammar — the same recipe works for scatter plots, line charts, heatmaps, and beyond. This systematic grammar is what makes ggplot2 powerful: once you learn the components, you can build *any* visualization.
+`ggplot2` is built on a consistent grammar — the same recipe works for scatter plots, line charts, heatmaps, and beyond. This systematic grammar is what makes `ggplot2` powerful: once you learn the components, you can build *any* visualization.
 
 The **Grammar of Graphics** says every chart is built from the same small set of components:
 
@@ -582,6 +660,7 @@ Building a plot is additive — you layer components with `+`:
 DATA |>
   ggplot(aes(x = VAR1, y = VAR2)) +
   GEOM_FUNCTION() +
+  ... +
   LABELS +
   FACETS +
   THEME
@@ -593,12 +672,15 @@ DATA |>
 Notice the switch from `|>` (pipe) to `+` (plus) when you enter `ggplot`. The pipe passes data into `ggplot()`; the plus adds layers *within* the plot. This is the most common source of syntax errors when learning ggplot.
 :::
 
-## Building a Plot: Data → Aesthetics → Geom
+`r flipbookr::chunq_reveal("geoms", title = "Building a Plot: Data→Aes→Geom", lcolw = 40, rcolw = 60)`
 
 All ggplot2 plots follow the same structure: data + aesthetics (which variables to visual properties) + geometry (what shape).
 
 ```{r}
-gm2007 <- filter(gapminder, year == 2007)
+#| label: geoms
+#| include: false
+
+(gm2007 <- filter(gapminder, year == 2007))
 
 ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
   geom_point()
@@ -610,7 +692,7 @@ ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
 
 ## Fixed vs. Data-Driven Aesthetics
 
-::: {layout-ncol=2}
+::: {.columns}
 
 ::: {.column}
 **Fixed** — set outside `aes()`, applies to all points:
@@ -634,11 +716,14 @@ ggplot(data = gm2007,
 
 :::
 
-## Multiple Geoms
+`r flipbookr:::chunq_reveal("multiple-geoms", title = "Step 2: Layers", lcolw = "60", rcolw = "40")`
 
 Layers compose — each `+` adds a new geometric object:
 
 ```{r}
+#| label: multiple-geoms
+#| include: false
+
 ggplot(data = gm2007,
        aes(x = gdpPercap, y = lifeExp)) +
   geom_point(aes(color = continent, size = pop)) +
@@ -647,25 +732,36 @@ ggplot(data = gm2007,
   geom_vline(xintercept = mean(gm2007$gdpPercap), color = "gray50")
 ```
 
-## Step 3: Labels
 
-```{r}
+## 3. Labels
+
+`r flipbookr:::chunq_reveal("labs", title = "Step 3: Labels", lcolw = "60", rcolw = "40")`
+
+- Now that you have drawn the main parts of the graph. You might want to add labs that clarify what is being shown. 
+
+```{r, labs, include = F}
 ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
-  geom_point(aes(color = continent, size = pop)) +
-  geom_smooth(color = "black", linewidth = .5) +
-  labs(title    = "Per capita GDP vs. life expectancy (2007)",
-       x        = "Per Capita GDP (USD)",
-       y        = "Life Expectancy (years)",
-       subtitle = "Source: Gapminder",
-       color    = "",
-       size     = "Population")
+  geom_point(aes(color = continent, size = pop)) + 
+  geom_smooth(color = "black", size = .5) + 
+  geom_hline(yintercept = mean(gm2007$lifeExp), color = "gray") + 
+  geom_vline(xintercept = mean(gm2007$gdpPercap), color = "gray") + 
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP", 
+       y = "Life Expectancy", 
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "", 
+       size = "Population")
 ```
 
-## Step 4: Facets
+`r flipbookr:::chunq_reveal("facet", title = "Step 4: Facets", lcolw = "60", rcolw = "40")`
 
 Split one plot into many by a categorical variable:
 
 ```{r}
+#| label: facet
+#| include: false
+
 ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
   geom_point(aes(color = continent, size = pop)) +
   geom_smooth(color = "black", linewidth = .5) +
@@ -687,23 +783,84 @@ knitr::include_graphics('img/position-facets.png')
 
 Use `facet_wrap()` for many categories without hierarchy; `facet_grid()` for structured two-way comparisons.
 
-## Step 5: Themes
+## 5. Theme
 
-Themes control all non-data visual elements:
+- Great! Now we just need to polish our plots...
 
-```{r}
-ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
-  geom_point(aes(color = continent, size = pop)) +
-  labs(x = "Per Capita GDP", y = "Life Expectancy",
-       title = "GDP vs. Life Expectancy (2007)") +
-  theme_minimal()
+- ggplot offers a themeing system:
+
+  1.  `elements` specify the non-data elements that you can control. For example, 
+    -  `plot.title` controls the appearance of the plot title; 
+    - ` axis.ticks.x` controls the ticks on the x axis; 
+    - `legend.key.height`, controls the height of the keys in the legend.
+
+  2. Each `element` is associated with an element function, which describes the visual properties. For example, 
+    - `element_text()` sets the font size, color and face of text elements like `plot.title`.
+
+  3. The `theme()` function which allows you to override  default elements:
+    - For example  `theme(plot.title = element_text(color = "red"))`.
+
+## Built in themes
+
+Wow! That's a lot :) Fortunately, `ggplot` comes with many default themes that set all of the theme elements to values designed to work together harmoniously.
+
+```{r, echo = FALSE}
+ls(pattern = '^theme_', env = as.environment('package:ggplot2'))
 ```
 
-. . .
+## theme_bw()
 
-Built-in themes: `theme_bw()`, `theme_minimal()`, `theme_light()`, `theme_dark()`, `theme_classic()`
+- All themes are functions_ that "precan" a specified set of rules: 
 
-The `ggthemes` package adds Economist, WSJ, FiveThirtyEight, and many more.
+```{r}
+theme_bw
+```
+
+`r flipbookr::chunq_reveal("theme", title = "Built in Themes...", lcolw = 45, rcolw = 55)`
+
+```{r, theme, include = FALSE}
+gm2007 %>% 
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) + 
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP", 
+       y = "Life Expectancy", 
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "", 
+       size = "Population") +
+  theme_bw() +
+  theme_dark() + 
+  theme_gray() + 
+  theme_minimal() + 
+  theme_light()
+```
+---
+
+`r flipbookr::chunq_reveal("ggtheme", title = "ggtheme package...", lcolw = 40, rcolw = 60)`
+
+```{r, ggtheme, include = FALSE}
+library(ggthemes)
+
+gm2007 %>% 
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop)) + 
+  labs(title = "Per capita GDP versus life expectency in 2007",
+       x = "Per Capita GDP", 
+       y = "Life Expectancy", 
+       caption = "Based on Hans Rosling Plots",
+       subtitle = 'Data Source: Gapminder',
+       color = "", 
+       size = "Population") +
+  ggthemes::theme_stata() +
+  ggthemes::theme_economist() + 
+  ggthemes::theme_economist_white() +
+  ggthemes::theme_fivethirtyeight() + 
+  ggthemes::theme_gdocs() + 
+  ggthemes::theme_excel() +
+  ggthemes::theme_wsj() + 
+  ggthemes::theme_hc()
+```
 
 ## Saving Plots
 
@@ -727,23 +884,6 @@ ggsave(p,
 ::: callout-tip
 Always save with explicit `width`, `height`, and `units`. The default dimensions rarely match what you need for reports or publications. `fig.retina = 3` in your chunk options gives you high-DPI output for web rendering.
 :::
-
-## ggplot in a Pipeline
-
-ggplot integrates naturally with dplyr — pipe your wrangled data straight into a plot:
-
-```{r}
-gapminder |>
-  filter(continent == "Europe") |>
-  group_by(year) |>
-  summarize(mean_lifeExp = mean(lifeExp)) |>
-  ggplot(aes(x = year, y = mean_lifeExp)) +
-  geom_line(color = "steelblue", linewidth = 1) +
-  geom_point(color = "steelblue", size = 2) +
-  labs(title = "Mean Life Expectancy in Europe Over Time",
-       x = "Year", y = "Mean Life Expectancy") +
-  theme_minimal()
-```
 
 # Part 3: Relational Data {background-color="#1E4D2B"}
 
@@ -776,15 +916,22 @@ A **key** is the variable (or set of variables) that uniquely identifies an obse
 
 . . .
 
+:::{.columns}
+:::{.column}
 ```{r}
-library(dplyr)
 band_members
+```
+:::
+:::{.column}
+:::
+```{r}
 band_instruments
 ```
+:::
 
 `name` is the primary key in both tables and the foreign key that connects them.
 
-## The Four Joins
+## The Four (primary) Joins
 
 ```{r}
 #| echo: false
@@ -799,7 +946,33 @@ knitr::include_graphics('img/07-joins.png')
 | `inner_join(x, y)` | Only rows matching in **both** | Dropped |
 | `full_join(x, y)` | Both tables | NAs on whichever side has no match |
 
-## Inner Join
+
+## Today's Data:
+
+<br><br>
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r}
+band_members
+```
+:::
+::: {.column width="50%"}
+```{r}
+band_instruments
+```
+:::
+::::
+
+<br><br>
+
+```{r}
+#| echo: false
+#| fig.align: 'center'
+knitr::include_graphics('img/a128e-stones-beatles.png')
+```
+
+## Inner Join {.smaller}
 
 Returns only rows with matches in **both** tables:
 
@@ -807,9 +980,35 @@ Returns only rows with matches in **both** tables:
 inner_join(band_members, band_instruments, by = "name")
 ```
 
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = FALSE}
+kable(band_members) |>
+  kable_styling(full_width = FALSE, font_size = 24) |> 
+  row_spec(2:3, bold = T, color = col1, background = col2)  
+```
+:::
+::: {.column width="50%"}
+```{r, echo=FALSE}
+kable(band_instruments) |>
+  kable_styling(full_width = FALSE, font_size = 24) |> 
+  row_spec(1:2, bold = T, color = col1, background = col2) 
+```
+:::
+::::
+
+```{r, echo = FALSE}
+inner_join(band_members, band_instruments, by = "name") |> 
+   mutate(
+    band = cell_spec(band, "html", color = ifelse(is.na(band), "red", "black")),
+    plays = cell_spec(plays, "html", color = ifelse(is.na(plays), "red", "black")))|> 
+  kable(format = "html", escape = F) |>
+  kable_styling(full_width = FALSE, font_size = 36)  
+```
+
 Mick has no instrument record → dropped. Keith has no band record → dropped.
 
-## Left Join
+## Left Join {.smaller}
 
 Returns **all rows from the left table**, NAs where no match in right:
 
@@ -817,9 +1016,36 @@ Returns **all rows from the left table**, NAs where no match in right:
 left_join(band_members, band_instruments, by = "name")
 ```
 
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = FALSE}
+kable(band_members) |>
+  kable_styling(full_width = FALSE, font_size = 24) |> 
+  row_spec(1:3, bold = T, color = col1, background = col2)   
+```
+:::
+::: {.column width="50%"}
+```{r, echo=FALSE}
+kable(band_instruments) |>
+  kable_styling(full_width = FALSE, font_size = 24) |> 
+  row_spec(1:2, bold = T, color = col1, background = col2) 
+```
+:::
+::::
+
+```{r, echo = FALSE}
+left_join(band_members, band_instruments, by = "name") |> 
+   mutate(
+    band = cell_spec(band, "html", color = ifelse(is.na(band), "red", "black")),
+    plays = cell_spec(plays, "html", color = ifelse(is.na(plays), "red", "black")))|> 
+  kable(format = "html", escape = F) |>
+  kable_styling(full_width = FALSE, position = "center", font_size = 36)   
+```
+
+
 Mick kept, `plays` is `NA`. Keith dropped (not in left table).
 
-## Right Join
+## Right Join {.smaller}
 
 Returns **all rows from the right table**:
 
@@ -827,12 +1053,65 @@ Returns **all rows from the right table**:
 right_join(band_members, band_instruments, by = "name")
 ```
 
-## Full Join
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = FALSE}
+kable(band_members) |>
+  kable_styling(full_width = FALSE, font_size = 24) |> 
+  row_spec(2:3, bold = T, color = col1, background = col2)  
+```
+:::
+::: {.column width="50%"}
+```{r, echo=FALSE}
+kable(band_instruments) |>
+  kable_styling(full_width = FALSE, font_size = 24) |> 
+  row_spec(1:3, bold = T, color = col1, background = col2) 
+```
+:::
+::::
+
+```{r, echo = FALSE}
+right_join(band_members, band_instruments, by = "name") |> 
+   mutate(
+    band = cell_spec(band, "html", color = ifelse(is.na(band), "red", "black")),
+    plays = cell_spec(plays, "html", color = ifelse(is.na(plays), "red", "black")))|> 
+  kable(format = "html", escape = F) |>
+  kable_styling(full_width = FALSE, position = "center", font_size = 36)  
+```
+
+## Full Join {.smaller}
 
 Returns **all rows from both tables**:
 
 ```{r}
 full_join(band_members, band_instruments, by = "name")
+```
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = FALSE}
+kable(band_members) |>
+  kable_styling(full_width = FALSE, font_size = 24) |> 
+  row_spec(1:3, bold = T, color = col1, background = col2)  
+```
+:::
+::: {.column width="50%"}
+```{r, echo=FALSE}
+kable(band_instruments) |>
+  kable_styling(full_width = FALSE, font_size = 24) |> 
+  row_spec(1:3, bold = T, color = col1, background = col2) 
+```
+:::
+::::
+
+```{r, echo = FALSE}
+full_join(band_members, band_instruments, by = "name") |> 
+   mutate(
+    band = cell_spec(band, "html", color = ifelse(is.na(band), "red", "black")),
+    plays = cell_spec(plays, "html", color = ifelse(is.na(plays), "red", "black")))|> 
+  kable(format = "html", escape = F) |>
+  kable_styling(full_width = FALSE, position = "center", font_size = 24
+                )  
 ```
 
 Everyone is kept. NAs fill missing values on either side.
@@ -864,18 +1143,6 @@ sum(is.na(result$new_column))
 # 3. Spot-check a known value
 result |> filter(key == "known_value") |> distinct(key, new_column)
 ```
-
-## Surrogate Keys
-
-Sometimes a table has no natural primary key. Create one with `row_number()`:
-
-```{r}
-gapminder |>
-  slice(1:5) |>
-  mutate(id = row_number())
-```
-
-This is called a **surrogate key** — it has no real-world meaning but uniquely identifies each row for joining purposes.
 
 ## Real Example: NWIS Flow + Site Metadata
 
@@ -1017,7 +1284,7 @@ table_long |>
 
 ## When to Use Each Format
 
-::: {layout-ncol=2}
+::: {.columns}
 
 ::: {.column}
 **Long format is better for:**
@@ -1026,15 +1293,6 @@ table_long |>
 - `group_by()` + `summarize()` — aggregating over a variable
 - Time series with multiple variables
 - Repeated measures data
-
-```{r}
-table_long |>
-  ggplot(aes(x = year, y = value, color = country)) +
-  geom_line() +
-  facet_grid(metric ~ country, scales = "free_y") +
-  theme_bw() +
-  theme(legend.position = "none")
-```
 :::
 
 ::: {.column}
@@ -1044,24 +1302,19 @@ table_long |>
 - Sharing data with non-technical audiences
 - Correlation matrices
 - When few variables and many observations
-
-```{r}
-table_wide |>
-  ggplot(aes(x = year, y = gdpPercap, color = country)) +
-  geom_line() +
-  facet_wrap(~country) +
-  theme_bw() +
-  theme(legend.position = "none")
-```
 :::
 
 :::
 
-## Pivot Within a Pipeline
+
+`r flipbookr::chunq_reveal("pivot", title = "Pivot Within a Pipeline", lcolw = '60', rcolw = '40')`
 
 The real power: wrangling shape and visualization in one chain:
 
 ```{r}
+#| label: pivot
+#| include: false
+
 gapminder |>
   filter(country %in% c("Canada", "United States")) |>
   select(country, year, lifeExp, gdpPercap) |>
@@ -1210,7 +1463,7 @@ format:
 
 . . .
 
-You won't edit this — I maintain it. But when you `quarto render`, it reads these defaults and applies them to every `.qmd` file in the project.
+When you `quarto render`, it reads these defaults and applies them to every `.qmd` file in the project.
 
 # Connecting to Lab 1 {background-color="#1E4D2B"}
 
@@ -1233,22 +1486,20 @@ The data source is `dataRetrieval` — a USGS package that wraps the same REST A
 
 ## Before Next Class
 
-::: {layout-ncol=2}
+::: {.columns}
 
 ::: {.column}
-### Lab 1 is due next Wednesday
+#### Lab 1 is due next Wednesday
 
 > **[Lab 1: Streamflow Across the Colorado River Basin](../labs/lab-01.qmd)**
 
 All the tools are now in your hands. The data is live. Start early — the data pull takes a few minutes the first time.
 
-### Next Topic
+#### Next Topic
 
 **Week 2: Vector Spatial Data**
 
-You will apply these same wrangling skills to geometries — points, lines, polygons, watershed boundaries, and the river network that connects them.
-
-The `sf` package treats spatial features as data frames. Everything you learned today still applies.
+You will apply these same wrangling skills to geometries and spatial features. The `sf` package treats spatial features as data frames. Everything you learned today will carry through!
 :::
 
 ::: {.column}
@@ -1259,5 +1510,4 @@ The `sf` package treats spatial features as data frames. Everything you learned 
 knitr::include_graphics('img/horst-eco-r4ds.png')
 ```
 :::
-
 :::

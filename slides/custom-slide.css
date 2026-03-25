@@ -1,0 +1,73 @@
+/* Reduce heading sizes for better fit */
+.reveal h1 {
+  font-size: 2.5em !important;
+  margin-bottom: 0.2em !important;
+}
+
+.reveal h2 {
+  font-size: 1.8em !important;
+  margin-bottom: 0.15em !important;
+}
+
+.reveal h3 {
+  font-size: 1.5em !important;
+}
+
+.reveal h4 {
+  font-size: 1.2em !important;
+}
+
+.reveal h5,
+.reveal h6 {
+  font-size: 1em !important;
+}
+
+/* Tighten paragraph spacing */
+.reveal p {
+  margin-bottom: 0.3em !important;
+  line-height: 1.3 !important;
+}
+
+/* Reduce list spacing */
+.reveal ul,
+.reveal ol {
+  margin-bottom: 0.3em !important;
+}
+
+.reveal li {
+  margin-bottom: 0.15em !important;
+}
+
+/* Fix column output layout */
+.reveal .column-output-location {
+  display: flex !important;
+  gap: 1em;
+  align-items: flex-start;
+}
+
+.reveal .column-output-location > div {
+  flex: 1;
+}
+
+/* Ensure code doesn't overflow */
+.reveal pre {
+  width: 100% !important;
+  font-size: 0.5em !important;
+  max-height: 400px !important;
+}
+
+.reveal code {
+  padding: 2px 4px !important;
+}
+
+/* Table sizing */
+.reveal table {
+  font-size: 0.8em !important;
+  margin: 0.5em auto !important;
+}
+
+/* Callout sizing */
+.callout {
+  font-size: 0.9em !important;
+  margin: 0.5em 0 !important;
+}
