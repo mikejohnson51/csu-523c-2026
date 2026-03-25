@@ -142,7 +142,7 @@ knitr::include_graphics('img/profile-pic.jpeg')
 The work we do in this course is in many ways the same work being done at the federal/state level right now. You're learning a living skillset.
 
 **Course site:**  
-[mikejohnson51.github.io/csu-ess-523c](https://mikejohnson51.github.io/csu-ess-523c/)
+[https://mikejohnson51.github.io/csu-ess-523c/](https://mikejohnson51.github.io/csu-ess-523c/)
 :::
 
 :::

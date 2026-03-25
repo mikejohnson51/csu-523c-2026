@@ -1,0 +1,1187 @@
+---
+title: "Week 2"
+subtitle: "Vector Data — Features, Projections & Measures"
+format:
+  revealjs:
+    smaller: true
+    incremental: false
+    self-contained: true
+    logo: ../csu-rams-logo.png
+    slide-number: c/t
+    footer: "[ESS 523c: Environmental Data Science Applications: Water Resources](https://github.com/mikejohnson51/csu-ess-523c/)"
+    include-before-body: header.html
+    include-after-body: footer-annotations.html
+    theme: [default, csu-css.scss]
+    highlightStyle: github
+    highlightLines: true
+    width: 1280
+    height: 720
+    countIncrementalSlides: false
+    title-slide-attributes:
+      data-background-color: "#1E4D2B"
+knitr:
+  opts_chunk:
+    echo: true
+    message: false
+    warning: false
+    collapse: true
+    comment: "#>"
+    fig.retina: 3
+---
+
+```{r}
+#| label: week2-setup
+#| echo: false
+#| include: false
+library(tidyverse)
+library(sf)
+library(flipbookr)
+
+co <- AOI::aoi_get(state = "CO", county = "all") |>
+  select(geoid = fip_code, name, aland = land_area, state_nm = state_name)
+
+conus <- AOI::aoi_get(state = "conus")
+```
+
+# Today's Arc {background-color="#1E4D2B"}
+
+## From Tabular to Spatial
+
+Last week: data as **rows and columns** — wrangling, joining, visualizing, modeling.
+
+. . .
+
+This week: data as **features in space** — the same verbs, but now every observation has a *geometry* that describes where it is and what shape it takes.
+
+. . .
+
+| Block | Topic | Time |
+|-------|-------|------|
+| **1** | Simple Features — the standard and the R implementation | ~45 min |
+| ☕ | Break | 5 min |
+| **2** | Coordinate Systems — GCS, datums, projections | ~35 min |
+| **3** | Measurements — distance, area, units | ~25 min |
+
+## Why CRS Matters for Water Resources
+
+Before we start: the single most common silent error in spatial water resources analysis.
+
+. . .
+
+- USGS NWIS gauge coordinates → **WGS84** (EPSG:4326)
+- NHDPlus HR flowlines → **NAD83** (EPSG:4269)  
+- 3DEP elevation → varies by tile
+
+. . .
+
+These are different coordinate systems. The differences are small (~1–3 meters for NAD83 vs. WGS84) but:
+
+- Joining gauges to their catchments? Wrong
+- Snapping gauges to the nearest flowline? Wrong
+- Computing distance from a gauge to a dam? Wrong
+
+. . .
+
+::: callout-important
+Always check CRS before any spatial join or distance calculation. We'll learn the three tools that make this automatic.
+:::
+
+# Simple Features {background-color="#1E4D2B"}
+
+## Simple Features
+
+```{r}
+#| echo: false
+#| fig.align: center
+knitr::include_graphics("images/09-sf-model.png")
+```
+
+## Today's Data: Colorado Counties
+
+```{r}
+#| echo: false
+co
+```
+
+## What Is a Simple Feature?
+
+- [Simple features](https://en.wikipedia.org/wiki/Simple_Features) (ISO 19125-1:2004) is a standard describing how real-world objects can be represented in computers, with emphasis on their *spatial geometry*
+
+- It defines:
+  1. A **class hierarchy** of geometry types
+  2. A **set of operations** on those geometries
+  3. **Binary and text encodings** for storage and transfer
+
+. . .
+
+- Widely implemented: PostGIS, ESRI ArcGIS, GDAL, GeoJSON — and `sf` in R
+- A subset of simple features (the **big 7**) forms the [GeoJSON](http://geojson.org/) specification
+
+## What Is a Feature?
+
+A feature is a **thing in the real world** — a river, a gauge, a watershed, a county.
+
+- Features often consist of other features:
+  - A river *system* → a river → an outlet point
+  - A watershed → sub-basins → individual reaches
+
+. . .
+
+The standard says: *"A simple feature has both **spatial** and **non-spatial** attributes. Spatial attributes are geometry valued."*
+
+- The **geometry** describes *where* the feature is and *how* it is represented
+- A river's geometry could be its watershed polygon, its mainstem linestring, or its outlet point — depending on the question
+
+. . .
+
+```{r}
+str(co$geometry)
+```
+
+## The Big 7 Geometry Types
+
+| Single | Description |
+|--------|-------------|
+| `POINT` | Zero-dimensional — a single coordinate pair |
+| `LINESTRING` | Sequence of points connected by straight line pieces — 1D |
+| `POLYGON` | Closed ring with positive area — 2D; may have interior holes |
+
+| Multi (same type) | Description |
+|--------|-------------|
+| `MULTIPOINT` | Set of points |
+| `MULTILINESTRING` | Set of linestrings |
+| `MULTIPOLYGON` | Set of polygons |
+
+| Mixed | Description |
+|--------|-------------|
+| `GEOMETRYCOLLECTION` | Set of geometries of any type |
+
+::: callout-note
+These 7 types cover virtually everything in water resources work: gauge locations (POINT), stream reaches (LINESTRING), watershed boundaries (POLYGON), and their multi-feature equivalents.
+:::
+
+## Dimensions
+
+All geometries are composed of **points** defined in 2-, 3-, or 4-D space:
+
+- **XY** — standard 2D coordinates (longitude, latitude or easting, northing)
+- **XYZ** — adds altitude (elevation of stream bed, DEM surface)
+- **XYM** — adds a measure attribute independent of the feature (e.g., streamflow at a vertex — rarely used)
+- **XYZM** — both Z and M
+
+. . .
+
+Note: "dimension" here means *coordinate dimension* (XY vs XYZ), **not** whether the geometry has length or area:
+
+```{r}
+m1 <- rbind(c(8,1), c(2,5), c(3,2))
+st_dimension(st_multipoint(m1))    # 0 — point set, no length
+st_dimension(st_linestring(m1))    # 1 — has length, no area
+```
+
+## Valid Geometries
+
+Valid geometries obey these rules:
+
+- `LINESTRING` — shall not self-intersect
+- `POLYGON` — rings shall be closed (last point = first point)
+- `POLYGON` — holes shall be inside the exterior ring
+- `POLYGON` — inner rings shall touch the exterior ring at single points only
+- `POLYGON` — rings shall not repeat their own path
+
+. . .
+
+```{r}
+x1 <- st_linestring(cbind(c(0,1,0,1), c(0,1,1,0)))   # self-intersecting
+st_is_simple(x1)
+
+x2 <- st_polygon(list(cbind(c(0,1,1,1,0,0), c(0,0,1,0.6,1,0))))
+st_is_valid(x2)
+```
+
+::: callout-tip
+Invalid geometries cause silent failures in spatial operations. Run `st_is_valid()` on any data you read in. Fix with `st_make_valid()`.
+:::
+
+## Empty Geometries
+
+Empty geometries serve as `NA` placeholders — they arise naturally from spatial operations:
+
+```{r}
+#| message: true
+(e <- st_intersection(st_point(c(0,0)), st_point(c(1,1))))
+st_is_empty(e)
+```
+
+# WKT and WKB {background-color="#1E4D2B"}
+
+## Well-Known Text and Well-Known Binary
+
+The simple feature standard defines two encodings:
+
+**Well-Known Text (WKT)** — human-readable:
+
+```{r}
+x <- st_linestring(matrix(10:1, 5))
+st_as_text(x)
+```
+
+`LINESTRING` = type · parentheses contain points · points separated by commas · coordinates separated by spaces
+
+. . .
+
+**Well-Known Binary (WKB)** — machine-readable, fast, lossless:
+
+```{r}
+st_as_binary(x)
+```
+
+WKB is used to communicate with external libraries (GDAL, GEOS) and spatial databases. Converting back to R:
+
+```{r}
+#| message: true
+st_as_sfc("LINESTRING(10 5, 9 4, 8 3, 7 2, 6 1)")[[1]]
+```
+
+# sfg → sfc → sf {background-color="#1E4D2B"}
+
+## Three Classes, One Object
+
+```{r}
+#| echo: false
+#| fig.align: center
+knitr::include_graphics("images/10-sf-diagram.png")
+```
+
+- 🟢 **sf** — a `data.frame` with feature attributes and a geometry column
+- 🔴 **sfc** — the geometry list-column (set of geometries)
+- 🔵 **sfg** — individual simple feature geometry (one geometry per feature)
+
+## `sfg`: Simple Feature Geometry
+
+`sfg` objects carry the geometry for a **single feature**. Storage rules:
+
+1. A single `POINT` → numeric vector
+2. Points in a `LINESTRING` or `POLYGON` ring → matrix (each row = a point)
+3. Any other set → list
+
+. . .
+
+Creator functions (rarely used in practice — you usually read existing data):
+
+```{r}
+(x <- st_point(c(1, 2)))
+str(x)
+
+(x <- st_linestring(matrix(c(1,2,3,4), ncol = 2)))
+str(x)
+```
+
+## `sfg`: Class Structure
+
+All geometry objects have an S3 class indicating (1) dimension, (2) type, (3) superclass:
+
+```{r}
+(pt  <- st_point(c(0, 1)))
+attributes(pt)
+
+(pt2 <- st_point(c(0, 1, 4)))   # XYZ
+attributes(pt2)
+```
+
+## `sfg`: Same Points, Different Meaning
+
+The same coordinate matrix creates geometries with entirely different dimensionality:
+
+```{r}
+m1 <- rbind(c(8,1), c(2,5), c(3,2))
+
+(mp <- st_multipoint(m1))   # zero-dimensional point set
+(ls <- st_linestring(m1))   # one-dimensional line
+
+st_dimension(mp); st_length(mp)
+st_dimension(ls); st_length(ls)
+```
+
+## Mixed Geometries and `GEOMETRYCOLLECTION`
+
+Sets of features can have heterogeneous geometry types — type becomes `GEOMETRY`:
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+(g <- st_sfc(st_point(c(0,0)),
+             st_linestring(rbind(c(0,0), c(1,1)))))
+```
+:::
+::: {.column width="50%"}
+Filter by type with `st_is`:
+```{r}
+g |> st_is("LINESTRING")
+
+st_sf(g) |>
+  filter(st_is(geometry, "LINESTRING"))
+```
+:::
+:::
+
+. . .
+
+When intersections produce mixed types, use `GEOMETRYCOLLECTION` and extract:
+
+```{r}
+pt   <- st_point(c(1,0))
+ls   <- st_linestring(matrix(c(4,3,0,0), ncol=2))
+poly <- st_polygon(list(matrix(c(5.5,7,7,6,5.5,0,0,-0.5,-0.5,0), ncol=2)))
+j    <- st_geometrycollection(list(pt, ls, poly))
+
+st_collection_extract(j, "POLYGON")
+```
+
+## Conversion Between Types: `st_cast`
+
+```{r}
+(co1   <- filter(co, name == "Larimer")$geometry)
+(co_ls <- st_cast(co1, "MULTILINESTRING"))
+```
+
+```{r}
+#| echo: false
+#| fig.align: center
+par(mfrow = c(1,2), mar = c(1,1,2,1))
+plot(co1,   col = "steelblue", main = "MULTIPOLYGON")
+plot(co_ls, col = "firebrick", main = "MULTILINESTRING")
+```
+
+## Casting: Feature vs. Set Level
+
+Casting operates at the **feature level**, not the set level:
+
+```{r}
+#| warning: true
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) |>
+  st_linestring() |>
+  st_cast("POINT")   # ⚠️ converts ONE line to ONE point — not what you want
+```
+
+. . .
+
+To extract individual points, work at the **set level** (`sfc`):
+
+```{r}
+(p <- rbind(c(0,0), c(1,1), c(1,0), c(0,1)) |>
+   st_linestring() |>
+   st_sfc() |>           # create a SET of one geometry
+   st_cast("POINT"))     # now produces 4 individual points
+```
+
+`r flipbookr::chunq_reveal("set", title = "Sets of geometries", lcolw = 40, rcolw = 60)`
+
+```{r set}
+#| include: false
+#| warning: true
+rbind(c(0,0), c(1,1), c(1,0), c(0,1)) |>
+  st_linestring() |>
+  st_sfc() |>
+  st_cast("POINT") ->
+  p
+```
+
+## `sfc`: Geometry List-Columns
+
+`st_sfc` creates sets of geometries — what becomes the sticky list-column in `sf` objects:
+
+```{r}
+(sfc <- st_sfc(st_point(c(0,1)), st_point(c(-3,2))))
+class(sfc)
+attributes(sfc) |> names()
+```
+
+The `sfc` object records for the **whole set**: precision, bounding box, CRS, and count of empty geometries.
+
+# Dissolving Geometries {background-color="#1E4D2B"}
+
+## Combine vs. Union
+
+Combining geometries **preserves** interior boundaries. Unioning **dissolves** them.
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+(co_c <- st_combine(co$geometry))
+```
+```{r}
+#| echo: false
+#| fig.align: center
+plot(co_c, col = "steelblue", main = "st_combine (boundaries preserved)")
+```
+:::
+::: {.column width="50%"}
+```{r}
+(co_u <- st_union(co$geometry))
+```
+```{r}
+#| echo: false
+#| fig.align: center
+plot(co_u, col = "firebrick", main = "st_union (boundaries dissolved)")
+```
+:::
+:::
+
+## Combine + Cast: Borders as Lines
+
+```{r}
+co_c_ml <- st_combine(co$geometry) |> st_cast("MULTILINESTRING")
+co_u_ml <- st_union(co$geometry)   |> st_cast("MULTILINESTRING")
+```
+
+```{r}
+#| echo: false
+#| fig.align: center
+par(mfrow = c(1,2), mar = c(1,1,2,1))
+plot(co_c_ml, col = "steelblue", main = "Combined (county borders)")
+plot(co_u_ml, col = "firebrick", main = "Unioned (state border only)")
+```
+
+. . .
+
+::: callout-tip
+This distinction matters constantly in water resources: county boundaries vs. watershed boundaries, stream reaches vs. the river network, individual gauge catchments vs. the basin outline.
+:::
+
+## CONUS: Combine vs. Union
+
+```{r}
+us_c_ml <- st_combine(conus) |> st_cast("MULTILINESTRING")
+us_u_ml <- st_union(conus)   |> st_cast("MULTILINESTRING")
+```
+
+```{r}
+#| echo: false
+#| fig.align: center
+g1 <- ggplot() + geom_sf(data = us_c_ml, color = "steelblue") +
+  theme_linedraw() + labs(title = paste("Combined:", length(st_geometry(us_c_ml)), "feature(s)"))
+
+g2 <- ggplot() + geom_sf(data = us_u_ml, color = "firebrick") +
+  theme_linedraw() + labs(title = paste("Unioned:", length(st_geometry(us_u_ml)), "feature(s)"))
+
+gridExtra::grid.arrange(g1, g2, nrow = 1)
+```
+
+## Distance to Denver: Thinking About Feature Level
+
+**Question**: how far is Denver from the nearest state border?
+
+```{r}
+denver_sf <- data.frame(y = 39.7392, x = -104.9903, name = "Denver") |>
+  st_as_sf(coords = c("x", "y"), crs = 4326)
+```
+
+`r flipbookr::chunq_reveal("q14", title = "Attempt 1: distance to states (polygons)", lcolw = 40, rcolw = 60)`
+
+```{r q14}
+#| include: false
+conus |>
+  select(state_name) |>
+  mutate(dist = st_distance(., denver_sf)) |>
+  slice_min(dist, n = 3)
+```
+
+- Distance to Colorado is 0 — Denver is *inside* a polygon, so distance = 0
+- Polygons describe **areas** — distance to the interior is always 0
+
+`r flipbookr::chunq_reveal("q15", title = "Attempt 2: cast to lines first", widths = c(40,60,0))`
+
+```{r q15}
+#| include: false
+conus |>
+  select(state_name) |>
+  st_cast("MULTILINESTRING") |>
+  mutate(dist = st_distance(., denver_sf)) |>
+  slice_min(dist, n = 3)
+```
+
+## The Right Feature Level
+
+Computing distance to 48 state borders when we only need the nearest one is wasteful. The **feature** should be the complete set of borders — one `MULTILINESTRING`:
+
+```{r}
+st_distance(denver_sf, st_cast(st_combine(conus), "MULTILINESTRING"))
+```
+
+. . .
+
+- 1 calculation instead of 48
+- Correct answer: distance to the **border**, not to individual state features
+- Same principle applies to: distance to national border, distance to any river network, distance to nearest dam
+
+# The `sf` Object {background-color="#1E4D2B"}
+
+## `sf`: Attributes + Geometry
+
+```{r}
+co
+class(co)
+attr(co, "sf_column")
+```
+
+An `sf` object is a `data.frame` with one special list-column: the geometry. It extends `data.frame` with spatial awareness.
+
+## Sticky Geometry
+
+The geometry column **persists through dplyr operations**:
+
+```{r}
+co |> select(name) |> slice(1:2)   # geometry comes along
+```
+
+. . .
+
+Drop it explicitly when you don't need it:
+
+```{r}
+co |> st_drop_geometry() |> select(name) |> slice(1:2)
+```
+
+## Plotting `sf` Objects with ggplot2
+
+`geom_sf()` is the bridge between `sf` and `ggplot2` — everything from last week works:
+
+```{r}
+#| fig.align: center
+ggplot(data = co) +
+  geom_sf(aes(fill = aland)) +
+  scale_fill_viridis_c(name = "Land Area (m²)") +
+  labs(title = "Colorado Counties by Land Area") +
+  theme_minimal()
+```
+
+. . .
+
+All `dplyr` verbs work on `sf` objects first, then pipe into `ggplot`:
+
+```{r}
+#| eval: false
+co |>
+  filter(name == "Larimer") |>
+  ggplot() + geom_sf(fill = "#1E4D2B") + theme_void()
+```
+
+## The Sticky Geometry Structure
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: '75%'
+knitr::include_graphics("images/11-sticky-geom.png")
+```
+
+The geometry binding is unique — unlike `bind_cols()` or `cbind()`, the `sfc` list-column carries CRS, bounding box, and precision metadata that regular column binding does not.
+
+---
+
+## Simple Features: What You've Learned
+
+You now understand:
+
+- The **seven geometry types** — POINT, LINESTRING, POLYGON, and their multi-equivalents
+- The **class hierarchy** — `sfg` (individual geometry) → `sfc` (set) → `sf` (dataframe with sticky geometry)
+- **Valid geometries** — self-intersecting lines and invalid polygons break spatial operations silently
+- **WKT and WKB** — human-readable and machine-readable encodings
+- **Casting and dissolving** — changing geometry type and boundary representation
+- **Sticky geometry in dplyr** — `sf` objects work naturally with pipes, filters, and ggplot
+
+Now a 5-minute break, then: **What makes these coordinates actually *spatial*?** We'll cover the Coordinate Reference System — the foundation that anchors every spatial operation.
+
+# ☕ Break {background-color="#1E4D2B"}
+
+## 5 Minutes
+
+Back in 5. Next: coordinate systems, projections, and the three-part system (ellipsoid, datum, prime meridian) that determines whether your spatial analysis is correct or silently wrong.
+
+# Coordinate Systems {background-color="#1E4D2B"}
+
+## What Makes Spatial Data Spatial?
+
+```{r}
+#| echo: false
+#| fig.align: center
+#| out.width: '75%'
+knitr::include_graphics("images/09-sf-model.png")
+```
+
+The geometry alone is meaningless without knowing **where on Earth** those coordinates refer to. That's the job of the Coordinate Reference System.
+
+## Coordinate Reference Systems
+
+A **Coordinate Reference System (CRS)** defines how spatial features relate to the surface of the Earth.
+
+Two broad types:
+
+- **Geographic Coordinate System (GCS)** — locations on the *curved* surface of the Earth, measured in angular units (degrees)
+- **Projected Coordinate System (PCS)** — locations on a *flat* surface, measured in linear units (meters, feet)
+
+In `sf`, three tools:
+
+| Function | Does |
+|---|---|
+| `st_crs()` | Retrieve CRS from an `sf` or `sfc` object |
+| `st_set_crs()` | Set or replace CRS (no coordinate transformation) |
+| `st_transform()` | Transform coordinates from one CRS to another |
+
+## Geographic Coordinate Systems
+
+A GCS identifies locations on the **curved** surface of the Earth using angular measurements from the center:
+
+- **Latitude** — vertical angle (North/South from equator)
+- **Longitude** — horizontal angle (East/West from prime meridian)
+- North and East are positive; South and West are negative
+
+. . .
+
+A GCS is defined by three components:
+
+1. **Ellipsoid** — the mathematical model of Earth's shape (flattened sphere, not perfect)
+2. **Datum** — how the ellipsoid is anchored to the real Earth (locally fitted or globally centered)
+3. **Prime meridian** — the origin of longitude (Greenwich, 0°E/W)
+
+Why this matters: two datasets may use the same coordinates but different datums. The difference is small (sub-meter) but compounds in spatial joins and distance calculations.
+
+## Common Datums in Water Resources
+
+Three datums account for most US data:
+
+| Datum | Acronym | Used by | Typical error vs. NAD83 |
+|---|---|---|---|
+| North American Datum 1983 | NAD83 | NHDPlus, most USGS vector data | Reference datum |
+| World Geodetic System 1984 | WGS84 | GPS, NWIS gauges, web maps | <1 meter in CONUS |
+| NAD27 (historic) | NAD27 | Legacy sources only | Can be 100+ meters off |
+
+::: callout-note
+NAD83 and WGS84 differ by less than 1 meter for most of CONUS. But they are *not* the same CRS. Mixing them without explicit transformation introduces sub-meter errors that compound in spatial joins. Always check with `st_crs(a) == st_crs(b)` before joining.
+:::
+
+## Projected Coordinate Systems
+
+The Earth's surface is curved; maps and GIS are flat. A **Projected Coordinate System (PCS)** transforms from GCS to a 2D plane:
+
+- Has an origin, X axis, Y axis, and linear unit of measure (usually meters)
+- Requires a mathematical transformation — and every transformation introduces **distortion**
+
+. . .
+
+Three main projection families:
+
+```{r}
+#| echo: false
+#| fig.align: center
+knitr::include_graphics("images/11-projected-crs.png")
+```
+
+- **Planar**: projects onto a flat surface touching the globe at a point — best for polar regions
+- **Cylindrical**: wraps a cylinder around the globe — best for whole-world maps (Mercator)
+- **Conic**: projects onto a cone — best for mid-latitude areas like CONUS
+
+## Spatial Properties and Distortion
+
+Each type of projection prioritizes one property at the cost of others:
+
+| Property | Preserved by | Used for |
+|---|---|---|
+| **Area** | Equal-area (Albers) | Accurate area calculations, choropleth maps |
+| **Distance** | Equidistant | Distance from a fixed center point |
+| **Shape** | Conformal (Mercator) | Navigation, preserving local angles |
+| **Direction** | Azimuthal | Navigation from a pole |
+
+## Projection Choice: Water Resources Defaults
+
+For CONUS analysis, use these defaults:
+
+::: callout-important
+- **Computing area** (choropleth maps, watershed statistics) → **EPSG:5070** (Albers Equal Area). This is the standard federal projection for CONUS.
+- **Measuring distance** (gauge to outlet, confluences, dam spacing) → Keep data in geographic (WGS84, EPSG:4326) and use `st_distance()` with default S2 spherical geometry — it's geodesic and correct.
+- **Sub-state local analysis** → Use a local UTM zone (e.g., NAD83 / UTM zone 13) if you need projected planar distance.
+- **Visualization/mapping** → Use whatever looks right for your region (Web Mercator for web, Albers for print).
+:::
+
+## EPSG Codes and PROJ Strings
+
+`sf` stores CRS in two ways:
+
+- **EPSG code** — integer ID for a known CRS (e.g., `4326` = WGS84 geographic)
+- **PROJ4 string** — generic text description understood by the PROJ library
+
+Common codes for water resources work:
+
+| EPSG | Name | Use |
+|---|---|---|
+| 4326 | WGS84 geographic | GPS coordinates, web maps, NWIS gauges |
+| 4269 | NAD83 geographic | NHDPlus, most USGS vector data |
+| 5070 | NAD83 / Conus Albers | Area calculations, CONUS-wide analysis |
+| 26913–26915 | UTM NAD83 zones 13–15 | Local/state-level distance calculations |
+
+Practical rule: Use EPSG:5070 for CONUS area calculations; use a local UTM (e.g., NAD83 / UTM zones) for sub-state analyses.
+
+## Checking and Setting CRS
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+st_crs(conus)$epsg
+st_crs(conus)$proj4string
+st_crs(conus)$datum
+```
+:::
+::: {.column width="50%"}
+```{r}
+conus5070 <- st_transform(conus, 5070)
+st_crs(conus5070)$epsg
+st_crs(conus5070)$proj4string
+```
+:::
+:::
+
+## Visualizing Projections
+
+```{r}
+#| echo: false
+#| fig.align: center
+
+eqdc <- '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'
+
+g1 <- ggplot(data = conus) +
+  geom_sf() + theme_linedraw() + coord_sf(datum = 4326) +
+  labs(title = "Unprojected (WGS84)", subtitle = "EPSG:4326 — angular units")
+
+g2 <- ggplot(data = st_transform(conus, 5070)) +
+  geom_sf() + theme_linedraw() + coord_sf(datum = 5070) +
+  labs(title = "Albers Equal Area", subtitle = "EPSG:5070 — preserves area")
+
+g3 <- ggplot(data = st_transform(conus, eqdc)) +
+  geom_sf() + theme_linedraw() + coord_sf(datum = eqdc) +
+  labs(title = "Equidistant Conic", subtitle = "EQDC — preserves distance")
+
+gridExtra::grid.arrange(g1, g2, g3, nrow = 1)
+```
+
+## #1 Reproducibility Habit: Always Check CRS
+
+Before **any** spatial operation — joins, distance calculations, area calculations — verify CRS match:
+
+```{r}
+#| eval: false
+# Guard pattern: check before joining
+if (st_crs(gauges) != st_crs(flowlines)) {
+  flowlines <- st_transform(flowlines, st_crs(gauges))
+}
+
+# Or use the equality check
+st_crs(gauges) == st_crs(flowlines)  # must be TRUE
+```
+
+. . .
+
+**Real example**: NWIS gauges (WGS84, EPSG:4326) + NHD flowlines (NAD83, EPSG:4269):
+
+```{r}
+st_crs(4326) == st_crs(4269)    # FALSE — they are not the same!
+```
+
+They look similar (sub-meter differences in CONUS), but snapping a point to a line or computing a distance will be subtly wrong without transformation.
+
+::: callout-important
+`sf` will warn you about CRS mismatch but **won't stop you**. The result will execute and look plausible — but numbers will be wrong. Build the guard-check habit now.
+:::
+
+# Measurements {background-color="#1E4D2B"}
+
+## Geodesic vs. Planar Measurements
+
+**Geodesic distance**: shortest path between two points on an ellipsoid — independent of any projection. This is the true distance on Earth's surface.
+
+**Planar distance**: Euclidean distance computed in projected coordinates — fast but introduces error proportional to the area of analysis.
+
+```{r}
+pts <- data.frame(y = c(40.7128, 34.4208),
+                  x = c(-74.0060, -119.6982),
+                  name = c("NYC", "SB")) |>
+  st_as_sf(coords = c("x", "y"), crs = 4326)
+
+# Geodesic (great circle) — default when CRS is geographic
+st_distance(pts)                          # ~3,962 km (correct)
+
+# Projected planar — for comparison only
+st_distance(st_transform(pts, 5070))      # ~3,950 km (distorted by projection)
+```
+
+. . .
+
+::: callout-important
+**For water resources work: use geodesic (default)**. When your data is in geographic coordinates (WGS84, EPSG:4326), `st_distance()` automatically uses spherical/geodesic calculations. This is correct and required for continental scales.
+
+Use planar distance only for small local areas (< 50 km) where distortion becomes negligible.
+:::
+
+. . .
+
+::: callout-note
+`sf` defaults to **geodesic** calculations when data is in a geographic CRS (degrees). You can toggle S2 explicitly with `sf::sf_use_s2(TRUE)` or `sf::sf_use_s2(FALSE)`: enable S2 for accurate, fast geodesic operations on large-domain analyses (CONUS and continental scales); disable it for some local, planar operations where GEOS-based routines may be marginally faster but less geodesically precise.
+:::
+
+```{r}
+#| echo: false
+knitr::include_graphics("images/11-sf-geos-measures.png")
+```
+
+## Area and Length
+
+```{r}
+(l <- sum(st_length(conus)))
+(a <- sum(st_area(conus)))
+```
+
+. . .
+
+## Units as an S3 Class — Workflow
+
+Results carry **units** as an S3 class attribute — both powerful for correctness and a source of confusion in practice.
+
+```{r}
+class(st_length(conus))
+attributes(st_length(conus)) |> unlist()
+```
+
+## Units Workflow: Create → Convert → Drop
+
+Create units naturally from measurements, convert between units, then drop before plotting or filtering:
+
+Convert between units with the `units` package:
+
+```{r}
+units::set_units(l, "km")
+units::set_units(l, "mile")
+units::set_units(a, "ha")
+units::set_units(a, "km2")
+```
+
+. . .
+
+Strip units when needed for arithmetic or plotting:
+
+```{r}
+units::drop_units(sum(st_length(conus)))
+as.numeric(sum(st_length(conus)))
+```
+
+## Units Are a Class — Know the Rules
+
+Units enforce dimensional correctness but can surprise you:
+
+```{r}
+#| error: true
+st_length(conus) + 100   # can't add meters + unitless number
+filter(cities, dist_to_border < 160)  # may warn or fail
+```
+
+. . .
+
+The corrected patterns:
+
+```{r}
+#| eval: false
+# Create numeric version for filtering/plotting
+cities <- cities |>
+  mutate(dist_to_border_km = as.numeric(units::set_units(dist_to_border, "km")))
+
+# Now filter and plot safely
+cities |>
+  filter(dist_to_border_km < 160) |>
+  ggplot(aes(color = dist_to_border_km)) +
+  geom_sf()
+```
+
+# Getting Spatial Data into R {background-color="#1E4D2B"}
+
+## Two Essential Data Packages
+
+The lab uses two packages you will reach for constantly in water resources work:
+
+::: {.columns}
+::: {.column width="50%"}
+**`tigris`** — US Census Bureau TIGER/Line boundaries
+
+```{r}
+#| eval: false
+library(tigris)
+options(tigris_use_cache = TRUE)
+
+# State boundaries
+states(cb = TRUE, progress_bar = FALSE)
+
+# County boundaries
+counties(state = "CO", cb = TRUE, progress_bar = FALSE)
+```
+
+Returns `sf` objects directly. `cb = TRUE` gives simplified cartographic boundaries — faster for analysis.
+:::
+::: {.column width="50%"}
+**`rnaturalearth`** — country and continent boundaries
+
+```{r}
+#| eval: false
+library(rnaturalearth)
+
+ne_countries(scale = "medium", returnclass = "sf") |>
+  filter(admin %in% c("United States of America",
+                      "Canada", "Mexico"))
+```
+
+`returnclass = "sf"` returns an `sf` object directly. Filter on the `admin` column for specific countries.
+:::
+:::
+
+## Building `sf` from a CSV
+
+When coordinates are stored as numeric columns in a CSV — the most common format for point data from APIs, sensors, and databases — use `st_as_sf()`:
+
+```{r}
+#| eval: false
+cities <- read_csv("data/uscities.csv") |>
+  st_as_sf(coords = c("lng", "lat"),  # column names: X first, then Y
+           crs    = 4326)             # raw lat/lon is almost always WGS84
+```
+
+. . .
+
+Three things to always specify:
+
+1. `coords =` — column names in order X (longitude), Y (latitude)
+2. `crs =` — the CRS the raw numbers **are in** (not what you want them in)
+3. Then `st_transform()` to convert to your analysis CRS
+
+. . .
+
+Full pipeline:
+
+```{r}
+#| eval: false
+cities <- read_csv("data/uscities.csv") |>
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) |>
+  st_filter(st_union(states)) |>    # keep only points inside CONUS
+  st_transform(eqdc)                # reproject for distance analysis
+```
+
+## `st_filter()` — Spatial Subsetting
+
+`st_filter()` is the spatial equivalent of `dplyr::filter()` — it keeps only features that satisfy a spatial predicate (default: intersection):
+
+```{r}
+#| eval: false
+# Keep only cities inside CONUS states
+cities_conus <- cities |>
+  st_filter(st_union(states))
+```
+
+This is how you clip a point dataset to a polygon boundary — one of the most common operations in spatial data preparation.
+
+## End-to-End: CSV → Filtered → Transformed → Measured
+
+This is the complete workflow you will execute in Lab 2:
+
+```{r}
+#| eval: false
+# 1. Read CSV with coordinates
+cities <- read_csv("data/uscities.csv") |>
+  # 2. Build sf object — specify coords and their CRS
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) |>
+  # 3. Filter to CONUS (spatial predicate)
+  st_filter(tigris::states(cb = TRUE)) |>
+  # 4. Transform to equal-area CRS for measurements
+  st_transform(5070) |>
+  # 5. Compute distance to boundary and convert units
+  mutate(
+    dist_to_border_m = as.numeric(st_distance(., us_border)),
+    dist_to_border_km = dist_to_border_m / 1000
+  )
+```
+
+Key takeaways:
+- **Build sf**: CSV coordinates + CRS they're in + pipe to `st_as_sf()`
+- **Filter**: spatial operations work naturally with dplyr verbs
+- **Transform**: change CRS when needed for analysis properties (equal-area, equidistant, etc.)
+- **Measure**: convert units to numeric before filtering or plotting
+
+## `set_units()` with Distances
+
+The lab uses `set_units()` to convert and label distance results:
+
+```{r}
+#| eval: false
+cities <- cities |>
+  mutate(dist_to_border = set_units(st_distance(geometry, us_border), "km"))
+```
+
+::: callout-tip
+Remember: `set_units()` returns a units object. Convert to numeric before comparisons or filtering, e.g. `filter(cities, as.numeric(dist_to_border) < 160)` or create a numeric column with `dist_to_border_km <- as.numeric(set_units(dist_to_border, "km"))`.
+:::
+
+`st_distance()` returns distances in the units of the CRS — meters for projected systems. `set_units()` converts and labels:
+
+```{r}
+#| eval: false
+d <- st_distance(st_transform(pts, eqdc))
+d                               # meters, labeled [m]
+set_units(d, "km")              # km, still labeled
+as.numeric(set_units(d, "km"))  # numeric — drop units for plotting/filtering
+```
+
+. . .
+
+Always use `as.numeric()` before comparison operators:
+
+```{r}
+#| eval: false
+filter(cities, as.numeric(dist_to_border) < 160)  # correct
+filter(cities, dist_to_border < 160)               # may warn or fail
+```
+
+# Visualizing Spatial Data {background-color="#1E4D2B"}
+
+## `ggrepel`: Non-Overlapping Labels
+
+`ggrepel` solves label collision — essential any time you label points on a map:
+
+```{r}
+#| eval: false
+library(ggrepel)
+
+ggplot() +
+  geom_sf(data = big_cities) +
+  ggrepel::geom_label_repel(
+    data = big_cities,
+    aes(geometry = geometry, label = city),
+    stat = "sf_coordinates",  # extracts coordinates from sf geometry
+    size = 3
+  )
+```
+
+. . .
+
+`stat = "sf_coordinates"` is the key argument — it tells ggrepel to extract X/Y from the geometry column rather than expecting explicit `x` and `y` aesthetics. Without it, you get an error.
+
+## `gghighlight`: Emphasize a Subset
+
+`gghighlight` greys out features that do not meet a condition, keeping them as spatial context:
+
+```{r}
+#| eval: false
+library(gghighlight)
+
+ggplot() +
+  geom_sf(data = cities,
+          aes(color = as.numeric(dist_to_border)),
+          size = 0.3) +
+  gghighlight(as.numeric(dist_to_border) < 160) +
+  scale_color_gradient(low = "orange", high = "darkred") +
+  theme_void()
+```
+
+. . .
+
+Features outside the condition are rendered in grey at reduced opacity — they provide spatial context without competing visually with the highlighted subset. Works with any `geom_*` — points, lines, polygons.
+
+# Lab 2: Distances and Projections {background-color="#1E4D2B"}
+
+## Everything You've Learned Applied
+
+Lab 2 puts all these pieces together on real US cities data:
+
+**Your workflow:**
+
+1. Read US cities CSV with lat/lon coordinates
+2. Build `sf` object with `st_as_sf()`
+3. Filter to CONUS using `st_filter()` (spatial subset)
+4. Transform to equal-area CRS (EPSG:5070) for distance calculations
+5. Compute distance from each city to the nearest national border
+6. Identify which cities fall within 160 km of international/state borders
+7. Analyze the result: which states are "border-proximate" and why it matters for federal policy
+
+**Skills you'll use:**
+
+- Spatial data types and classes (`sf`, `sfc`, geometry types)
+- Coordinate systems and transformations (check CRS, transform to analysis CRS)
+- Distance measurements (geodesic by default, units handling)
+- Spatial subsetting (`st_filter()` as a spatial predicate)
+- Spatial visualization (`geom_sf()`, `ggrepel`, `gghighlight`)
+
+# Wrapping Up {background-color="#1E4D2B"}
+
+## What We Covered
+
+::: {.columns}
+::: {.column width="50%"}
+**Simple Features**
+
+- The ISO standard and its R implementation
+- The big 7 geometry types
+- sfg → sfc → sf class hierarchy
+- WKT / WKB encodings
+- Casting, combining, dissolving
+- Sticky geometry + `geom_sf()`
+
+**Coordinate Systems**
+
+- GCS: ellipsoid, geoid, datum
+- PCS: projection types and distortion
+- EPSG codes and `st_transform()`
+- Always check CRS before joining
+:::
+::: {.column width="50%"}
+**Measurements**
+
+- Geodesic vs. planar distance
+- `st_distance()`, `st_area()`, `st_length()`
+- Units as an S3 class — `set_units()`, `drop_units()`
+- Converting and dropping units
+
+**Data & Visualization**
+
+- `tigris` and `rnaturalearth` for boundary data
+- `st_as_sf()` from CSV coordinates
+- `st_filter()` for spatial subsetting
+- `ggrepel` for non-overlapping labels
+- `gghighlight` for subset emphasis
+
+**Key habits built today:**
+
+1. `st_is_valid()` on every dataset you read
+2. `st_crs(a) == st_crs(b)` before every spatial join
+3. Use equal-area CRS for areas, equidistant for distances
+4. `as.numeric()` before filtering on unit quantities
+:::
+:::
+
+## Before Next Class
+
+::: {.columns}
+::: {.column width="50%"}
+### Lab 2 is due next Wednesday
+
+> **Lab 2: Distances and Projections**
+
+You will apply everything from today — building `sf` objects from multiple sources, transforming CRS, computing distances to boundaries, and identifying features within threshold zones — to a national US cities dataset culminating in a real federal policy analysis.
+
+The `sf` verbs are the same `dplyr` verbs you already know. `tigris`, `rnaturalearth`, `ggrepel`, and `gghighlight` are now in your toolkit.
+
+### Next topic
+
+**Week 3: Spatial operations — predicates, joins, and the river network**
+:::
+::: {.column width="50%"}
+```{r}
+#| echo: false
+#| fig.align: center
+knitr::include_graphics("images/09-sf-model.png")
+```
+:::
+:::

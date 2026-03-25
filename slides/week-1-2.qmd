@@ -91,11 +91,7 @@ glimpse(gapminder)
 knitr::include_graphics('img/tidy-data.png')
 ```
 
-Three rules — every tidyverse tool assumes them:
-
-1. Each **variable** has its own column
-2. Each **observation** has its own row
-3. Each **value** has its own cell
+Tidy data follows three rules: each **variable** is a column, each **observation** is a row, each **value** is a cell. Every tidyverse tool assumes this shape.
 
 When your data doesn't conform, you fix the data — not the tools.
 
@@ -128,7 +124,11 @@ knitr::include_graphics('img/dplyr-part-of-tidyverse.png')
 
 :::
 
+---
+
 ## A Note on Subsetting
+
+Before we use these verbs, let's ground ourselves in base R subsetting — it's what dplyr builds on. Understanding the foundation makes the syntax sugar more transparent.
 
 You already know base R subsetting. Here's the vocabulary:
 
@@ -153,6 +153,33 @@ gapminder[19:70, ]   # ❌ not self-documenting, breaks if data changes
 
 Always subset by **condition** — it is explicit, readable, and robust.
 :::
+
+## Connection to SQL
+
+```{r}
+#| echo: false
+#| fig-align: center
+#| out.width: "75%"
+knitr::include_graphics('img/sql_example.png')
+```
+
+. . .
+
+You just learned the core concepts of SQL:
+
+- `filter()` = `WHERE`
+- `select()` = `SELECT`
+- `mutate()` = computed columns
+- `summarize()` + `group_by()` = `GROUP BY` + aggregate functions
+- `arrange()` = `ORDER BY`
+
+The grammar transfers directly. SQL is the language of databases; dplyr is the language of R data frames. They solve the same class of problems.
+
+---
+
+## Now Let's Apply Them
+
+Now let's walk through each verb with concrete examples. You'll see how they work in isolation, then how they compose into powerful pipelines.
 
 ## `filter()` — Keep Rows by Condition
 
@@ -184,6 +211,34 @@ filter(gapminder,
 `%in%` tests membership in a vector — much cleaner than chaining `|` (OR) conditions. You'll use it constantly with site numbers, HUC codes, and state names in water resources work.
 :::
 
+## How `filter()` Works: Boolean Vectors
+
+Under the hood, `filter()` creates a **boolean vector** (all TRUE or FALSE) and keeps only the rows where the condition is TRUE.
+
+```{r}
+# Create a boolean vector
+lifeExp_condition <- gapminder$lifeExp < 40
+
+# This is what filter() does internally
+gapminder[lifeExp_condition, ]  # base R subsetting with boolean vector
+```
+
+. . .
+
+Equivalent to:
+
+```{r}
+# Using filter()
+gapminder |>
+  filter(lifeExp < 40)
+```
+
+. . .
+
+::: callout-note
+`filter()` is cleaner and more readable, but it's doing exactly what base R subsetting does: keeping rows where the condition is TRUE, dropping rows where it's FALSE or NA.
+:::
+
 ## `select()` — Keep Columns by Name
 
 ```{r}
@@ -205,6 +260,54 @@ Drop a column with `!`:
 ```{r}
 select(gapminder, !continent)
 ```
+
+## `select()` — Base R Equivalence
+
+Under the hood, `select()` is doing column subsetting — the same operation as base R.
+
+```{r}
+#| eval: false
+# Base R column subsetting
+gapminder[, c("country", "lifeExp")]     # [rows, cols]
+gapminder[["lifeExp"]]                   # extract single column
+gapminder$lifeExp                        # $ shorthand
+```
+
+. . .
+
+**Using `select()`:**
+
+```{r}
+gapminder |>
+  select(country, lifeExp)
+```
+
+. . .
+
+::: callout-note
+`select()` is syntactic sugar on top of base R's column subsetting. It's more readable and composable with pipes.
+:::
+
+## `select()` Helpers — `tidyselect` Functions {.smaller}
+
+Beyond explicit column names, use **tidyselect** helpers to match columns by pattern:
+
+```{r}
+# Select columns starting with a pattern
+select(gapminder, starts_with("life"))
+
+# Select columns ending with a pattern
+select(gapminder, ends_with("pc"))
+
+# Select columns containing a substring
+select(gapminder, contains("pop"))
+```
+
+. . .
+
+::: callout-tip
+These patterns are especially useful for **water data** where columns follow naming conventions: `site_no`, `site_name`, `discharge_cfs`, `temp_c`. You'll select all temperature columns with `starts_with("temp_")`.
+:::
 
 ## The `|>` Pipe Operator
 
@@ -247,6 +350,18 @@ gapminder |>
   filter(country %in% c("United States", "Mexico"))
 ```
 
+## Combining Verbs
+
+The pipe lets you chain as many operations as needed:
+
+```{r}
+gapminder |>
+  select(year, country, gdpPercap) |>
+  filter(year == max(year)) |>
+  arrange(-gdpPercap) |>
+  mutate(rank = 1:n())
+```
+
 ## `mutate()` — Add New Columns
 
 `mutate()` adds new variables computed from existing ones. New variables are available immediately within the same `mutate()` call:
@@ -264,6 +379,83 @@ Set a column to `NULL` to remove it:
 gapminder |>
   mutate(gdp = pop * gdpPercap,
          gdpPercap = NULL)
+```
+
+## `mutate()` — Base R Equivalence
+
+Under the hood, `mutate()` is column assignment — the same operation as base R.
+
+```{r}
+#| eval: false
+# Base R column assignment
+gapminder$gdp <- gapminder$pop * gapminder$gdpPercap
+
+# Remove a column (assign to NULL)
+gapminder$gdpPercap <- NULL
+```
+
+. . .
+
+**Using `mutate()`:**
+
+```{r}
+gapminder |>
+  mutate(gdp = pop * gdpPercap,
+         gdpPercap = NULL)
+```
+
+. . .
+
+::: callout-note
+`mutate()` builds on base R assignment but allows you to chain operations with the pipe and reference newly created columns *within the same call*.
+:::
+
+## `transmute()` — Keep Only New Columns
+
+`transmute()` is like `mutate()`, but it **drops all other columns** — you're left with only what you explicitly create.
+
+```{r}
+# mutate() keeps everything
+gapminder |>
+  mutate(gdp = pop * gdpPercap) |>
+  head(2)
+```
+
+. . .
+
+```{r}
+# transmute() keeps only the new column
+gapminder |>
+  transmute(gdp = pop * gdpPercap) |>
+  head(2)
+```
+
+. . .
+
+::: callout-tip
+Use `transmute()` when you want to extract a subset of computed columns in one go — cleaner than `mutate()` followed by `select()`.
+:::
+
+## Conditional Mutations with `if_else()`
+
+When you need to compute values based on a condition, use `if_else()`:
+
+```{r}
+gapminder |>
+  filter(year == 2007) |>
+  mutate(income_level = if_else(gdpPercap > 10000, "high", "low")) |>
+  select(country, gdpPercap, income_level) |>
+  head(8)
+```
+
+. . .
+
+**In Lab 1 context**: Flag anomalies in streamflow:
+
+```{r}
+#| eval: false
+flow_data |>
+  mutate(is_low = if_else(discharge < quantile(discharge, 0.1), TRUE, FALSE))
 ```
 
 ## `summarize()` — Collapse to a Summary
@@ -297,18 +489,6 @@ Descending order with `-`:
 gapminder |>
   filter(year == 2007) |>
   arrange(-lifeExp)
-```
-
-## Combining Verbs
-
-The pipe lets you chain as many operations as needed:
-
-```{r}
-gapminder |>
-  select(year, country, gdpPercap) |>
-  filter(year == max(year)) |>
-  arrange(-gdpPercap) |>
-  mutate(rank = 1:n())
 ```
 
 ## `group_by()` + `summarize()` — Split-Apply-Combine
@@ -376,41 +556,17 @@ gapminder |>
 This is `dplyr` doing in 8 lines what would take 30+ lines of base R. The verbs compose — every operation is readable, every result is auditable.
 :::
 
-## Connection to SQL
-
-```{r}
-#| echo: false
-#| fig-align: center
-#| out.width: "75%"
-knitr::include_graphics('img/sql_example.png')
-```
-
-. . .
-
-You just learned the core concepts of SQL:
-
-- `filter()` = `WHERE`
-- `select()` = `SELECT`
-- `mutate()` = computed columns
-- `summarize()` + `group_by()` = `GROUP BY` + aggregate functions
-- `arrange()` = `ORDER BY`
-
-The grammar transfers directly. SQL is the language of databases; dplyr is the language of R data frames. They solve the same class of problems.
-
 # Part 2: Data Visualization {background-color="#1E4D2B"}
 
 ## Why Visualization?
-
-```{r}
-#| echo: false
-#| fig-align: center
-```
 
 Data without visualization is just numbers. Before building any model or writing any interpretation, plot your data. Always.
 
 . . .
 
-`ggplot2` is built on the **Grammar of Graphics** — the idea that every chart can be described by the same small set of components:
+`ggplot2` is built on a consistent grammar — the same recipe works for scatter plots, line charts, heatmaps, and beyond. This systematic grammar is what makes ggplot2 powerful: once you learn the components, you can build *any* visualization.
+
+The **Grammar of Graphics** says every chart is built from the same small set of components:
 
 1. **Data** — what are we visualizing?
 2. **Aesthetic mappings** — which variables map to which visual properties?
@@ -437,30 +593,20 @@ DATA |>
 Notice the switch from `|>` (pipe) to `+` (plus) when you enter `ggplot`. The pipe passes data into `ggplot()`; the plus adds layers *within* the plot. This is the most common source of syntax errors when learning ggplot.
 :::
 
-## Step 1: The Canvas
+## Building a Plot: Data → Aesthetics → Geom
+
+All ggplot2 plots follow the same structure: data + aesthetics (which variables to visual properties) + geometry (what shape).
 
 ```{r}
 gm2007 <- filter(gapminder, year == 2007)
 
-ggplot(data = gm2007)
-```
-
-## Step 1: Add Aesthetic Mappings
-
-```{r}
-ggplot(data = gm2007,
-       aes(x = gdpPercap, y = lifeExp))
-```
-
-Aesthetic mappings describe how variables in the data are **visualized**. Placed in `ggplot()`, they apply globally to all layers.
-
-## Step 2: Add a Geometry
-
-```{r}
-ggplot(data = gm2007,
-       aes(x = gdpPercap, y = lifeExp)) +
+ggplot(data = gm2007, aes(x = gdpPercap, y = lifeExp)) +
   geom_point()
 ```
+
+. . .
+
+**Key point**: Aesthetic mappings in `aes()` describe how variables are **visualized** — placed in `ggplot()`, they apply globally to all layers.
 
 ## Fixed vs. Data-Driven Aesthetics
 
@@ -934,6 +1080,137 @@ gapminder |>
   theme(legend.position = "none",
         axis.text.x = element_text(angle = 90, face = "bold"))
 ```
+
+# Quarto: Scientific Authoring for the Modern Era {background-color="#1E4D2B"}
+
+## What is Quarto?
+
+Quarto is the evolution of R Markdown — same authoring paradigm, modernized syntax and expanded scope:
+
+- **R Markdown** (2014–): Documents combining code + prose, renders to HTML/PDF/Word
+- **Quarto** (2022–): Same concept, better syntax, works with R, Python, Julia, Observable
+
+Everything you did in lab 0 still applies. Three things changed:
+
+1. **Code chunk options**: New YAML-style syntax
+2. **Callout blocks**: Native features, simpler markup
+3. **Rendering**: Universal command-line tool
+
+## Old vs. New: Chunk Options
+
+**R Markdown syntax:**
+
+```markdown
+`{r echo=FALSE, fig.width=6}`
+plot(1:10)
+`{}`
+```
+
+. . .
+
+**Quarto syntax:**
+
+```markdown
+`{r}`
+#| echo: false
+#| fig-width: 6
+plot(1:10)
+`{}`
+```
+
+. . .
+
+Quarto uses **YAML-style options** — one per `#|` line. Clearer, easier to scan.
+
+## Built-in Formatting: Callouts
+
+**Old way** (complicated divs):
+
+```markdown
+:::{.callout-note}
+This is a note.
+:::
+```
+
+**Quarto way** (same syntax, more types):
+
+```markdown
+:::{.callout-tip}
+This is a tip.
+:::
+```
+
+. . .
+
+Types: `callout-note`, `callout-tip`, `callout-warning`, `callout-important`, `callout-caution`
+
+We've been using these all along — now you know how to author them.
+
+## How to Render & Preview
+
+**Preview live** (auto-reload on save):
+
+```bash
+quarto preview slides/week-1-2.qmd
+```
+
+Output opens in your browser.
+
+. . .
+
+**Render to static HTML:**
+
+```bash
+quarto render slides/week-1-2.qmd
+```
+
+Output lands in `docs/` and is ready to share.
+
+. . .
+
+In RStudio: click **Render** button → preview in Viewer pane.
+
+## The Key Takeaway
+
+You will author and submit assignments in Quarto. The workflow:
+
+1. Header (YAML) → sets title, output format, theme
+2. Code chunks → execute, embed output, with `#|` options
+3. Callouts → highlight key points
+4. Prose → explains the data story
+
+This deck is a Quarto reveal.js presentation. Lab assignments are Quarto HTML documents. **Same tool, different output format.**
+
+## Project Configuration: _quarto.yml
+
+Every Quarto project has a `_quarto.yml` file that sets global defaults.
+
+Here's the one for this course:
+
+```yaml
+project:
+  type: website
+  
+website:
+  title: "ESS 523c: Environmental Data Science"
+  site-url: https://github.com/mikejohnson51/csu-ess-523c
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: labs/lab-01.qmd
+        text: Lab 1
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: false
+```
+
+. . .
+
+You won't edit this — I maintain it. But when you `quarto render`, it reads these defaults and applies them to every `.qmd` file in the project.
 
 # Connecting to Lab 1 {background-color="#1E4D2B"}
 
