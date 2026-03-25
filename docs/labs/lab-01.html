@@ -194,7 +194,7 @@ window.Quarto = {
   <li><a href="#q2" id="toc-q2" class="nav-link" data-scroll-target="#q2"><strong>Question 2</strong>: Basin Metadata Join</a>
   <ul class="collapse">
   <li><a href="#the-anatomy-of-a-join" id="toc-the-anatomy-of-a-join" class="nav-link" data-scroll-target="#the-anatomy-of-a-join">The anatomy of a join</a></li>
-  <li><a href="#graduate-expectations-applies-to-this-lab" id="toc-graduate-expectations-applies-to-this-lab" class="nav-link" data-scroll-target="#graduate-expectations-applies-to-this-lab">Graduate expectations (applies to this lab)</a></li>
+  <li><a href="#graduate-expectations" id="toc-graduate-expectations" class="nav-link" data-scroll-target="#graduate-expectations">Graduate expectations</a></li>
   </ul></li>
   <li><a href="#q3" id="toc-q3" class="nav-link" data-scroll-target="#q3"><strong>Question 3</strong>: Per-Unit-Area Normalization</a></li>
   <li><a href="#q4" id="toc-q4" class="nav-link" data-scroll-target="#q4"><strong>Question 4</strong>: Low-Flow Threshold Monitoring</a></li>
@@ -417,7 +417,7 @@ Introducing <code>flextable</code>
 <h2 class="anchored" data-anchor-id="the-anatomy-of-a-join">The anatomy of a join</h2>
 <p>Before writing a single <code>_join()</code> call, answer three questions:</p>
 <ol type="1">
-<li><strong>What is the key?</strong> Which column connects the two tables?</li>
+<li><strong>What is the key?</strong> Which column(s) connect the two tables?</li>
 <li><strong>What is the relationship?</strong> One-to-one, or one-to-many?</li>
 <li><strong>What happens to non-matching rows?</strong> Keep them (with NAs), or drop them?</li>
 </ol>
@@ -427,7 +427,7 @@ Introducing <code>flextable</code>
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-The four joins — and when to use each
+The (main) four joins — and when to use each
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -509,37 +509,7 @@ Keys: primary and foreign
 </div>
 </div>
 <p><strong>b.</strong> Join <code>site_meta</code> to your flow data using <code>site_no</code> as the key. Use the join type that keeps <strong>all flow records</strong> regardless of whether metadata is available.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># student: join metadata to flow records</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g., flow_meta &lt;- raw |&gt; left_join(site_meta, by = "site_no")</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># then run the verification checks below</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 <p><strong>c.</strong> Verify the join — this step is not optional:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 1: row count must be unchanged</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># FALSE means rows were gained (duplicate key) or lost (wrong join type)</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(flow_meta) <span class="sc">==</span> <span class="fu">nrow</span>(flow)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 2: no unexpected NAs in the joined column</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>flow_meta <span class="sc">|&gt;</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_total        =</span> <span class="fu">n</span>(),</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_missing_area =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(drain_area_va)),</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_complete   =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(<span class="sc">!</span><span class="fu">is.na</span>(drain_area_va)), <span class="dv">1</span>)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 3: spot-check a known value</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Lees Ferry (09380000) should have drain_area_va ≈ 111,800 mi²</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>flow_meta <span class="sc">|&gt;</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site_no <span class="sc">==</span> <span class="st">"09380000"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(site_no, name, drain_area_va)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -555,13 +525,13 @@ Always verify your joins — three checks, every time
 <li><code>sum(is.na(new_column)) == 0</code> — no unexpected NAs ✓</li>
 <li>Spot-check a known value — numbers are plausible ✓</li>
 </ol>
-<p>These checks cost 30 seconds and catch errors that would otherwise corrupt every downstream calculation silently. You will join data in every lab this semester. Build the habit now.</p>
+<p>These checks cost 30 seconds and catch errors that would otherwise corrupt every downstream calculation silently. You will join data in every lab this semester. Consider, building this habit now.</p>
 </div>
 </div>
 <hr>
 </section>
-<section id="graduate-expectations-applies-to-this-lab" class="level2">
-<h2 class="anchored" data-anchor-id="graduate-expectations-applies-to-this-lab">Graduate expectations (applies to this lab)</h2>
+<section id="graduate-expectations" class="level2">
+<h2 class="anchored" data-anchor-id="graduate-expectations">Graduate expectations</h2>
 <p>This course is at the graduate level. In addition to producing correct code and outputs, your submission should:</p>
 <ul>
 <li>Briefly justify methodological choices (e.g., window lengths, alignment for rolling statistics, normalization approaches, and model structure). A short 3–5 sentence justification is sufficient.</li>
@@ -569,28 +539,14 @@ Always verify your joins — three checks, every time
 <li>Report basic uncertainty/robustness: how sensitive are your central conclusions to small changes in preprocessing or parameter choices?</li>
 <li>Cite one relevant source (paper, USGS stat documentation, or authoritative report) if you reference an established hydrological statistic (e.g., 7Q10 logic) or external dataset.</li>
 </ul>
-<p>TA guidance: award partial credit within existing rubric for evidence of methodological justification and sensitivity checks even when minor numeric differences exist — the goal at this level is defensible, reproducible analysis, not only exact matches.</p>
 <hr>
 </section>
 </section>
 <section id="q3" class="level1">
 <h1><strong>Question 3</strong>: Per-Unit-Area Normalization</h1>
 <p>Lees Ferry’s high discharge reflects its enormous watershed, not necessarily more intense rainfall or runoff. To compare <strong>runoff intensity</strong> across sites with different drainage areas, we normalize by expressing flow per unit area: cfs per square mile.</p>
-<p><strong>a.</strong> Add a <code>flow_per_sqmi</code> column: <code>flow_per_sqmi = Flow / drain_area_va</code>.</p>
+<p><strong>a.</strong> Add a <code>flow_per_sqmi</code> column to your data.frame.</p>
 <p><strong>b.</strong> On <code>my.date</code>, build a flextable showing <strong>both raw and normalized rankings</strong> side by side for all 7 gauges. Include columns for gauge name, raw discharge (cfs), drainage area (mi²), normalized flow (cfs/mi²), raw rank, and normalized rank. Sort by raw rank.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><code>rank(-Flow)</code> gives rank 1 to the highest flow (the negative sign reverses the default ascending order). Create both rank columns before passing to <code>flextable()</code>: Hint: create ranking columns with <code>rank()</code> (e.g., <code>raw_rank = rank(-Flow)</code> and <code>norm_rank = rank(-flow_per_sqmi)</code>) before rendering tables.</p>
-</div>
-</div>
 <p><strong>c.</strong> Answer in 2–3 sentences: (1) do the raw and normalized rankings differ, and if so, which gauge changes most dramatically? (2) Why does per-area normalization matter for comparing gauges in the Colorado Basin? (3) Name one analysis where you would use raw discharge and one where you would use normalized discharge.</p>
 <blockquote class="blockquote">
 <p>…</p>
@@ -613,10 +569,10 @@ Note
 <p>The USGS computes official low-flow statistics — including the 7Q10 — and makes them accessible via <code>dataRetrieval::readNWISstat()</code>. The thresholds you compute here will closely approximate those official values and follow the same logic water rights lawyers and regulators actually use.</p>
 </div>
 </div>
-<p><strong>a.</strong> For each gauge, compute the <strong>7-day rolling mean</strong> of daily discharge. Use <code>zoo::rollmean()</code> with <code>fill = NA</code> and <code>align = "right"</code> so each value represents the average of the current and 6 preceding days.</p>
+<p><strong>a.</strong> For each gauge, compute the <strong>7-day rolling mean</strong> of daily discharge. Use <code>zoo::rollmean()</code> with <code>fill = NA</code> and <code>align = "right"</code> so each value represents the average of the current and 6 preceding days. If you havent see this function before, check out the documentation (<code>?rollmean</code>) and examples to understand how it works.</p>
 <p><strong>b.</strong> Define a <strong>low-flow threshold</strong> for each gauge as the 10th percentile of its historical discharge during <strong>1980–2010</strong>. A flow that is critically low for Lees Ferry might be above average for the Little Colorado — thresholds must be site-specific.</p>
 <p><strong>c.</strong> Add a logical column <code>below_threshold</code> that is <code>TRUE</code> when the 7-day rolling mean is below the gauge’s 10th percentile threshold.</p>
-<p><strong>d.</strong> For <strong>Lees Ferry</strong> (site <code>09380000</code>) — the Compact’s primary accounting point — plot the 7-day rolling mean from 2000–2023. Shade periods below threshold in red and add a dashed horizontal reference line at the threshold.</p>
+<p><strong>d.</strong> For <strong>Lees Ferry</strong> (site <code>09380000</code>) — the Compact’s primary accounting point — plot the 7-day rolling mean from 2000–2023 using <code>ggplot</code>. Shade periods below threshold in red and add a dashed horizontal reference line at the threshold.</p>
 <p><strong>e.</strong> How many days per year, on average, did Lees Ferry fall below its low-flow threshold in <strong>2000–2010</strong> vs.&nbsp;<strong>2011–2023</strong>? Produce a small summary table and answer in 2–3 sentences: (1) did below-threshold days increase or decrease? (2) Is this a shift in isolated dry years or a persistent baseline change? (3) What does this imply for Compact delivery obligations?</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -650,10 +606,10 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Use <code>if_else()</code> to set <code>water_year</code> for Oct–Dec months as taught in lecture.</p>
+<p>Use <code>if_else()</code> to set <code>water_year</code> for Oct–Dec months.</p>
 </div>
 </div>
-<p><strong>b.</strong> For each gauge and water year, compute: total annual discharge (<code>sum(Flow)</code>), peak daily discharge (<code>max(Flow)</code>), and number of days below the low-flow threshold (<code>sum(below_threshold)</code>).</p>
+<p><strong>b.</strong> For each gauge and water year, compute: total annual discharge, peak daily discharge, and number of days below the low-flow threshold.</p>
 <p><strong>c.</strong> Plot <strong>total annual discharge at Lees Ferry</strong> by water year (1980–2023) as a bar chart. Color bars above the long-term median blue and bars below it red. Add a dashed horizontal reference line at the median.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -705,8 +661,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>geom_tile()</code> draws one rectangle per gauge-year. For the color scale:</p>
-<p>Hint: use a diverging color scale centered at zero (e.g., RdBu), clamp extreme values with <code>oob = scales::squish</code>, and wrap long gauge names to keep labels readable.</p>
+<p><code>geom_tile()</code> draws one rectangle per gauge-year. For the color scale, use a diverging color scale centered at zero (e.g., RdBu), clamp extreme values with <code>oob = scales::squish</code>, and wrap long gauge names to keep labels readable.</p>
 </div>
 </div>
 <p><strong>c.</strong> In 3–4 sentences: (1) describe whether the post-2000 drought signal appears across all gauges or only some, (2) identify two specific years that appear as basin-wide anomalies — one dry, one wet — and name the climate event that caused each, and (3) explain what simultaneous basin-wide anomalies tell you that a single-gauge record cannot.</p>
@@ -717,7 +672,7 @@ Tip
 </section>
 <section id="q7" class="level1">
 <h1><strong>Question 7</strong>: The Moving Center of Drought</h1>
-<p>You have been asked to understand how the <em>geographic locus</em> of streamflow has shifted over time. If drought has disproportionately reduced flow in the southern tributaries, the flow-weighted center of the basin should drift north — proportionally more flow is coming from northern headwater gauges. In exceptional snowmelt years it should shift back.</p>
+<p>You have been asked to understand how the <em>geographic center</em> of streamflow has shifted over time. If drought has disproportionately reduced flow in the southern tributaries, the flow-weighted center of the basin should drift north — proportionally more flow is coming from northern headwater gauges. In exceptional snowmelt years it should shift back.</p>
 <p>We measure this with the <strong>flow-weighted mean position</strong>: each gauge’s coordinates are weighted by its fraction of total annual basin flow.</p>
 <p><span class="math display">\[\bar{X}_{year} = \frac{\sum (lon_i \times Q_i)}{\sum Q_i} \qquad \bar{Y}_{year} = \frac{\sum (lat_i \times Q_i)}{\sum Q_i}\]</span></p>
 <p><strong>a.</strong> Join gauge coordinates (<code>dec_lat_va</code>, <code>dec_long_va</code>) from <code>site_meta</code> to your annual summary. Compute the flow-weighted mean latitude and longitude for each water year.</p>
@@ -734,18 +689,7 @@ Tip
 <p>Hint: join coordinates from <code>site_meta</code> to the annual table, then compute weighted longitude/latitude per year as sum(coord * total_flow) / sum(total_flow). This is your third join — verify row counts, NAs, and spot-check known values.</p>
 </div>
 </div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># student: join coordinates</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g., annual |&gt; left_join(site_meta |&gt; select(site_no, dec_lat_va, dec_long_va), by = "site_no")</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify the join</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># nrow(result) == nrow(annual)?</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># sum(is.na(result$dec_lat_va)) == 0?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<p>Note: mapping below uses <code>map_data("state")</code>; if <code>map_data()</code> is not available install the <code>maps</code> package (<code>install.packages("maps")</code>) or use <code>ggplot2::map_data("state")</code> which provides equivalent polygons.</p>
+<p>Note: mapping can use <code>map_data("state")</code>; if <code>map_data()</code> is not available install the <code>maps</code> package (<code>install.packages("maps")</code>) or use <code>ggplot2::map_data("state")</code> which provides equivalent polygons.</p>
 <p><strong>b.</strong> Create a two-panel figure using <code>patchwork</code>:</p>
 <ul>
 <li><strong>Left</strong>: western US base map with the weighted center plotted as points colored by water year (blue = early, red = recent) and connected by a path through time</li>
@@ -762,6 +706,7 @@ Tip
 </div>
 <div class="callout-body-container callout-body">
 <p>Hint: draw a western-US polygon basemap and overlay the annual weighted centers as a colored path and points; beside it, plot weighted latitude over time with a linear trend. Use a diverging color gradient for year progression and <code>patchwork</code> to combine panels.</p>
+<p>If you haven’t seen patchwork before, it allows you to combine multiple ggplots into a single figure with simple syntax: <code>plot1 + plot2</code> places them side by side; <code>plot1 / plot2</code> stacks them vertically assuming the package is loaded.</p>
 </div>
 </div>
 <p><strong>c.</strong> Your latitude time series should show two years where the weighted center spikes dramatically northward. Identify those two years and explain: (1) what climate event caused each spike, (2) what they have in common physically, and (3) what the long-term upward trend in weighted latitude suggests about which part of the basin is becoming proportionally more important to total flow — and why that matters for water managers downstream.</p>
@@ -773,7 +718,7 @@ Tip
 <section id="q8" class="level1">
 <h1><strong>Question 8</strong>: Seasonal Regimes and Peak Timing</h1>
 <p>Annual totals mask important seasonal structure. The Colorado Basin has two distinct runoff pulses: a <strong>snowmelt</strong> surge in spring (April–June) driven by Rocky Mountain headwater snowpack, and a <strong>monsoon</strong> pulse in late summer (July–September) driven by convective storms across the Arizona-New Mexico plateau. These seasons respond differently to climate forcing — and under warming, the snowmelt season is arriving earlier.</p>
-<p><strong>a.</strong> Add a <code>season</code> column using <code>case_when()</code>:</p>
+<p><strong>a.</strong> Add a <code>season</code> column using <code>case_when()</code>. Roughly we will define the seasons as follows:</p>
 <ul>
 <li><strong>Snowmelt</strong>: April–June (months 4–6)</li>
 <li><strong>Monsoon</strong>: July–September (months 7–9)</li>
@@ -791,20 +736,20 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Hint: extract <code>month</code> from <code>Date</code> with <code>month()</code>, create <code>season</code> with <code>case_when()</code> mapping month ranges to labels, then convert to a factor with explicit level ordering:</p>
+<p>Hint: extract <code>month</code> from <code>Date</code> with <code>lubridate::month()</code>, create <code>season</code> with <code>case_when()</code> mapping month ranges to labels, then convert to a factor with explicit level ordering:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>data <span class="sc">|&gt;</span> <span class="fu">mutate</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">month =</span> <span class="fu">month</span>(Date),</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">case_when</span>(...),</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">factor</span>(season, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Snowmelt'</span>, <span class="st">'Monsoon'</span>, <span class="st">'Low-flow'</span>, <span class="st">'Winter'</span>))</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>data <span class="sc">|&gt;</span> <span class="fu">mutate</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">month =</span> <span class="fu">month</span>(Date),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">case_when</span>(...),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> <span class="fu">factor</span>(season, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Snowmelt'</span>, <span class="st">'Monsoon'</span>, <span class="st">'Low-flow'</span>, <span class="st">'Winter'</span>))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
 </div>
-<p><strong>b.</strong> Group by gauge, water year, and season. Summarize total seasonal discharge and normalized runoff (<code>sum(flow_per_sqmi)</code>) per group.</p>
+<p><strong>b.</strong> Group by gauge, water year, and season. Summarize total seasonal discharge and normalized runoff per group.</p>
 <p><strong>c.</strong> For each gauge and water year, identify the <strong>date of peak 7-day mean flow</strong> and convert it to day-of-year. Plot peak day-of-year vs.&nbsp;water year for <strong>Lees Ferry</strong> with a linear trend line.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -816,7 +761,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>slice_max(roll7, n = 1, with_ties = FALSE)</code> inside a <code>group_by(site_no, water_year)</code> block selects the single highest 7-day mean row per gauge per year. Then <code>yday(Date)</code> converts to day-of-year (1–365).</p>
+<p><code>slice_max(roll7, n = 1, with_ties = FALSE)</code> inside a <code>group_by(site_no, water_year)</code> block selects the single highest 7-day mean row per gauge per year. Then <code>lubridate::yday(Date)</code> converts to day-of-year (1–365).</p>
 </div>
 </div>
 <p><strong>d.</strong> In 2–3 sentences: (1) describe the direction and magnitude of the peak timing trend, (2) is it statistically visible or buried in noise? (3) What would a two-week earlier peak timing mean operationally for reservoir managers trying to capture spring runoff before it passes downstream?</p>
@@ -828,14 +773,14 @@ Tip
 <section id="q9" class="level1">
 <h1><strong>Question 9</strong>: Predicting Lees Ferry from Upstream Conditions</h1>
 <p>Lees Ferry is the <strong>Compact’s accounting point</strong> — the location where upper basin states must deliver flow to lower basin states. Predicting annual discharge at Lees Ferry from upstream conditions has direct operational value: managers can begin planning deliveries months before the water arrives.</p>
-<p>We’ll build a simple but physically grounded model: can Glenwood Springs (an upper Rocky Mountain gauge) predict Lees Ferry annual flow? Does that relationship change by season?</p>
+<p>We’ll build a simple but physically grounded model: can Glenwood Springs (an upper Rocky Mountain gauge) predict Lees Ferry annual flow, and, does that relationship change by season?</p>
 <section id="data-preparation" class="level2">
 <h2 class="anchored" data-anchor-id="data-preparation">Data Preparation</h2>
 <p><strong>a.</strong> Build your model dataset through four sequential operations:</p>
 <ol type="1">
 <li>Filter <code>annual</code> to Lees Ferry; rename <code>total_flow</code> to <code>lees_flow</code></li>
 <li>Join annual Glenwood Springs flow (site <code>09085000</code>); rename to <code>glenwood_flow</code></li>
-<li>Join the <strong>dominant season</strong> at Lees Ferry per water year — the season with the highest total discharge</li>
+<li>Join the <strong>dominant season</strong> at Lees Ferry per water year, the season with the highest total discharge</li>
 <li>Log-transform both flow variables</li>
 </ol>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -851,34 +796,17 @@ Tip
 <p>The dominant season: within each water year, which season (Snowmelt, Monsoon, Low-flow, Winter) carried the most flow at Lees Ferry? Filter seasonal summaries to Lees Ferry, then <code>group_by(water_year) |&gt; slice_max(total_flow, n = 1)</code> to select one season per year.</p>
 <p>Then join that back to your Lees Ferry &amp; Glenwood annual table by <code>water_year</code>.</p>
 <p>This is your fourth join. <strong>Always verify</strong>: the final dataset should have ~44 rows (one per water year, 1980–2023), zero NAs in flow columns, and log-transformed values should be positive.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>lees_model_data <span class="ot">&lt;-</span> annual <span class="sc">|&gt;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site_no <span class="sc">==</span> <span class="st">"09380000"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">lees_flow =</span> total_flow) <span class="sc">|&gt;</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(annual <span class="sc">|&gt;</span> <span class="fu">filter</span>(site_no <span class="sc">==</span> <span class="st">"09085000"</span>) <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">glenwood_flow =</span> total_flow),</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">"water_year"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dominant_season, <span class="at">by =</span> <span class="st">"water_year"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_lees =</span> <span class="fu">log</span>(lees_flow),</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">log_glenwood =</span> <span class="fu">log</span>(glenwood_flow))</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify: 44 rows? No NAs in log columns?</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(lees_model_data)</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(lees_model_data<span class="sc">$</span>log_lees))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 </div>
 </div>
 </section>
 <section id="model-building" class="level2">
 <h2 class="anchored" data-anchor-id="model-building">Model Building</h2>
-<p><strong>b.</strong> Fit a linear model predicting <code>log_lees</code> from <code>log_glenwood</code>, <code>season</code>, and their interaction:</p>
+<p><strong>b.</strong> Fit a linear model predicting <code>log_lees</code> from <code>log_glenwood</code>, <code>season</code>, and their interaction, If you haven’t seen linear modeling in R, we will cover it in more detail latter in this course, but, the syntax is straightforward: <code>lm(response ~ predictor1 * predictor2, data = mydata)</code> fits a model with main effects and an interaction term. The interaction (<code>*</code>) allows the relationship between Glenwood and Lees to differ by season while a model without interaction (<code>lm(log_lees ~ log_glenwood + season)</code>) would assume the same Glenwood-Lees relationship in every season.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(log_lees <span class="sc">~</span> log_glenwood <span class="sc">*</span> season, <span class="at">data =</span> lees_model_data)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(log_lees <span class="sc">~</span> log_glenwood <span class="sc">*</span> season, <span class="at">data =</span> lees_model_data)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p><strong>c.</strong> In 3–4 sentences: (1) report the R² and state whether the overall model is statistically significant, (2) interpret the <code>log_glenwood</code> coefficient as an elasticity — what does it mean physically that the coefficient is greater than 1? (3) describe what the significant negative interaction terms tell you about the upstream-downstream relationship outside of Snowmelt season.</p>
@@ -908,7 +836,7 @@ Tip
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>aug <span class="ot">&lt;-</span> <span class="fu">augment</span>(mod, <span class="at">data =</span> lees_model_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>aug <span class="ot">&lt;-</span> <span class="fu">augment</span>(mod, <span class="at">data =</span> lees_model_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -945,7 +873,7 @@ Tip
 </div>
 </div>
 <p><strong>c.</strong> Plot a <strong>histogram of the residuals</strong> with a vertical dashed line at zero.</p>
-<p><strong>d.</strong> In 3–4 sentences: (1) identify the outlier water year visible in your scatter plot — which year is it and why did the model fail to predict it? (2) Do the residuals appear approximately normal, or is there a tail that concerns you? (3) Name two additional predictors that would most improve this model and explain the physical mechanism behind each.</p>
+<p><strong>d.</strong> In 3–4 sentences: (1) identify the outlier water year visible in your scatter plot. Which year is it and why did the model fail to predict it? (2) Do the residuals appear approximately normal, or is there a tail that concerns you? (3) Name two additional predictors that would most improve this model and explain the physical mechanism behind each.</p>
 <blockquote class="blockquote">
 <p>…</p>
 </blockquote>
@@ -953,8 +881,8 @@ Tip
 </section>
 <section id="going-further-ungraded" class="level1">
 <h1>Going Further (ungraded)</h1>
-<p>The model in Q9 predicts Lees Ferry from a single upstream gauge. <code>dataRetrieval</code> gives you access to hundreds more across the basin — and to SNOTEL snow water equivalent data, streamflow statistics, and groundwater levels. Could a multi-gauge ensemble prediction outperform the single-gauge model? Could peak SWE in March predict the following June’s flow at Lees Ferry months before snowmelt begins?</p>
-<p>These are real operational forecasting questions that USBR and state water agencies work on every year. The data is already in your hands.</p>
+<p>The model in Q9 predicts Lees Ferry from a single upstream gauge. <code>dataRetrieval</code> gives you access to hundreds more across the basin. Could a multi-gauge ensemble prediction outperform the single-gauge model? Could peak flows in March predict the following June’s flow at Lees Ferry months before snowmelt begins?</p>
+<p>These are real operational forecasting questions that USBR and state water agencies work on every year. The data is already in your hands to try!</p>
 <hr>
 </section>
 <section id="summary" class="level1">
@@ -970,8 +898,7 @@ Tip
 <li><strong>Modeled</strong> the upstream-downstream relationship at the Compact’s accounting point</li>
 <li><strong>Evaluated</strong> model assumptions and identified the outlier year the model couldn’t predict</li>
 </ul>
-<p>Every tool — <code>dplyr</code>, <code>ggplot2</code>, <code>zoo</code>, <code>patchwork</code>, <code>broom</code>, <code>flextable</code> — recurs in every lab ahead. The workflow is always the same: get → tidy → explore → model → communicate.</p>
-<p><strong>Next week</strong> you will bring spatial geometry into this pipeline — moving from time series at point locations to vector features, watershed boundaries, and the river network itself. The wrangling skills you practiced today carry forward directly.</p>
+<p>Every tool — <code>dplyr</code>, <code>ggplot2</code>, <code>zoo</code>, <code>patchwork</code>, <code>broom</code>, <code>flextable</code> — recurs in work you will inevitabbly do. The key is that the workflow is always the same: get → tidy → explore → model → communicate.</p>
 <hr>
 </section>
 <section id="rubric" class="level1">
