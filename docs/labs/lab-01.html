@@ -317,11 +317,11 @@ Note
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>site_no,     <span class="sc">~</span>name,                           <span class="sc">~</span>state,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09380000"</span>,   <span class="st">"Colorado R at Lees Ferry"</span>,      <span class="st">"AZ"</span>,</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09163500"</span>,   <span class="st">"Colorado R near CO-UT border"</span>,  <span class="st">"CO"</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09085000"</span>,   <span class="st">"Colorado R at Glenwood Springs"</span>,<span class="st">"CO"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09085000"</span>,   <span class="st">"Roaring Fork at Glenwood Springs"</span>,<span class="st">"CO"</span>,</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09306500"</span>,   <span class="st">"White R near Watson"</span>,           <span class="st">"UT"</span>,</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09379500"</span>,   <span class="st">"San Juan R near Bluff"</span>,         <span class="st">"UT"</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09402500"</span>,   <span class="st">"Little Colorado R near Cameron"</span>,<span class="st">"AZ"</span>,</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09423000"</span>,   <span class="st">"Colorado R below Hoover Dam"</span>,   <span class="st">"NV"</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09402500"</span>,   <span class="st">"Colorado River near Grand Canyon"</span>,<span class="st">"AZ"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"09423000"</span>,   <span class="st">"Colorado R near Davis Dam"</span>,   <span class="st">"NV"</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(</span>
@@ -337,10 +337,10 @@ Note
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Rows: 109,435
+<pre><code>Rows: 109,428
 Columns: 5
 $ site_no &lt;chr&gt; "09085000", "09085000", "09085000", "09085000", "09085000", "0…
-$ name    &lt;chr&gt; "Colorado R at Glenwood Springs", "Colorado R at Glenwood Spri…
+$ name    &lt;chr&gt; "Roaring Fork at Glenwood Springs", "Roaring Fork at Glenwood …
 $ state   &lt;chr&gt; "CO", "CO", "CO", "CO", "CO", "CO", "CO", "CO", "CO", "CO", "C…
 $ Date    &lt;date&gt; 1980-01-01, 1980-01-02, 1980-01-03, 1980-01-04, 1980-01-05, 1…
 $ Flow    &lt;dbl&gt; 620, 605, 582, 582, 575, 590, 582, 582, 582, 590, 560, 598, 59…</code></pre>
@@ -779,7 +779,7 @@ Tip
 <p><strong>a.</strong> Build your model dataset through four sequential operations:</p>
 <ol type="1">
 <li>Filter <code>annual</code> to Lees Ferry; rename <code>total_flow</code> to <code>lees_flow</code></li>
-<li>Join annual Glenwood Springs flow (site <code>09085000</code>); rename to <code>glenwood_flow</code></li>
+<li>Join annual Roaring Fork flow (site <code>09085000</code>); rename to <code>glenwood_flow</code></li>
 <li>Join the <strong>dominant season</strong> at Lees Ferry per water year, the season with the highest total discharge</li>
 <li>Log-transform both flow variables</li>
 </ol>

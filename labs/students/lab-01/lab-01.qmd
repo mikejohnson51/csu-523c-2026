@@ -99,11 +99,11 @@ gauges <- tribble(
   ~site_no,     ~name,                           ~state,
   "09380000",   "Colorado R at Lees Ferry",      "AZ",
   "09163500",   "Colorado R near CO-UT border",  "CO",
-  "09085000",   "Colorado R at Glenwood Springs","CO",
+  "09085000",   "Roaring Fork at Glenwood Springs","CO",
   "09306500",   "White R near Watson",           "UT",
   "09379500",   "San Juan R near Bluff",         "UT",
-  "09402500",   "Little Colorado R near Cameron","AZ",
-  "09423000",   "Colorado R below Hoover Dam",   "NV"
+  "09402500",   "Colorado River near Grand Canyon","AZ",
+  "09423000",   "Colorado R near Davis Dam",   "NV"
 )
 
 raw <- readNWISdv(
