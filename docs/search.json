@@ -613,7 +613,7 @@
     "href": "index.html#about-this-course",
     "title": "ESS 523c: Environmental Data Science Applications",
     "section": "About This Course",
-    "text": "About This Course\nThis course focuses on analyzing and understanding water resources through the lens of modern data science. Building on the foundational R skills from ESS/WR 523a, we examine key innovations in data science, geospatial processing and machine learning for hydrological prediction and model parameterization — with an emphasis using real data.\nEvery dataset, every example, and every lab draws from systems you will encounter in professional practice. The course is organized around a single professional question: what does it take to turn raw environmental data into a reproducible, publishable result that informs real decisions? Each week answers a piece of that question with a different class of data and methods — from spatial analysis through to machine learning workflows applied directly to hydrological problems.\nBy the end of the course you will have built a public portfolio of six published analyses spanning data wrangling, vector data, raster data, machine learning, and time series — using the same data infrastructure that federal agencies and consulting firms use operationally.\n\n\n\n\n\n\nOpen Science\n\n\n\nAll course materials — slides, labs, and code — are open source under the Apache 2.0 license and built with Quarto. If you find something that could be improved, please submit an issue on the course GitHub repository.\n\n\n\n📋 Grading\n\n\n\nComponent\nCount\nPoints Each\nTotal\n\n\n\n\nLabs\n7\n950\n950\n\n\nFinal Project (optional)\n1\n150 EC\n+150\n\n\nTotal (required)\n\n\n950\n\n\n\nGrade scale (percentage of 950 required points): A+ ≥ 96.67% · A ≥ 93.33% · A– ≥ 90% · B+ ≥ 86.67% · B ≥ 83.33% · B– ≥ 80% · C+ ≥ 76.67% · C ≥ 70% · D ≥ 60% · F &lt; 60%\nLabs - with the exception of Lab 0 - are assigned on Wednesdays and due the following Wednesday before class. All submissions are deployed as GitHub Pages. Collaboration on concepts is encouraged; code, writing, and results must be individually produced.\n\n📅 Schedule\n\n\n\n  \n    Week 1\n    Data Science Tools & Digital Environment\n  \n  \n    \n      🎓\n      Lecture\n      Day 1: Digital Environment — Files, Paths, URLs & Git\n      complete\n    \n    \n      📝\n      HW\n      Lab 0: Verify Your Environment + Meet Your Tools\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Day 2: Data Manipulation, Visualization & Relational Data\n      new\n    \n    \n      🔬\n      Lab\n      Lab 1: Streamflow Across the Colorado River Basin\n      new"
+    "text": "About This Course\nThis course focuses on analyzing and understanding water resources through the lens of modern data science. Building on the foundational R skills from ESS/WR 523a, we examine key innovations in data science, geospatial processing and machine learning for hydrological prediction and model parameterization — with an emphasis using real data.\nEvery dataset, every example, and every lab draws from systems you will encounter in professional practice. The course is organized around a single professional question: what does it take to turn raw environmental data into a reproducible, publishable result that informs real decisions? Each week answers a piece of that question with a different class of data and methods — from spatial analysis through to machine learning workflows applied directly to hydrological problems.\nBy the end of the course you will have built a public portfolio of six published analyses spanning data wrangling, vector data, raster data, machine learning, and time series — using the same data infrastructure that federal agencies and consulting firms use operationally.\n\n\n\n\n\n\nOpen Science\n\n\n\nAll course materials — slides, labs, and code — are open source under the Apache 2.0 license and built with Quarto. If you find something that could be improved, please submit an issue on the course GitHub repository.\n\n\n\n📋 Grading\n\n\n\nComponent\nCount\nPoints Each\nTotal\n\n\n\n\nLabs\n7\n950\n950\n\n\nFinal Project (optional)\n1\n150 EC\n+150\n\n\nTotal (required)\n\n\n950\n\n\n\nGrade scale (percentage of 950 required points): A+ ≥ 96.67% · A ≥ 93.33% · A– ≥ 90% · B+ ≥ 86.67% · B ≥ 83.33% · B– ≥ 80% · C+ ≥ 76.67% · C ≥ 70% · D ≥ 60% · F &lt; 60%\nLabs - with the exception of Lab 0 - are assigned on Wednesdays and due the following Wednesday before class. All submissions are deployed as GitHub Pages. Collaboration on concepts is encouraged; code, writing, and results must be individually produced.\n\n📅 Schedule\n\n\n\n  \n    Week 1\n    Data Science Tools & Digital Environment\n  \n  \n    \n      🎓\n      Lecture\n      Day 1: Digital Environment — Files, Paths, URLs & Git\n      complete\n    \n    \n      📝\n      HW\n      Lab 0: Verify Your Environment + Meet Your Tools\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Day 2: Data Manipulation, Visualization & Relational Data\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 1: Streamflow Across the Colorado River Basin\n      Due 4/1/26\n    \n  \n\n\n\n  \n    Week 2\n    Vector Data — Features, Projections & Measures\n  \n  \n    \n      🎓\n      Lecture\n      Spatial Data: Simple Features, CRS & Measurements\n      new\n    \n    \n      ⚙️\n      Tech Talk\n      Spatial Predicates & Filtering\n      coming\n    \n    \n      🔬\n      Lab\n      Lab 2: Measuring Distance to CONUS Borders\n      coming\n    \n  \n\n\n\n  Reuse and licensing: Unless otherwise noted, all course materials are licensed under\n  Apache 2.0.\n  Slides, labs, and code are built with Quarto.\n  Found something that needs fixing?\n  Submit an issue on GitHub."
   },
   {
     "objectID": "slides/week-1-1.html#search-programmatically",
@@ -2084,5 +2084,775 @@
     "title": "Week 1 | Day 2",
     "section": "Pivot Within a Pipeline",
     "text": "Pivot Within a Pipeline\n\n\n\ngapminder |&gt;\n  filter(country %in% c(\"Canada\", \"United States\")) |&gt;\n  select(country, year, lifeExp, gdpPercap) |&gt;\n  pivot_longer(cols = c(lifeExp, gdpPercap),\n               names_to  = \"metric\",\n               values_to = \"value\") |&gt;\n  ggplot(aes(x = year, y = value)) +\n  geom_line(color = \"gray80\") +\n  geom_point(aes(color = country)) +\n  facet_grid(metric ~ country, scales = \"free_y\") +\n  labs(x = \"\", y = \"\",\n       title    = \"North America: GDP & Life Expectancy\",\n       subtitle = \"1950–2007\",\n       caption  = \"Data: Gapminder R package\") +\n  theme_linedraw() +\n  theme(legend.position = \"none\",\n        axis.text.x = element_text(angle = 90, face = \"bold\"))\n\n\n\n\n\n\n\n\n\n\n\n\nThe real power: wrangling shape and visualization in one chain:"
+  },
+  {
+    "objectID": "slides/week-2-1.html#from-tabular-to-spatial",
+    "href": "slides/week-2-1.html#from-tabular-to-spatial",
+    "title": "Week 2",
+    "section": "From Tabular to Spatial",
+    "text": "From Tabular to Spatial\nLast week: data as rows and columns — wrangling, joining, visualizing, modeling.\n\nThis week: data as features in space — the same verbs, but now every observation has a geometry that describes where it is and what shape it takes.\n\n\nToday’s arc:\n\nSimple Features — the standard and the R implementation\nSpatial Computing: The Stack — GDAL, PROJ, GEOS (the C++ libraries under sf)\nCoordinate Systems — GCS, datums, projections\nMeasurements — distance, area, units\n\n(We’ll take a 5-minute break after Simple Features.)"
+  },
+  {
+    "objectID": "slides/week-2-1.html#why-crs-matters-for-water-resources",
+    "href": "slides/week-2-1.html#why-crs-matters-for-water-resources",
+    "title": "Week 2",
+    "section": "Why CRS Matters for Water Resources",
+    "text": "Why CRS Matters for Water Resources\nBefore we start: the single most common silent error in spatial water resources analysis.\n\n\nUSGS NWIS gauge coordinates → WGS84 (EPSG:4326)\nNHDPlus HR flowlines → NAD83 (EPSG:4269)\n\n3DEP elevation → varies by tile\n\n\n\nThese are different coordinate systems. The differences are small (~1–3 meters for NAD83 vs. WGS84) but:\n\nJoining gauges to their catchments? Wrong\nSnapping gauges to the nearest flowline? Wrong\nComputing distance from a gauge to a dam? Wrong\n\n\n\n\n\n\n\n\n\nImportant\n\n\nAlways check CRS before any spatial join or distance calculation. We’ll learn the three tools that make this automatic."
+  },
+  {
+    "objectID": "slides/week-2-1.html#why-classes-matter-one-data-structure-many-behaviors",
+    "href": "slides/week-2-1.html#why-classes-matter-one-data-structure-many-behaviors",
+    "title": "Week 2",
+    "section": "Why Classes Matter: One Data Structure, Many Behaviors",
+    "text": "Why Classes Matter: One Data Structure, Many Behaviors\nYou’ve already used S3 classes in tidyverse without noticing. The same object type can behave differently based on its class.\nUnderstanding S3 classes in R explains:\n\nWhy print() on a tibble looks different than a regular data.frame\n\n\n\nWhy filter() on grouped data filters within each group instead of globally\n\n\n\n\nWhy summarize() on a grouped_df produces a different output shape\n\n\n\nThis is the callback pattern — R looks at an object’s class and dispatches to the right function. Later, sf will extend data.frame with spatial methods that work the same way."
+  },
+  {
+    "objectID": "slides/week-2-1.html#adding-class-matrix-data-frame",
+    "href": "slides/week-2-1.html#adding-class-matrix-data-frame",
+    "title": "Week 2",
+    "section": "Adding Class: Matrix → Data Frame",
+    "text": "Adding Class: Matrix → Data Frame\nA class is metadata attached to an object telling R how to interpret and operate on it:\n\n# Start with a matrix — just numbers in rows and columns\nv &lt;- c(1,2,3,4,5,6)\nclass(v)\n#&gt; [1] \"numeric\"\nm &lt;- matrix(v, nrow = 3)\nclass(m)\n#&gt; [1] \"matrix\" \"array\"\nm\n#&gt;      [,1] [,2]\n#&gt; [1,]    1    4\n#&gt; [2,]    2    5\n#&gt; [3,]    3    6\n\n\n# Add class metadata: \"this is a data frame\"\ndf &lt;- as.data.frame(m)\nclass(df)\n#&gt; [1] \"data.frame\"\ndf\n#&gt;   V1 V2\n#&gt; 1  1  4\n#&gt; 2  2  5\n#&gt; 3  3  6\n\nSame data. But now df has column names, printed summary, and methods that respect rectangular structure. The class changed the behavior without changing the underlying values."
+  },
+  {
+    "objectID": "slides/week-2-1.html#class-hierarchies-adding-layers",
+    "href": "slides/week-2-1.html#class-hierarchies-adding-layers",
+    "title": "Week 2",
+    "section": "Class Hierarchies: Adding Layers",
+    "text": "Class Hierarchies: Adding Layers\nObjects can have multiple classes in a hierarchy. Adding structure adds more classes:\n\n# Plain data.frame\ndf &lt;- data.frame(gauge = c(\"A\", \"B\", \"C\"), flow = c(100, 120, 95))\nclass(df)\n#&gt; [1] \"data.frame\"\n\n# Add grouping — now it has *two* classes\ngdf &lt;- group_by(df, gauge)\nclass(gdf)\n#&gt; [1] \"grouped_df\" \"tbl_df\"     \"tbl\"        \"data.frame\"\n\n# Methods are dispatched: dplyr functions check for \"grouped_df\" first\nslice(gdf, 1)  # respects grouping — one row per group, not one global row\n#&gt; # A tibble: 3 × 2\n#&gt; # Groups:   gauge [3]\n#&gt;   gauge  flow\n#&gt;   &lt;chr&gt; &lt;dbl&gt;\n#&gt; 1 A       100\n#&gt; 2 B       120\n#&gt; 3 C        95\nslice(df, 1)   # no grouping — just one row total\n#&gt;   gauge flow\n#&gt; 1     A  100\n\n\nThe key insight: the same function behaves differently based on class. This is the callback mechanism. When you call slice(), R internally asks: “What class is this object?” and dispatches to the right implementation."
+  },
+  {
+    "objectID": "slides/week-2-1.html#methods-functions-that-know-their-objects-class",
+    "href": "slides/week-2-1.html#methods-functions-that-know-their-objects-class",
+    "title": "Week 2",
+    "section": "Methods: Functions That Know Their Object’s Class",
+    "text": "Methods: Functions That Know Their Object’s Class\nEvery function that respects class has methods or versions specialized for each class:\n\n# Base R example: print() has different methods\nprint.data.frame()   # specialized for data.frames\nprint.default()      # fallback for other objects\n\n# You can list all methods for a class:\nmethods(class = \"data.frame\")   # all functions with .data.frame versions\n\n\nselect(), filter(), mutate() are dplyr verbs that have methods:\n\nmethods(\"filter\")    # shows filter.data.frame, filter.grouped_df, filter.ts, etc.\n#&gt; [1] filter.data.frame* filter.sf*         filter.ts*        \n#&gt; see '?methods' for accessing help and source code"
+  },
+  {
+    "objectID": "slides/week-2-1.html#the-dependencies-under-sf",
+    "href": "slides/week-2-1.html#the-dependencies-under-sf",
+    "title": "Week 2",
+    "section": "The Dependencies Under sf",
+    "text": "The Dependencies Under sf\nsf is powerful because it’s not built from scratch — it wraps three long standing C/C++ libraries, each with a focused job:"
+  },
+  {
+    "objectID": "slides/week-2-1.html#the-spatial-stack",
+    "href": "slides/week-2-1.html#the-spatial-stack",
+    "title": "Week 2",
+    "section": "The Spatial Stack",
+    "text": "The Spatial Stack\nYour R code:\nsf::st_read(\"data.shp\")      # I/O\nsf::st_distance(a, b)        # Geometry\nsf::st_transform(x, 4269)    # CRS\n\n\n\n\n\n\n\n\n📦 GDAL\n\n\nFile I/O\n\nFormat translators\nReads/writes Shapefile, GeoJSON, GeoPackage, GeoTIFF\nReturns WKB geometry\n\n\n\n\n\n\n\n\n\n\n\n🧭 PROJ\n\n\nCoordinate Systems\n\nTransforms between 10,000+ CRS definitions\nHandles datum shifts & projections\nUnderlies st_transform()\n\n\n\n\n\n\n\n\n\n\n\n⚙️ GEOS\n\n\nGeometry Ops\n\nIntersection, union, buffer, centroid\nDistance calculations\nSpatial predicates (st_intersects())"
+  },
+  {
+    "objectID": "slides/week-2-1.html#why-this-matters",
+    "href": "slides/week-2-1.html#why-this-matters",
+    "title": "Week 2",
+    "section": "Why This Matters",
+    "text": "Why This Matters\nEach library solves a hard problem:\n\n\n\n\n\n\n\n\nLibrary\nSolves\nWater Resources Example\n\n\n\n\nGDAL\n“How do I read a shapefile or GeoPackage?”\nRead NHD flowlines, USGS boundaries, stream gauges\n\n\nPROJ\n“How do I convert WGS84 to Albers?”\nTransform NWIS gauges from GPS coordinates to federal projection\n\n\nGEOS\n“Is this point inside this polygon? What’s the distance?”\nSnap gauge to nearest flowline, clip to basin\n\n\n\nIf we had to write these from scratch in R, it would take years. Instead, spatial computing in R benefits from decades of work by the OSGeo community."
+  },
+  {
+    "objectID": "slides/week-2-1.html#the-sf-wrapper",
+    "href": "slides/week-2-1.html#the-sf-wrapper",
+    "title": "Week 2",
+    "section": "The sf Wrapper",
+    "text": "The sf Wrapper\n\nsf::sf_extSoftVersion()\n#&gt;           GEOS           GDAL         proj.4 GDAL_with_GEOS     USE_PROJ_H \n#&gt;       \"3.14.1\"       \"3.12.2\"        \"9.7.1\"         \"true\"         \"true\" \n#&gt;           PROJ \n#&gt;        \"9.7.1\"\n\nsf doesn’t reinvent these wheels. It:\n\nCalls GDAL for I/O (st_read(), st_write())\nCalls PROJ for CRS transformations (st_transform())\nCalls GEOS for geometry operations (st_distance(), st_buffer(), spatial predicates)\nWraps results with S3 classes and methods so dplyr verbs (filter(), mutate(), select()) just work — same as tidyverse\n\nThis diagram shows the relationship: sf methods dispatch to GEOS for the heavy lifting, then return R objects.\n\n\n\n\n\n\nNote\n\n\nWhen you install the sf package on your machine, the R package manager compiles and links against GDAL, PROJ, and GEOS. If installation fails, it’s usually because one of these C/C++ libraries is missing from your system. This is why setting up spatial computing can be more complex than installing a pure-R package."
+  },
+  {
+    "objectID": "slides/week-2-1.html#simple-features-1",
+    "href": "slides/week-2-1.html#simple-features-1",
+    "title": "Week 2",
+    "section": "Simple Features",
+    "text": "Simple Features"
+  },
+  {
+    "objectID": "slides/week-2-1.html#todays-data-colorado-counties",
+    "href": "slides/week-2-1.html#todays-data-colorado-counties",
+    "title": "Week 2",
+    "section": "Today’s Data: Colorado Counties",
+    "text": "Today’s Data: Colorado Counties\n\n\n\nco\n#&gt; Simple feature collection with 64 features and 4 fields\n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -109.0602 ymin: 36.99246 xmax: -102.0415 ymax: 41.00342\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;    geoid       name      aland state_nm                       geometry\n#&gt; 1  08001      Adams 3021840487 Colorado MULTIPOLYGON (((-105.0532 3...\n#&gt; 2  08003    Alamosa 1871643028 Colorado MULTIPOLYGON (((-105.4855 3...\n#&gt; 3  08005   Arapahoe 2066438714 Colorado MULTIPOLYGON (((-103.7065 3...\n#&gt; 4  08007  Archuleta 3496712164 Colorado MULTIPOLYGON (((-107.1287 3...\n#&gt; 5  08009       Baca 6617400567 Colorado MULTIPOLYGON (((-102.0416 3...\n#&gt; 6  08011       Bent 3918255148 Colorado MULTIPOLYGON (((-102.7476 3...\n#&gt; 7  08013    Boulder 1881325109 Colorado MULTIPOLYGON (((-105.3978 3...\n#&gt; 8  08014 Broomfield   85386685 Colorado MULTIPOLYGON (((-105.1092 3...\n#&gt; 9  08015    Chaffee 2624715692 Colorado MULTIPOLYGON (((-105.9698 3...\n#&gt; 10 08017   Cheyenne 4605713960 Colorado MULTIPOLYGON (((-103.1729 3..."
+  },
+  {
+    "objectID": "slides/week-2-1.html#what-is-a-simple-feature",
+    "href": "slides/week-2-1.html#what-is-a-simple-feature",
+    "title": "Week 2",
+    "section": "What Is a Simple Feature?",
+    "text": "What Is a Simple Feature?\n\nSimple features (ISO 19125-1:2004) is a standard describing how real-world objects can be represented in computers, with emphasis on their spatial geometry\nIt defines:\n\nA class hierarchy of geometry types\nA set of operations on those geometries\nBinary and text encodings for storage and transfer\n\n\n\n\nWidely implemented: PostGIS, ESRI ArcGIS, GDAL, GeoJSON — and sf in R\nA subset of simple features (the big 7) forms the GeoJSON specification"
+  },
+  {
+    "objectID": "slides/week-2-1.html#what-is-a-feature",
+    "href": "slides/week-2-1.html#what-is-a-feature",
+    "title": "Week 2",
+    "section": "What Is a Feature?",
+    "text": "What Is a Feature?\nA feature is a thing in the real world — a river, a gauge, a watershed, a county.\n\nFeatures often consist of other features:\n\nA river system → a river → an outlet point\nA watershed → sub-basins → individual reaches\n\n\n\nThe standard says: “A simple feature has both spatial and non-spatial attributes. Spatial attributes are geometry valued.”\n\nThe geometry describes where the feature is and how it is represented\nA river’s geometry could be its watershed polygon, its mainstem linestring, or its outlet point — depending on the question\n\n\n\n\nstr(co)\n#&gt; Classes 'sf' and 'data.frame':   64 obs. of  5 variables:\n#&gt;  $ geoid   : chr  \"08001\" \"08003\" \"08005\" \"08007\" ...\n#&gt;  $ name    : chr  \"Adams\" \"Alamosa\" \"Arapahoe\" \"Archuleta\" ...\n#&gt;  $ aland   : num  3.02e+09 1.87e+09 2.07e+09 3.50e+09 6.62e+09 ...\n#&gt;  $ state_nm: chr  \"Colorado\" \"Colorado\" \"Colorado\" \"Colorado\" ...\n#&gt;  $ geometry:sfc_MULTIPOLYGON of length 64; first list element: List of 1\n#&gt;   ..$ :List of 1\n#&gt;   .. ..$ : num [1:132, 1:2] -105 -105 -105 -105 -105 ...\n#&gt;   ..- attr(*, \"class\")= chr [1:3] \"XY\" \"MULTIPOLYGON\" \"sfg\"\n#&gt;  - attr(*, \"sf_column\")= chr \"geometry\"\n#&gt;  - attr(*, \"agr\")= Factor w/ 3 levels \"constant\",\"aggregate\",..: NA NA NA NA\n#&gt;   ..- attr(*, \"names\")= chr [1:4] \"geoid\" \"name\" \"aland\" \"state_nm\""
+  },
+  {
+    "objectID": "slides/week-2-1.html#the-big-7-geometry-types",
+    "href": "slides/week-2-1.html#the-big-7-geometry-types",
+    "title": "Week 2",
+    "section": "The Big 7 Geometry Types",
+    "text": "The Big 7 Geometry Types\n\n\n\n\n\n\n\n\nSingle\nDescription\n\n\n\n\nPOINT\nZero-dimensional — a single coordinate pair\n\n\nLINESTRING\nSequence of points connected by straight line pieces — 1D\n\n\nPOLYGON\nClosed ring with positive area — 2D; may have interior holes\n\n\n\n\n\n\nMulti (same type)\nDescription\n\n\n\n\nMULTIPOINT\nSet of points\n\n\nMULTILINESTRING\nSet of linestrings\n\n\nMULTIPOLYGON\nSet of polygons\n\n\n\n\n\n\nMixed\nDescription\n\n\n\n\nGEOMETRYCOLLECTION\nSet of geometries of any type\n\n\n\n\n\n\n\n\n\n\nNote\n\n\nThese 7 types cover virtually everything in water resources work: gauge locations (POINT), stream reaches (LINESTRING), watershed boundaries (POLYGON), and their multi-feature equivalents."
+  },
+  {
+    "objectID": "slides/week-2-1.html#dimensions",
+    "href": "slides/week-2-1.html#dimensions",
+    "title": "Week 2",
+    "section": "Dimensions",
+    "text": "Dimensions\nAll geometries are composed of points defined in 2-, 3-, or 4-D space:\n\nXY — standard 2D coordinates (longitude, latitude or easting, northing)\nXYZ — adds altitude (elevation of stream bed, DEM surface)\nXYM — adds a measure attribute independent of the feature (e.g., streamflow at a vertex — rarely used)\nXYZM — both Z and M\n\n\nNote: “dimension” here means coordinate dimension (XY vs XYZ), not whether the geometry has length or area:\n\nm1 &lt;- rbind(c(8,1), c(2,5), c(3,2))\nst_dimension(st_multipoint(m1))    # 0 — point set, no length\n#&gt; [1] 0\nst_dimension(st_linestring(m1))    # 1 — has length, no area\n#&gt; [1] 1"
+  },
+  {
+    "objectID": "slides/week-2-1.html#valid-geometries",
+    "href": "slides/week-2-1.html#valid-geometries",
+    "title": "Week 2",
+    "section": "Valid Geometries",
+    "text": "Valid Geometries\nRules for valid geometries:\n\nLINESTRING — no self-intersections\nPOLYGON — rings must be closed\nPOLYGON — holes inside exterior only\nPOLYGON — rings touch at points only\nPOLYGON — no repeated paths\n\n\n\n\n\n\n\nWarning\n\n\nRun st_is_valid() to check your data. Fix invalid geometries with st_make_valid()."
+  },
+  {
+    "objectID": "slides/week-2-1.html#empty-geometries",
+    "href": "slides/week-2-1.html#empty-geometries",
+    "title": "Week 2",
+    "section": "Empty Geometries",
+    "text": "Empty Geometries\nEMPTY geometries serve as “NA” placeholders for geometry types — they arise naturally from spatial operations:\n\n(e &lt;- st_intersection(st_point(c(0,0)), st_point(c(1,1))))\n#&gt; GEOMETRYCOLLECTION EMPTY\nst_is_empty(e)\n#&gt; [1] TRUE\n\nplot(st_point(c(0,0)), pch = 16)\nplot(st_point(c(1,1)), add = TRUE, col = 'red', pch = 16)"
+  },
+  {
+    "objectID": "slides/week-2-1.html#well-known-text-and-well-known-binary",
+    "href": "slides/week-2-1.html#well-known-text-and-well-known-binary",
+    "title": "Week 2",
+    "section": "Well-Known Text and Well-Known Binary",
+    "text": "Well-Known Text and Well-Known Binary\nThe simple feature standard defines two encodings:\nWell-Known Text (WKT) — human-readable:\n\nx &lt;- st_linestring(matrix(10:1, 5))\nst_as_text(x)\n#&gt; [1] \"LINESTRING (10 5, 9 4, 8 3, 7 2, 6 1)\"\n\nLINESTRING = type · parentheses contain points · points separated by commas · coordinates separated by spaces\n\nWell-Known Binary (WKB) — machine-readable, fast, lossless:\n\nst_as_binary(x)\n#&gt;  [1] 01 02 00 00 00 05 00 00 00 00 00 00 00 00 00 24 40 00 00 00 00 00 00 14 40\n#&gt; [26] 00 00 00 00 00 00 22 40 00 00 00 00 00 00 10 40 00 00 00 00 00 00 20 40 00\n#&gt; [51] 00 00 00 00 00 08 40 00 00 00 00 00 00 1c 40 00 00 00 00 00 00 00 40 00 00\n#&gt; [76] 00 00 00 00 18 40 00 00 00 00 00 00 f0 3f\n\nWKB is used to communicate with external libraries (GDAL, GEOS) and spatial databases. Converting back to R:\n\nst_as_sfc(\"LINESTRING(10 5, 9 4, 8 3, 7 2, 6 1)\")[[1]]\n#&gt; LINESTRING (10 5, 9 4, 8 3, 7 2, 6 1)"
+  },
+  {
+    "objectID": "slides/week-2-1.html#three-classes-one-object",
+    "href": "slides/week-2-1.html#three-classes-one-object",
+    "title": "Week 2",
+    "section": "Three Classes, One Object",
+    "text": "Three Classes, One Object\n\n\n🟢 sf — a data.frame with feature attributes and a geometry column (class: sf)\n🔴 sfc — the geometry list-column (set of geometries)\n🔵 sfg — individual simple feature geometry (one geometry per feature)\n\n\n\n\n\n\n\n\nImportant\n\n\nThis is the S3 class hierarchy in action. sf is a subclass of data.frame adding the geometry column and specialized methods. When you call filter() on an sf object, R looks at its class and dispatches to the spatial-aware filter.sf() method, which respects the geometry column. Same pattern as grouped_df from tidyverse."
+  },
+  {
+    "objectID": "slides/week-2-1.html#sfg-simple-feature-geometry",
+    "href": "slides/week-2-1.html#sfg-simple-feature-geometry",
+    "title": "Week 2",
+    "section": "sfg: Simple Feature Geometry",
+    "text": "sfg: Simple Feature Geometry\nsfg objects carry the geometry for a single feature. Storage rules:\n\nA single POINT → numeric vector\nPoints in a LINESTRING or POLYGON ring → matrix (each row = a point)\nAny other set → list\n\n\nCreator functions (rarely used in practice — you usually read existing data):\n\n(x &lt;- st_point(c(1, 2)))\nstr(x)\n#&gt;  'XY' num [1:2] 1 2\n\n(x &lt;- st_linestring(matrix(c(1,2,3,4), ncol = 2)))\nstr(x)\n#&gt;  'XY' num [1:2, 1:2] 1 2 3 4"
+  },
+  {
+    "objectID": "slides/week-2-1.html#sfg-class-structure",
+    "href": "slides/week-2-1.html#sfg-class-structure",
+    "title": "Week 2",
+    "section": "sfg: Class Structure",
+    "text": "sfg: Class Structure\nAll geometry objects have an S3 class indicating (1) dimension, (2) type, (3) superclass:\n\n(pt  &lt;- st_point(c(0, 1)))\nattributes(pt)\n#&gt; $class\n#&gt; [1] \"XY\"    \"POINT\" \"sfg\"\n\n(pt2 &lt;- st_point(c(0, 1, 4)))   # XYZ\nattributes(pt2)\n#&gt; $class\n#&gt; [1] \"XYZ\"   \"POINT\" \"sfg\""
+  },
+  {
+    "objectID": "slides/week-2-1.html#sfg-same-points-different-meaning",
+    "href": "slides/week-2-1.html#sfg-same-points-different-meaning",
+    "title": "Week 2",
+    "section": "sfg: Same Points, Different Meaning",
+    "text": "sfg: Same Points, Different Meaning\nThe same coordinate matrix creates geometries with entirely different dimensionality:\n\nm1 &lt;- rbind(c(8,1), c(2,5), c(3,2))\n\n(mp &lt;- st_multipoint(m1))   # zero-dimensional point set\n(ls &lt;- st_linestring(m1))   # one-dimensional line\n\nst_dimension(mp); st_length(mp)\n#&gt; [1] 0\n#&gt; [1] 0\nst_dimension(ls); st_length(ls)\n#&gt; [1] 1\n#&gt; [1] 10.37338"
+  },
+  {
+    "objectID": "slides/week-2-1.html#mixed-geometries-and-geometrycollection",
+    "href": "slides/week-2-1.html#mixed-geometries-and-geometrycollection",
+    "title": "Week 2",
+    "section": "Mixed Geometries and GEOMETRYCOLLECTION",
+    "text": "Mixed Geometries and GEOMETRYCOLLECTION\nSets of features can have heterogeneous geometry types — type becomes GEOMETRY:\n\n\n\n(g &lt;- st_sfc(st_point(c(0,0)),\n             st_linestring(rbind(c(0,0), c(1,1)))))\n#&gt; Geometry set for 2 features \n#&gt; Geometry type: GEOMETRY\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1\n#&gt; CRS:           NA\n\n\nFilter by type with st_is:\n\ng |&gt; st_is(\"LINESTRING\")\n#&gt; [1] FALSE  TRUE\n\nst_sf(geometry = g) |&gt;\n  filter(st_is(geometry, \"LINESTRING\"))\n#&gt; Simple feature collection with 1 feature and 0 fields\n#&gt; Geometry type: LINESTRING\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1\n#&gt; CRS:           NA\n#&gt;                geometry\n#&gt; 1 LINESTRING (0 0, 1 1)\n\n\n\nWhen intersections produce mixed types, use GEOMETRYCOLLECTION and extract:\n\npt   &lt;- st_point(c(1,0))\nls   &lt;- st_linestring(matrix(c(4,3,0,0), ncol=2))\npoly &lt;- st_polygon(list(matrix(c(5.5,7,7,6,5.5,0,0,-0.5,-0.5,0), ncol=2)))\nj    &lt;- st_geometrycollection(list(pt, ls, poly))\n\nst_collection_extract(j, \"POLYGON\")"
+  },
+  {
+    "objectID": "slides/week-2-1.html#conversion-between-types-st_cast",
+    "href": "slides/week-2-1.html#conversion-between-types-st_cast",
+    "title": "Week 2",
+    "section": "Conversion Between Types: st_cast",
+    "text": "Conversion Between Types: st_cast\n\n(co1   &lt;- filter(co, name == \"Larimer\")$geometry)\n#&gt; Geometry set for 1 feature \n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -106.1954 ymin: 40.25778 xmax: -104.9431 ymax: 40.99844\n#&gt; Geodetic CRS:  WGS 84\n(co_ls &lt;- st_cast(co1, \"MULTILINESTRING\"))\n#&gt; Geometry set for 1 feature \n#&gt; Geometry type: MULTILINESTRING\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -106.1954 ymin: 40.25778 xmax: -104.9431 ymax: 40.99844\n#&gt; Geodetic CRS:  WGS 84"
+  },
+  {
+    "objectID": "slides/week-2-1.html#casting-feature-vs.-set-level",
+    "href": "slides/week-2-1.html#casting-feature-vs.-set-level",
+    "title": "Week 2",
+    "section": "Casting: Feature vs. Set Level",
+    "text": "Casting: Feature vs. Set Level\nCasting operates at the feature level, not the set level:\n\nrbind(c(0,0), c(1,1), c(1,0), c(0,1)) |&gt;\n  st_linestring() |&gt;\n  st_cast(\"POINT\")   # ⚠️ converts ONE line to ONE point — not what you want\n#&gt; Warning in st_cast.LINESTRING(st_linestring(rbind(c(0, 0), c(1, 1), c(1, :\n#&gt; point from first coordinate only\n#&gt; POINT (0 0)\n\n\nTo extract individual points, work at the set level (sfc):\n\n(p &lt;- rbind(c(0,0), c(1,1), c(1,0), c(0,1)) |&gt;\n   st_linestring() |&gt;\n   st_sfc() |&gt;           # create a SET of one geometry\n   st_cast(\"POINT\"))     # now produces 4 individual points\n#&gt; Geometry set for 4 features \n#&gt; Geometry type: POINT\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1\n#&gt; CRS:           NA"
+  },
+  {
+    "objectID": "slides/week-2-1.html#sets-of-geometries",
+    "href": "slides/week-2-1.html#sets-of-geometries",
+    "title": "Week 2",
+    "section": "Sets of geometries",
+    "text": "Sets of geometries\n\n\n\nrbind(c(0,0), c(1,1), c(1,0), c(0,1))\n\n\n\n#&gt;      [,1] [,2]\n#&gt; [1,]    0    0\n#&gt; [2,]    1    1\n#&gt; [3,]    1    0\n#&gt; [4,]    0    1"
+  },
+  {
+    "objectID": "slides/week-2-1.html#sets-of-geometries-1",
+    "href": "slides/week-2-1.html#sets-of-geometries-1",
+    "title": "Week 2",
+    "section": "Sets of geometries",
+    "text": "Sets of geometries\n\n\n\nrbind(c(0,0), c(1,1), c(1,0), c(0,1)) |&gt;\n  st_linestring()"
+  },
+  {
+    "objectID": "slides/week-2-1.html#sets-of-geometries-2",
+    "href": "slides/week-2-1.html#sets-of-geometries-2",
+    "title": "Week 2",
+    "section": "Sets of geometries",
+    "text": "Sets of geometries\n\n\n\nrbind(c(0,0), c(1,1), c(1,0), c(0,1)) |&gt;\n  st_linestring() |&gt;\n  st_sfc()\n\n\n\n#&gt; Geometry set for 1 feature \n#&gt; Geometry type: LINESTRING\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1\n#&gt; CRS:           NA"
+  },
+  {
+    "objectID": "slides/week-2-1.html#sets-of-geometries-3",
+    "href": "slides/week-2-1.html#sets-of-geometries-3",
+    "title": "Week 2",
+    "section": "Sets of geometries",
+    "text": "Sets of geometries\n\n\n\nrbind(c(0,0), c(1,1), c(1,0), c(0,1)) |&gt;\n  st_linestring() |&gt;\n  st_sfc() |&gt;\n  st_cast(\"POINT\")\n\n\n\n#&gt; Geometry set for 4 features \n#&gt; Geometry type: POINT\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1\n#&gt; CRS:           NA"
+  },
+  {
+    "objectID": "slides/week-2-1.html#sets-of-geometries-4",
+    "href": "slides/week-2-1.html#sets-of-geometries-4",
+    "title": "Week 2",
+    "section": "Sets of geometries",
+    "text": "Sets of geometries\n\n\n\nrbind(c(0,0), c(1,1), c(1,0), c(0,1)) |&gt;\n  st_linestring() |&gt;\n  st_sfc() |&gt;\n  st_cast(\"POINT\") -&gt;\n  p"
+  },
+  {
+    "objectID": "slides/week-2-1.html#sfc-geometry-list-columns",
+    "href": "slides/week-2-1.html#sfc-geometry-list-columns",
+    "title": "Week 2",
+    "section": "sfc: Geometry List-Columns",
+    "text": "sfc: Geometry List-Columns\nst_sfc creates sets of geometries — what becomes the sticky list-column in sf objects:\n\n(sfc &lt;- st_sfc(st_point(c(0,1)), st_point(c(-3,2))))\n#&gt; Geometry set for 2 features \n#&gt; Geometry type: POINT\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -3 ymin: 1 xmax: 0 ymax: 2\n#&gt; CRS:           NA\nclass(sfc)\n#&gt; [1] \"sfc_POINT\" \"sfc\"\nattributes(sfc) |&gt; names()\n#&gt; [1] \"class\"     \"precision\" \"bbox\"      \"crs\"       \"n_empty\"\n\nThe sfc object records for the whole set: precision, bounding box, CRS, and count of empty geometries."
+  },
+  {
+    "objectID": "slides/week-2-1.html#combine-vs.-union",
+    "href": "slides/week-2-1.html#combine-vs.-union",
+    "title": "Week 2",
+    "section": "Combine vs. Union",
+    "text": "Combine vs. Union\nCombining geometries preserves interior boundaries. Unioning dissolves them.\n\n\n\n(co_c &lt;- st_combine(co$geometry))\n#&gt; Geometry set for 1 feature \n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -109.0602 ymin: 36.99246 xmax: -102.0415 ymax: 41.00342\n#&gt; Geodetic CRS:  WGS 84\n\n\n\n\n\n\n\n\n\n\n\n\n(co_u &lt;- st_union(co$geometry))\n#&gt; Geometry set for 1 feature \n#&gt; Geometry type: POLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -109.0602 ymin: 36.99246 xmax: -102.0415 ymax: 41.00342\n#&gt; Geodetic CRS:  WGS 84"
+  },
+  {
+    "objectID": "slides/week-2-1.html#combine-cast-borders-as-lines",
+    "href": "slides/week-2-1.html#combine-cast-borders-as-lines",
+    "title": "Week 2",
+    "section": "Combine + Cast: Borders as Lines",
+    "text": "Combine + Cast: Borders as Lines\n\nco_c_ml &lt;- st_combine(co$geometry) |&gt; st_cast(\"MULTILINESTRING\")\nco_u_ml &lt;- st_union(co$geometry)   |&gt; st_cast(\"MULTILINESTRING\")\n\n\n\n\n\n\n\n\n\nTip\n\n\nThis distinction matters constantly in water resources: county boundaries vs. watershed boundaries, stream reaches vs. the river network, individual gauge catchments vs. the basin outline."
+  },
+  {
+    "objectID": "slides/week-2-1.html#conus-combine-vs.-union",
+    "href": "slides/week-2-1.html#conus-combine-vs.-union",
+    "title": "Week 2",
+    "section": "CONUS: Combine vs. Union",
+    "text": "CONUS: Combine vs. Union\n\nus_c_ml &lt;- st_combine(conus) |&gt; st_cast(\"MULTILINESTRING\")\nus_u_ml &lt;- st_union(conus)   |&gt; st_cast(\"MULTILINESTRING\")"
+  },
+  {
+    "objectID": "slides/week-2-1.html#distance-to-denver-thinking-about-feature-level",
+    "href": "slides/week-2-1.html#distance-to-denver-thinking-about-feature-level",
+    "title": "Week 2",
+    "section": "Distance to Denver: Thinking About Feature Level",
+    "text": "Distance to Denver: Thinking About Feature Level\nQuestion: how far is Denver from the nearest state border?\n\ndenver_sf &lt;- data.frame(y = 39.7392, x = -104.9903, name = \"Denver\") |&gt;\n  st_as_sf(coords = c(\"x\", \"y\"), crs = 4326)"
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-1-distance-to-states-polygons",
+    "href": "slides/week-2-1.html#attempt-1-distance-to-states-polygons",
+    "title": "Week 2",
+    "section": "Attempt 1: distance to states (polygons)",
+    "text": "Attempt 1: distance to states (polygons)\n\n\n\nconus\n\n\n\n#&gt; Simple feature collection with 49 features and 14 fields\n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -124.8485 ymin: 24.39631 xmax: -66.88544 ymax: 49.38448\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;    state_region state_division feature_code           state_name state_abbr\n#&gt; 1             3              6      1779775              Alabama         AL\n#&gt; 2             4              8      1779777              Arizona         AZ\n#&gt; 3             3              7      0068085             Arkansas         AR\n#&gt; 4             4              9      1779778           California         CA\n#&gt; 5             4              8      1779779             Colorado         CO\n#&gt; 6             1              1      1779780          Connecticut         CT\n#&gt; 7             3              5      1779781             Delaware         DE\n#&gt; 8             3              5      1702382 District of Columbia         DC\n#&gt; 9             3              5      0294478              Florida         FL\n#&gt; 10            3              5      1705317              Georgia         GA\n#&gt;                    name fip_class tiger_class combined_area_code\n#&gt; 1               Alabama      &lt;NA&gt;       G4000                 NA\n#&gt; 2               Arizona      &lt;NA&gt;       G4000                 NA\n#&gt; 3              Arkansas      &lt;NA&gt;       G4000                 NA\n#&gt; 4            California      &lt;NA&gt;       G4000                 NA\n#&gt; 5              Colorado      &lt;NA&gt;       G4000                 NA\n#&gt; 6           Connecticut      &lt;NA&gt;       G4000                 NA\n#&gt; 7              Delaware      &lt;NA&gt;       G4000                 NA\n#&gt; 8  District of Columbia      &lt;NA&gt;       G4000                 NA\n#&gt; 9               Florida      &lt;NA&gt;       G4000                 NA\n#&gt; 10              Georgia      &lt;NA&gt;       G4000                 NA\n#&gt;    metropolitan_area_code functional_status    land_area  water_area fip_code\n#&gt; 1                    &lt;NA&gt;                 A 131175477769  4591897964       01\n#&gt; 2                    &lt;NA&gt;                 A 294363973043   855871553       04\n#&gt; 3                    &lt;NA&gt;                 A 134660767709  3121950081       05\n#&gt; 4                    &lt;NA&gt;                 A 403671756816 20293573058       06\n#&gt; 5                    &lt;NA&gt;                 A 268418796417  1185716938       08\n#&gt; 6                    &lt;NA&gt;                 A  12541690473  1816424193       09\n#&gt; 7                    &lt;NA&gt;                 A   5046731559  1399179670       10\n#&gt; 8                    &lt;NA&gt;                 A    158316124    18709762       11\n#&gt; 9                    &lt;NA&gt;                 A 138961722096 45972570361       12\n#&gt; 10                   &lt;NA&gt;                 A 149486624386  4418360134       13\n#&gt;                          geometry\n#&gt; 1  MULTIPOLYGON (((-85.4883 30...\n#&gt; 2  MULTIPOLYGON (((-110.7507 3...\n#&gt; 3  MULTIPOLYGON (((-90.95577 3...\n#&gt; 4  MULTIPOLYGON (((-116.1062 3...\n#&gt; 5  MULTIPOLYGON (((-105.155 36...\n#&gt; 6  MULTIPOLYGON (((-72.5279 41...\n#&gt; 7  MULTIPOLYGON (((-75.13846 3...\n#&gt; 8  MULTIPOLYGON (((-77.00244 3...\n#&gt; 9  MULTIPOLYGON (((-83.10874 2...\n#&gt; 10 MULTIPOLYGON (((-81.09538 3..."
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-1-distance-to-states-polygons-1",
+    "href": "slides/week-2-1.html#attempt-1-distance-to-states-polygons-1",
+    "title": "Week 2",
+    "section": "Attempt 1: distance to states (polygons)",
+    "text": "Attempt 1: distance to states (polygons)\n\n\n\nconus |&gt;\n  select(state_name)\n\n\n\n#&gt; Simple feature collection with 49 features and 1 field\n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -124.8485 ymin: 24.39631 xmax: -66.88544 ymax: 49.38448\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;              state_name                       geometry\n#&gt; 1               Alabama MULTIPOLYGON (((-85.4883 30...\n#&gt; 2               Arizona MULTIPOLYGON (((-110.7507 3...\n#&gt; 3              Arkansas MULTIPOLYGON (((-90.95577 3...\n#&gt; 4            California MULTIPOLYGON (((-116.1062 3...\n#&gt; 5              Colorado MULTIPOLYGON (((-105.155 36...\n#&gt; 6           Connecticut MULTIPOLYGON (((-72.5279 41...\n#&gt; 7              Delaware MULTIPOLYGON (((-75.13846 3...\n#&gt; 8  District of Columbia MULTIPOLYGON (((-77.00244 3...\n#&gt; 9               Florida MULTIPOLYGON (((-83.10874 2...\n#&gt; 10              Georgia MULTIPOLYGON (((-81.09538 3..."
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-1-distance-to-states-polygons-2",
+    "href": "slides/week-2-1.html#attempt-1-distance-to-states-polygons-2",
+    "title": "Week 2",
+    "section": "Attempt 1: distance to states (polygons)",
+    "text": "Attempt 1: distance to states (polygons)\n\n\n\nconus |&gt;\n  select(state_name) %&gt;%\n  mutate(dist = st_distance(., denver_sf))\n\n\n\n#&gt; Simple feature collection with 49 features and 2 fields\n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -124.8485 ymin: 24.39631 xmax: -66.88544 ymax: 49.38448\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;              state_name                       geometry          dist\n#&gt; 1               Alabama MULTIPOLYGON (((-85.4883 30... 1571007.9 [m]\n#&gt; 2               Arizona MULTIPOLYGON (((-110.7507 3...  466602.9 [m]\n#&gt; 3              Arkansas MULTIPOLYGON (((-90.95577 3...  975519.6 [m]\n#&gt; 4            California MULTIPOLYGON (((-116.1062 3... 1000950.5 [m]\n#&gt; 5              Colorado MULTIPOLYGON (((-105.155 36...       0.0 [m]\n#&gt; 6           Connecticut MULTIPOLYGON (((-72.5279 41... 2636635.7 [m]\n#&gt; 7              Delaware MULTIPOLYGON (((-75.13846 3... 2485997.1 [m]\n#&gt; 8  District of Columbia MULTIPOLYGON (((-77.00244 3... 2388920.9 [m]\n#&gt; 9               Florida MULTIPOLYGON (((-83.10874 2... 1847447.4 [m]\n#&gt; 10              Georgia MULTIPOLYGON (((-81.09538 3... 1788781.6 [m]"
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-1-distance-to-states-polygons-3",
+    "href": "slides/week-2-1.html#attempt-1-distance-to-states-polygons-3",
+    "title": "Week 2",
+    "section": "Attempt 1: distance to states (polygons)",
+    "text": "Attempt 1: distance to states (polygons)\n\n\n\nconus |&gt;\n  select(state_name) %&gt;%\n  mutate(dist = st_distance(., denver_sf)) |&gt;\n  slice_min(dist, n = 3)\n\n\n\n#&gt; Simple feature collection with 3 features and 2 fields\n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -111.0546 ymin: 36.99246 xmax: -95.30829 ymax: 45.00582\n#&gt; Geodetic CRS:  WGS 84\n#&gt;   state_name         dist                       geometry\n#&gt; 1   Colorado      0.0 [m] MULTIPOLYGON (((-105.155 36...\n#&gt; 2    Wyoming 140002.6 [m] MULTIPOLYGON (((-106.3212 4...\n#&gt; 3   Nebraska 161243.2 [m] MULTIPOLYGON (((-95.93779 4..."
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-2-cast-to-lines-first",
+    "href": "slides/week-2-1.html#attempt-2-cast-to-lines-first",
+    "title": "Week 2",
+    "section": "Attempt 2: cast to lines first",
+    "text": "Attempt 2: cast to lines first\n\n\n\nconus\n\n\n\n#&gt; Simple feature collection with 49 features and 14 fields\n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -124.8485 ymin: 24.39631 xmax: -66.88544 ymax: 49.38448\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;    state_region state_division feature_code           state_name state_abbr\n#&gt; 1             3              6      1779775              Alabama         AL\n#&gt; 2             4              8      1779777              Arizona         AZ\n#&gt; 3             3              7      0068085             Arkansas         AR\n#&gt; 4             4              9      1779778           California         CA\n#&gt; 5             4              8      1779779             Colorado         CO\n#&gt; 6             1              1      1779780          Connecticut         CT\n#&gt; 7             3              5      1779781             Delaware         DE\n#&gt; 8             3              5      1702382 District of Columbia         DC\n#&gt; 9             3              5      0294478              Florida         FL\n#&gt; 10            3              5      1705317              Georgia         GA\n#&gt;                    name fip_class tiger_class combined_area_code\n#&gt; 1               Alabama      &lt;NA&gt;       G4000                 NA\n#&gt; 2               Arizona      &lt;NA&gt;       G4000                 NA\n#&gt; 3              Arkansas      &lt;NA&gt;       G4000                 NA\n#&gt; 4            California      &lt;NA&gt;       G4000                 NA\n#&gt; 5              Colorado      &lt;NA&gt;       G4000                 NA\n#&gt; 6           Connecticut      &lt;NA&gt;       G4000                 NA\n#&gt; 7              Delaware      &lt;NA&gt;       G4000                 NA\n#&gt; 8  District of Columbia      &lt;NA&gt;       G4000                 NA\n#&gt; 9               Florida      &lt;NA&gt;       G4000                 NA\n#&gt; 10              Georgia      &lt;NA&gt;       G4000                 NA\n#&gt;    metropolitan_area_code functional_status    land_area  water_area fip_code\n#&gt; 1                    &lt;NA&gt;                 A 131175477769  4591897964       01\n#&gt; 2                    &lt;NA&gt;                 A 294363973043   855871553       04\n#&gt; 3                    &lt;NA&gt;                 A 134660767709  3121950081       05\n#&gt; 4                    &lt;NA&gt;                 A 403671756816 20293573058       06\n#&gt; 5                    &lt;NA&gt;                 A 268418796417  1185716938       08\n#&gt; 6                    &lt;NA&gt;                 A  12541690473  1816424193       09\n#&gt; 7                    &lt;NA&gt;                 A   5046731559  1399179670       10\n#&gt; 8                    &lt;NA&gt;                 A    158316124    18709762       11\n#&gt; 9                    &lt;NA&gt;                 A 138961722096 45972570361       12\n#&gt; 10                   &lt;NA&gt;                 A 149486624386  4418360134       13\n#&gt;                          geometry\n#&gt; 1  MULTIPOLYGON (((-85.4883 30...\n#&gt; 2  MULTIPOLYGON (((-110.7507 3...\n#&gt; 3  MULTIPOLYGON (((-90.95577 3...\n#&gt; 4  MULTIPOLYGON (((-116.1062 3...\n#&gt; 5  MULTIPOLYGON (((-105.155 36...\n#&gt; 6  MULTIPOLYGON (((-72.5279 41...\n#&gt; 7  MULTIPOLYGON (((-75.13846 3...\n#&gt; 8  MULTIPOLYGON (((-77.00244 3...\n#&gt; 9  MULTIPOLYGON (((-83.10874 2...\n#&gt; 10 MULTIPOLYGON (((-81.09538 3..."
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-2-cast-to-lines-first-1",
+    "href": "slides/week-2-1.html#attempt-2-cast-to-lines-first-1",
+    "title": "Week 2",
+    "section": "Attempt 2: cast to lines first",
+    "text": "Attempt 2: cast to lines first\n\n\n\nconus |&gt;\n  select(state_name)\n\n\n\n#&gt; Simple feature collection with 49 features and 1 field\n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -124.8485 ymin: 24.39631 xmax: -66.88544 ymax: 49.38448\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;              state_name                       geometry\n#&gt; 1               Alabama MULTIPOLYGON (((-85.4883 30...\n#&gt; 2               Arizona MULTIPOLYGON (((-110.7507 3...\n#&gt; 3              Arkansas MULTIPOLYGON (((-90.95577 3...\n#&gt; 4            California MULTIPOLYGON (((-116.1062 3...\n#&gt; 5              Colorado MULTIPOLYGON (((-105.155 36...\n#&gt; 6           Connecticut MULTIPOLYGON (((-72.5279 41...\n#&gt; 7              Delaware MULTIPOLYGON (((-75.13846 3...\n#&gt; 8  District of Columbia MULTIPOLYGON (((-77.00244 3...\n#&gt; 9               Florida MULTIPOLYGON (((-83.10874 2...\n#&gt; 10              Georgia MULTIPOLYGON (((-81.09538 3..."
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-2-cast-to-lines-first-2",
+    "href": "slides/week-2-1.html#attempt-2-cast-to-lines-first-2",
+    "title": "Week 2",
+    "section": "Attempt 2: cast to lines first",
+    "text": "Attempt 2: cast to lines first\n\n\n\nconus |&gt;\n  select(state_name) |&gt;\n  st_cast(\"MULTILINESTRING\")\n\n\n\n#&gt; Simple feature collection with 49 features and 1 field\n#&gt; Geometry type: MULTILINESTRING\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -124.8485 ymin: 24.39631 xmax: -66.88544 ymax: 49.38448\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;              state_name                       geometry\n#&gt; 1               Alabama MULTILINESTRING ((-85.4883 ...\n#&gt; 2               Arizona MULTILINESTRING ((-110.7507...\n#&gt; 3              Arkansas MULTILINESTRING ((-90.95577...\n#&gt; 4            California MULTILINESTRING ((-116.1062...\n#&gt; 5              Colorado MULTILINESTRING ((-105.155 ...\n#&gt; 6           Connecticut MULTILINESTRING ((-72.5279 ...\n#&gt; 7              Delaware MULTILINESTRING ((-75.13846...\n#&gt; 8  District of Columbia MULTILINESTRING ((-77.00244...\n#&gt; 9               Florida MULTILINESTRING ((-83.10874...\n#&gt; 10              Georgia MULTILINESTRING ((-81.09538..."
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-2-cast-to-lines-first-3",
+    "href": "slides/week-2-1.html#attempt-2-cast-to-lines-first-3",
+    "title": "Week 2",
+    "section": "Attempt 2: cast to lines first",
+    "text": "Attempt 2: cast to lines first\n\n\n\nconus |&gt;\n  select(state_name) |&gt;\n  st_cast(\"MULTILINESTRING\") %&gt;%\n  mutate(dist = st_distance(., denver_sf))\n\n\n\n#&gt; Simple feature collection with 49 features and 2 fields\n#&gt; Geometry type: MULTILINESTRING\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -124.8485 ymin: 24.39631 xmax: -66.88544 ymax: 49.38448\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;              state_name                       geometry          dist\n#&gt; 1               Alabama MULTILINESTRING ((-85.4883 ... 1571007.9 [m]\n#&gt; 2               Arizona MULTILINESTRING ((-110.7507...  466602.9 [m]\n#&gt; 3              Arkansas MULTILINESTRING ((-90.95577...  975519.6 [m]\n#&gt; 4            California MULTILINESTRING ((-116.1062... 1000950.5 [m]\n#&gt; 5              Colorado MULTILINESTRING ((-105.155 ...  140002.6 [m]\n#&gt; 6           Connecticut MULTILINESTRING ((-72.5279 ... 2636635.7 [m]\n#&gt; 7              Delaware MULTILINESTRING ((-75.13846... 2485997.1 [m]\n#&gt; 8  District of Columbia MULTILINESTRING ((-77.00244... 2388920.9 [m]\n#&gt; 9               Florida MULTILINESTRING ((-83.10874... 1847447.4 [m]\n#&gt; 10              Georgia MULTILINESTRING ((-81.09538... 1788781.6 [m]"
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-2-cast-to-lines-first-4",
+    "href": "slides/week-2-1.html#attempt-2-cast-to-lines-first-4",
+    "title": "Week 2",
+    "section": "Attempt 2: cast to lines first",
+    "text": "Attempt 2: cast to lines first\n\n\n\nconus |&gt;\n  select(state_name) |&gt;\n  st_cast(\"MULTILINESTRING\") %&gt;%\n  mutate(dist = st_distance(., denver_sf)) |&gt;\n  slice_min(dist, n = 3)\n\n\n\n#&gt; Simple feature collection with 3 features and 2 fields\n#&gt; Geometry type: MULTILINESTRING\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -111.0546 ymin: 36.99246 xmax: -95.30829 ymax: 45.00582\n#&gt; Geodetic CRS:  WGS 84\n#&gt;   state_name         dist                       geometry\n#&gt; 1   Colorado 140002.6 [m] MULTILINESTRING ((-105.155 ...\n#&gt; 2    Wyoming 140002.6 [m] MULTILINESTRING ((-106.3212...\n#&gt; 3   Nebraska 161243.2 [m] MULTILINESTRING ((-95.93779..."
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-2-cast-to-lines-first-5",
+    "href": "slides/week-2-1.html#attempt-2-cast-to-lines-first-5",
+    "title": "Week 2",
+    "section": "Attempt 2: cast to lines first",
+    "text": "Attempt 2: cast to lines first\n\n\n\nconus |&gt;\n  select(state_name) |&gt;\n  st_cast(\"MULTILINESTRING\") -&gt;\n  state_lines\n\nstate_lines |&gt;\n  mutate(dist = st_distance(state_lines, denver_sf))\n\n\n\n#&gt; Simple feature collection with 49 features and 2 fields\n#&gt; Geometry type: MULTILINESTRING\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -124.8485 ymin: 24.39631 xmax: -66.88544 ymax: 49.38448\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;              state_name                       geometry          dist\n#&gt; 1               Alabama MULTILINESTRING ((-85.4883 ... 1571007.9 [m]\n#&gt; 2               Arizona MULTILINESTRING ((-110.7507...  466602.9 [m]\n#&gt; 3              Arkansas MULTILINESTRING ((-90.95577...  975519.6 [m]\n#&gt; 4            California MULTILINESTRING ((-116.1062... 1000950.5 [m]\n#&gt; 5              Colorado MULTILINESTRING ((-105.155 ...  140002.6 [m]\n#&gt; 6           Connecticut MULTILINESTRING ((-72.5279 ... 2636635.7 [m]\n#&gt; 7              Delaware MULTILINESTRING ((-75.13846... 2485997.1 [m]\n#&gt; 8  District of Columbia MULTILINESTRING ((-77.00244... 2388920.9 [m]\n#&gt; 9               Florida MULTILINESTRING ((-83.10874... 1847447.4 [m]\n#&gt; 10              Georgia MULTILINESTRING ((-81.09538... 1788781.6 [m]"
+  },
+  {
+    "objectID": "slides/week-2-1.html#the-right-feature-level",
+    "href": "slides/week-2-1.html#the-right-feature-level",
+    "title": "Week 2",
+    "section": "The Right Feature Level",
+    "text": "The Right Feature Level\nComputing distance to 48 state borders when we only need the nearest one is wasteful. The feature should be the complete set of borders — one MULTILINESTRING:\n\nst_distance(denver_sf, st_cast(st_combine(conus), \"MULTILINESTRING\"))\n#&gt; Units: [m]\n#&gt;          [,1]\n#&gt; [1,] 140002.6\n\n\n\n1 calculation instead of 48\nCorrect answer: distance to the border, not to individual state features\nSame principle applies to: distance to national border, distance to any river network, distance to nearest dam"
+  },
+  {
+    "objectID": "slides/week-2-1.html#sf-attributes-geometry",
+    "href": "slides/week-2-1.html#sf-attributes-geometry",
+    "title": "Week 2",
+    "section": "sf: Attributes + Geometry",
+    "text": "sf: Attributes + Geometry\n\nco\n#&gt; Simple feature collection with 64 features and 4 fields\n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -109.0602 ymin: 36.99246 xmax: -102.0415 ymax: 41.00342\n#&gt; Geodetic CRS:  WGS 84\n#&gt; First 10 features:\n#&gt;    geoid       name      aland state_nm                       geometry\n#&gt; 1  08001      Adams 3021840487 Colorado MULTIPOLYGON (((-105.0532 3...\n#&gt; 2  08003    Alamosa 1871643028 Colorado MULTIPOLYGON (((-105.4855 3...\n#&gt; 3  08005   Arapahoe 2066438714 Colorado MULTIPOLYGON (((-103.7065 3...\n#&gt; 4  08007  Archuleta 3496712164 Colorado MULTIPOLYGON (((-107.1287 3...\n#&gt; 5  08009       Baca 6617400567 Colorado MULTIPOLYGON (((-102.0416 3...\n#&gt; 6  08011       Bent 3918255148 Colorado MULTIPOLYGON (((-102.7476 3...\n#&gt; 7  08013    Boulder 1881325109 Colorado MULTIPOLYGON (((-105.3978 3...\n#&gt; 8  08014 Broomfield   85386685 Colorado MULTIPOLYGON (((-105.1092 3...\n#&gt; 9  08015    Chaffee 2624715692 Colorado MULTIPOLYGON (((-105.9698 3...\n#&gt; 10 08017   Cheyenne 4605713960 Colorado MULTIPOLYGON (((-103.1729 3...\nclass(co)\n#&gt; [1] \"sf\"         \"data.frame\"\nattr(co, \"sf_column\")\n#&gt; [1] \"geometry\"\n\nAn sf object is a data.frame with one special list-column: the geometry. It extends data.frame with spatial awareness."
+  },
+  {
+    "objectID": "slides/week-2-1.html#sticky-geometry",
+    "href": "slides/week-2-1.html#sticky-geometry",
+    "title": "Week 2",
+    "section": "Sticky Geometry",
+    "text": "Sticky Geometry\nThe geometry column persists through dplyr operations:\n\nco |&gt; \n  select(name) |&gt; \n  slice(1:2)   # geometry comes along\n#&gt; Simple feature collection with 2 features and 1 field\n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -106.0393 ymin: 37.3562 xmax: -103.7057 ymax: 40.00137\n#&gt; Geodetic CRS:  WGS 84\n#&gt;      name                       geometry\n#&gt; 1   Adams MULTIPOLYGON (((-105.0532 3...\n#&gt; 2 Alamosa MULTIPOLYGON (((-105.4855 3...\n\n\nDrop it explicitly when you don’t need it:\n\nco |&gt; st_drop_geometry() |&gt; select(name) |&gt; slice(1:2)\n#&gt;      name\n#&gt; 1   Adams\n#&gt; 2 Alamosa"
+  },
+  {
+    "objectID": "slides/week-2-1.html#plotting-sf-objects-with-ggplot2",
+    "href": "slides/week-2-1.html#plotting-sf-objects-with-ggplot2",
+    "title": "Week 2",
+    "section": "Plotting sf Objects with ggplot2",
+    "text": "Plotting sf Objects with ggplot2\ngeom_sf() is the bridge between sf and ggplot2 — everything from last week works:\n\nggplot(data = co) +\n  geom_sf(aes(fill = aland)) +\n  scale_fill_viridis_c(name = \"Land Area (m²)\") +\n  labs(title = \"Colorado Counties by Land Area\") +\n  theme_minimal()\n\n\n\nAll dplyr verbs work on sf objects first, then pipe into ggplot:\n\nco |&gt;\n  filter(name == \"Larimer\") |&gt;\n  ggplot() + geom_sf(fill = \"#1E4D2B\") + theme_void()"
+  },
+  {
+    "objectID": "slides/week-2-1.html#the-sticky-geometry-structure",
+    "href": "slides/week-2-1.html#the-sticky-geometry-structure",
+    "title": "Week 2",
+    "section": "The Sticky Geometry Structure",
+    "text": "The Sticky Geometry Structure\n\nThe geometry binding is unique — unlike bind_cols() or cbind(), the sfc list-column carries CRS, bounding box, and precision metadata that regular column binding does not."
+  },
+  {
+    "objectID": "slides/week-2-1.html#simple-features-what-youve-learned",
+    "href": "slides/week-2-1.html#simple-features-what-youve-learned",
+    "title": "Week 2",
+    "section": "Simple Features: What You’ve Learned",
+    "text": "Simple Features: What You’ve Learned\nYou now understand:\n\nThe seven geometry types — POINT, LINESTRING, POLYGON, and their multi-equivalents\nThe class hierarchy — sfg (individual geometry) → sfc (set) → sf (dataframe with sticky geometry)\nValid geometries — self-intersecting lines and invalid polygons break spatial operations silently\nWKT and WKB — human-readable and machine-readable encodings\nCasting and dissolving — changing geometry type and boundary representation\nSticky geometry in dplyr — sf objects work naturally with pipes, filters, and ggplot\n\nNow a 5-minute break, then: What makes these coordinates actually spatial? We’ll cover the Coordinate Reference System — the foundation that anchors every spatial operation."
+  },
+  {
+    "objectID": "slides/week-2-1.html#minutes",
+    "href": "slides/week-2-1.html#minutes",
+    "title": "Week 2",
+    "section": "5 Minutes",
+    "text": "5 Minutes\nBack in 5. Next: coordinate systems, projections, and the three-part system (ellipsoid, datum, prime meridian) that determines whether your spatial analysis is correct or silently wrong."
+  },
+  {
+    "objectID": "slides/week-2-1.html#what-makes-spatial-data-spatial",
+    "href": "slides/week-2-1.html#what-makes-spatial-data-spatial",
+    "title": "Week 2",
+    "section": "What Makes Spatial Data Spatial?",
+    "text": "What Makes Spatial Data Spatial?\n\nThe geometry alone is meaningless without knowing where on Earth those coordinates refer to. That’s the job of the Coordinate Reference System."
+  },
+  {
+    "objectID": "slides/week-2-1.html#coordinate-reference-systems",
+    "href": "slides/week-2-1.html#coordinate-reference-systems",
+    "title": "Week 2",
+    "section": "Coordinate Reference Systems",
+    "text": "Coordinate Reference Systems\nA Coordinate Reference System (CRS) defines how spatial features relate to the surface of the Earth.\nTwo broad types:\n\nGeographic Coordinate System (GCS) — locations on the curved surface of the Earth, measured in angular units (degrees)\nProjected Coordinate System (PCS) — locations on a flat surface, measured in linear units (meters, feet)\n\nIn sf, three tools:\n\n\n\nFunction\nDoes\n\n\n\n\nst_crs()\nRetrieve CRS from an sf or sfc object\n\n\nst_set_crs()\nSet or replace CRS (no coordinate transformation)\n\n\nst_transform()\nTransform coordinates from one CRS to another"
+  },
+  {
+    "objectID": "slides/week-2-1.html#geographic-coordinate-systems",
+    "href": "slides/week-2-1.html#geographic-coordinate-systems",
+    "title": "Week 2",
+    "section": "Geographic Coordinate Systems",
+    "text": "Geographic Coordinate Systems\nA GCS identifies locations on the curved surface of the Earth using angular measurements from the center:\n\nLatitude — vertical angle (North/South from equator)\nLongitude — horizontal angle (East/West from prime meridian)\nNorth and East are positive; South and West are negative\n\n\nA GCS is defined by three components:\n\nEllipsoid — the mathematical model of Earth’s shape (flattened sphere, not perfect)\nDatum — how the ellipsoid is anchored to the real Earth (locally fitted or globally centered)\nPrime meridian — the origin of longitude (Greenwich, 0°E/W)\n\nWhy this matters: two datasets may use the same coordinates but different datums. The difference is small (sub-meter) but compounds in spatial joins and distance calculations."
+  },
+  {
+    "objectID": "slides/week-2-1.html#common-datums-in-water-resources",
+    "href": "slides/week-2-1.html#common-datums-in-water-resources",
+    "title": "Week 2",
+    "section": "Common Datums in Water Resources",
+    "text": "Common Datums in Water Resources\nThree datums account for most US data:\n\n\n\n\n\n\n\n\n\nDatum\nAcronym\nUsed by\nTypical error vs. NAD83\n\n\n\n\nNorth American Datum 1983\nNAD83\nNHDPlus, most USGS vector data\nReference datum\n\n\nWorld Geodetic System 1984\nWGS84\nGPS, NWIS gauges, web maps\n&lt;1 meter in CONUS\n\n\nNAD27 (historic)\nNAD27\nLegacy sources only\nCan be 100+ meters off\n\n\n\n\n\n\n\n\n\nNote\n\n\nNAD83 and WGS84 differ by less than 1 meter for most of CONUS. But they are not the same CRS. Mixing them without explicit transformation introduces sub-meter errors that compound in spatial joins. Always check with st_crs(a) == st_crs(b) before joining."
+  },
+  {
+    "objectID": "slides/week-2-1.html#projected-coordinate-systems",
+    "href": "slides/week-2-1.html#projected-coordinate-systems",
+    "title": "Week 2",
+    "section": "Projected Coordinate Systems",
+    "text": "Projected Coordinate Systems\nA Projected Coordinate System (PCS) transforms the curved Earth onto a 2D plane. Every transformation introduces distortion.\n\nThree main projection families:\n\n\n\n\n\n\n\n\n\n\n\n\nPlanar — flat surface touches globe at a point (best for polar regions)\nCylindrical — cylinder wraps around globe (world maps, Mercator)\nConic — cone around globe (mid-latitude areas, CONUS)"
+  },
+  {
+    "objectID": "slides/week-2-1.html#spatial-properties-and-distortion",
+    "href": "slides/week-2-1.html#spatial-properties-and-distortion",
+    "title": "Week 2",
+    "section": "Spatial Properties and Distortion",
+    "text": "Spatial Properties and Distortion\nEach type of projection prioritizes one property at the cost of others:\n\n\n\n\n\n\n\n\nProperty\nPreserved by\nUsed for\n\n\n\n\nArea\nEqual-area (Albers)\nAccurate area calculations, choropleth maps\n\n\nDistance\nEquidistant\nDistance from a fixed center point\n\n\nShape\nConformal (Mercator)\nNavigation, preserving local angles\n\n\nDirection\nAzimuthal\nNavigation from a pole"
+  },
+  {
+    "objectID": "slides/week-2-1.html#projection-choice-water-resources-defaults",
+    "href": "slides/week-2-1.html#projection-choice-water-resources-defaults",
+    "title": "Week 2",
+    "section": "Projection Choice: Water Resources Defaults",
+    "text": "Projection Choice: Water Resources Defaults\nFor CONUS analysis, use these defaults:\n\n\n\n\n\n\nImportant\n\n\n\nComputing area (choropleth maps, watershed statistics) → EPSG:5070 (Albers Equal Area). This is the standard federal projection for CONUS.\nMeasuring distance (gauge to outlet, confluences, dam spacing) → Keep data in geographic (WGS84, EPSG:4326) and use st_distance() with default S2 spherical geometry — it’s geodesic and correct.\nSub-state local analysis → Use a local UTM zone (e.g., NAD83 / UTM zone 13) if you need projected planar distance.\nVisualization/mapping → Use whatever looks right for your region (Web Mercator for web, Albers for print)."
+  },
+  {
+    "objectID": "slides/week-2-1.html#epsg-codes-and-proj-strings",
+    "href": "slides/week-2-1.html#epsg-codes-and-proj-strings",
+    "title": "Week 2",
+    "section": "EPSG Codes and PROJ Strings",
+    "text": "EPSG Codes and PROJ Strings\nsf stores CRS in two ways:\n\nEPSG code — integer ID for a known CRS (e.g., 4326 = WGS84 geographic)\nPROJ4 string — generic text description understood by the PROJ library\n\nCommon codes for water resources work:\n\n\n\n\n\n\n\n\nEPSG\nName\nUse\n\n\n\n\n4326\nWGS84 geographic\nGPS coordinates, web maps, NWIS gauges\n\n\n4269\nNAD83 geographic\nNHDPlus, most USGS vector data\n\n\n5070\nNAD83 / Conus Albers\nArea calculations, CONUS-wide analysis\n\n\n26913–26915\nUTM NAD83 zones 13–15\nLocal/state-level distance calculations\n\n\n\nPractical rule: Use EPSG:5070 for CONUS area calculations; use a local UTM (e.g., NAD83 / UTM zones) for sub-state analyses."
+  },
+  {
+    "objectID": "slides/week-2-1.html#checking-and-setting-crs",
+    "href": "slides/week-2-1.html#checking-and-setting-crs",
+    "title": "Week 2",
+    "section": "Checking and Setting CRS",
+    "text": "Checking and Setting CRS\n\n\n\nst_crs(conus)$epsg\n#&gt; [1] 4326\nst_crs(conus)$proj4string\n#&gt; [1] \"+proj=longlat +datum=WGS84 +no_defs\"\nst_crs(conus)$datum\n#&gt; [1] \"WGS84\"\n\n\n\nconus5070 &lt;- st_transform(conus, 5070)\nst_crs(conus5070)$epsg\n#&gt; [1] 5070\nst_crs(conus5070)$proj4string\n#&gt; [1] \"+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs\""
+  },
+  {
+    "objectID": "slides/week-2-1.html#visualizing-projections",
+    "href": "slides/week-2-1.html#visualizing-projections",
+    "title": "Week 2",
+    "section": "Visualizing Projections",
+    "text": "Visualizing Projections"
+  },
+  {
+    "objectID": "slides/week-2-1.html#reproducibility-habit-always-check-crs",
+    "href": "slides/week-2-1.html#reproducibility-habit-always-check-crs",
+    "title": "Week 2",
+    "section": "#1 Reproducibility Habit: Always Check CRS",
+    "text": "#1 Reproducibility Habit: Always Check CRS\nBefore any spatial operation — joins, distance calculations, area calculations — verify CRS match:\n\n# Guard pattern: check before joining\nif (st_crs(gauges) != st_crs(flowlines)) {\n  flowlines &lt;- st_transform(flowlines, st_crs(gauges))\n}\n\n# Or use the equality check\nst_crs(gauges) == st_crs(flowlines)  # must be TRUE\n\n\nReal example: NWIS gauges (WGS84, EPSG:4326) + NHD flowlines (NAD83, EPSG:4269):\n\nst_crs(4326) == st_crs(4269)    # FALSE — they are not the same!\n#&gt; [1] FALSE\n\nThey look similar (sub-meter differences in CONUS), but snapping a point to a line or computing a distance will be subtly wrong without transformation.\n\n\n\n\n\n\nImportant\n\n\nsf will warn you about CRS mismatch but won’t stop you. The result will execute and look plausible — but numbers will be wrong. Build the guard-check habit now."
+  },
+  {
+    "objectID": "slides/week-2-1.html#geodesic-vs.-planar-measurements",
+    "href": "slides/week-2-1.html#geodesic-vs.-planar-measurements",
+    "title": "Week 2",
+    "section": "Geodesic vs. Planar Measurements",
+    "text": "Geodesic vs. Planar Measurements\nGeodesic distance: shortest path on an ellipsoid — true Earth surface distance.\nPlanar distance: Euclidean distance in projected coordinates — fast but introduces error.\n\npts &lt;- data.frame(y = c(40.7128, 34.4208), x = c(-74.0060, -119.6982)) |&gt;\n  st_as_sf(coords = c(\"x\", \"y\"), crs = 4326)\n\nst_distance(pts)                    # Geodesic: ~3,962 km (correct)\nst_distance(st_transform(pts, 5070))# Planar: ~3,950 km (distorted)\n\n\n\n\n\n\n\n\nImportant\n\n\nFor water resources: use geodesic (default). In geographic CRS, st_distance() automatically computes geodesic (spherical) distances — correct for continental scales.\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\nsf uses geodesic by default in geographic CRS. Toggle S2 with sf::sf_use_s2(TRUE/FALSE) for fine control (rarely needed).\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\nPerformance: S2 geodesic calculations used to be substantially slower, but modern versions of sf and the S2 library have optimized performance significantly. Geodesic is now only ~25% slower than planar for large operations — a measurable but not critical difference for most workflows. Use geodesic unless you’re profiling and find it’s a real bottleneck."
+  },
+  {
+    "objectID": "slides/week-2-1.html#area-and-length",
+    "href": "slides/week-2-1.html#area-and-length",
+    "title": "Week 2",
+    "section": "Area and Length",
+    "text": "Area and Length\n\n(l &lt;- sum(st_length(conus)))\n#&gt; 0 [m]\n(a &lt;- sum(st_area(conus)))\n#&gt; 8.08951e+12 [m^2]"
+  },
+  {
+    "objectID": "slides/week-2-1.html#units-as-an-s3-class-workflow",
+    "href": "slides/week-2-1.html#units-as-an-s3-class-workflow",
+    "title": "Week 2",
+    "section": "Units as an S3 Class — Workflow",
+    "text": "Units as an S3 Class — Workflow\nResults carry units as an S3 class attribute — both powerful for correctness and a source of confusion in practice.\n\nclass(st_length(conus))\n#&gt; [1] \"units\"\nattributes(st_length(conus)) |&gt; unlist()\n#&gt; units.numerator           class \n#&gt;             \"m\"         \"units\""
+  },
+  {
+    "objectID": "slides/week-2-1.html#units-workflow-create-convert-drop",
+    "href": "slides/week-2-1.html#units-workflow-create-convert-drop",
+    "title": "Week 2",
+    "section": "Units Workflow: Create → Convert → Drop",
+    "text": "Units Workflow: Create → Convert → Drop\nCreate units naturally from measurements, convert between units, then drop before plotting or filtering:\nConvert between units with the units package:\n\nunits::set_units(l, \"km\")\n#&gt; 0 [km]\nunits::set_units(l, \"mile\")\n#&gt; 0 [mile]\nunits::set_units(a, \"ha\")\n#&gt; 808950983 [ha]\nunits::set_units(a, \"km2\")\n#&gt; 8089510 [km^2]\n\n\nStrip units when needed for arithmetic or plotting:\n\nunits::drop_units(sum(st_length(conus)))\n#&gt; [1] 0\nas.numeric(sum(st_length(conus)))\n#&gt; [1] 0"
+  },
+  {
+    "objectID": "slides/week-2-1.html#units-are-a-class-know-the-rules",
+    "href": "slides/week-2-1.html#units-are-a-class-know-the-rules",
+    "title": "Week 2",
+    "section": "Units Are a Class — Know the Rules",
+    "text": "Units Are a Class — Know the Rules\nUnits enforce dimensional correctness but can surprise you:\n\nst_length(conus) + 100   # can't add meters + unitless number\n#&gt; Error in Ops.units(st_length(conus), 100): both operands of the expression should be \"units\" objects\nfilter(cities, dist_to_border &lt; 160)  # may warn or fail\n#&gt; Error: object 'cities' not found\n\n\nThe corrected patterns:\n\n# Create numeric version for filtering/plotting\ncities &lt;- cities |&gt;\n  mutate(dist_to_border_km = as.numeric(units::set_units(dist_to_border, \"km\")))\n\n# Now filter and plot safely\ncities |&gt;\n  filter(dist_to_border_km &lt; 160) |&gt;\n  ggplot(aes(color = dist_to_border_km)) +\n  geom_sf()"
+  },
+  {
+    "objectID": "slides/week-2-1.html#two-essential-data-packages",
+    "href": "slides/week-2-1.html#two-essential-data-packages",
+    "title": "Week 2",
+    "section": "Two Essential Data Packages",
+    "text": "Two Essential Data Packages\nThe lab uses two packages you will reach for constantly in water resources work:\n\n\ntigris — US Census Bureau TIGER/Line boundaries\n\nlibrary(tigris)\noptions(tigris_use_cache = TRUE)\n\n# State boundaries\nstates(cb = TRUE, progress_bar = FALSE)\n\n# County boundaries\ncounties(state = \"CO\", cb = TRUE, progress_bar = FALSE)\n\nReturns sf objects directly. cb = TRUE gives simplified cartographic boundaries — faster for analysis.\n\nrnaturalearth — country and continent boundaries\n\nlibrary(rnaturalearth)\n\nne_countries(scale = \"medium\", returnclass = \"sf\") |&gt;\n  filter(admin %in% c(\"United States of America\",\n                      \"Canada\", \"Mexico\"))\n\nreturnclass = \"sf\" returns an sf object directly. Filter on the admin column for specific countries."
+  },
+  {
+    "objectID": "slides/week-2-1.html#building-sf-from-a-csv",
+    "href": "slides/week-2-1.html#building-sf-from-a-csv",
+    "title": "Week 2",
+    "section": "Building sf from a CSV",
+    "text": "Building sf from a CSV\nWhen coordinates are stored as numeric columns in a CSV — the most common format for point data from APIs, sensors, and databases — use st_as_sf():\n\ncities &lt;- read_csv(\"data/uscities.csv\") |&gt;\n  st_as_sf(coords = c(\"lng\", \"lat\"),  # column names: X first, then Y\n           crs    = 4326)             # raw lat/lon is almost always WGS84\n\n\nThree things to always specify:\n\ncoords = — column names in order X (longitude), Y (latitude)\ncrs = — the CRS the raw numbers are in (not what you want them in)\nThen st_transform() to convert to your analysis CRS"
+  },
+  {
+    "objectID": "slides/week-2-1.html#the-spatial-file-format-problem",
+    "href": "slides/week-2-1.html#the-spatial-file-format-problem",
+    "title": "Week 2",
+    "section": "The Spatial File Format Problem",
+    "text": "The Spatial File Format Problem\nThe real world doesn’t use one file format. Water resources agencies publish data in:\n\nShapefiles (USGS, NOAA — legacy, fragmented)\nGeoPackage (modern databases — NHDPlus HR)\nGeoJSON (web APIs — USGS, Google)\nNetCDF (climate data — NOAA, NCAR)\nHDF5 (satellite imagery — Landsat, MODIS)\nProprietary (Esri FileGeodatabase, GeoTIFF variants)\n\n\nIf R’s sf had to write code for every format, it would have thousands of functions and hundreds of library dependencies.\nThe solution: GDAL — the industry standard library that reads and writes all formats through a unified interface."
+  },
+  {
+    "objectID": "slides/week-2-1.html#what-is-gdal",
+    "href": "slides/week-2-1.html#what-is-gdal",
+    "title": "Week 2",
+    "section": "What Is GDAL?",
+    "text": "What Is GDAL?\nGDAL = Geospatial Data Abstraction Layer\nA C++ library (developed by OSGeo, used by every GIS software) that:\n\nAbstracts file formats — speaks shapefile, GeoJSON, GeoPackage, etc., but exposes the same API to your program\nTranslates between formats — convert any format to any other with one command\nManages drivers — each format has a “driver” (code that knows how to read/write that specific format)\nHandles metadata — CRS, bounds, layer names, attribute types\n\n\n\n# GDAL (C++ library) &lt;- drivers (one per format)\n#     ├── Shapefile driver\n#     ├── GeoJSON driver\n#     ├── GeoPackage driver\n#     ├── GeoTIFF driver\n#     ├── NetCDF driver\n#     └── ... 200+ more"
+  },
+  {
+    "objectID": "slides/week-2-1.html#gdal-drivers-and-water-resources",
+    "href": "slides/week-2-1.html#gdal-drivers-and-water-resources",
+    "title": "Week 2",
+    "section": "GDAL Drivers and Water Resources",
+    "text": "GDAL Drivers and Water Resources\n\nsf::st_drivers() # shows Format, type (vector/raster), open, write\n\nKey drivers for water resources:\n\n\n\n\nDriver\nFormat\nExtension\nCommon Use\n\n\n\n\nESRI Shapefile\nShapefile\n.shp\nUSGS NHD, NOAA, boundaries\n\n\nGeoJSON\nGeoJSON\n.geojson\nGoogle APIs, web services\n\n\nGPKG\nGeoPackage\n.gpkg\nNHDPlus HR, modern data\n\n\nGTiff\nGeoTIFF\n.tif\nUSGS 3DEP elevation, imagery\n\n\nnetCDF\nNetCDF\n.nc\nNOAA climate grids\n\n\nHDF5\nHDF5\n.h5\nNASA satellite data\n\n\n\n\n\n\n\n\n\n\n\nImportant\n\n\nGeoPackage replaces Shapefiles: one file, complete metadata, SQLite-based. Shapefiles require sidecars (.shx, .dbf, .prj) and lack metadata. Use GeoPackage when possible."
+  },
+  {
+    "objectID": "slides/week-2-1.html#practical-workflow-checking-drivers",
+    "href": "slides/week-2-1.html#practical-workflow-checking-drivers",
+    "title": "Week 2",
+    "section": "Practical Workflow: Checking Drivers",
+    "text": "Practical Workflow: Checking Drivers\nBefore downloading a big dataset or writing code to read a file format you haven’t used:\n\n# What drivers do I have?\nsf::st_drivers() |&gt; filter(grepl(\"GeoTIFF|NetCDF|HDF5\", name))\n\n# Can GDAL write this format?\nsf::st_drivers(type = \"vector\")[, c(\"name\", \"write\")]\n\n# What layers are in this file?\nst_layers(\"databases/nhdplus.gpkg\")\n\nThis prevents silent failures where you think you’re reading a file but GDAL can’t find the driver on your system."
+  },
+  {
+    "objectID": "slides/week-2-1.html#reading-spatial-files-shapefiles-geojson-and-geopackage",
+    "href": "slides/week-2-1.html#reading-spatial-files-shapefiles-geojson-and-geopackage",
+    "title": "Week 2",
+    "section": "Reading Spatial Files: Shapefiles, GeoJSON, and GeoPackage",
+    "text": "Reading Spatial Files: Shapefiles, GeoJSON, and GeoPackage\nFor pre-built spatial data (boundaries, networks, rasters), use st_read(). The GDAL library (integrated into sf) auto-detects format and reads dozens of file types:\n\n# Shapefile (most common)\nstates &lt;- st_read(\"data/tl_2023_us_state/tl_2023_us_state.shp\")\n\n# GeoJSON (web-friendly, human-readable)\nwatersheds &lt;- st_read(\"data/watersheds.geojson\")\n\n# GeoPackage (single-file, database-like, modern standard)\nnhdplus &lt;- st_read(\"databases/nhdplus.gpkg\", layer = \"flowlines\")\n\n# GeoTIFF (raster — not sf, but mentioned for context)\n# dem &lt;- terra::rast(\"elevation/dem.tif\")\n\n\nCommon GDAL drivers for water resources:\n\n\n\n\n\n\n\n\n\nFormat\nExtension\nWhen to use\nNotes\n\n\n\n\nShapefile\n.shp\nLegacy data, USGS sources\nRequires 3+ sidecar files (.dbf, .shx, .prj)\n\n\nGeoJSON\n.geojson\nWeb APIs, GitHub, lightweight sharing\nText-based, human-readable\n\n\nGeoPackage\n.gpkg\nModern standard, large datasets\nSQLite-based, single file, efficient\n\n\nGeoTIFF\n.tif\nRaster data (DEMs, satellite)\nUse terra::rast() not st_read()\n\n\n\n\n\n\n\n\n\n\n\nTip\n\n\nShapefiles look like one file (.shp) but require 3–4 sidecars (.shx, .dbf, .prj). Zip them together when sharing. GeoPackage is the modern replacement — one file, one st_read() call, no sidecars."
+  },
+  {
+    "objectID": "slides/week-2-1.html#full-pipeline",
+    "href": "slides/week-2-1.html#full-pipeline",
+    "title": "Week 2",
+    "section": "Full pipeline:",
+    "text": "Full pipeline:\n\ncities &lt;- read_csv(\"data/uscities.csv\") |&gt;\n  st_as_sf(coords = c(\"lng\", \"lat\"), crs = 4326) |&gt;\n  st_transform(5070)                # reproject for distance analysis"
+  },
+  {
+    "objectID": "slides/week-2-1.html#st_filter-spatial-subsetting",
+    "href": "slides/week-2-1.html#st_filter-spatial-subsetting",
+    "title": "Week 2",
+    "section": "st_filter() — Spatial Subsetting",
+    "text": "st_filter() — Spatial Subsetting\nst_filter() is the spatial equivalent of dplyr::filter() — it keeps only features that satisfy a spatial predicate (default: intersection):\n\n# Keep only cities inside CONUS states\ncities_conus &lt;- cities |&gt;\n  st_filter(st_union(states))\n\nThis is how you clip a point dataset to a polygon boundary — one of the most common operations in spatial data preparation."
+  },
+  {
+    "objectID": "slides/week-2-1.html#end-to-end-csv-filtered-transformed-measured",
+    "href": "slides/week-2-1.html#end-to-end-csv-filtered-transformed-measured",
+    "title": "Week 2",
+    "section": "End-to-End: CSV → Filtered → Transformed → Measured",
+    "text": "End-to-End: CSV → Filtered → Transformed → Measured\nThis is the complete workflow to compute the distance from every city to the national border:\n\n# Pre-compute boundary in projected space (outside the pipeline)\nboundary &lt;- st_cast(st_union(st_transform(conus, 5070)), \"MULTILINESTRING\")\n\n# Main workflow: read, build, transform, measure\nsystem.time({\ncities &lt;- read_csv(\"data/uscities.csv\", show_col_types =FALSE) |&gt;\n  st_as_sf(coords = c(\"lng\", \"lat\"), crs = 4326) |&gt;\n  st_transform(5070) %&gt;%\n  mutate(\n    dist_to_border_m = st_distance(., boundary),\n    dist_to_border_km = units::set_units(dist_to_border_m, \"km\")\n  )\n})\n#&gt;    user  system elapsed \n#&gt;   1.656   0.026   1.637\n\n# user  system elapsed \n# 1.648   0.014   1.677\n\nKey takeaways: - Build sf: CSV coordinates + CRS they’re in → st_as_sf() - Transform: project to EPSG:5070 for measurements - Measure: distance returns units object; convert as needed - Reuse: pass pre-computed boundary to st_distance() — clean, fast, readable"
+  },
+  {
+    "objectID": "slides/week-2-1.html#set_units-with-distances",
+    "href": "slides/week-2-1.html#set_units-with-distances",
+    "title": "Week 2",
+    "section": "set_units() with Distances",
+    "text": "set_units() with Distances\nThe lab uses set_units() to convert and label distance results:\n\ncities &lt;- cities |&gt;\n  mutate(dist_to_border = set_units(st_distance(geometry, us_border), \"km\"))\n\n\n\n\n\n\n\nTip\n\n\nRemember: set_units() returns a units object. Convert to numeric before comparisons or filtering, e.g. filter(cities, as.numeric(dist_to_border) &lt; 160) or create a numeric column with dist_to_border_km &lt;- as.numeric(set_units(dist_to_border, \"km\")).\n\n\n\nst_distance() returns distances in the units of the CRS — meters for projected systems. set_units() converts and labels:\n\nd &lt;- st_distance(st_transform(pts, eqdc))\nd                               # meters, labeled [m]\nset_units(d, \"km\")              # km, still labeled\nas.numeric(set_units(d, \"km\"))  # numeric — drop units for plotting/filtering\n\n\nAlways use as.numeric() before comparison operators:\n\nfilter(cities, as.numeric(dist_to_border) &lt; 160)  # correct\nfilter(cities, dist_to_border &lt; 160)               # may warn or fail"
+  },
+  {
+    "objectID": "slides/week-2-1.html#ggrepel-non-overlapping-labels",
+    "href": "slides/week-2-1.html#ggrepel-non-overlapping-labels",
+    "title": "Week 2",
+    "section": "ggrepel: Non-Overlapping Labels",
+    "text": "ggrepel: Non-Overlapping Labels\nggrepel solves label collision — essential any time you label points on a map:\n\nlibrary(ggrepel)\n\nggplot() +\n  geom_sf(data = conus, fill = \"white\") +\n  geom_sf(data = st_filter(cities, st_transform(conus, 5070)), color = \"red\", size = 0.1) +\n  ggrepel::geom_label_repel(\n    data = filter(cities, city == \"Denver\"),\n    aes(geometry = geometry, label = city),\n    stat = \"sf_coordinates\",  # extracts coordinates from sf geometry\n    size = 3\n  ) +\n  theme_void()\n\n\nstat = \"sf_coordinates\" is the key argument — it tells ggrepel to extract X/Y from the geometry column rather than expecting explicit x and y aesthetics. Without it, you get an error."
+  },
+  {
+    "objectID": "slides/week-2-1.html#gghighlight-emphasize-a-subset",
+    "href": "slides/week-2-1.html#gghighlight-emphasize-a-subset",
+    "title": "Week 2",
+    "section": "gghighlight: Emphasize a Subset",
+    "text": "gghighlight: Emphasize a Subset\ngghighlight greys out features that do not meet a condition, keeping them as spatial context:\n\nlibrary(gghighlight)\n\nggplot() +\n  geom_sf(data = conus) +\n  geom_sf(data = st_filter(cities, st_transform(conus, 5070)),\n          aes(color = as.numeric(dist_to_border_km)),\n          size = 0.3) +\n  gghighlight(as.numeric(dist_to_border_km) &lt; 100) +\n  scale_color_gradient(low = \"orange\", high = \"darkred\") +\n  labs(title = \"Cities within 100 km of the national border\",\n       color = \"Distance (km)\") +\n  theme_void()\n\n\nFeatures outside the condition are rendered in grey at reduced opacity — they provide spatial context without competing visually with the highlighted subset. Works with any geom_* — points, lines, polygons."
+  },
+  {
+    "objectID": "slides/week-2-1.html#everything-youve-learned-applied",
+    "href": "slides/week-2-1.html#everything-youve-learned-applied",
+    "title": "Week 2",
+    "section": "Everything You’ve Learned Applied",
+    "text": "Everything You’ve Learned Applied\nLab 2 puts all these pieces together on real US cities data:\nYour workflow:\n\nRead US cities CSV with lat/lon coordinates\nBuild sf object with st_as_sf()\nFilter to CONUS using st_filter() (spatial subset)\nTransform to equal-area CRS (EPSG:5070) for distance calculations\nCompute distance from each city to the nearest national border\nIdentify which cities fall within 160 km of international/state borders\nAnalyze the result: which states are “border-proximate” and why it matters for federal policy\n\nSkills you’ll use:\n\nSpatial data types and classes (sf, sfc, geometry types)\nCoordinate systems and transformations (check CRS, transform to analysis CRS)\nDistance measurements (geodesic by default, units handling)\nSpatial subsetting (st_filter() as a spatial predicate)\nSpatial visualization (geom_sf(), ggrepel, gghighlight)"
+  },
+  {
+    "objectID": "slides/week-2-1.html#what-we-covered",
+    "href": "slides/week-2-1.html#what-we-covered",
+    "title": "Week 2",
+    "section": "What We Covered",
+    "text": "What We Covered\n\n\nSimple Features\n\nThe ISO standard and its R implementation\nThe big 7 geometry types\nsfg → sfc → sf class hierarchy\nWKT / WKB encodings\nCasting, combining, dissolving\nSticky geometry + geom_sf()\n\nCoordinate Systems\n\nGCS: ellipsoid, geoid, datum\nPCS: projection types and distortion\nEPSG codes and st_transform()\nAlways check CRS before joining\n\n\nMeasurements\n\nGeodesic vs. planar distance\nst_distance(), st_area(), st_length()\nUnits as an S3 class — set_units(), drop_units()\nConverting and dropping units\n\nKey habits built today:\n\nst_is_valid() on every dataset you read\nst_crs(a) == st_crs(b) before every spatial join\nUse equal-area CRS for areas, equidistant for distances\nas.numeric() before filtering on unit quantities"
+  },
+  {
+    "objectID": "slides/week-2-1.html#before-next-class",
+    "href": "slides/week-2-1.html#before-next-class",
+    "title": "Week 2",
+    "section": "Before Next Class",
+    "text": "Before Next Class\n\n\nLab 2 is due next Wednesday\n\nLab 2: Distances and Projections\n\nYou will apply everything from today — building sf objects from multiple sources, transforming CRS, computing distances to boundaries, and identifying features within threshold zones — to a national US cities dataset culminating in a real federal policy analysis.\nThe sf verbs are the same dplyr verbs you already know. tigris, rnaturalearth, ggrepel, and gghighlight are now in your toolkit.\nNext topic\nWeek 3: Spatial operations — predicates, joins, and the river network"
+  },
+  {
+    "objectID": "slides/week-2-1.html#when-you-call-filter-on-a-grouped-dataframe-r-internally-does",
+    "href": "slides/week-2-1.html#when-you-call-filter-on-a-grouped-dataframe-r-internally-does",
+    "title": "Week 2",
+    "section": "When you call filter() on a grouped dataframe, R internally does:",
+    "text": "When you call filter() on a grouped dataframe, R internally does:\n\nCheck: “What class is this object?” (grouped_df)\nLook for filter.grouped_df()\nIf it exists, call it; if not, fall back to filter.data.frame()\nThe filter.grouped_df() method applies the condition within each group — the key behavior\n\nCompare the same code on grouped vs ungrouped data:\n\ndf &lt;- data.frame(site = c(\"A\", \"A\", \"B\", \"B\"), flow = c(100, 120, 95, 110))\n\n# On ungrouped data: keeps rows where flow &gt; 105\ndf |&gt; filter(flow &gt; 105)\n#&gt;   site flow\n#&gt; 1    A  120\n#&gt; 2    B  110\n\n# On grouped data: keeps earliest row per group where flow &gt; 105\ndf |&gt; group_by(site) |&gt; filter(flow &gt; 105)\n#&gt; # A tibble: 2 × 2\n#&gt; # Groups:   site [2]\n#&gt;   site   flow\n#&gt;   &lt;chr&gt; &lt;dbl&gt;\n#&gt; 1 A       120\n#&gt; 2 B       110\n\nThe function is identical; the method dispatched changes based on class."
+  },
+  {
+    "objectID": "slides/week-2-1.html#section",
+    "href": "slides/week-2-1.html#section",
+    "title": "Week 2",
+    "section": "",
+    "text": "When you call filter() on a grouped dataframe, R internally does:\n\nCheck: “What class is this object?” (grouped_df)\nLook for filter.grouped_df()\nIf it exists, call it; if not, fall back to filter.data.frame()\nThe filter.grouped_df() method applies the condition within each group — the key behavior\n\nCompare the same code on grouped vs ungrouped data:\n\ndf &lt;- data.frame(site = c(\"A\", \"A\", \"B\", \"B\"), flow = c(100, 120, 95, 110))\n\n# On ungrouped data: keeps rows where flow &gt; 105\ndf |&gt; filter(flow &gt; 105)\n#&gt;   site flow\n#&gt; 1    A  120\n#&gt; 2    B  110\n\n# On grouped data: keeps earliest row per group where flow &gt; 105\ngroup_by(df, site) |&gt; filter(flow &gt; 105)\n#&gt; # A tibble: 2 × 2\n#&gt; # Groups:   site [2]\n#&gt;   site   flow\n#&gt;   &lt;chr&gt; &lt;dbl&gt;\n#&gt; 1 A       120\n#&gt; 2 B       110\n\nThe function is identical; the method dispatched changes based on class."
+  },
+  {
+    "objectID": "slides/week-2-1.html#building-geometries-from-points-to-polygons",
+    "href": "slides/week-2-1.html#building-geometries-from-points-to-polygons",
+    "title": "Week 2",
+    "section": "Building Geometries: From Points to Polygons",
+    "text": "Building Geometries: From Points to Polygons\nThe big 7 aren’t arbitrary. They compose from simpler to more complex:\nPoints are the foundation:\n\npt &lt;- st_point(c(-104.99, 39.74))   # One coordinate: (x, y)\n\n\nLines are sequences of connected points:\n\n# 3 points connected by straight segments\nline &lt;- st_linestring(rbind(c(-104.99, 39.74),\n                             c(-105.10, 39.80),\n                             c(-105.15, 39.85)))\n\n\n\nPolygons are closed lines that enclose area (first point = last point):\n\n# Same 3 points, but closed: return to start\nring &lt;- rbind(c(-104.99, 39.74), c(-105.10, 39.80), c(-105.15, 39.85), c(-104.99, 39.74))\npoly &lt;- st_polygon(list(ring))\n\nThen Multi- variants are just sets of the same type (e.g., MultiPolygon = set of 3 separate polygons). GEOMETRYCOLLECTION is a set of mixed types."
+  },
+  {
+    "objectID": "slides/week-2-1.html#point",
+    "href": "slides/week-2-1.html#point",
+    "title": "Week 2",
+    "section": "POINT",
+    "text": "POINT\nA point is composed of one coordinate pair in a specific coordinate system.\n\nPoints have no length or area\nExample: a gauge location, a dam, a city\n\n\nggplot() + \n  geom_point(aes(x = c(1, 2, 3), y = c(3, 1, 2)), size = 3) + \n  labs(x = \"Longitude\", y = \"Latitude\") +\n  theme_linedraw()"
+  },
+  {
+    "objectID": "slides/week-2-1.html#linestring",
+    "href": "slides/week-2-1.html#linestring",
+    "title": "Week 2",
+    "section": "LINESTRING",
+    "text": "LINESTRING\nA linestring is composed of an ordered sequence of two or more coordinate points.\n\nPoints in a line are called vertices and explicitly define the connection between two points\nA line has length, but no area\nExample: a stream centerline, a river reach, a road\n\n\nggplot() + \n  geom_line(aes(x = c(1, 2, 3), y = c(3, 1, 2)), linewidth = 1) + \n  geom_point(aes(x = c(1, 2, 3), y = c(3, 1, 2)), col = \"red\", size = 3) + \n  labs(x = \"Longitude\", y = \"Latitude\") +\n  theme_linedraw()"
+  },
+  {
+    "objectID": "slides/week-2-1.html#polygon",
+    "href": "slides/week-2-1.html#polygon",
+    "title": "Week 2",
+    "section": "POLYGON",
+    "text": "POLYGON\nA polygon is composed of 4 or more points whose starting and ending point are the same.\n\nPolygons enclose a closed ring (first point = last point)\nPolygons have both length and area\nExample: a watershed boundary, a county border, a floodplain\n\n\nggplot() + \n  geom_polygon(aes(x = c(1, 2, 3, 1), y = c(3, 1, 2, 3)), fill = \"steelblue\", alpha = 0.5, color = \"black\") + \n  geom_point(aes(x = c(1, 2, 3), y = c(3, 1, 2)), col = \"red\", size = 3) +\n  labs(x = \"Longitude\", y = \"Latitude\") +\n  theme_linedraw()"
+  },
+  {
+    "objectID": "slides/week-2-1.html#multi-geometries-and-collections",
+    "href": "slides/week-2-1.html#multi-geometries-and-collections",
+    "title": "Week 2",
+    "section": "Multi-Geometries and Collections",
+    "text": "Multi-Geometries and Collections\nMulti- variants are just sets of the same type:\n\nMULTIPOINT = set of points\nMULTILINESTRING = set of lines (e.g., a braided river system)\nMULTIPOLYGON = set of polygons (e.g., an island chain, a fragmented watershed)\n\nGEOMETRYCOLLECTION = a set of mixed geometry types (rare, usually from intersections)"
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-1-distance-to-states-polygons-4",
+    "href": "slides/week-2-1.html#attempt-1-distance-to-states-polygons-4",
+    "title": "Week 2",
+    "section": "Attempt 1: distance to states (polygons)",
+    "text": "Attempt 1: distance to states (polygons)\n\n\n\nconus |&gt;\n  select(state_name) %&gt;%\n  mutate(dist = st_distance(., denver_sf)) |&gt;\n  slice_min(dist, n = 3) -&gt;\n  state_data\n\n\n\n\n\nNOTE: the `%&gt;% pipe needed here …\nDistance to Colorado is 0 — Denver is inside a polygon, so distance = 0\nPolygons describe areas — distance to the interior is always 0"
+  },
+  {
+    "objectID": "slides/week-2-1.html#attempt-2-cast-to-lines-first-6",
+    "href": "slides/week-2-1.html#attempt-2-cast-to-lines-first-6",
+    "title": "Week 2",
+    "section": "Attempt 2: cast to lines first",
+    "text": "Attempt 2: cast to lines first\n\n\n\nconus |&gt;\n  select(state_name) |&gt;\n  st_cast(\"MULTILINESTRING\") -&gt;\n  state_lines\n\nstate_lines |&gt;\n  mutate(dist = st_distance(state_lines, denver_sf)) |&gt;\n  slice_min(dist, n = 3)\n\n\n\n#&gt; Simple feature collection with 3 features and 2 fields\n#&gt; Geometry type: MULTILINESTRING\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -111.0546 ymin: 36.99246 xmax: -95.30829 ymax: 45.00582\n#&gt; Geodetic CRS:  WGS 84\n#&gt;   state_name         dist                       geometry\n#&gt; 1   Colorado 140002.6 [m] MULTILINESTRING ((-105.155 ...\n#&gt; 2    Wyoming 140002.6 [m] MULTILINESTRING ((-106.3212...\n#&gt; 3   Nebraska 161243.2 [m] MULTILINESTRING ((-95.93779..."
+  },
+  {
+    "objectID": "slides/week-2-1.html#geometry-as-a-list-column-the-bridge",
+    "href": "slides/week-2-1.html#geometry-as-a-list-column-the-bridge",
+    "title": "Week 2",
+    "section": "Geometry as a List Column: The Bridge",
+    "text": "Geometry as a List Column: The Bridge\nWKT and WKB are intermediate—R’s native geometry storage is a list column. Remember nested lists? They’re key to understanding sfc:\n\n# A simple nested list: list containing lists\nlist(list(c(1, 2)), list(c(3, 4)), list(c(5, 6)))\n#&gt; [[1]]\n#&gt; [[1]][[1]]\n#&gt; [1] 1 2\n#&gt; \n#&gt; \n#&gt; [[2]]\n#&gt; [[2]][[1]]\n#&gt; [1] 3 4\n#&gt; \n#&gt; \n#&gt; [[3]]\n#&gt; [[3]][[1]]\n#&gt; [1] 5 6\n\n\nA geometry list-column (sfc) is exactly this structure — a column where each cell contains a list (a geometry).\nThis is why sfc is itself a list of lists, and why:\n\nOne row = one feature\nEach row’s geometry = one complex object (sfg)\nMultiple rows’ geometries = the sfc list-column\n\nThis structure is what allows sf to be a data.frame — geometry is just another column, treated like any list-column."
+  },
+  {
+    "objectID": "slides/week-2-1.html#combining-and-dissolving-geometries",
+    "href": "slides/week-2-1.html#combining-and-dissolving-geometries",
+    "title": "Week 2",
+    "section": "Combining and Dissolving Geometries",
+    "text": "Combining and Dissolving Geometries\nTwo key operations for working with geometry sets:\nst_combine() — joins geometries while preserving interior boundaries:\n\n(co_combined &lt;- st_combine(co$geometry))\n#&gt; Geometry set for 1 feature \n#&gt; Geometry type: MULTIPOLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -109.0602 ymin: 36.99246 xmax: -102.0415 ymax: 41.00342\n#&gt; Geodetic CRS:  WGS 84\n\n\nst_union() — joins geometries and dissolves interior boundaries (merges into one feature):\n\n(co_unioned &lt;- st_union(co$geometry))\n#&gt; Geometry set for 1 feature \n#&gt; Geometry type: POLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: -109.0602 ymin: 36.99246 xmax: -102.0415 ymax: 41.00342\n#&gt; Geodetic CRS:  WGS 84"
+  },
+  {
+    "objectID": "slides/week-2-1.html#visualizing-combine-vs.-union",
+    "href": "slides/week-2-1.html#visualizing-combine-vs.-union",
+    "title": "Week 2",
+    "section": "Visualizing Combine vs. Union",
+    "text": "Visualizing Combine vs. Union\n\n\nst_combine (boundaries preserved):\n\n\n\n\n\n\n\n\n\n\nst_union (boundaries dissolved):\n\n\n\n\n\n\n\n\n\n\n\nWater resources example: Use st_combine() to keep sub-basins separate, use st_union() to create a single merged basin outline."
+  },
+  {
+    "objectID": "slides/week-2-1.html#section-1",
+    "href": "slides/week-2-1.html#section-1",
+    "title": "Week 2",
+    "section": "",
+    "text": "When you call st_read(\"data.shp\"), here’s what happens:\n\nR/sf calls GDAL: “Read this file”\nGDAL looks at the extension (.shp)\nGDAL finds the Shapefile driver\nThe driver reads the .shp and its sidecars\nGDAL returns data to sf\nsf wraps it in an sfc geometry + sf object structure and hands it to your R code\n\n\n\n\n\n\n\n\nNote\n\n\nYou don’t write GDAL code directly. But st_read() and st_write() are thin wrappers around GDAL. Understanding this explains why st_read() “just works” on 50+ formats and why format conversions are trivial in R but painful elsewhere."
+  },
+  {
+    "objectID": "slides/week-2-1.html#how-core-libraries-pass-data-to-r-wkt-and-wkb",
+    "href": "slides/week-2-1.html#how-core-libraries-pass-data-to-r-wkt-and-wkb",
+    "title": "Week 2",
+    "section": "How Core Libraries Pass Data to R: WKT and WKB",
+    "text": "How Core Libraries Pass Data to R: WKT and WKB\nWhen GDAL reads a file or GEOS performs an operation, it uses two standard encodings to pass geometry to R:\nWell-Known Text (WKT) — human-readable (you’ll see this in error messages and discussions):\n\nx &lt;- st_linestring(matrix(10:1, 5))\nst_as_text(x)\n#&gt; [1] \"LINESTRING (10 5, 9 4, 8 3, 7 2, 6 1)\"\n\n\nLINESTRING = type; parentheses contain points; points separated by commas; coordinates separated by spaces\n\nWell-Known Binary (WKB) — machine-readable, used internally by GDAL/GEOS for speed and lossless communication:\n\nst_as_binary(x)\n#&gt;  [1] 01 02 00 00 00 05 00 00 00 00 00 00 00 00 00 24 40 00 00 00 00 00 00 14 40\n#&gt; [26] 00 00 00 00 00 00 22 40 00 00 00 00 00 00 10 40 00 00 00 00 00 00 20 40 00\n#&gt; [51] 00 00 00 00 00 08 40 00 00 00 00 00 00 1c 40 00 00 00 00 00 00 00 40 00 00\n#&gt; [76] 00 00 00 00 18 40 00 00 00 00 00 00 f0 3f\n\n\n\n\n\n\n\n\nNote\n\n\nYou rarely write WKT/WKB directly, but understanding they exist explains why st_read() “just works”—GDAL converts any format to WKB, sf wraps it as an R object, and the roundtrip is seamless."
+  },
+  {
+    "objectID": "slides/week-2-1.html#storing-geometry-from-coordinates-to-nested-lists",
+    "href": "slides/week-2-1.html#storing-geometry-from-coordinates-to-nested-lists",
+    "title": "Week 2",
+    "section": "Storing Geometry: From Coordinates to Nested Lists",
+    "text": "Storing Geometry: From Coordinates to Nested Lists\nRemember nested lists from Week 1? They’re the key to understanding how R stores spatial data.\nA geometry is just a collection of coordinate pairs:\n\n# A simple list of coordinates (one geometry)\nc(x = 1, y = 2)\n#&gt; x y \n#&gt; 1 2\n\n# A nested list: many geometries, each is a list of coordinates\nlist(\n  list(c(1, 2)),        # First geometry (one point)\n  list(c(3, 4)),        # Second geometry (one point)\n  list(c(5, 6))         # Third geometry (one point)\n)\n#&gt; [[1]]\n#&gt; [[1]][[1]]\n#&gt; [1] 1 2\n#&gt; \n#&gt; \n#&gt; [[2]]\n#&gt; [[2]][[1]]\n#&gt; [1] 3 4\n#&gt; \n#&gt; \n#&gt; [[3]]\n#&gt; [[3]][[1]]\n#&gt; [1] 5 6\n\n\nThis nested structure is how R stores multiple geometries side-by-side. Each row in a data.frame can hold one geometry (which itself is a list of coordinates). When you add a geometry column to a data.frame, you’ve created a geometry column — many rows, each containing its own nested geometry structure.\n\nOne row = one feature (with attributes + geometry)\nEach row’s geometry = one nested structure of coordinates\n\nColumn of geometries = all features’ geometries stacked together"
+  },
+  {
+    "objectID": "slides/week-2-1.html#invalid-examples",
+    "href": "slides/week-2-1.html#invalid-examples",
+    "title": "Week 2",
+    "section": "Invalid Examples",
+    "text": "Invalid Examples\n\n\nSelf-intersecting line:\n\nx1 &lt;- st_linestring(cbind(c(0,1,0,1), \n                          c(0,1,1,0)))\nst_is_simple(x1)  # FALSE\n\nInvalid polygon (crossing edges):\n\nx2 &lt;- st_polygon(list(cbind(\n  c(0,1,1,1,0,0), \n  c(0,0,1,0.6,1,0))))\nst_is_valid(x2)  # FALSE\n\n\n\n\n\n\n\n\n\n\n\n\nThese operations fail silently unless checked."
+  },
+  {
+    "objectID": "slides/week-2-1.html#storing-geometry",
+    "href": "slides/week-2-1.html#storing-geometry",
+    "title": "Week 2",
+    "section": "Storing Geometry:",
+    "text": "Storing Geometry:\nRemember nested lists? They’re the key to understanding how R stores spatial data. A geometry is just a collection of coordinate pairs:\n\n# A simple coordinate set (one geometry)\nc(x = 1, y = 2)\n#&gt; x y \n#&gt; 1 2\n\n# A nested list: many geometries, each is a list of coordinates\nlist(\n  list(c(1, 2)),        # First geometry (one point)\n  list(c(3, 4)),        # Second geometry (one point)\n  list(c(5, 6))         # Third geometry (one point)\n)\n#&gt; [[1]]\n#&gt; [[1]][[1]]\n#&gt; [1] 1 2\n#&gt; \n#&gt; \n#&gt; [[2]]\n#&gt; [[2]][[1]]\n#&gt; [1] 3 4\n#&gt; \n#&gt; \n#&gt; [[3]]\n#&gt; [[3]][[1]]\n#&gt; [1] 5 6\n\n\nThis nested structure is how R stores multiple geometries side-by-side. Each row in a data.frame can hold one geometry (which itself is a list of coordinates). When you add a geometry column to a data.frame, you’ve created a geometry column — many rows, each containing its own nested geometry structure.\n\nOne row = one feature (with attributes + geometry)\nEach row’s geometry = one nested structure of coordinates\n\nColumn of geometries = all features’ geometries stacked together"
+  },
+  {
+    "objectID": "slides/week-2-1.html#storing-geometry-nested-lists",
+    "href": "slides/week-2-1.html#storing-geometry-nested-lists",
+    "title": "Week 2",
+    "section": "Storing Geometry: Nested Lists",
+    "text": "Storing Geometry: Nested Lists\nRemember nested lists? A geometry is just coordinates:\n\n# One geometry: a pair of coordinates\nc(x = 1, y = 2)\n\n# Many geometries: nested list of coordinate pairs\nlist(list(c(1, 2)), list(c(3, 4)), list(c(5, 6)))\n\n\nR stores multiple geometries side-by-side this way: Each row in a data.frame holds one geometry (which is a list of coordinates). This creates a geometry column — many rows, each with its own nested geometry.\n\nOne row = one feature (with attributes + geometry)\nEach row’s geometry = one nested coordinate structure\n\nAll rows together = a geometry list-column"
+  },
+  {
+    "objectID": "slides/week-2-1.html#mixed-geometries-and-collections",
+    "href": "slides/week-2-1.html#mixed-geometries-and-collections",
+    "title": "Week 2",
+    "section": "Mixed Geometries and Collections",
+    "text": "Mixed Geometries and Collections\nWhen features have different geometry types, the type becomes GEOMETRY.\nExample: A collection with POINT + LINESTRING:\n\ng &lt;- st_sfc(st_point(c(0, 0)), \n            st_linestring(rbind(c(0, 0), c(1, 1))))\n\n\nFilter by type with st_is():\n\nst_sf(geometry = g) |&gt;\n  filter(st_is(geometry, \"LINESTRING\"))   # keep only lines\n#&gt; Simple feature collection with 1 feature and 0 fields\n#&gt; Geometry type: LINESTRING\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: 0 ymin: 0 xmax: 1 ymax: 1\n#&gt; CRS:           NA\n#&gt;                geometry\n#&gt; 1 LINESTRING (0 0, 1 1)\n\n\n\nWhen intersections produce mixed types, use st_collection_extract():\n\npt   &lt;- st_point(c(1, 0))\nls   &lt;- st_linestring(matrix(c(4, 3, 0, 0), ncol = 2))\npoly &lt;- st_polygon(list(matrix(c(5.5, 7, 7, 6, 5.5, 0, 0, -0.5, -0.5, 0), ncol = 2)))\ncollection &lt;- st_geometrycollection(list(pt, ls, poly))\n\nst_collection_extract(collection, \"POLYGON\")  # extract only polygons"
+  },
+  {
+    "objectID": "slides/week-2-1.html#combine-cast-from-boundaries-to-lines",
+    "href": "slides/week-2-1.html#combine-cast-from-boundaries-to-lines",
+    "title": "Week 2",
+    "section": "Combine + Cast: From Boundaries to Lines",
+    "text": "Combine + Cast: From Boundaries to Lines\nYou can combine geometries and then cast them to a different type — useful for creating line networks from polygon boundaries:\n\nco_borders_combined &lt;- st_combine(co$geometry) |&gt; st_cast(\"MULTILINESTRING\")\nco_borders_unioned  &lt;- st_union(co$geometry) |&gt; st_cast(\"MULTILINESTRING\")\n\n\n\n\n\n\n\n\n\nTip\n\n\nThis distinction matters constantly in water resources: county boundaries vs. watershed boundaries, stream reaches vs. the river network, individual gauge catchments vs. the basin outline."
+  },
+  {
+    "objectID": "slides/week-2-1.html#what-is-s2",
+    "href": "slides/week-2-1.html#what-is-s2",
+    "title": "Week 2",
+    "section": "What Is S2?",
+    "text": "What Is S2?\nS2 is Google’s spherical geometry library — a modern C++ implementation for accurate calculations on a sphere/ellipsoid.\nsf uses S2 under the hood when data is in geographic coordinates (e.g., WGS84). Instead of flattening Earth to a 2D plane (which introduces distortion), S2 works directly with spherical coordinates:\n\nEllipsoidal geometry — computes distances, intersections, areas on the actual Earth shape\nEfficient spatial indexing — divides the sphere into hierarchical cells for fast operations\nReplaces GEOS for geographic data — when your CRS is in degrees, S2 handles the heavy lifting\nFast enough in practice — modern optimizations have made geodesic calculations competitive with planar\n\n\n\n\n\n\n\n\nImportant\n\n\nS2 is automatic: if your data is in geographic coordinates, st_distance(), st_intersects(), and other spatial operations use S2 geodesic calculations by default. You don’t need to do anything."
+  },
+  {
+    "objectID": "slides/week-2-1.html#controlling-s2-when-and-how",
+    "href": "slides/week-2-1.html#controlling-s2-when-and-how",
+    "title": "Week 2",
+    "section": "Controlling S2: When and How",
+    "text": "Controlling S2: When and How\nS2 is the right default for water resources work (continental scales, mixed coordinate systems), but you can toggle it for specialized cases:\n\n# Disable S2 (use GEOS planar geometry instead)\nsf::sf_use_s2(FALSE)\n\n# Re-enable S2\nsf::sf_use_s2(TRUE)\n\n# Check current setting\nsf::sf_use_s2()\n\n\nWhen to disable S2: - Very small local areas (&lt; 10 km) where planar error is negligible and you want marginal speed gains - Specialized geometric algorithms that require GEOS planar operations (rare in practice)\nLeave S2 enabled (default): - Continental and larger scales (your typical water resources workflow) - Mixing geographic and projected data - When correctness matters more than squeezing out microseconds"
+  },
+  {
+    "objectID": "slides/week-2-1.html#common-pitfalls",
+    "href": "slides/week-2-1.html#common-pitfalls",
+    "title": "Week 2",
+    "section": "Common Pitfalls ⚠️",
+    "text": "Common Pitfalls ⚠️\nPitfall: Distances in Geographic Space\n\nboundary &lt;- st_cast(st_union(conus),\"MULTILINESTRING\")\n\ncities &lt;- read_csv(\"data/uscities.csv\") |&gt;\n  st_as_sf(coords = c(\"lng\", \"lat\"), crs = 4326) %&gt;%\n  mutate(dist = st_distance(., boundary))\n\n# user    system  elapsed\n# 80.763  0.300   81.055\n\n. . .\nRule: Transform geometry to projected CRS before expensive operations like st_union(), st_intersection(), etc.\nPitfall 2: Comparing Units\n\ndist &lt;- st_distance(cities, boundary)  # Returns [m]\n\nfilter(cities, dist &lt; 100)              # ❌ ERROR\nfilter(cities, as.numeric(dist) &lt; 100)  # ✅ CORRECT\n\nRule: Drop units with as.numeric() before comparisons.\n\n\n\n\n\n\nImportant\n\n\nPrinciple: Choose CRS strategically.\n\nGeographic (4326) by default for input/output (standard data format)\nProject immediately to EPSG:5070 (or your region’s standard) for analysis\nPre-compute expensive operations (union, clip, buffer) in projected space outside the data pipeline\nThis respects both correctness (geodesic) and performance (planar operations where they matter)"
+  },
+  {
+    "objectID": "slides/week-2-1.html#geom_sf-the-foundation",
+    "href": "slides/week-2-1.html#geom_sf-the-foundation",
+    "title": "Week 2",
+    "section": "geom_sf(): The Foundation",
+    "text": "geom_sf(): The Foundation\ngeom_sf() is ggplot2’s spatial geometry layer. It automatically extracts coordinates from the geometry column and plots them. No need to specify x and y aesthetics.\n\n\nPoints\n\nggplot(cities) +\n  geom_sf(color = \"navy\", size = 1)\n\n\nPolygons\n\nggplot(conus) +\n  geom_sf(fill = \"lightblue\", color = \"black\")\n\n\n\nKey advantage: All standard ggplot2 aesthetics work — color, fill, size, alpha, linetype, etc. And you can layer multiple geom_sf() calls:\n\nggplot() +\n  geom_sf(data = conus, fill = \"white\") +\n  geom_sf(data = st_filter(cities, st_transform(conus, 5070)), color = \"red\", size = 0.1) +\n  theme_void()\n\n\n\n\n\n\n\nTip\n\n\nAlways add theme_void() to remove axes, gridlines, and background — maps don’t need Cartesian coordinates."
+  },
+  {
+    "objectID": "slides/week-2-1.html#next-week",
+    "href": "slides/week-2-1.html#next-week",
+    "title": "Week 2",
+    "section": "Next Week",
+    "text": "Next Week\nWeek 3: Spatial Predicates & Joins — relationships between geometries, filtering by space, and combining data sources"
   }
 ]
