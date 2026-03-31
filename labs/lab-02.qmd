@@ -1,0 +1,627 @@
+---
+title: 'Lab 2: Distances and Projections'
+subtitle: 'The Geometry of Place: Spatial Analysis Skills for Environmental Science'
+format:
+  html:
+    code-fold: true
+    toc: true
+    include-before-body: ../slides/header.html
+    include-after-body: ../slides/footer-annotations.html
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(
+  message    = FALSE,
+  warning    = FALSE,
+  comment    = "",
+  cache      = FALSE,
+  fig.retina = 3
+)
+```
+
+```{r}
+#| echo: false
+#| fig-align: center
+knitr::include_graphics('images/03-aclu.jpg')
+```
+
+The spatial analysis skills in this lab — building `sf` objects from multiple sources, transforming coordinate reference systems, computing distances to boundaries, and identifying features within threshold zones — are the same operations you will apply to watersheds, river networks, gauge networks, and dam inventories throughout this course.
+
+Before those datasets become available, we need the techniques to be automatic. This lab builds them on a familiar, nationally relevant dataset: US cities. Every operation you perform here — `st_union`, `st_combine`, `st_cast`, `st_distance`, `st_transform`, `gghighlight` — transfers directly to vector water resources data.
+
+The payoff is Q4: a real-world application of these spatial skills to a live federal policy question that affects more Americans than most people realize. When you finish, you will have the tools to apply the same analysis to any spatial threshold problem.
+
+This lab connects directly to recent policy discussions about border enforcement and the so-called "100-mile" border zone — for example, shifts in migration policy after the end of the pandemic-era Title 42 expulsions in 2023 have renewed attention on how proximity to the border affects enforcement, resource allocation, and civil liberties (see recent coverage: https://www.reuters.com/world/us/us-ceases-using-title-42-pandemic-order-control-migration-2023-05-11/).
+
+More recent operational discussions involving ICE and border enforcement through 2025–2026 have emphasized how interior and border-zone enforcement strategies depend on distance-to-border metrics; readers can consult summaries on civil-liberties implications (ACLU) or policy analyses that discuss the "100-mile" enforcement footprint for background: https://www.aclu.org/know-your-rights/border-zone, https://www.americanimmigrationcouncil.org/blog/border-patrol-charlotte-atlanta-100-mile-zone/.
+
+---
+
+# Set-up {#setup}
+
+## Repository
+
+1. Navigate to your `csu-523c` repository
+2. Create a new Quarto file called `lab-02.qmd`
+3. Populate its YAML:
+
+```yaml
+---
+title: "Lab 2: Distances and Projections"
+subtitle: 'ESS 523c: Environmental Data Science Applications'
+author:
+  - name: Your Name
+    email: your@colostate.edu
+format: html
+---
+```
+
+If you dont have a project `_quarto.yml` file, be sure to set the output directory to `docs`.
+
+## Libraries
+
+Install any missing packages with `install.packages("packagename")`, then load:
+
+```{r}
+#| code-fold: false
+pacman::p_load(
+  tidyverse, sf, units, tigris, rnaturalearth, gghighlight, ggrepel, flextable
+)
+
+options(tigris_use_cache = TRUE)
+```
+
+::: callout-tip
+Optional hints and worked examples are available if you need extra help: [labs/hints/lab-02-hints.qmd](labs/hints/lab-02-hints.qmd)
+:::
+
+---
+
+# Background
+
+In this lab four main spatial skills are covered:
+
+1. **Building** `sf` objects from R packages and CSV files — Q1
+2. **Manipulating** geometries and coordinate systems — Q2
+3. **Calculating** distances using geometry type selection — Q2
+4. **Visualizing** spatial patterns with `ggplot2`, `gghighlight`, and `ggrepel` — Q3 & Q4
+
+::: callout-tip
+## Why these skills matter for water resources
+Computing distance from a point to a boundary is one of the most common operations in spatial hydrology: distance from a gauge to a watershed outlet, distance from a city to the nearest floodplain, distance from a well to the nearest stream. The mechanics are identical regardless of what the features represent — master them here and they transfer everywhere.
+:::
+
+---
+
+# **Question 1**: Build Your Spatial Dataset {#q1}
+
+For this lab we need three datasets:
+
+1. CONUS state boundaries (1.1)
+2. North American country boundaries — US, Mexico, Canada (1.2)
+3. All US cities (1.3)
+
+## 1.1 Define a Projection
+
+Distance calculations require a projected coordinate system that minimizes distance distortion at the scale of CONUS. We will use the **North America Equidistant Conic**:
+
+```{r}
+#| code-fold: false
+eqdc <- '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'
+```
+
+This PROJ string defines:
+
+| Parameter | Value | Meaning |
+|---|---|---|
+| `+proj=eqdc` | — | Equidistant Conic projection |
+| `+lat_0=40` | 40°N | Latitude of projection center |
+| `+lon_0=-96` | 96°W | Central meridian |
+| `+lat_1=20`, `+lat_2=60` | 20°N, 60°N | Standard parallels |
+| `+datum=NAD83` | — | North American Datum 1983 |
+| `+units=m` | — | Output in meters |
+
+Distortion is minimized between the two standard parallels — 20°N and 60°N encompasses all of CONUS, making this projection well-suited for national-scale distance analysis.
+
+## 1.2 CONUS State Boundaries
+
+Use `tigris::states()` to get US state boundaries, filter to CONUS, and transform to the equidistant projection.
+
+::: callout-tip
+`tigris` is the modern, CRAN-stable replacement for `USAboundaries`. It pulls boundaries directly from the US Census Bureau TIGER/Line files.
+
+```r
+states(cb = TRUE, progress_bar = FALSE)
+```
+
+Filter with `!STUSPS %in% c("AK", "HI", "PR", "VI", "GU", "MP", "AS")` to keep only the 48 contiguous states. Then `st_transform(eqdc)`.
+:::
+
+```{r}
+
+```
+
+## 1.3 North American Country Boundaries
+
+Use `rnaturalearth::ne_countries()` to get country boundaries for the United States, Canada, and Mexico.
+
+::: callout-tip
+`ne_countries()` returns an `sf` object directly when you specify `returnclass = "sf"`. Filter on the `admin` column for the three countries you need. Transform to `eqdc`.
+
+```r
+rnaturalearth::ne_countries(scale = "medium", returnclass = "sf") |>
+  filter(admin %in% c("United States of America", "Canada", "Mexico"))
+```
+:::
+
+```{r}
+
+```
+
+## 1.4 US City Locations
+
+Go to [simplemaps.com/data/us-cities](https://simplemaps.com/data/us-cities) and download the free basic dataset into your `data/` directory.
+
+Read it in with `readr::read_csv()` and explore it — understand what columns are available before proceeding.
+
+The raw data is tabular — coordinates are stored as numeric columns, not geometry. Convert it to a spatial object:
+
+::: callout-tip
+`st_as_sf()` converts a data frame to an `sf` object when you specify which columns hold coordinates and what CRS those coordinates are in. Raw lat/lon from a CSV is almost always WGS84 (EPSG:4326):
+
+```r
+read_csv("data/uscities.csv") |>
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) |>
+  st_transform(eqdc)
+```
+
+After transforming, use `st_filter()` with `st_union(states)` to keep only cities inside CONUS.
+:::
+
+```{r}
+
+```
+
+::: callout-important
+## Verify all three datasets before proceeding
+
+Run these checks before moving to Q2 — a CRS mismatch here will silently corrupt every distance calculation downstream.
+
+```r
+# All three must return the same CRS
+st_crs(states) == st_crs(countries)
+st_crs(states) == st_crs(cities)
+
+# Row counts should be reasonable
+nrow(states)    # should be 48
+nrow(cities)    # should be ~28,000
+```
+:::
+
+---
+
+# **Question 2**: Distance Calculations {#q2}
+
+Here we calculate the distance from each US city to four boundaries:
+
+1. The US national border (coastline + land borders, resolved)
+2. The nearest state border (internal boundaries preserved)
+3. The Mexican border
+4. The Canadian border
+
+In all cases, since we want distance to a **border** (a line), we must cast our polygon geometries to `MULTILINESTRING` before computing distances. The choice of `st_union` vs. `st_combine` determines whether interior boundaries are dissolved or preserved — a distinction that matters for questions 2.1 and 2.2.
+
+::: callout-tip
+## The geometry type determines the answer
+
+- `POLYGON` / `MULTIPOLYGON` → distance to the interior is **0** (you're inside the area)
+- `MULTILINESTRING` → distance to the **boundary line** — what we actually want
+
+```r
+# Wrong: distance to a polygon
+st_distance(city_point, state_polygon)   # returns 0 if city is inside
+
+# Right: distance to the border
+st_distance(city_point, state_polygon |> st_cast("MULTILINESTRING"))
+```
+:::
+
+## 2.1 Distance to US National Border (km)
+
+The national border is the **resolved** outer boundary of all states — internal state lines dissolved, only the coastline and land borders remain. Use `st_union()` which dissolves all internal boundaries, then cast to `MULTILINESTRING`.
+
+Store the result as a new column `dist_to_border` in your cities data frame. Produce a **flextable** of the 5 cities farthest from the national border — include city name, state, and distance.
+
+::: callout-tip
+```r
+us_border <- st_union(states) |> st_cast("MULTILINESTRING")
+
+cities <- cities |>
+  mutate(dist_to_border = set_units(st_distance(geometry, us_border), "km"))
+```
+
+`set_units()` from the `units` package converts the raw distance to labeled kilometers — essential for readable output and correct unit handling downstream.
+:::
+
+```{r}
+
+```
+
+## 2.2 Distance to Nearest State Border (km)
+
+The nearest state border uses **preserved** internal boundaries — we want every state line, not just the outer edge. Use `st_combine()` which keeps all boundaries, then cast to `MULTILINESTRING`.
+
+Store as `dist_to_state`. Produce a flextable of the 5 cities farthest from any state border.
+
+::: callout-tip
+Think carefully about why the answers for 2.1 and 2.2 differ. The city farthest from the national border might be close to a state line. The city farthest from any state line must be far from all internal AND external borders.
+:::
+
+```{r}
+
+```
+
+## 2.3 Distance to Mexico (km)
+
+Isolate Mexico from your countries object. Cast to `MULTILINESTRING`. Compute distance from each city to the Mexican border. Store as `dist_to_mexico`. Produce a flextable of the 5 cities farthest from Mexico.
+
+```{r}
+
+```
+
+## 2.4 Distance to Canada (km)
+
+Same approach as 2.3, for Canada. Store as `dist_to_canada`. Produce a flextable of the 5 cities farthest from Canada.
+
+```{r}
+
+```
+
+---
+
+# **Question 3**: Mapping Distance Patterns {#q3}
+
+Now visualize the distance data you computed. You will use `ggplot2` for all maps, `ggrepel::geom_label_repel()` for non-overlapping city labels, and `gghighlight` to emphasize subsets.
+
+## 3.1 Reference Map
+
+Create a base reference map showing:
+
+- North America (US, Canada, Mexico) as filled grey polygons
+- CONUS state boundaries as dashed lines
+- The 10 largest US cities by population as labeled points
+
+::: callout-tip
+Use `geom_sf()` for spatial layers. For labels that don't overlap:
+
+```r
+ggrepel::geom_label_repel(
+  data = big_cities,
+  aes(geometry = geometry, label = city),
+  stat = "sf_coordinates",
+  size = 3
+)
+```
+
+`stat = "sf_coordinates"` extracts point coordinates from the geometry for label placement — required when using `ggrepel` with `sf` objects.
+:::
+
+```{r}
+
+```
+```{r}
+#| eval: false
+# Student scaffold: reference map example (non-executing)
+# big_cities <- cities |> arrange(desc(population)) |> slice_head(n = 10)
+
+# ggplot() +
+#   geom_sf(data = countries, fill = "gray95", color = NA) +
+#   geom_sf(data = states, fill = NA, color = "white", linetype = "dashed") +
+#   geom_sf(data = big_cities, aes(size = population), color = "darkred") +
+#   ggrepel::geom_label_repel(data = big_cities,
+#                             aes(label = city, geometry = geometry),
+#                             stat = "sf_coordinates") +
+#   scale_size(range = c(2, 6)) +
+#   theme_minimal()
+```
+
+## 3.2 Distance to National Border
+
+Color all US cities by their distance to the national border using a continuous color scale. Highlight and label the 5 cities farthest from the border.
+
+Your map should:
+- Use `scale_color_viridis_c()` for the distance gradient
+- Show the CONUS outline
+- Label the 5 farthest cities with `ggrepel`
+
+```{r}
+
+```
+```{r}
+#| eval: false
+# Student scaffold: distance-to-national-border map (non-executing)
+# # create top5_national_sf with geometry for labeling
+# top5_national_sf <- cities |> arrange(desc(dist_to_border)) |> slice_head(n = 5)
+
+# ggplot() +
+#   geom_sf(data = states, fill = "gray90", color = "white") +
+#   geom_sf(data = cities, aes(color = dist_to_border), size = 0.6) +
+#   geom_sf(data = top5_national_sf, color = "black", size = 2) +
+#   ggrepel::geom_label_repel(data = top5_national_sf,
+#                             aes(label = city, geometry = geometry),
+#                             stat = "sf_coordinates") +
+#   scale_color_viridis_c(name = "Dist to national border (km)") +
+#   theme_minimal()
+```
+
+In 2–3 sentences: (1) where are the cities farthest from the national border? (2) Does the geographic pattern make sense given the shape of CONUS? (3) Name one water resources application where distance to a national border would be a meaningful variable.
+
+> ...
+
+## 3.3 Distance to Nearest State Border
+
+Color all cities by distance to the nearest state border. Highlight and label the 5 cities farthest from any state line.
+
+```{r}
+
+```
+```{r}
+#| eval: false
+# Student scaffold: distance-to-state-border map (non-executing)
+# top5_state_sf <- cities |> arrange(desc(dist_to_state)) |> slice_head(n = 5)
+
+# ggplot() +
+#   geom_sf(data = states, fill = "gray95", color = "white") +
+#   geom_sf(data = cities, aes(color = dist_to_state), size = 0.6) +
+#   geom_sf(data = top5_state_sf, color = "black", size = 2) +
+#   ggrepel::geom_label_repel(data = top5_state_sf,
+#                             aes(label = city, geometry = geometry),
+#                             stat = "sf_coordinates") +
+#   scale_color_viridis_c(name = "Dist to state border (km)") +
+#   theme_minimal()
+```
+
+In 2–3 sentences: (1) how does the pattern differ from 3.2? (2) Which states appear to have the largest interior areas — do any water resources features (large river basins, aquifer extents) correlate with the states where cities can be far from borders? (3) What would a hydrologist use this distance for?
+
+> ...
+
+## 3.4 Equidistance Zone: Mexico and Canada
+
+Identify cities that are **approximately equidistant** from the Mexican and Canadian borders — within ±100 km of equal distance from both.
+
+::: callout-tip
+Create a variable for the absolute difference between the two distances:
+
+```r
+cities <- cities |>
+  mutate(mx_ca_diff = abs(as.numeric(dist_to_mexico) - as.numeric(dist_to_canada)))
+```
+
+Then use `gghighlight(mx_ca_diff < 100)` to highlight the equidistant zone. Label the 5 most populous cities in this zone.
+:::
+
+```{r}
+
+```
+```{r}
+#| eval: false
+# Student scaffold: equidistance band map (non-executing)
+# cities <- cities |> mutate(mx_ca_diff = abs(dist_to_mexico - dist_to_canada))
+# equid_sf <- cities |> filter(mx_ca_diff < 100)
+
+# ggplot() +
+#   geom_sf(data = states, fill = "gray95", color = "white") +
+#   geom_sf(data = cities, aes(color = mx_ca_diff), size = 0.5) +
+#   gghighlight::gghighlight(mx_ca_diff < 100, use_group_by = FALSE) +
+#   ggrepel::geom_label_repel(data = equid_sf |> arrange(desc(population)) |> slice_head(n = 5),
+#                             aes(label = city, geometry = geometry),
+#                             stat = "sf_coordinates") +
+#   scale_color_viridis_c(name = "|MX - CAN| (km)") +
+#   theme_minimal()
+```
+
+In 2–3 sentences: (1) describe where the equidistant zone runs geographically, (2) does it surprise you that this band cuts through the interior of the country where it does? (3) What does this zone imply about the relative influence of Canadian vs. Mexican climate systems on cities in this corridor?
+
+> ...
+
+---
+
+# **Question 4**: Real-World Application — The 100-Mile Border Zone {#q4}
+
+## Background
+
+Federal regulations give U.S. Customs and Border Protection (CBP) authority to operate within **100 miles of any US "external boundary"** — including both land borders and coastlines. Within this zone, CBP agents can conduct stops and searches without a warrant or reasonable suspicion. Federal courts have repeatedly upheld this authority.
+
+The American Civil Liberties Union has documented and challenged this policy. Their analysis is [here](https://www.aclu.org/other/constitution-100-mile-border-zone).
+
+```{r}
+#| echo: false
+#| fig-align: center
+knitr::include_graphics('images/03-aclu.jpg')
+```
+
+100 miles ≈ **160 kilometers**. Your distance calculations are already in kilometers.
+
+## 4.1 Quantify the Zone
+
+Using your `dist_to_border` column, calculate:
+
+- How many cities fall within the 100-mile zone?
+- What is the total population living in cities within the zone?
+- What percentage of the total US city population does this represent?
+- Does your result match the ACLU's published estimate?
+
+Present your findings as a formatted **flextable**.
+
+::: callout-tip
+```r
+cities |>
+  st_drop_geometry() |>
+  filter(as.numeric(dist_to_border) < 160) |>
+  summarise(
+    n_cities      = n(),
+    population    = sum(population, na.rm = TRUE),
+    pct_of_total  = round(100 * population / sum(cities$population, na.rm = TRUE), 1)
+  )
+```
+:::
+
+```{r}
+
+```
+
+In 2–3 sentences: (1) report the percentage and compare it to the ACLU's estimate, (2) explain why the result might be higher than many people expect given the geography of the US, (3) name one scenario where a water resources professional might need to navigate federal jurisdictional boundaries in a similar way — where a regulatory zone defined by distance from a physical boundary changes what analysis or permitting is required.
+
+> ...
+
+## 4.2 Map the Zone
+
+Create a map highlighting all cities within the 100-mile zone using `gghighlight`. 
+
+- Color cities by distance to the border using a gradient from `"orange"` to `"darkred"`
+- Label the **10 most populous** cities in the zone
+
+```{r}
+
+```
+
+## 4.3 Most Populous City per State in the Zone
+
+Repeat the map from 4.2, but instead of the 10 most populous overall, label the **most populous city in each state** that falls within the zone.
+
+::: callout-tip
+```r
+filter(cities, as.numeric(dist_to_border) < 160) |>
+  group_by(state_name) |>
+  slice_max(population, n = 1)
+```
+:::
+
+```{r}
+
+```
+
+In 2–3 sentences: (1) how many states have at least one city in the zone? (2) Are there states where the most populous city is NOT in the zone — what does that tell you about that state's geography? (3) How might the jurisdictional boundary created by this rule create challenges for environmental monitoring programs that cross state or national boundaries?
+
+> ...
+
+---
+
+# **Question 5**: Interactive Leaflet Exercise — Build an interactive map
+
+This hands-on exercise ties the distance calculations and mapping skills from Q1–Q4 into a single interactive web map. The goal is a compact, well-documented Leaflet map with layer controls, informative popups, and two toggleable thematic layers: (A) the ±100 km equidistance band (Mexico vs Canada) and (B) the 100-mile (≈160 km) national-border zone.
+
+Learning objectives:
+
+- Practice turning `sf` results into interactive HTML widgets with `leaflet`.
+- Build informative popups that show computed distances and metadata.
+- Implement layer groups and a legend so users can toggle overlays.
+- Consider performance and projection issues when publishing web maps.
+
+Starter scaffold (run in the lab project root; requires `cities`, `states`, `countries`, and `dist_*` columns computed):
+
+```{r}
+#| label: q5-leaflet-scaffold
+#| echo: true
+#| eval: FALSE
+library(leaflet)
+library(leaflet.extras)
+library(htmltools)
+
+# Prepare flags
+threshold_km <- 160
+cities <- cities |> mutate(mx_ca_diff = abs(dist_to_mexico - dist_to_canada),
+                           equid_flag = mx_ca_diff < 100,
+                           in_border_zone = dist_to_border < threshold_km)
+
+pal_border <- colorNumeric("viridis", domain = cities$dist_to_border)
+
+# Popup HTML helper (small, safe HTML)
+popup_html <- function(df){
+  paste0(
+    "<strong>", df$city, ", ", df$state_name, "</strong><br/>",
+    "Population: ", formatC(df$population, big.mark = ",", format = "d"), "<br/>",
+    "Dist to national border: ", round(df$dist_to_border,1), " km<br/>",
+    "Dist to nearest state border: ", round(df$dist_to_state,1), " km<br/>",
+    "|MX-CAN diff: ", round(df$mx_ca_diff,1), " km<br/>",
+    "<a href=\"https://www.google.com/maps/search/?api=1&query=", df$lat, ",", df$lng, "\" target=\"_blank\">Open in Google Maps</a>"
+  )
+}
+
+# Build map (students should run and tweak)
+m <- leaflet() |> 
+  addProviderTiles(providers$CartoDB.Positron, group = "Base") |> 
+  addPolygons(data = states, fill = FALSE, color = "#444", weight = 1, group = "States") |> 
+  addCircleMarkers(data = cities, ~lng, ~lat,
+                   radius = ~pmax(3, log10(population + 1)),
+                   color = ~pal_border(dist_to_border),
+                   stroke = FALSE, fillOpacity = 0.8,
+                   popup = popup_html(cities),
+                   group = "All cities") |> 
+  addCircleMarkers(data = cities |> filter(equid_flag), ~lng, ~lat,
+                   radius = 6, color = "black", fillColor = "gold",
+                   fillOpacity = 0.9, group = "Equidistance band") |> 
+  addCircleMarkers(data = cities |> filter(in_border_zone), ~lng, ~lat,
+                   radius = 6, color = "black", fillColor = "firebrick",
+                   fillOpacity = 0.9, group = "100-mile zone") |> 
+  addLegend("bottomright", pal = pal_border, values = cities$dist_to_border,
+            title = "Dist to national border (km)") |> 
+  addLayersControl(overlayGroups = c("All cities", "Equidistance band", "100-mile zone", "States"),
+                   options = layersControlOptions(collapsed = FALSE)) |> 
+  addEasyButton(easyButton(icon = "fa-globe", title = "Zoom to US",
+                            onClick = JS("function(btn, map){ map.setView([39.8, -98.6],4); }")))
+
+print(m)
+```
+
+Deliverables (student submission):
+
+- A working `leaflet` HTML file (`lab-02-leaflet.html`) produced by knitting this chunk (or a small companion QMD). The file should include layer controls and functional popups.
+- A 2–3 sentence methods note describing the CRS used when computing distances and any choices made to reduce widget size (e.g., downsampling, clustering).
+
+Grading rubric (10 points):
+
+- Map renders and toggles overlays correctly — 4 pts
+- Informative popups with distances and link — 2 pts
+- Equidistance band and 100-mile zone layers present and correct — 2 pts
+- Short methods note that mentions CRS and performance — 2 pts
+
+Extensions (optional): add marker clustering (`markerClusterOptions()`), custom basemap attributions, or a small caching strategy for GeoJSON layers when publishing.
+
+
+# Summary
+
+In this lab you:
+
+- **Built** spatial datasets from three different sources: a CRAN package (`tigris`), a data package (`rnaturalearth`), and a downloaded CSV
+- **Transformed** coordinate reference systems and selected a projection appropriate for national-scale distance analysis
+- **Manipulated** geometry types — understanding when to use `st_union` vs. `st_combine`, and why casting to `MULTILINESTRING` is required before computing distances to borders
+- **Computed** four sets of distances using `st_distance()` and stored them as labeled unit vectors
+- **Visualized** spatial patterns with continuous color scales, `gghighlight`, and `ggrepel`
+- **Applied** these skills to a real federal policy question with verifiable real-world consequences
+
+Every one of these operations recurs in the labs ahead — applied to watersheds, river networks, elevation grids, and gauge networks. The mechanics are now yours.
+
+---
+
+# Rubric
+
+| Question | Topic | Points |
+|----------|-------|--------|
+| Q1 | Build spatial dataset — 3 sources, correct CRS, verification | 25 |
+| Q2 | Distance calculations — 4 distances, correct geometry types, flextables | 35 |
+| Q3 | Mapping — 4 maps, gghighlight, ggrepel, written interpretations | 40 |
+| Q4 | Border zone analysis — table, 2 maps, written interpretation | 35 |
+| Well-structured, legible Qmd | — | 15 |
+| **Total** | | **150** |
+
+---
+
+# Submission
+
+1. Render: `quarto render lab-02.qmd`
+2. Push: `git add -A && git commit -m "lab 2 complete" && git push`
+3. Your lab will be live at: `https://USERNAME.github.io/csu-523c/lab-02.html`
+
+Submit this URL to Canvas. Add the project to your personal website with a brief description of what you built — it counts toward end-of-semester extra credit.

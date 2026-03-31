@@ -1,0 +1,539 @@
+---
+title: "Interactive Mapping in R"
+subtitle: "Leaflet"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+---
+
+```{r,echo=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, comment = "#>", out.width = "100%")
+```
+
+
+This is the supplementary notes and examples for an introduction to leaflet.
+
+It is based on data and examples seen in class
+
+Built on the excellent tutorial from [RStudio](https://rstudio.github.io/leaflet/)
+
+# TLDR {background-color="#1E4D2B"}
+
+| Topic | TLDR | Action |
+|-------|------:|--------|
+| Files & Paths | Use relative paths anchored to the project | Use `here::here()`; avoid absolute `/Users/...` paths |
+| Packages | Install and load required packages before running examples | Install `leaflet`, `leaflet.extras`, `leaflet.minicharts`, `leafem`, `sf`, `tidyverse` |
+| Maps | Use provider tiles that don't require API keys for demos | Prefer `Esri`, `Stamen`, `CartoDB`, `OpenStreetMap` |
+
+
+------------------------------------------------------------------------
+
+If not already installed, install the mapping packages:
+
+```{r, eval = FALSE}
+install.packages(c("leaflet", "leaflet.extras", "leaflet.minicharts", "leafem"))
+```
+
+Then attach the library:
+
+```{r}
+library(leaflet)
+```
+
+Bring in the other needed libraries:
+
+| Package | Purpose |
+|---------|---------|
+| `leaflet` | Interactive web maps and map widgets |
+| `leaflet.extras` | Extra controls and drawing tools for Leaflet |
+| `leaflet.minicharts` | Small embedded charts for map popups/markers |
+| `leafem` | Utilities for exporting/filtering Leaflet maps |
+| `sf` | Vector spatial data — points, lines, polygons |
+| `tidyverse` | Data manipulation (`dplyr`, `tidyr`) and visualization (`ggplot2`) |
+| `USAboundaries` | Convenience datasets for US boundaries (teaching) |
+| `here` | Project-root-aware paths for reproducible file access |
+
+```{r}
+library(sf)
+library(tidyverse)
+library(USAboundaries)
+library(here)
+library(leaflet)
+library(leaflet.extras)
+library(leaflet.minicharts)
+library(leafem)
+```
+
+------------------------------------------------------------------------
+
+# Basic Usage
+
+Creating a Leaflet map requires a few basic steps (not dissimilar to ggplot):
+
+1.  Initialize a map widget by calling leaflet().
+
+2.  Add layers (i.e., features) to the map by using layer functions (e.g. addTiles, addMarkers, addPolygons,...)
+
+3.  Print the map widget to display it.
+
+------------------------------------------------------------------------
+
+Here’s a basic example:
+
+```{r, fig.height= 4}
+leaflet() |>
+  addTiles() |>
+  addMarkers(lng=-105.0848, lat=40.5729, popup="CSU")
+```
+
+------------------------------------------------------------------------
+
+-   By default, leaflet sets the view of the map to the range of latitude/longitude data in the map layers
+
+-   You can adjust these if needed using:
+
+    -   `setView()`: sets the center of the map view and the zoom level;
+
+    -   `fitBounds()`: fits the view into the rectangle [lng1, lat1] – [lng2, lat2];
+
+    -   `clearBounds()` clears the bound
+
+------------------------------------------------------------------------
+
+# Basemaps
+
+### Default (OpenStreetMap) Tiles
+
+The easiest way to add tiles is by calling `addTiles()` with no arguments; by default, OpenStreetMap tiles are used.
+
+```{r}
+leaflet() |> 
+  setView(lng=-105.0848, lat=40.5729, zoom = 16) |> 
+  addTiles()
+```
+
+### Third-Party Tiles
+
+-   Many third-party basemaps can be added using the `addProviderTiles()` function
+
+-   As a convenience, leaflet provides a named list of all the third-party tile providers supported by the plugin: just type `providers$` and choose from one of the options.
+
+```{r}
+length(providers)
+names(providers) |> 
+  head()
+```
+
+> Note that some tile set providers require you to register. You can pass access tokens/keys, and other options, to the tile provider by populating the options argument with the providerTileOptions() function.
+
+-   I would personal stick with the OSM, CartoDB, ESRI, and Stamen servers ... [see more here] (<https://leaflet-extras.github.io/leaflet-providers/preview/>)
+
+Below are a few examples:
+
+### CartoDB
+
+```{r}
+leaflet() |> 
+  setView(lng=-105.0848, lat=40.5729, zoom = 16) |> 
+  addProviderTiles(providers$CartoDB)
+```
+
+### ESRI Imagery
+
+```{r}
+leaflet() |> 
+  setView(lng=-105.0848, lat=40.5729, zoom = 16) |> 
+  addProviderTiles(providers$Esri.WorldImagery)
+```
+
+
+### Combining Tile Layers
+
+You can stack multiple tile layers if the front tiles have some level of opacity. Here we layer the Stamen.TonerLines with aerial imagery
+
+```{r}
+leaflet() %>%
+  setView(lng = -105.0848, lat = 40.5729, zoom = 16) %>%
+  addProviderTiles(providers$Esri.WorldImagery) %>%
+  addProviderTiles(providers$Stadia.StamenTonerLabels, 
+                   options = providerTileOptions(opacity = 0.5))
+
+```
+
+::: callout-warning
+If your rendered HTML shows a `401 Error` or tiles labeled "Invalid Authentication", a provider requiring an API key (e.g., Stadia Maps) was used by the frozen site assets or a previous render. The example above uses `Esri.WorldImagery` + `Stamen.TonerLines`, which do not require API keys. If you still see 401s after re-rendering, clear the browser cache or re-run `quarto render` to regenerate the site assets.
+:::
+
+------------------------------------------------------------------------
+
+# Markers
+
+Markers are one way to identify point information on a map:
+
+------------------------------------------------------------------------
+
+#### Example Starbucks data:
+
+```{r}
+(starbucks = read_csv('data/directory.csv') |> 
+  filter(City %in% c("Fort Collins", "Loveland"),
+         `State/Province` == "CO") |> 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) |> 
+  select(store_name = `Store Name`, phone = `Phone Number`, address = `Street Address`, city = City, brand = Brand))
+```
+
+### Markers
+
+Markers are added using the `addMarkers` or `addAwesomeMarkers`
+
+Their default appearance is a blue dropped pin.
+
+As with most layer functions, - the `popup` argument adds a message to be displayed on click - the `label` argument display a text label either on hover
+
+```{r}
+leaflet() |> 
+  addProviderTiles(providers$CartoDB) |> 
+  addMarkers(data = starbucks, popup = ~store_name, label = ~city)
+```
+
+### [Awesome Icons](https://github.com/lvoogdt/Leaflet.awesome-markers)
+
+Using the Font Awesome Icons seen in lab one, we can make markers with more specific coloring and icons
+
+-   Here we define the icon as a green marker with a coffee icon from the fa library
+-   For fun we can make the coffee cups spin...
+
+We then use addAwesomeMarkers to spcifiy the icon we created using the icon argument:
+
+```{r}
+icons = awesomeIcons(icon = 'coffee', markerColor = "green", library = 'fa', spin = TRUE)
+
+leaflet(data = starbucks) |> 
+  addProviderTiles(providers$CartoDB) |> 
+  addAwesomeMarkers(icon = icons, popup = ~store_name)
+```
+
+### Custom Popups
+
+You can use HTML, CSS, and Java Script to modify your pop-ups
+
+For example, we can associate the name of the Starbucks locations with their google maps URL as an hyper reference (href):
+
+```{r}
+starbucks = starbucks |> 
+  mutate(url = paste0('https://www.google.com/maps/place/',
+                      gsub(" ", "+", address), "+",
+                      gsub(" ", "+", city)))
+
+pop = paste0('<a href=', starbucks$url, '>', starbucks$store_name, "</a>")
+head(pop)
+```
+
+We can then add our custom popup to our icons:
+
+```{r}
+leaflet(data = starbucks) |>
+  addProviderTiles(providers$CartoDB) |> 
+  addAwesomeMarkers(icon = icons, 
+                    label = ~address, popup = pop)
+```
+
+### Circle Markers
+
+Circle markers are much like regular circles (shapes), except their radius in onscreen pixels stays constant *regardless* of zoom level (z).
+
+```{r}
+leaflet(data = starbucks) |>
+  addProviderTiles(providers$CartoDB) |> 
+  addCircleMarkers(label = ~address, popup = pop)
+```
+
+#### Marker Clustering
+
+Sometimes while mapping many points, it is useful to cluster them. For example lets plot all starbucks in the world!
+
+```{r}
+all_co = read_csv('data/directory.csv') |> 
+  filter(!is.na(Latitude)) |> 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) 
+
+leaflet(data = all_co) |> 
+  addProviderTiles(providers$CartoDB) |> 
+  addMarkers(clusterOptions = markerClusterOptions())
+```
+
+### Mini charts on maps (`leaflet.minicharts`)
+
+When each location has a few summary values, mini charts can be more informative than a single marker color.
+
+```{r}
+mini_pts <- tibble::tibble(
+  name = c("A", "B", "C"),
+  lon = c(-105.0848, -105.06, -105.10),
+  lat = c(40.5729, 40.57, 40.565),
+  flow = c(12, 18, 9),
+  temp = c(7, 11, 8)
+)
+
+leaflet() |>
+  addProviderTiles(providers$CartoDB) |>
+  setView(lng = -105.08, lat = 40.57, zoom = 12) |>
+  addMinicharts(
+    lng = mini_pts$lon,
+    lat = mini_pts$lat,
+    chartdata = as.matrix(mini_pts[, c("flow", "temp")]),
+    type = "bar",
+    width = 45,
+    height = 45,
+    colorPalette = c("#1E4D2B", "#C8C372")
+  )
+```
+
+------------------------------------------------------------------------
+
+# Other web-mapping options (including deck.gl)
+
+- `leaflet` (+ `leaflet.extras`, `leaflet.minicharts`, `leafem`): best default for this course; strong interactivity with simple setup.
+- `leafgl`: WebGL rendering for very large point/polygon layers while staying in the Leaflet ecosystem.
+- `mapdeck` (R bindings for `deck.gl`): high-performance WebGL layers for big/complex visualizations.
+- `mapboxapi` / Mapbox-based stacks: advanced styling and vector tiles, but typically requires API tokens.
+- `tmap` and `mapview`: high-level options for quick interactive or static thematic maps.
+
+If you want to try `deck.gl` in R, start with `mapdeck`:
+
+```{r, eval = FALSE}
+install.packages("mapdeck")
+# often paired with a Mapbox token
+```
+
+For class demos/labs, prefer `leaflet` and its extensions unless you specifically need WebGL scale/performance.
+
+------------------------------------------------------------------------
+
+# Adding color ramps
+
+-   Colors can be add by factor, numeric, bins, or quartiles using the built in leaflet functions
+-   Each of these are defined by a palette, and a domain
+
+The palette argument can be any of the following:
+
+-   A character vector of RGB or named colors.
+    -   Examples: palette(), c("#000000", "#0000FF", "#FFFFFF"), topo.colors(10)
+-   The name of an RColorBrewer palette
+    -   Examples: "BuPu" or "Greens".
+-   The full name of a viridis palette:
+    -   Examples: "viridis", "magma", "inferno", or "plasma".
+-   A function that receives a single value between 0 and 1 and returns a color.
+    -   Examples: colorRamp(c("#000000", "#FFFFFF"), interpolate = "spline").
+
+The domain is the values - named by variable - that the color palette should range over
+
+```{r}
+# ?colorFactor
+
+# Create a palette that maps factor levels to colors
+pal <- colorFactor(c("darkgreen", "navy"), 
+                   domain = c("Fort Collins", "Loveland"))
+
+leaflet(data = starbucks) |> addProviderTiles(providers$CartoDB) |> 
+  addCircleMarkers(color = ~pal(city), fillOpacity = .5, stroke = FALSE)
+
+```
+
+------------------------------------------------------------------------
+
+# Shapes (Polylines, Polygons, Circles)
+
+#### Getting some data ...
+
+```{r}
+(covid = readr::read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-states.csv') |> 
+  filter(date == max(date)) |> 
+  right_join(USAboundaries::us_states(), by = c("state" = "name")) |> 
+  filter(!stusps %in% c("AK","PR", "HI")) |> 
+  st_as_sf())
+```
+
+### Polygons
+
+Adding those cases counts to polygons over a `YlOrRd` color ramp
+
+```{r}
+leaflet() |> 
+  addProviderTiles(providers$CartoDB) |> 
+  addPolygons(data = covid, 
+              fillColor  = ~colorQuantile("YlOrRd", cases)(cases),
+              color = NA,
+              label = ~state_name)
+```
+
+### Circles
+
+```{r}
+leaflet() |> 
+  addProviderTiles(providers$CartoDB.DarkMatter) |> 
+  addCircles(data = st_centroid(covid), 
+             fillColor  = ~colorQuantile("YlOrRd", cases)(cases),
+             color = NA,
+             fillOpacity = .5,
+             radius = ~cases/50,
+             label = ~state)
+```
+
+# Web based data
+
+### USGS Gage near UCSB: ID-11120000
+
+<https://waterdata.usgs.gov/monitoring-location/11120000/>
+
+```{r, fig.align='center', fig.width = 5, echo = FALSE}
+knitr::include_graphics('img/16-usgs-gage.png')
+```
+
+### [Network Linked Data](https://labs.waterdata.usgs.gov/about-nldi/index.html) (GeoJSON)
+
+<https://labs.waterdata.usgs.gov/api/nldi/linked-data/nwissite/USGS-11120000/navigate/UT>
+
+Trance the Upper Tributary (UT) of the USGS-11120000
+
+```{r, fig.align='center', fig.width = 10, echo = FALSE}
+knitr::include_graphics('img/16-geojson.png')
+```
+
+### Adding "Web data" to the map
+
+```{r}
+id = "11120000"
+
+# base URL
+(base = dataRetrieval:::pkg.env$nldi_base)
+
+# Reading sf for URLs in line
+leaflet() |> 
+  addProviderTiles(providers$CartoDB) |> 
+  addPolylines(data = read_sf(paste0(base,'nwissite/USGS-',id,'/navigate/UT'))) |> 
+  addPolygons(data =  read_sf(paste0(base,'nwissite/USGS-',id,'/basin')), 
+              fillColor =  "transparent", color = "black")
+```
+
+------------------------------------------------------------------------
+
+### [WMS Tiles](https://leafletjs.com/examples/wms/wms.html)
+
+WMS tiles can be added directly to a map. Here we use the NEXRAD rainfall information (refelctivity) from the Iowa Mesonet Program
+
+(You may need to scroll out to find an)
+
+```{r}
+conus = filter(us_states(), !stusps %in% c("AK", "PR", "HI"))
+
+leaflet() |> 
+  addProviderTiles(providers$CartoDB) |> 
+  addPolygons(data = st_union(conus), fillColor = "transparent",
+              color = "black", weight = 1) |> 
+  addWMSTiles(
+    "http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi",
+    layers = "nexrad-n0r-900913",
+    options = WMSTileOptions(format = "image/png", transparent = TRUE)
+  )
+```
+
+# Layer Controls
+
+Uses Leaflet's built-in layers control you can choose one of several base layers, and any number of overlay layers to view.
+
+By defining groups, you have the ability to toogle layers, and overlays on/off.
+
+```{r, out.height="50%", eval = F}
+leaflet() |> 
+  addProviderTiles(providers$CartoDB, group = "Grayscale") |> 
+  addProviderTiles(providers$Esri.WorldTerrain, group = "Terrain") |> 
+  addPolylines(data = read_sf(paste0(base,'nwissite/USGS-',id,'/navigate/UT'))) |> 
+  addPolygons(data =  read_sf(paste0(base,'nwissite/USGS-',id,'/basin')), fillColor =  "transparent", color = "black", group = "basin") |> 
+  addWMSTiles("http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi", layers = "nexrad-n0r-900913",
+    options = WMSTileOptions(format = "image/png", transparent = TRUE)) |> 
+  addLayersControl(overlayGroups = c("basin"), baseGroups = c("Terrain", "Grayscale"))
+```
+
+# 'Function-ize'
+
+You can wrap your mapping code in functions to allow reusability
+
+```{r}
+watershed_map = function(gage_id){
+leaflet() |> 
+  addProviderTiles(providers$CartoDB) |> 
+  addPolylines(data = read_sf(paste0(base,'nwissite/USGS-',gage_id,'/navigate/UT'))) |> 
+  addPolygons(data =  read_sf(paste0(base,'nwissite/USGS-',gage_id,'/basin')), 
+              fillColor =  "transparent", color = "black", group = "basin") |> 
+  addWMSTiles("http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi", layers = "nexrad-n0r-900913",
+    options = WMSTileOptions(format = "image/png", transparent = TRUE))
+}
+```
+
+```{r}
+watershed_map("06752260")
+```
+
+### Adding Details
+
+-   Measures, graticules, and inset maps
+
+```{r}
+watershed_map("06752260") |> 
+  addMeasure() |> 
+  addGraticule() |> 
+  addMiniMap()
+```
+
+### [leafem](https://github.com/r-spatial/leafem) (new library)
+
+-   Home buttons and Mouse Coordinates
+-   Support for raster and stars objects (to come)
+
+```{r}
+watershed_map("06752260") |> 
+  addMeasure() |> 
+  addGraticule() |> 
+  leafem::addHomeButton(group = "basin") |> 
+  leafem::addMouseCoordinates() 
+```
+
+### [leafpop](https://github.com/r-spatial/leafpop) (new library)
+
+-   Popup Tables
+
+```{r}
+leaflet(data = starbucks) |> 
+  addProviderTiles(providers$CartoDB) |> 
+  addCircleMarkers(
+    color = ~pal(city), 
+    fillOpacity = .5,
+    stroke = FALSE, 
+    popup = leafpop::popupTable(starbucks)
+  )
+```
+
+Making that table nicer...
+
+```{r}
+leaflet(data = starbucks) |> addProviderTiles(providers$CartoDB) |> 
+  addCircleMarkers(
+    color = ~pal(city), fillOpacity = .5,
+    stroke = FALSE, 
+    popup = leafpop::popupTable(st_drop_geometry(starbucks[,1:5]), feature.id = FALSE, row.numbers = FALSE)
+  )
+```
+
+# [Mapview](https://r-spatial.github.io/mapview/)
+
+-   easy, but less control
+-   Support for raster and stars objects (to come in our class)
+-   Implements many of the `leafem` and `leafpop` functionalities
+
+```{r}
+library(mapview)
+mapview(starbucks)
+```

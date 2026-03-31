@@ -305,3 +305,51 @@ The PAT wasn't stored correctly. Re-run `gitcreds::gitcreds_set()` and paste the
 
 **`git clone` prompts for username and password**  
 Your PAT isn't being picked up. Run `gitcreds::gitcreds_set()` again — paste the token (not your GitHub password) when prompted.
+
+---
+
+## Optional: Quick web-mapping example (leaflet.minicharts)
+
+If you'd like a short interactive example, `leaflet.minicharts` embeds small charts at marker locations — handy for showing two or three summary numbers per site. This is optional for Lab 0 but useful in later labs.
+
+```{r}
+#| eval: false
+install.packages("leaflet.minicharts")
+```
+
+```{r}
+#| echo: true
+#| warning: false
+library(leaflet)
+library(leaflet.minicharts)
+library(sf)
+
+# sample points with two metrics (a, b)
+pts <- data.frame(
+  lon = c(-105.0848, -105.06),
+  lat = c(40.5729, 40.57),
+  a = c(10, 20),
+  b = c(5, 15)
+) |> st_as_sf(coords = c("lon", "lat"), crs = 4326)
+
+leaflet() |> 
+  addProviderTiles(providers$CartoDB) |> 
+  addMinicharts(lng = st_coordinates(pts)[,1],
+                lat = st_coordinates(pts)[,2],
+                chartdata = as.matrix(pts[,c("a","b")]),
+                type = "pie",
+                width = 40, height = 40)
+```
+
+`leaflet.minicharts` also supports `bar`, `line`, and other micro-chart types.
+
+## Other mapping options — quick notes
+
+- `leaflet` + `leaflet.extras`: recommended for labs and demos; most basemaps work without API keys.
+- `leaflet.minicharts`: lightweight embedded charts for markers/popup summaries (no token needed).
+- `leafgl`: WebGL-accelerated rendering for many thousands of points or polygons (no token needed).
+- `mapdeck` / `deck.gl`: high-performance WebGL layers with advanced visualizations; often requires a Mapbox token for basemaps or certain layers.
+- `mapbox` / `mapboxgl` bindings: powerful but require Mapbox tokens and careful attention to licensing for public content.
+- `tmap` / `mapview`: quick, higher-level tools that can render to interactive `leaflet` or to static images.
+
+Recommendation: use `leaflet` and its extensions (`leaflet.extras`, `leaflet.minicharts`, `leafgl`) for classroom labs unless you specifically need deck.gl/mapdeck performance and can supply API tokens.

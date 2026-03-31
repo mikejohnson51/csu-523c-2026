@@ -39,6 +39,15 @@ assess_color <- "#84cae1"
 splits_pal   <- c(data_color, train_color, test_color)
 ```
 
+# TLDR {background-color="#1E4D2B"}
+
+| Topic | TLDR | Action |
+|-------|------:|--------|
+| Files & Paths | Use relative paths anchored to the project | Use `here::here()`; avoid absolute `/Users/...` paths |
+| Packages | Install and load core packages before running examples | Install `tidyverse`, `sf`, `terra`, `leaflet`, `here` |
+| Interactive Maps | Use `leaflet` for demos and labs | Run the `leaflet` setup chunk before map code |
+
+
 # Agenda & Timing {background-color="#1E4D2B"}
 
 ## Today's flow (1 hr 50 min)
@@ -884,6 +893,11 @@ library(sf)              # once per session
 | `sf` | Vector spatial data — points, lines, polygons |
 | `terra` | Raster spatial data — grids, DEMs, satellite imagery |
 | `tidymodels` | Machine learning with tidy principles |
+| `leaflet` | Interactive web maps and map widgets (labs + demos) |
+| `here` | Project-root-aware paths for reproducible file access |
+| `broom` | Tidying model outputs for tabular summaries |
+| `lubridate` | Date-time parsing and manipulation (time series) |
+| `janitor` | Cleaning and inspecting tabular data (clean_names(), etc.) |
 
 # Version Control {background-color="#1E4D2B"}
 

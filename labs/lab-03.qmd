@@ -1,0 +1,428 @@
+---
+title: 'Lab 3: Tessellations, Point-in-Polygon'
+subtitle: 'National Dam Inventory'
+format:
+  html:
+    code-fold: true
+    toc: true
+    include-before-body: ../slides/header.html
+    include-after-body: ../slides/footer-annotations.html
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(
+  fig.width  = 8,
+  message    = FALSE,
+  warning    = FALSE,
+  comment    = "",
+  cache      = FALSE,
+  fig.retina = 3
+)
+```
+
+```{r}
+#| echo: false
+#| fig-align: center
+#| out.width: '100%'
+
+knitr::include_graphics('img/colorado-river.jpg')
+```
+
+# Background
+
+In this lab we will explore the impacts of tessellated surfaces and the modifiable areal unit problem (MAUP) using the National Dam Inventory maintained by the United States Army Corps of Engineers. The work requires writing reusable functions and careful consideration of feature aggregation/simplification, spatial joins, and data visualization. The end goal is to visualize the distribution of dams and their purposes across the country.
+
+**DISCLAIMER**: This lab can be computationally intensive. For some steps you may be processing hundreds of millions of relations; run code chunk-by-chunk during development rather than knitting the whole document repeatedly. Your final knit may take a few minutes. Be proud — the report will summarize analyses over very large geometric relations.
+
+****
+
+This lab covers 4 main skills: 
+
+1. **Tessellating surfaces** to discretize space
+2. **Geometry simplification** to expedite expensive intersections
+3. **Writing functions** to automate repetitive reporting and mapping tasks
+4. **Point-in-polygon counts** to aggregate point data
+
+### Libraries
+
+```{r, eval = TRUE, message = F, warning = F, echo = TRUE}
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+
+# Data Science
+library(tidyverse) # data wrangling
+library(sf)        # Working with vector data
+library(rmapshaper)# Simplify geometries
+library(units)     # manage your units
+
+# Data
+# remotes::install_github("mikejohnson/AOI") # get US counties
+library(AOI) # county boundaries
+
+# Visualization
+library(gghighlight) # ggplot conditional highlighting
+library(knitr) # table generation
+library(kableExtra) # making tables pretty
+```
+
+
+******
+
+# Question 1: 
+
+Here we will prepare five tessellated surfaces from CONUS and write a function to plot them in a descriptive way.
+
+### Step 1.1
+
+First, we need a spatial file of CONUS counties. For future area calculations we want these in an equal area projection (`EPSG:5070`). 
+
+To achieve this:
+
+  - get an `sf` object of US counties (`AOI::aoi_get(state = "conus", county = "all")`)
+
+  - transform the data to `EPSG:5070`
+
+```{r}
+```
+
+
+### Step 1.2
+
+For triangle based tessellations we need point locations to serve as our "anchors".  
+
+To achieve this:
+
+  - generate county centroids using `st_centroid`
+  
+  - Since, we can only tessellate over a feature we need to _combine_ or _union_ the resulting 3,108 `POINT` features into a single `MULTIPOINT` feature
+  
+  - Since these are point objects, the difference between union/combine is mute
+
+```{r}
+```
+
+### Step 1.3
+
+Tessellations/Coverage's describe the **extent** of a region with geometric shapes, called **tiles**, with _no_ overlaps or gaps.
+
+**Tiles** can range in _size_, _shape_, _area_ and have different methods for being created.
+
+Some methods generate triangular tiles across a set of defined points (e.g. `Voronoi` and Delaunay triangulation)
+
+Others generate equal area tiles over a known extent (`st_make_grid`)
+
+For this lab, we will create surfaces of CONUS using using 4 methods, 2 based on an extent and 2 based on point anchors:
+
+**Tessellations** :
+
+  - `st_voronoi`: creates a Voronoi tessellation
+
+  - `st_triangulate`: triangulates a set of points (not constrained)
+  
+**Coverages**:
+
+  - `st_make_grid`: creates a square grid covering the geometry of an sf or sfc object
+
+  - `st_make_grid(square = FALSE)`: creates a hexagonal grid covering the geometry of an sf or sfc object
+
+  - The side of coverage tiles can be defined by a cell resolution or a specified number of cell in the X and Y direction
+
+****      
+
+For this step: 
+
+   - Make a voroni tessellation over your county centroids (`MULTIPOINT`)
+   - Make a triangulated tessellation over your county centroids (`MULTIPOINT`)
+   - Make a gridded coverage with n  = 70, over your counties object
+   - Make a hexagonal coverage with n  = 70, over your counties object
+
+In addition to creating these 4 coverage's we need to add an ID to each _tile_. 
+
+To do this:
+
+  - add a new column to each tessellation that spans from `1:n()`. 
+  
+  - Remember that **ALL** tessellation methods return an `sfc` `GEOMETRYCOLLECTION`, and to add attribute information - like our ID -  you will have to coerce the `sfc` list into an `sf` object (`st_sf` or `st_as_sf`)
+
+Last, we want to ensure that our surfaces are topologically valid/simple.
+  
+  - To ensure this, we can pass our surfaces through  `st_cast`.
+
+  - Remember that casting an object explicitly (e.g. `st_cast(x, "POINT")`) changes a geometry
+  
+  - If no output type is specified (e.g. `st_cast(x)`) then the cast attempts to simplify the geometry. 
+  
+  - If you don't do this you might get unexpected "TopologyException" errors.
+
+
+```{r}
+
+```
+
+### Step 1.4
+
+If you plot the above tessellations you'll see the triangulated surfaces produce regions far beyond the boundaries of CONUS.
+
+We need to cut these boundaries to CONUS border. 
+
+To do this, we will call on `st_intersection`, but will first need a geometry of CONUS to serve as our differencing feature. We can get this by unioning our existing county boundaries.
+
+```{r, eval = TRUE}
+
+```
+
+### Step 1.5
+
+With a single feature boundary, we must carefully consider the complexity of the geometry. Remember, the more points our geometry contains, the more computations needed for spatial predicates our differencing. For a task like ours, we do not need a finely resolved coastal boarder. 
+
+
+To achieve this: 
+
+- Simplify your unioned border using the Visvalingam algorithm provided by `rmapshaper::ms_simplify`. 
+
+- Choose what percentage of vertices to retain using the `keep` argument and work to find the highest number that provides a shape _you_ are comfortable with for the analysis:
+
+```{r, eval = TRUE}
+
+```
+
+- Once you are happy with your simplification, use the `mapview::npts` function to report the number of points in your original object, and the number of points in your simplified object. 
+
+- How many points were you able to remove? What are the consequences of doing this computationally?
+
+```{r}
+```
+
+- Finally, use your simplified object to crop the two triangulated tessellations with `st_intersection`:
+
+```{r}
+
+```
+
+### Step 1.6
+
+The last step is to plot your tessellations. We don't want to write out 5 ggplots (or mindlessly copy and paste `r emo::ji("smile")`)
+
+Instead, lets make a function that takes an `sf` object as _arg1_ and a character string as _arg2_ and returns a ggplot object showing _arg1_ titled with _arg2_. 
+
+****
+
+The form of a function is: 
+
+```{r}
+#| echo: true
+#| eval: false
+
+name = function(arg1, arg2) {
+  
+  ... code goes here ...
+  
+}
+```
+
+*****
+
+For this function: 
+
+  - The name can be anything you chose, _arg1_ should take an `sf` object, and _arg2_ should take a character string that will title the plot
+  
+  - In your function, the code should follow our standard `ggplot` practice where your data is _arg1_, and your title is _arg2_
+  
+  - The function should also enforce the following:
+  
+    - a `white` fill
+    
+    - a `navy` border
+    
+    - a `size` of 0.2
+    
+    - `theme_void``
+    
+    - a caption that reports the number of features in _arg1_
+    
+      - You will need to paste character stings and variables together.
+
+```{r}
+
+```
+
+### Step 1.7
+
+Use your new function to plot each of your tessellated surfaces and the original county data (5 plots in total):
+
+```{r}
+```
+
+# Question 2:
+
+In this question, we will write out a function to summarize our tessellated surfaces. Most of this should have been done in your daily assignments.
+
+### Step 2.1
+
+First, we need a function that takes a `sf` object and a `character` string and returns a `data.frame`. 
+
+For this function: 
+
+  - The function name can be anything you chose, _arg1_ should take an `sf` object, and _arg2_ should take a character string describing the object
+  
+  - In your function, calculate the area of `arg1`; convert the units to km^2^; and then drop the units
+  
+  - Next, create a `data.frame` containing the following:
+  
+      1. text from _arg2_
+      
+      2. the number of features in _arg1_
+      
+      3. the mean area of the features in _arg1_ (km^2^)
+      
+      4. the standard deviation of the features in _arg1_
+      
+      5. the total area (km^2^) of _arg1_
+      
+  - Return this `data.frame`
+  
+```{r}
+
+```
+
+### Step 2.2 
+
+Use your new function to summarize each of your tessellations and the original counties. 
+
+### Step 2.3
+
+Multiple `data.frame` objects can bound row-wise with `bind_rows` into a single `data.frame`
+
+For example, if your function is called `sum_tess`, the following would bind your summaries of the triangulation and voroni object.
+
+```{r}
+
+```
+
+### Step 2.4
+
+Once your 5 summaries are bound (2 tessellations, 2 coverage's, and the raw counties) print the `data.frame` as a nice table using `knitr`/`kableExtra.`
+
+```{r, echo = FALSE}
+
+```
+
+### Step 2.5
+
+Comment on the traits of each tessellation. Be specific about how these traits might impact the results of a point-in-polygon analysis in the contexts of the modifiable areal unit problem and with respect computational requirements.
+
+****
+
+# Question 3:
+
+The data we will analyze in this lab are from the U.S. Army Corps of Engineers National Dam Inventory (NID). This dataset documents ~91,000 dams in the United States and includes attributes such as design specifications, risk level, age, and purpose.
+
+For the remainder of this lab we will analyze the distributions of these dams (*Q3*) and their purposes (*Q4*) using point-in-polygon analysis.
+
+### Step 3.1
+
+In the tradition of this class - and true to data science/GIS work - you need to find, download, and manage raw data. While the raw NID data is no longer easy to get with the transition of the USACE services to ESRI Features Services, I staged the data in the resources directory of this class. To get it, navigate to that location and download the raw file into you lab data directory.
+
+- Return to your RStudio Project and read the data in using the `readr::read_csv`
+  - After reading the data in, be sure to remove rows that don’t have location values (`!is.na()`)
+  - Convert the data.frame to a sf object by defining the coordinates and CRS
+  - Transform the data to a CONUS AEA (EPSG:5070) projection - matching your tessellation
+  - Filter to include only those within your CONUS boundary
+ 
+```{r, eval = TRUE}
+#| eval: true
+#| message: false
+# Prefer a local NID CSV named `nation.csv`; otherwise download to that filename
+nid_url <- "https://nid.sec.usace.army.mil/api/nation/csv"
+dir.create("data", showWarnings = FALSE)
+nid_dest <- "data/nation.csv"
+if (file.exists(nid_dest)) {
+  message("Using local NID file: ", nid_dest)
+} else {
+  tryCatch({
+    message("Downloading NID CSV to: ", nid_dest)
+    download.file(nid_url, nid_dest, quiet = FALSE, mode = "wb")
+  }, error = function(e) {
+    message("NID download failed: ", e$message)
+  })
+}
+
+# read the CSV (will error if download failed and file missing)
+if (!file.exists(nid_dest)) stop("NID CSV not found at ", nid_dest)
+dams <- readr::read_csv(nid_dest)
+
+usa <- AOI::aoi_get(state = "conus") %>% 
+  st_union() %>% 
+  st_transform(5070)
+
+dams2 <- dams %>% 
+  filter(!is.na(LATITUDE)) %>%
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326) %>% 
+  st_transform(5070) %>% 
+  st_filter(usa)
+```
+
+### Step 3.2
+
+Following the in-class examples develop an efficient point-in-polygon function that takes:
+
+  - points as `arg1`, 
+  - polygons as `arg2`,
+  - The name of the id column as `arg3`
+  
+The function should make use of spatial and non-spatial joins, sf coercion and `dplyr::count`. The returned object should be input `sf` object with a column - `n` -  counting the number of points in each tile.
+  
+```{r}
+
+```
+
+### Step 3.3 
+
+Apply your point-in-polygon function to each of your five tessellated surfaces where:
+
+- Your points are the dams
+- Your polygons are the respective tessellation
+- The id column is the name of the id columns you defined.
+
+```{r}
+
+```
+
+### Step 3.4
+
+Lets continue the trend of automating our repetitive tasks through function creation. This time make a new function that extends your previous plotting function.
+
+For this function: 
+
+  - The name can be anything you chose, _arg1_ should take an `sf` object, and _arg2_ should take a character string that will title the plot
+  
+  - The function should also enforce the following:
+  
+    - the fill aesthetic is driven by the count column `n`
+    
+    - the col is `NA`
+    
+    - the fill is scaled to a continuous `viridis` color ramp
+    
+    - `theme_void`
+    
+    - a caption that reports the number of dams in _arg1_ (e.g. `sum(n)`)
+    
+      - You will need to paste character stings and variables together.
+      
+```{r}
+
+```
+
+### Step 3.5
+
+Apply your plotting function to each of the 5 tessellated surfaces with Point-in-Polygon counts:
+
+### Step 3.6 
+
+Comment on the influence of the tessellated surface in the visualization of point counts. How does this related to the MAUP problem. Moving forward you will only use one tessellation, which will you chose and why?  
+
+While there is not "_right_" answer, justify your selection here.
