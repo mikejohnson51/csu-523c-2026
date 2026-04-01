@@ -1302,18 +1302,17 @@ sf::sf_use_s2()
 - Mixing geographic and projected data
 - When correctness matters more than squeezing out microseconds
 
-## Area and Length
-
-```{r}
-(l <- sum(st_length(conus)))
-(a <- sum(st_area(conus)))
-```
-
-. . .
 
 ## Units as an S3 Class — Workflow
 
 Results carry **units** as an S3 class attribute — both powerful for correctness and a source of confusion in practice.
+
+```{r}
+class(conus)
+attributes(conus)
+```
+
+...
 
 ```{r}
 class(st_length(conus))
@@ -1327,8 +1326,14 @@ Create units naturally from measurements, convert between units, then drop befor
 Convert between units with the `units` package:
 
 ```{r}
+co <- AOI::aoi_get(state = "CO")
+(l = st_length(st_cast(co, "MULTILINESTRING")))
+
 units::set_units(l, "km")
 units::set_units(l, "mile")
+
+(a = st_area(co))
+
 units::set_units(a, "ha")
 units::set_units(a, "km2")
 ```
@@ -1338,8 +1343,8 @@ units::set_units(a, "km2")
 Strip units when needed for arithmetic or plotting:
 
 ```{r}
-units::drop_units(sum(st_length(conus)))
-as.numeric(sum(st_length(conus)))
+units::drop_units(l)
+as.numeric(l)
 ```
 
 ## Units Are a Class — Know the Rules
@@ -1348,7 +1353,9 @@ Units enforce dimensional correctness but can surprise you:
 
 ```{r}
 #| error: true
+#| eval: false
 st_length(conus) + 100   # can't add meters + unitless number
+
 filter(cities, dist_to_border < 160)  # may warn or fail
 ```
 

@@ -3111,18 +3111,44 @@ margin-right: 0; }
 <p><strong>Leave S2 enabled (default):</strong> - Continental and larger scales (your typical water resources workflow) - Mixing geographic and projected data - When correctness matters more than squeezing out microseconds</p>
 </div>
 </section>
-<section id="area-and-length" class="slide level2">
-<h2>Area and Length</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a></a>(l <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">st_length</span>(conus)))</span>
-<span id="cb77-2"><a></a><span class="co">#&gt; 0 [m]</span></span>
-<span id="cb77-3"><a></a>(a <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">st_area</span>(conus)))</span>
-<span id="cb77-4"><a></a><span class="co">#&gt; 8.08951e+12 [m^2]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
 <section id="units-as-an-s3-class-workflow" class="slide level2">
 <h2>Units as an S3 Class — Workflow</h2>
 <p>Results carry <strong>units</strong> as an S3 class attribute — both powerful for correctness and a source of confusion in practice.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a></a><span class="fu">class</span>(conus)</span>
+<span id="cb77-2"><a></a><span class="co">#&gt; [1] &quot;sf&quot;         &quot;data.frame&quot;</span></span>
+<span id="cb77-3"><a></a><span class="fu">attributes</span>(conus)</span>
+<span id="cb77-4"><a></a><span class="co">#&gt; $names</span></span>
+<span id="cb77-5"><a></a><span class="co">#&gt;  [1] &quot;state_region&quot;           &quot;state_division&quot;         &quot;feature_code&quot;          </span></span>
+<span id="cb77-6"><a></a><span class="co">#&gt;  [4] &quot;state_name&quot;             &quot;state_abbr&quot;             &quot;name&quot;                  </span></span>
+<span id="cb77-7"><a></a><span class="co">#&gt;  [7] &quot;fip_class&quot;              &quot;tiger_class&quot;            &quot;combined_area_code&quot;    </span></span>
+<span id="cb77-8"><a></a><span class="co">#&gt; [10] &quot;metropolitan_area_code&quot; &quot;functional_status&quot;      &quot;land_area&quot;             </span></span>
+<span id="cb77-9"><a></a><span class="co">#&gt; [13] &quot;water_area&quot;             &quot;fip_code&quot;               &quot;geometry&quot;              </span></span>
+<span id="cb77-10"><a></a><span class="co">#&gt; </span></span>
+<span id="cb77-11"><a></a><span class="co">#&gt; $row.names</span></span>
+<span id="cb77-12"><a></a><span class="co">#&gt;  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25</span></span>
+<span id="cb77-13"><a></a><span class="co">#&gt; [26] 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49</span></span>
+<span id="cb77-14"><a></a><span class="co">#&gt; </span></span>
+<span id="cb77-15"><a></a><span class="co">#&gt; $sf_column</span></span>
+<span id="cb77-16"><a></a><span class="co">#&gt; [1] &quot;geometry&quot;</span></span>
+<span id="cb77-17"><a></a><span class="co">#&gt; </span></span>
+<span id="cb77-18"><a></a><span class="co">#&gt; $agr</span></span>
+<span id="cb77-19"><a></a><span class="co">#&gt;           state_region         state_division           feature_code </span></span>
+<span id="cb77-20"><a></a><span class="co">#&gt;                   &lt;NA&gt;                   &lt;NA&gt;                   &lt;NA&gt; </span></span>
+<span id="cb77-21"><a></a><span class="co">#&gt;             state_name             state_abbr                   name </span></span>
+<span id="cb77-22"><a></a><span class="co">#&gt;                   &lt;NA&gt;                   &lt;NA&gt;                   &lt;NA&gt; </span></span>
+<span id="cb77-23"><a></a><span class="co">#&gt;              fip_class            tiger_class     combined_area_code </span></span>
+<span id="cb77-24"><a></a><span class="co">#&gt;                   &lt;NA&gt;                   &lt;NA&gt;                   &lt;NA&gt; </span></span>
+<span id="cb77-25"><a></a><span class="co">#&gt; metropolitan_area_code      functional_status              land_area </span></span>
+<span id="cb77-26"><a></a><span class="co">#&gt;                   &lt;NA&gt;                   &lt;NA&gt;                   &lt;NA&gt; </span></span>
+<span id="cb77-27"><a></a><span class="co">#&gt;             water_area               fip_code </span></span>
+<span id="cb77-28"><a></a><span class="co">#&gt;                   &lt;NA&gt;                   &lt;NA&gt; </span></span>
+<span id="cb77-29"><a></a><span class="co">#&gt; Levels: constant aggregate identity</span></span>
+<span id="cb77-30"><a></a><span class="co">#&gt; </span></span>
+<span id="cb77-31"><a></a><span class="co">#&gt; $class</span></span>
+<span id="cb77-32"><a></a><span class="co">#&gt; [1] &quot;sf&quot;         &quot;data.frame&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>…</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a></a><span class="fu">class</span>(<span class="fu">st_length</span>(conus))</span>
 <span id="cb78-2"><a></a><span class="co">#&gt; [1] &quot;units&quot;</span></span>
@@ -3136,22 +3162,30 @@ margin-right: 0; }
 <p>Create units naturally from measurements, convert between units, then drop before plotting or filtering:</p>
 <p>Convert between units with the <code>units</code> package:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(l, <span class="st">&quot;km&quot;</span>)</span>
-<span id="cb79-2"><a></a><span class="co">#&gt; 0 [km]</span></span>
-<span id="cb79-3"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(l, <span class="st">&quot;mile&quot;</span>)</span>
-<span id="cb79-4"><a></a><span class="co">#&gt; 0 [mile]</span></span>
-<span id="cb79-5"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(a, <span class="st">&quot;ha&quot;</span>)</span>
-<span id="cb79-6"><a></a><span class="co">#&gt; 808950983 [ha]</span></span>
-<span id="cb79-7"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(a, <span class="st">&quot;km2&quot;</span>)</span>
-<span id="cb79-8"><a></a><span class="co">#&gt; 8089510 [km^2]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a></a>co <span class="ot">&lt;-</span> AOI<span class="sc">::</span><span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">&quot;CO&quot;</span>)</span>
+<span id="cb79-2"><a></a>(<span class="at">l =</span> <span class="fu">st_length</span>(<span class="fu">st_cast</span>(co, <span class="st">&quot;MULTILINESTRING&quot;</span>)))</span>
+<span id="cb79-3"><a></a><span class="co">#&gt; 2100640 [m]</span></span>
+<span id="cb79-4"><a></a></span>
+<span id="cb79-5"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(l, <span class="st">&quot;km&quot;</span>)</span>
+<span id="cb79-6"><a></a><span class="co">#&gt; 2100.64 [km]</span></span>
+<span id="cb79-7"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(l, <span class="st">&quot;mile&quot;</span>)</span>
+<span id="cb79-8"><a></a><span class="co">#&gt; 1305.277 [mile]</span></span>
+<span id="cb79-9"><a></a></span>
+<span id="cb79-10"><a></a>(<span class="at">a =</span> <span class="fu">st_area</span>(co))</span>
+<span id="cb79-11"><a></a><span class="co">#&gt; 2.69382e+11 [m^2]</span></span>
+<span id="cb79-12"><a></a></span>
+<span id="cb79-13"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(a, <span class="st">&quot;ha&quot;</span>)</span>
+<span id="cb79-14"><a></a><span class="co">#&gt; 26938196 [ha]</span></span>
+<span id="cb79-15"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(a, <span class="st">&quot;km2&quot;</span>)</span>
+<span id="cb79-16"><a></a><span class="co">#&gt; 269382 [km^2]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
 <p>Strip units when needed for arithmetic or plotting:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a></a>units<span class="sc">::</span><span class="fu">drop_units</span>(<span class="fu">sum</span>(<span class="fu">st_length</span>(conus)))</span>
-<span id="cb80-2"><a></a><span class="co">#&gt; [1] 0</span></span>
-<span id="cb80-3"><a></a><span class="fu">as.numeric</span>(<span class="fu">sum</span>(<span class="fu">st_length</span>(conus)))</span>
-<span id="cb80-4"><a></a><span class="co">#&gt; [1] 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a></a>units<span class="sc">::</span><span class="fu">drop_units</span>(l)</span>
+<span id="cb80-2"><a></a><span class="co">#&gt; [1] 2100640</span></span>
+<span id="cb80-3"><a></a><span class="fu">as.numeric</span>(l)</span>
+<span id="cb80-4"><a></a><span class="co">#&gt; [1] 2100640</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </section>
@@ -3160,9 +3194,8 @@ margin-right: 0; }
 <p>Units enforce dimensional correctness but can surprise you:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a></a><span class="fu">st_length</span>(conus) <span class="sc">+</span> <span class="dv">100</span>   <span class="co"># can&#39;t add meters + unitless number</span></span>
-<span id="cb81-2"><a></a><span class="co">#&gt; Error in Ops.units(st_length(conus), 100): both operands of the expression should be &quot;units&quot; objects</span></span>
-<span id="cb81-3"><a></a><span class="fu">filter</span>(cities, dist_to_border <span class="sc">&lt;</span> <span class="dv">160</span>)  <span class="co"># may warn or fail</span></span>
-<span id="cb81-4"><a></a><span class="co">#&gt; Error: object &#39;cities&#39; not found</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb81-2"><a></a></span>
+<span id="cb81-3"><a></a><span class="fu">filter</span>(cities, dist_to_border <span class="sc">&lt;</span> <span class="dv">160</span>)  <span class="co"># may warn or fail</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
 <p>The corrected patterns:</p>
@@ -3227,7 +3260,7 @@ margin-right: 0; }
 <span id="cb85-12"><a></a>  )</span>
 <span id="cb85-13"><a></a>})</span>
 <span id="cb85-14"><a></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb85-15"><a></a><span class="co">#&gt;   1.656   0.026   1.637</span></span>
+<span id="cb85-15"><a></a><span class="co">#&gt;   1.653   0.016   1.624</span></span>
 <span id="cb85-16"><a></a></span>
 <span id="cb85-17"><a></a><span class="co"># user  system elapsed </span></span>
 <span id="cb85-18"><a></a><span class="co"># 1.648   0.014   1.677</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
