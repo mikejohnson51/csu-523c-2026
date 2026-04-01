@@ -613,7 +613,7 @@
     "href": "index.html#about-this-course",
     "title": "ESS 523c: Environmental Data Science Applications",
     "section": "About This Course",
-    "text": "About This Course\nThis course focuses on analyzing and understanding water resources through the lens of modern data science. Building on the foundational R skills from ESS/WR 523a, we examine key innovations in data science, geospatial processing and machine learning for hydrological prediction and model parameterization — with an emphasis using real data.\nEvery dataset, every example, and every lab draws from systems you will encounter in professional practice. The course is organized around a single professional question: what does it take to turn raw environmental data into a reproducible, publishable result that informs real decisions? Each week answers a piece of that question with a different class of data and methods — from spatial analysis through to machine learning workflows applied directly to hydrological problems.\nBy the end of the course you will have built a public portfolio of six published analyses spanning data wrangling, vector data, raster data, machine learning, and time series — using the same data infrastructure that federal agencies and consulting firms use operationally.\n\n\n\n\n\n\nOpen Science\n\n\n\nAll course materials — slides, labs, and code — are open source under the Apache 2.0 license and built with Quarto. If you find something that could be improved, please submit an issue on the course GitHub repository.\n\n\n\n📋 Grading\n\n\n\nComponent\nCount\nPoints Each\nTotal\n\n\n\n\nLabs\n7\n950\n950\n\n\nFinal Project (optional)\n1\n150 EC\n+150\n\n\nTotal (required)\n\n\n950\n\n\n\nGrade scale (percentage of 950 required points): A+ ≥ 96.67% · A ≥ 93.33% · A– ≥ 90% · B+ ≥ 86.67% · B ≥ 83.33% · B– ≥ 80% · C+ ≥ 76.67% · C ≥ 70% · D ≥ 60% · F &lt; 60%\nLabs - with the exception of Lab 0 - are assigned on Wednesdays and due the following Wednesday before class. All submissions are deployed as GitHub Pages. Collaboration on concepts is encouraged; code, writing, and results must be individually produced.\n\n📅 Schedule\n\n\n\n  \n    Week 1\n    Data Science Tools & Digital Environment\n  \n  \n    \n      🎓\n      Lecture\n      Day 1: Digital Environment — Files, Paths, URLs & Git\n      complete\n    \n    \n      📝\n      HW\n      Lab 0: Verify Your Environment + Meet Your Tools\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Day 2: Data Manipulation, Visualization & Relational Data\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 1: Streamflow Across the Colorado River Basin\n      Due 4/1/26\n    \n  \n\n\n\n  \n    Week 2\n    Vector Data — Features, Projections & Measures\n  \n  \n    \n      🎓\n      Lecture\n      Spatial Data: Simple Features, CRS & Measurements\n      new\n    \n    \n      ⚙️\n      Tech Talk\n      Interactive Mapping with Leaflet\n      coming\n    \n    \n      🔬\n      Lab\n      Lab 2: Measuring Distance to National Borders\n      coming\n    \n  \n\n\n\n  Reuse and licensing: Unless otherwise noted, all course materials are licensed under\n  Apache 2.0.\n  Slides, labs, and code are built with Quarto.\n  Found something that needs fixing?\n  Submit an issue on GitHub."
+    "text": "About This Course\nThis course focuses on analyzing and understanding water resources through the lens of modern data science. Building on the foundational R skills from ESS/WR 523a, we examine key innovations in data science, geospatial processing and machine learning for hydrological prediction and model parameterization — with an emphasis using real data.\nEvery dataset, every example, and every lab draws from systems you will encounter in professional practice. The course is organized around a single professional question: what does it take to turn raw environmental data into a reproducible, publishable result that informs real decisions? Each week answers a piece of that question with a different class of data and methods — from spatial analysis through to machine learning workflows applied directly to hydrological problems.\nBy the end of the course you will have built a public portfolio of six published analyses spanning data wrangling, vector data, raster data, machine learning, and time series — using the same data infrastructure that federal agencies and consulting firms use operationally.\n\n\n\n\n\n\nOpen Science\n\n\n\nAll course materials — slides, labs, and code — are open source under the Apache 2.0 license and built with Quarto. If you find something that could be improved, please submit an issue on the course GitHub repository.\n\n\n\n📋 Grading\n\n\n\nComponent\nCount\nPoints Each\nTotal\n\n\n\n\nLabs\n7\n950\n950\n\n\nFinal Project (optional)\n1\n150 EC\n+150\n\n\nTotal (required)\n\n\n950\n\n\n\nGrade scale (percentage of 950 required points): A+ ≥ 96.67% · A ≥ 93.33% · A– ≥ 90% · B+ ≥ 86.67% · B ≥ 83.33% · B– ≥ 80% · C+ ≥ 76.67% · C ≥ 70% · D ≥ 60% · F &lt; 60%\nLabs - with the exception of Lab 0 - are assigned on Wednesdays and due the following Wednesday before class. All submissions are deployed as GitHub Pages. Collaboration on concepts is encouraged; code, writing, and results must be individually produced.\n\n📅 Schedule\n\n\n\n  \n    Week 1\n    Data Science Tools & Digital Environment\n  \n  \n    \n      🎓\n      Lecture\n      Day 1: Digital Environment — Files, Paths, URLs & Git\n      complete\n    \n    \n      📝\n      HW\n      Lab 0: Verify Your Environment + Meet Your Tools\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Day 2: Data Manipulation, Visualization & Relational Data\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 1: Streamflow Across the Colorado River Basin\n      Due 4/1/26\n    \n  \n\n\n\n  \n    Week 2\n    Vector Data — Features, Projections & Measures\n  \n  \n    \n      🎓\n      Lecture\n      Spatial Data: Simple Features, CRS & Measurements\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Interactive Mapping with Leaflet\n      new\n    \n    \n      🔬\n      Lab\n      Lab 2: Measuring Distance to National Borders\n      Due 4/8/26\n    \n  \n\n\n\n  Reuse and licensing: Unless otherwise noted, all course materials are licensed under\n  Apache 2.0.\n  Slides, labs, and code are built with Quarto.\n  Found something that needs fixing?\n  Submit an issue on GitHub."
   },
   {
     "objectID": "slides/week-1-1.html#search-programmatically",
@@ -3309,5 +3309,152 @@
     "title": "Week 2",
     "section": "Tile / Zoom — Quick Notes",
     "text": "Tile / Zoom — Quick Notes\n\nWhat the formulas do: \\(C\\) is the equatorial circumference (Web‑Mercator reference). \\(S_{tile}=C\\cdot\\cos(\\text{lat})/2^{\\text{zoom}}\\) gives the east–west ground width of one 256×256 tile at the given latitude; divide by 256 for meters per pixel.\nNumeric example: lat = 40.5699°, zoom = 16 → \\(S_{tile}\\approx464.5\\,\\)m, so one pixel ≈ 1.81 m. At zoom 18 this becomes ≈0.45 m/pixel.\nPractical tips: choose the zoom to match desired ground resolution; if a point lies near a tile edge, fetch neighboring tiles (3×3) to avoid cropping; remember this is an east–west estimate along the parallel — Web‑Mercator distorts north–south scale."
+  },
+  {
+    "objectID": "labs/lab-02.html",
+    "href": "labs/lab-02.html",
+    "title": "Lab 2: Distances and Projections",
+    "section": "",
+    "text": "The spatial analysis skills in this lab — building sf objects from multiple sources, transforming coordinate reference systems, computing distances to boundaries, and identifying features within threshold zones — are the same operations you will apply to watersheds, river networks, gauge networks, and dam inventories throughout this course.\nBefore those datasets become available, we need the techniques to be automatic. This lab builds them on a familiar, nationally relevant dataset: US cities. Every operation you perform here — st_union, st_combine, st_cast, st_distance, st_transform, gghighlight — transfers directly to vector water resources data.\nThe payoff is Q4: a real-world application of these spatial skills to a live federal policy question that affects more Americans than most people realize. When you finish, you will have the tools to apply the same analysis to any spatial threshold problem.\nThis lab connects directly to recent policy discussions about border enforcement and the so-called “100-mile” border zone — for example, shifts in migration policy after the end of the pandemic-era Title 42 expulsions in 2023 have renewed attention on how proximity to the border affects enforcement, resource allocation, and civil liberties (see recent coverage: https://www.reuters.com/world/us/us-ceases-using-title-42-pandemic-order-control-migration-2023-05-11/).\nMore recent operational discussions involving ICE and border enforcement through 2025–2026 have emphasized how interior and border-zone enforcement strategies depend on distance-to-border metrics; readers can consult summaries on civil-liberties implications (ACLU) or policy analyses that discuss the “100-mile” enforcement footprint for background: https://www.aclu.org/know-your-rights/border-zone, https://www.americanimmigrationcouncil.org/blog/border-patrol-charlotte-atlanta-100-mile-zone/."
+  },
+  {
+    "objectID": "labs/lab-02.html#repository",
+    "href": "labs/lab-02.html#repository",
+    "title": "Lab 2: Distances and Projections",
+    "section": "Repository",
+    "text": "Repository\n\nNavigate to your csu-523c repository\nCreate a new Quarto file called lab-02.qmd\nPopulate its YAML:\n\n---\ntitle: \"Lab 2: Distances and Projections\"\nsubtitle: 'ESS 523c: Environmental Data Science Applications'\nauthor:\n  - name: Your Name\n    email: your@colostate.edu\nformat: html\n---\nIf you dont have a project _quarto.yml file, be sure to set the output directory to docs."
+  },
+  {
+    "objectID": "labs/lab-02.html#libraries",
+    "href": "labs/lab-02.html#libraries",
+    "title": "Lab 2: Distances and Projections",
+    "section": "Libraries",
+    "text": "Libraries\nInstall any missing packages with install.packages(\"packagename\"), then load:\n\npacman::p_load(\n  tidyverse, sf, units, tigris, rnaturalearth, gghighlight, ggrepel, flextable\n)\n\noptions(tigris_use_cache = TRUE)\n\n\n\n\n\n\n\nTip\n\n\n\nOptional hints and worked examples are available if you need extra help: hints/lab-02-hints.qmd"
+  },
+  {
+    "objectID": "labs/lab-02.html#define-a-projection",
+    "href": "labs/lab-02.html#define-a-projection",
+    "title": "Lab 2: Distances and Projections",
+    "section": "1.1 Define a Projection",
+    "text": "1.1 Define a Projection\nDistance calculations require a projected coordinate system that minimizes distance distortion at the scale of CONUS. We will use the North America Equidistant Conic:\n\neqdc &lt;- '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'\n\nThis PROJ string defines:\n\n\n\nParameter\nValue\nMeaning\n\n\n\n\n+proj=eqdc\n—\nEquidistant Conic projection\n\n\n+lat_0=40\n40°N\nLatitude of projection center\n\n\n+lon_0=-96\n96°W\nCentral meridian\n\n\n+lat_1=20, +lat_2=60\n20°N, 60°N\nStandard parallels\n\n\n+datum=NAD83\n—\nNorth American Datum 1983\n\n\n+units=m\n—\nOutput in meters\n\n\n\nDistortion is minimized between the two standard parallels — 20°N and 60°N encompasses all of CONUS, making this projection well-suited for national-scale distance analysis."
+  },
+  {
+    "objectID": "labs/lab-02.html#conus-state-boundaries",
+    "href": "labs/lab-02.html#conus-state-boundaries",
+    "title": "Lab 2: Distances and Projections",
+    "section": "1.2 CONUS State Boundaries",
+    "text": "1.2 CONUS State Boundaries\nUse tigris::states() to get US state boundaries, filter to CONUS, and transform to the equidistant projection.\n\n\n\n\n\n\nTip\n\n\n\ntigris is the modern, CRAN-stable replacement for USAboundaries. It pulls boundaries directly from the US Census Bureau TIGER/Line files. Load the data with states(cb = TRUE, progress_bar = FALSE). Filter the state codes (STUSPS column) to exclude Alaska, Hawaii, and US territories, then apply st_transform(eqdc) to reproject."
+  },
+  {
+    "objectID": "labs/lab-02.html#north-american-country-boundaries",
+    "href": "labs/lab-02.html#north-american-country-boundaries",
+    "title": "Lab 2: Distances and Projections",
+    "section": "1.3 North American Country Boundaries",
+    "text": "1.3 North American Country Boundaries\nUse rnaturalearth::ne_countries() to get country boundaries for the United States, Canada, and Mexico.\n\n\n\n\n\n\nTip\n\n\n\nne_countries() returns an sf object directly when you specify returnclass = \"sf\". Filter on the admin column to keep only the three countries you need, then transform to eqdc. See ?rnaturalearth::ne_countries for available scales and parameters."
+  },
+  {
+    "objectID": "labs/lab-02.html#us-city-locations",
+    "href": "labs/lab-02.html#us-city-locations",
+    "title": "Lab 2: Distances and Projections",
+    "section": "1.4 US City Locations",
+    "text": "1.4 US City Locations\nGo to simplemaps.com/data/us-cities and download the free basic dataset into your data/ directory.\nRead it in with readr::read_csv() and explore it — understand what columns are available before proceeding.\nThe raw data is tabular — coordinates are stored as numeric columns, not geometry. Convert it to a spatial object using st_as_sf(), specifying which columns hold X and Y coordinates and what CRS they use. Raw lat/lon from a CSV is almost always WGS84 (EPSG:4326).\n\n\n\n\n\n\nTip\n\n\n\nAfter creating the sf object, you’ll need to remove rows that fall outside CONUS. The st_union(states) geometry provides a boundary to filter against. See ?sf::st_filter for how to select geometries that intersect or fall within a bounding polygon.\n\n\n\n\n\n\n\n\nVerify all three datasets before proceeding\n\n\n\nRun these checks before moving to Q2 — a CRS mismatch here will silently corrupt every distance calculation downstream.\n# All three must return the same CRS\nst_crs(states) == st_crs(countries)\nst_crs(states) == st_crs(cities)\n\n# Row counts should be reasonable\nnrow(states)    # should be 48\nnrow(cities)    # should be ~28,000"
+  },
+  {
+    "objectID": "labs/lab-02.html#distance-to-us-national-border-km",
+    "href": "labs/lab-02.html#distance-to-us-national-border-km",
+    "title": "Lab 2: Distances and Projections",
+    "section": "2.1 Distance to US National Border (km)",
+    "text": "2.1 Distance to US National Border (km)\nThe national border is the resolved outer boundary of all states — internal state lines dissolved, only the coastline and land borders remain.\n\n\n\n\n\n\nTip\n\n\n\nUse st_union() to merge all state polygons into a single boundary (dissolving internal borders), then cast to MULTILINESTRING so distances are measured to the border line rather than interior. Compute distance using st_distance() and convert the result to kilometers using set_units() from the units package — this ensures clean numeric output and correct unit handling downstream.\n\n\nStore the result as a new column dist_to_border in your cities data frame. Produce a flextable of the 5 cities farthest from the national border — include city name, state, and distance."
+  },
+  {
+    "objectID": "labs/lab-02.html#distance-to-nearest-state-border-km",
+    "href": "labs/lab-02.html#distance-to-nearest-state-border-km",
+    "title": "Lab 2: Distances and Projections",
+    "section": "2.2 Distance to Nearest State Border (km)",
+    "text": "2.2 Distance to Nearest State Border (km)\nThe nearest state border uses preserved internal boundaries — we want every state line, not just the outer edge. Use st_combine() which keeps all boundaries, then cast to MULTILINESTRING.\nStore as dist_to_state. Produce a flextable of the 5 cities farthest from any state border.\n\n\n\n\n\n\nTip\n\n\n\nThink carefully about why the answers for 2.1 and 2.2 differ. The city farthest from the national border might be close to a state line. The city farthest from any state line must be far from all internal AND external borders."
+  },
+  {
+    "objectID": "labs/lab-02.html#distance-to-mexico-km",
+    "href": "labs/lab-02.html#distance-to-mexico-km",
+    "title": "Lab 2: Distances and Projections",
+    "section": "2.3 Distance to Mexico (km)",
+    "text": "2.3 Distance to Mexico (km)\nIsolate Mexico from your countries object. Cast to MULTILINESTRING. Compute distance from each city to the Mexican border. Store as dist_to_mexico. Produce a flextable of the 5 cities farthest from Mexico."
+  },
+  {
+    "objectID": "labs/lab-02.html#distance-to-canada-km",
+    "href": "labs/lab-02.html#distance-to-canada-km",
+    "title": "Lab 2: Distances and Projections",
+    "section": "2.4 Distance to Canada (km)",
+    "text": "2.4 Distance to Canada (km)\nSame approach as 2.3, for Canada. Store as dist_to_canada. Produce a flextable of the 5 cities farthest from Canada."
+  },
+  {
+    "objectID": "labs/lab-02.html#reference-map",
+    "href": "labs/lab-02.html#reference-map",
+    "title": "Lab 2: Distances and Projections",
+    "section": "3.1 Reference Map",
+    "text": "3.1 Reference Map\nCreate a base reference map showing:\n\nNorth America (US, Canada, Mexico) as filled grey polygons\nCONUS state boundaries as dashed lines\nThe 10 largest US cities by population as labeled points\n\n\n\n\n\n\n\nTip\n\n\n\nUse geom_sf() for spatial layers. For labels that don’t overlap:\nggrepel::geom_label_repel(\n  data = big_cities,\n  aes(geometry = geometry, label = city),\n  stat = \"sf_coordinates\",\n  size = 3\n)\nstat = \"sf_coordinates\" extracts point coordinates from the geometry for label placement — required when using ggrepel with sf objects."
+  },
+  {
+    "objectID": "labs/lab-02.html#distance-to-national-border",
+    "href": "labs/lab-02.html#distance-to-national-border",
+    "title": "Lab 2: Distances and Projections",
+    "section": "3.2 Distance to National Border",
+    "text": "3.2 Distance to National Border\nColor all US cities by their distance to the national border using a continuous color scale. Highlight and label the 5 cities farthest from the border.\nYour map should: - Use scale_color_viridis_c() for the distance gradient - Show the CONUS outline - Label the 5 farthest cities with ggrepel\nIn 2–3 sentences: (1) where are the cities farthest from the national border? (2) Does the geographic pattern make sense given the shape of CONUS? (3) Name one water resources application where distance to a national border would be a meaningful variable.\n\n…"
+  },
+  {
+    "objectID": "labs/lab-02.html#distance-to-nearest-state-border",
+    "href": "labs/lab-02.html#distance-to-nearest-state-border",
+    "title": "Lab 2: Distances and Projections",
+    "section": "3.3 Distance to Nearest State Border",
+    "text": "3.3 Distance to Nearest State Border\nColor all cities by distance to the nearest state border. Highlight and label the 5 cities farthest from any state line.\nIn 2–3 sentences: (1) how does the pattern differ from 3.2? (2) Which states appear to have the largest interior areas — do any water resources features (large river basins, aquifer extents) correlate with the states where cities can be far from borders? (3) What would a hydrologist use this distance for?\n\n…"
+  },
+  {
+    "objectID": "labs/lab-02.html#equidistance-zone-mexico-and-canada",
+    "href": "labs/lab-02.html#equidistance-zone-mexico-and-canada",
+    "title": "Lab 2: Distances and Projections",
+    "section": "3.4 Equidistance Zone: Mexico and Canada",
+    "text": "3.4 Equidistance Zone: Mexico and Canada\nIdentify cities that are approximately equidistant from the Mexican and Canadian borders — within ±100 km of equal distance from both.\n\n\n\n\n\n\nTip\n\n\n\nCreate a variable for the absolute difference between the two distances, then use gghighlight() to emphasize cities where that difference is less than 100 km. Label the 5 most populous cities in this zone with ggrepel.\n\n\nIn 2–3 sentences: (1) describe where the equidistant zone runs geographically, (2) does it surprise you that this band cuts through the interior of the country where it does? (3) What does this zone imply about the relative influence of Canadian vs. Mexican climate systems on cities in this corridor?\n\n…"
+  },
+  {
+    "objectID": "labs/lab-02.html#background-1",
+    "href": "labs/lab-02.html#background-1",
+    "title": "Lab 2: Distances and Projections",
+    "section": "Background",
+    "text": "Background\nFederal regulations give U.S. Customs and Border Protection (CBP) authority to operate within 100 miles of any US “external boundary” — including both land borders and coastlines. Within this zone, CBP agents can conduct stops and searches without a warrant or reasonable suspicion. Federal courts have repeatedly upheld this authority.\nThe American Civil Liberties Union has documented and challenged this policy. Their analysis is here.\n\n\n\n\n\n\n\n\n\n100 miles ≈ 160 kilometers. Your distance calculations are already in kilometers."
+  },
+  {
+    "objectID": "labs/lab-02.html#quantify-the-zone",
+    "href": "labs/lab-02.html#quantify-the-zone",
+    "title": "Lab 2: Distances and Projections",
+    "section": "4.1 Quantify the Zone",
+    "text": "4.1 Quantify the Zone\nUsing your dist_to_border column, calculate:\n\nHow many cities fall within the 100-mile zone?\nWhat is the total population living in cities within the zone?\nWhat percentage of the total US city population does this represent?\nDoes your result match the ACLU’s published estimate?\n\nPresent your findings as a formatted flextable.\n\n\n\n\n\n\nTip\n\n\n\nFilter to cities within 160 km, drop geometry if needed, then summarize: count rows (n()), sum population, and compute the percentage relative to total city population. You will need to reference total city population across the entire dataset, not just filtered rows — plan your calculation carefully.\n\n\nIn 2–3 sentences: (1) report the percentage and compare it to the ACLU’s estimate, (2) explain why the result might be higher than many people expect given the geography of the US, (3) name one scenario where a water resources professional might need to navigate federal jurisdictional boundaries in a similar way — where a regulatory zone defined by distance from a physical boundary changes what analysis or permitting is required.\n\n…"
+  },
+  {
+    "objectID": "labs/lab-02.html#map-the-zone",
+    "href": "labs/lab-02.html#map-the-zone",
+    "title": "Lab 2: Distances and Projections",
+    "section": "4.2 Map the Zone",
+    "text": "4.2 Map the Zone\nCreate a map highlighting all cities within the 100-mile zone using gghighlight.\n\nColor cities by distance to the border using a gradient from \"orange\" to \"darkred\"\nLabel the 10 most populous cities in the zone"
+  },
+  {
+    "objectID": "labs/lab-02.html#most-populous-city-per-state-in-the-zone",
+    "href": "labs/lab-02.html#most-populous-city-per-state-in-the-zone",
+    "title": "Lab 2: Distances and Projections",
+    "section": "4.3 Most Populous City per State in the Zone",
+    "text": "4.3 Most Populous City per State in the Zone\nRepeat the map from 4.2, but instead of the 10 most populous overall, label the most populous city in each state that falls within the zone.\n\n\n\n\n\n\nTip\n\n\n\nfilter(cities, as.numeric(dist_to_border) &lt; 160) |&gt;\n  group_by(state_name) |&gt;\n  slice_max(population, n = 1)\n\n\nIn 2–3 sentences: (1) how many states have at least one city in the zone? (2) Are there states where the most populous city is NOT in the zone — what does that tell you about that state’s geography? (3) How might the jurisdictional boundary created by this rule create challenges for environmental monitoring programs that cross state or national boundaries?\n\n…"
+  },
+  {
+    "objectID": "labs/hints/lab-02-hints.html",
+    "href": "labs/hints/lab-02-hints.html",
+    "title": "Lab 2: Distances and Projections",
+    "section": "",
+    "text": "Question 1:\n\nMaking Spatial Objects & Coordinate Transformation\nSpatial objects (sf) can be built from a vector of X and Y values in addition to a coordinate reference system (CRS). For example:\n\ndf &lt;- data.frame(name = state.name, \n                X = state.center$x, \n                Y = state.center$y)\nhead(df)\n\n        name         X       Y\n1    Alabama  -86.7509 32.5901\n2     Alaska -127.2500 49.2500\n3    Arizona -111.6250 34.2192\n4   Arkansas  -92.2992 34.7336\n5 California -119.7730 36.5341\n6   Colorado -105.5130 38.6777\n\n# Geographic Coordinate System (GCS)\n(df_sf_gcs = st_as_sf(df, \n                      coords = c(\"X\", \"Y\"), \n                      crs = 4269))\n\nSimple feature collection with 50 features and 1 field\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: -127.25 ymin: 27.8744 xmax: -68.9801 ymax: 49.25\nGeodetic CRS:  NAD83\nFirst 10 features:\n          name                 geometry\n1      Alabama POINT (-86.7509 32.5901)\n2       Alaska    POINT (-127.25 49.25)\n3      Arizona POINT (-111.625 34.2192)\n4     Arkansas POINT (-92.2992 34.7336)\n5   California POINT (-119.773 36.5341)\n6     Colorado POINT (-105.513 38.6777)\n7  Connecticut POINT (-72.3573 41.5928)\n8     Delaware POINT (-74.9841 38.6777)\n9      Florida  POINT (-81.685 27.8744)\n10     Georgia POINT (-83.3736 32.3329)\n\nggplot() + \n  geom_sf(data = df_sf_gcs) + \n  coord_sf(datum = st_crs(df_sf_gcs)) +\n  theme_linedraw()\n\n\n\n\n\n\n\n# Projected Coordinate System (PCS)\n# st_transforms converts from one reference system to another\n(df_sf_pcs = st_transform(df_sf_gcs, 5070))\n\nSimple feature collection with 50 features and 1 field\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: -2805703 ymin: 640477 xmax: 2079664 ymax: 3291437\nProjected CRS: NAD83 / Conus Albers\nFirst 10 features:\n          name                  geometry\n1      Alabama  POINT (862043.5 1099545)\n2       Alaska  POINT (-2264853 3291437)\n3      Arizona  POINT (-1422260 1356663)\n4     Arkansas  POINT (336061.5 1303543)\n5   California  POINT (-2086972 1760961)\n6     Colorado POINT (-818480.9 1779785)\n7  Connecticut   POINT (1936213 2307450)\n8     Delaware   POINT (1796466 1938236)\n9      Florida    POINT (1409814 640477)\n10     Georgia   POINT (1179012 1107322)\n\nggplot() + \n  geom_sf(data = df_sf_pcs) + \n  coord_sf(datum = st_crs(df_sf_pcs)) +\n  theme_linedraw()\n\n\n\n\n\n\n\n\n\n\n\nQuestion 2:\n\nst_distance review\n\n# Three most populous cities in the USA\n(big3 = cities |&gt; \n   select(city, population) |&gt; \n   slice_max(population, n = 3))\n\nSimple feature collection with 3 features and 2 fields\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: -2032603 ymin: 1468468 xmax: 1833394 ymax: 2178657\nProjected CRS: NAD83 / Conus Albers\n# A tibble: 3 × 3\n  city        population           geometry\n  &lt;chr&gt;            &lt;dbl&gt;        &lt;POINT [m]&gt;\n1 New York      18832416  (1833394 2178657)\n2 Los Angeles   11885717 (-2032603 1468468)\n3 Chicago        8489066 (684628.3 2122698)\n\n# Fort Collins\n(foco = filter(cities, city == \"Fort Collins\") |&gt; \n    select(city, population))\n\nSimple feature collection with 1 feature and 2 fields\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: -760147.5 ymin: 1984620 xmax: -760147.5 ymax: 1984620\nProjected CRS: NAD83 / Conus Albers\n# A tibble: 1 × 3\n  city         population            geometry\n  &lt;chr&gt;             &lt;dbl&gt;         &lt;POINT [m]&gt;\n1 Fort Collins     339256 (-760147.5 1984620)\n\n# Distance from foco to population centers\nst_distance(big3, foco)\n\nUnits: [m]\n        [,1]\n[1,] 2600790\n[2,] 1373156\n[3,] 1451359\n\n\nThere are two notable things about this result:\n\nIt has units\nIt is returned as a matrix, even though foco only had one row\n\nThis second point highlights a useful feature of st_distance, namley, its ability to return distance matrices between all combinations of features in x and y.\n\n\nunits review\n\nst_crs(big3)$units\n\n[1] \"m\"\n\n\nUnits can be converted using units::set_units. For example, ‘m’ can be converted to ‘km’.\n\nbig3 = mutate(big3, \n              dist_to_foco = st_distance(big3, foco),\n              dist_to_foco = set_units(dist_to_foco, \"km\")) \n\n(big3$dist_to_foco)\n\nUnits: [km]\n         [,1]\n[1,] 2600.790\n[2,] 1373.156\n[3,] 1451.359\n\n\nIf needed, drop units with units::drop_units() before numeric operations.\n\n\nGeometry review\nst_combine, st_union, and st_cast are commonly used together to build line boundaries for distance calculations. Use st_union() to dissolve internal boundaries for an outer border and st_combine() to preserve internal state lines.\n# Example: cast to MULTILINESTRING for border distance calculations\n# line_border = st_cast(st_union(states), \"MULTILINESTRING\")\n\n\n\nQuestion 3:\nExamples of gghighlight and ggrepel usage are included below; use stat = \"sf_coordinates\" when labeling sf points.\n# Example mapping pattern:\n# ggplot() + geom_sf(data = states) + geom_sf(data = cities, aes(color = dist_to_border)) + \n# ggrepel::geom_label_repel(data = top_cities, aes(label = city, geometry = geometry), stat = \"sf_coordinates\")\n\nThese hints are intentionally practical; keep them as optional help for students who are stuck on geometry/CRS debugging and plotting mechanics."
+  },
+  {
+    "objectID": "labs/lab-02.html#deliverables",
+    "href": "labs/lab-02.html#deliverables",
+    "title": "Lab 2: Distances and Projections",
+    "section": "Deliverables",
+    "text": "Deliverables\nCreate an interactive leaflet map that includes:\n\nBase layers: CONUS state boundaries and at least one provider tile basemap (e.g., CartoDB, OpenStreetMap)\nData layers (toggleable via addLayersControl):\n\nAll cities colored by distance to the national border (use a color palette like colorNumeric(\"viridis\"); see ?leaflet::colorNumeric)\nCities in the equidistance zone (±100 km Mexico/Canada difference) highlighted separately\nCities in the 100-mile border zone highlighted separately\n\nPopups: When you click a city marker, display relevant information: city name, state, population, and distances to borders\nLegend: Show what the color scale represents\n\n\n\n\n\n\n\nTip\n\n\n\nKey leaflet functions: - leaflet() to initialize - addProviderTiles() for basemaps - addCircleMarkers() or addMarkers() for point data - addPolygons() for state boundaries - addLegend() for a color scale legend - addLayersControl() to make layers toggleable\nSee ?leaflet and the Leaflet for R documentation for syntax and options. Remember that leaflet works with WGS84 coordinates (EPSG:4326), so you may need to transform your data before plotting.\n\n\nMethods note: In 2–3 sentences, describe the CRS transformation needed to convert from eqdc to leaflet-compatible coordinates, and any design choices you made to keep the map responsive (e.g., filtering, clustering, or simplifying geometries)."
   }
 ]

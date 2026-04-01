@@ -401,19 +401,19 @@ Labs - with the exception of Lab 0 - are assigned on Wednesdays and due the foll
       <div class="item-icon icon-lecture">🎓</div>
       <div class="item-type">Lecture</div>
       <div class="item-link"><a href="slides/week-2-1.html">Spatial Data: Simple Features, CRS & Measurements</a></div>
-      <span class="badge-new">new</span>
+      <span class="badge-old">complete</span>
     </div>
     <div class="week-item">
       <div class="item-icon icon-tech">⚙️</div>
       <div class="item-type">Tech Talk</div>
       <div class="item-link"><a href="slides/week-2-2-1.html">Interactive Mapping with Leaflet</a></div>
-      <span class="badge-soon">coming</span>
+      <span class="badge-new">new</span>
     </div>
     <div class="week-item">
       <div class="item-icon icon-lab">🔬</div>
       <div class="item-type">Lab</div>
       <div class="item-link"><a href="labs/lab-02.html">Lab 2: Measuring Distance to National Borders</a></div>
-      <span class="badge-soon">coming</span>
+      <span class="badge-new">Due 4/8/26</span>
     </div>
   </div>
 </div>

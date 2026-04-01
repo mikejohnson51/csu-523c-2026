@@ -4,8 +4,8 @@ subtitle: 'Hints & Tricks'
 format:
   html:
     toc: true
-    include-before-body: ../slides/header.html
-    include-after-body:  ../slides/footer-annotations.html
+    include-before-body: ../../slides/header.html
+    include-after-body:  ../../slides/footer-annotations.html
 ---
 
 ```{r, echo = FALSE}
@@ -29,7 +29,7 @@ library(knitr)
 ```
 
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
-cities = read_csv("../labs/data/uscities.csv") |> 
+cities = read_csv("../data/uscities.csv") |> 
   st_as_sf(coords = c("lng", "lat"), crs = 4326) |> 
   st_transform(5070) |> 
   filter(!state_name %in% c("Alaska", "Hawaii", "Puerto Rico"))

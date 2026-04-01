@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Mike Johnson">
 
-<title>ESS 523c: Environmental Data Science Applications – ESS 523c</title>
+<title>Lab 2: Distances and Projections – ESS 523c</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,27 +20,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./favicon.ico" rel="icon">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-8ea72dc5fed832574809a9c94082fbbb.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-5b6eb65566b1f8a996f1287d789c0740.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-c63d9198b28a859559c0f0cce9729cfa.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-8ea72dc5fed832574809a9c94082fbbb.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-5b6eb65566b1f8a996f1287d789c0740.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c63d9198b28a859559c0f0cce9729cfa.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -74,17 +107,17 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./csu-rams-logo.png" alt="" class="navbar-logo">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../csu-rams-logo.png" alt="" class="navbar-logo">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">ESS 523c</span>
     </a>
   </div>
@@ -95,7 +128,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
 </ul>
@@ -117,34 +150,40 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#question-1" id="toc-question-1" class="nav-link active" data-scroll-target="#question-1">Question 1:</a>
+  <ul class="collapse">
+  <li><a href="#making-spatial-objects-coordinate-transformation" id="toc-making-spatial-objects-coordinate-transformation" class="nav-link" data-scroll-target="#making-spatial-objects-coordinate-transformation">Making Spatial Objects &amp; Coordinate Transformation</a></li>
+  </ul></li>
+  <li><a href="#question-2" id="toc-question-2" class="nav-link" data-scroll-target="#question-2">Question 2:</a>
+  <ul class="collapse">
+  <li><a href="#st_distance-review" id="toc-st_distance-review" class="nav-link" data-scroll-target="#st_distance-review"><code>st_distance</code> review</a></li>
+  <li><a href="#units-review" id="toc-units-review" class="nav-link" data-scroll-target="#units-review"><code>units</code> review</a></li>
+  <li><a href="#geometry-review" id="toc-geometry-review" class="nav-link" data-scroll-target="#geometry-review"><code>Geometry</code> review</a></li>
+  </ul></li>
+  <li><a href="#question-3" id="toc-question-3" class="nav-link" data-scroll-target="#question-3">Question 3:</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
+<script src="https://use.fontawesome.com/5235085b15.js"></script>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">ESS 523c: Environmental Data Science Applications</h1>
-<p class="subtitle lead">Water Resources</p>
+<h1 class="title">Lab 2: Distances and Projections</h1>
+<p class="subtitle lead">Hints &amp; Tricks</p>
 </div>
 
 
-<div class="quarto-title-meta-author">
-  <div class="quarto-title-meta-heading">Author</div>
-  <div class="quarto-title-meta-heading">Affiliation</div>
-  
-    <div class="quarto-title-meta-contents">
-    <p class="author">Mike Johnson, PhD <a href="mailto:mike.johnson@colostate.edu" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> </p>
-  </div>
-  <div class="quarto-title-meta-contents">
-        <p class="affiliation">
-            Chief Data Scientist, Lynker
-          </p>
-      </div>
-  </div>
 
 <div class="quarto-title-meta">
 
-      
+    
   
     
   </div>
@@ -154,423 +193,224 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<style>
-/* ── Hero ─────────────────────────────────────────────── */
-.hero {
-  background: linear-gradient(135deg, #1E4D2B 0%, #2d6e40 60%, #1a3d22 100%);
-  color: white;
-  padding: 3.5rem 2.5rem 3rem;
-  border-radius: 8px;
-  margin-bottom: 2.5rem;
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: "";
-  position: absolute;
-  top: -60px; right: -60px;
-  width: 260px; height: 260px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.04);
-}
-.hero::after {
-  content: "";
-  position: absolute;
-  bottom: -80px; left: -40px;
-  width: 320px; height: 320px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.03);
-}
-.hero-logo {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
-}
-.hero-logo img { width: 64px; }
-.hero-course-code {
-  font-size: 0.8rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  opacity: 0.75;
-  margin-bottom: 0.35rem;
-}
-.hero h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 0.5rem;
-  color: white;
-  border: none;
-}
-.hero-subtitle {
-  font-size: 1.1rem;
-  opacity: 0.85;
-  margin-bottom: 1.5rem;
-}
-.hero-meta {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-.hero-meta span { display: flex; align-items: center; gap: 0.4rem; }
-
-/* ── Info cards ───────────────────────────────────────── */
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2.5rem;
-}
-.info-card {
-  background: #f8faf8;
-  border: 1px solid #dce8dc;
-  border-left: 4px solid #1E4D2B;
-  border-radius: 6px;
-  padding: 1.1rem 1.25rem;
-}
-.info-card .label {
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #1E4D2B;
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-}
-.info-card .value {
-  font-size: 0.95rem;
-  color: #1a2e1a;
-  line-height: 1.4;
-}
-
-/* ── Section headings ─────────────────────────────────── */
-.section-heading {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1E4D2B;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border-bottom: 2px solid #1E4D2B;
-  padding-bottom: 0.4rem;
-  margin: 2rem 0 1.2rem;
-}
-
-/* ── Schedule ─────────────────────────────────────────── */
-.week-block {
-  margin-bottom: 1.5rem;
-  border: 1px solid #e2ebe2;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.week-header {
-  background: #1E4D2B;
-  color: white;
-  padding: 0.6rem 1.1rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-.week-header .week-num {
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  opacity: 0.75;
-}
-.week-header .week-title {
-  font-weight: 600;
-  font-size: 0.95rem;
-  flex: 0 1 auto;
-  min-width: 0;
-  white-space: normal;
-}
-.week-items { padding: 0.6rem 0; }
-.week-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1.1rem;
-  font-size: 0.88rem;
-  border-bottom: 1px solid #f0f5f0;
-  transition: background 0.15s;
-}
-.week-item:last-child { border-bottom: none; }
-.week-item:hover { background: #f4f9f4; }
-.week-item .item-icon {
-  width: 26px; height: 26px;
-  border-radius: 5px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.75rem;
-  flex-shrink: 0;
-}
-.icon-lecture { background: #e8f4e8; color: #1E4D2B; }
-.icon-tech    { background: #e8f0fa; color: #2c5f9e; }
-.icon-lab     { background: #fef3e2; color: #b35c00; }
-.icon-hw      { background: #f3e8f8; color: #6b2fa0; }
-.item-type {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #777;
-  width: 52px;
-  flex-shrink: 0;
-}
-.item-link a {
-  color: #1E4D2B;
-  text-decoration: none;
-  font-weight: 500;
-}
-.item-link a:hover { text-decoration: underline; }
-.item-plain { color: #444; }
-.badge-soon {
-  margin-left: auto;
-  font-size: 0.65rem;
-  background: #C8C372;
-  color: #1E4D2B;
-  padding: 0.15rem 0.5rem;
-  border-radius: 20px;
-  letter-spacing: 0.05em;
-}
-.badge-old {
-  margin-left: auto;
-  font-size: 0.65rem;
-  background: #f0f0f0;
-  color: #888;
-  padding: 0.15rem 0.5rem;
-  border-radius: 20px;
-  letter-spacing: 0.05em;
-}
-.badge-new {
-  margin-left: auto;
-  font-size: 0.65rem;
-  background: #e8f4e8;
-  color: #1E4D2B;
-  padding: 0.15rem 0.5rem;
-  border-radius: 20px;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-}
-.badge-ec {
-  margin-left: auto;
-  font-size: 0.65rem;
-  background: #fef3e2;
-  color: #b35c00;
-  padding: 0.15rem 0.5rem;
-  border-radius: 20px;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-}
-
-/* ── Grading table ────────────────────────────────────── */
-.grade-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
-.grade-table th {
-  background: #1E4D2B;
-  color: white;
-  padding: 0.5rem 0.75rem;
-  text-align: left;
-  font-weight: 600;
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.grade-table td {
-  padding: 0.45rem 0.75rem;
-  border-bottom: 1px solid #e8ede8;
-}
-.grade-table tr:last-child td { border-bottom: none; }
-.grade-table tr:hover td { background: #f6faf6; }
-
-/* ── Footer note ──────────────────────────────────────── */
-.appendix-note {
-  margin-top: 3rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid #dce8dc;
-  font-size: 0.82rem;
-  color: #666;
-  line-height: 1.6;
-}
-</style>
-<div class="hero">
-  <div class="hero-logo">
-    <img src="csu-rams-logo.png" alt="CSU Rams logo">
-    <div>
-      <div class="hero-course-code">Colorado State University · ESS 523c · Spring 2026</div>
-    </div>
-  </div>
-  <h1>Environmental Data Science Applications:<br>Water Resources</h1>
-  <div class="hero-subtitle">
-    Building the quantitative, computational, and communication skills to work at the frontier of water science.
-  </div>
-  <div class="hero-meta">
-    <span>📍 CSU Fort Collins</span>
-    <span>👤 Mike Johnson, PhD — Chief Data Scientist, Lynker</span>
-    <span>✉️ mike.johnson@colostate.edu</span>
-  </div>
+<section id="question-1" class="level1">
+<h1>Question 1:</h1>
+<section id="making-spatial-objects-coordinate-transformation" class="level3">
+<h3 class="anchored" data-anchor-id="making-spatial-objects-coordinate-transformation">Making Spatial Objects &amp; Coordinate Transformation</h3>
+<p>Spatial objects (sf) can be built from a vector of X and Y values in addition to a coordinate reference system (CRS). For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> state.name, </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">X =</span> state.center<span class="sc">$</span>x, </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">Y =</span> state.center<span class="sc">$</span>y)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        name         X       Y
+1    Alabama  -86.7509 32.5901
+2     Alaska -127.2500 49.2500
+3    Arizona -111.6250 34.2192
+4   Arkansas  -92.2992 34.7336
+5 California -119.7730 36.5341
+6   Colorado -105.5130 38.6777</code></pre>
 </div>
-<div class="info-grid">
-  <div class="info-card">
-    <div class="label">Meeting Times</div>
-    <div class="value">Mon &amp; Wed · 4:00 – 5:50 PM</div>
-  </div>
-  <div class="info-card">
-    <div class="label">Location</div>
-    <div class="value">Stadium, Room 1215</div>
-  </div>
-  <div class="info-card">
-    <div class="label">Dates</div>
-    <div class="value">Mar 23 – May 17, 2026</div>
-  </div>
-  <div class="info-card">
-    <div class="label">Prerequisites</div>
-    <div class="value">ESS/WR 523a or equivalent experience with R and RStudio</div>
-  </div>
-  <div class="info-card">
-    <div class="label">Structure</div>
-    <div class="value">Mon: Lecture &nbsp;|&nbsp; Wed: Tech Talk + Lab</div>
-  </div>
-  <div class="info-card">
-    <div class="label">Grading</div>
-    <div class="value">7 Labs = 950 pts<br>+150 optional final project</div>
-  </div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Geographic Coordinate System (GCS)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>(<span class="at">df_sf_gcs =</span> <span class="fu">st_as_sf</span>(df, </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>), </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">crs =</span> <span class="dv">4269</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 50 features and 1 field
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -127.25 ymin: 27.8744 xmax: -68.9801 ymax: 49.25
+Geodetic CRS:  NAD83
+First 10 features:
+          name                 geometry
+1      Alabama POINT (-86.7509 32.5901)
+2       Alaska    POINT (-127.25 49.25)
+3      Arizona POINT (-111.625 34.2192)
+4     Arkansas POINT (-92.2992 34.7336)
+5   California POINT (-119.773 36.5341)
+6     Colorado POINT (-105.513 38.6777)
+7  Connecticut POINT (-72.3573 41.5928)
+8     Delaware POINT (-74.9841 38.6777)
+9      Florida  POINT (-81.685 27.8744)
+10     Georgia POINT (-83.3736 32.3329)</code></pre>
 </div>
-<section id="about-this-course" class="level2">
-<h2 class="anchored" data-anchor-id="about-this-course">About This Course</h2>
-<p>This course focuses on analyzing and understanding water resources through the lens of modern data science. Building on the foundational R skills from ESS/WR 523a, we examine key innovations in data science, geospatial processing and machine learning for hydrological prediction and model parameterization — with an emphasis using real data.</p>
-<p>Every dataset, every example, and every lab draws from systems you will encounter in professional practice. The course is organized around a single professional question: <strong>what does it take to turn raw environmental data into a reproducible, publishable result that informs real decisions?</strong> Each week answers a piece of that question with a different class of data and methods — from spatial analysis through to machine learning workflows applied directly to hydrological problems.</p>
-<p>By the end of the course you will have built a public portfolio of six published analyses spanning data wrangling, vector data, raster data, machine learning, and time series — using the same data infrastructure that federal agencies and consulting firms use operationally.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Open Science
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> df_sf_gcs) <span class="sc">+</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(<span class="at">datum =</span> <span class="fu">st_crs</span>(df_sf_gcs)) <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-02-hints_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
-<div class="callout-body-container callout-body">
-<p>All course materials — slides, labs, and code — are open source under the Apache 2.0 license and built with <a href="https://quarto.org/">Quarto</a>. If you find something that could be improved, please <a href="https://github.com/mikejohnson51/csu-523c-2026/issues">submit an issue</a> on the course GitHub repository.</p>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Projected Coordinate System (PCS)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># st_transforms converts from one reference system to another</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>(<span class="at">df_sf_pcs =</span> <span class="fu">st_transform</span>(df_sf_gcs, <span class="dv">5070</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 50 features and 1 field
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -2805703 ymin: 640477 xmax: 2079664 ymax: 3291437
+Projected CRS: NAD83 / Conus Albers
+First 10 features:
+          name                  geometry
+1      Alabama  POINT (862043.5 1099545)
+2       Alaska  POINT (-2264853 3291437)
+3      Arizona  POINT (-1422260 1356663)
+4     Arkansas  POINT (336061.5 1303543)
+5   California  POINT (-2086972 1760961)
+6     Colorado POINT (-818480.9 1779785)
+7  Connecticut   POINT (1936213 2307450)
+8     Delaware   POINT (1796466 1938236)
+9      Florida    POINT (1409814 640477)
+10     Georgia   POINT (1179012 1107322)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> df_sf_pcs) <span class="sc">+</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(<span class="at">datum =</span> <span class="fu">st_crs</span>(df_sf_pcs)) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-02-hints_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
+</div>
+</section>
+</section>
+<section id="question-2" class="level1">
+<h1>Question 2:</h1>
+<section id="st_distance-review" class="level3">
+<h3 class="anchored" data-anchor-id="st_distance-review"><code>st_distance</code> review</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Three most populous cities in the USA</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>(<span class="at">big3 =</span> cities <span class="sc">|&gt;</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">select</span>(city, population) <span class="sc">|&gt;</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">slice_max</span>(population, <span class="at">n =</span> <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 3 features and 2 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -2032603 ymin: 1468468 xmax: 1833394 ymax: 2178657
+Projected CRS: NAD83 / Conus Albers
+# A tibble: 3 × 3
+  city        population           geometry
+  &lt;chr&gt;            &lt;dbl&gt;        &lt;POINT [m]&gt;
+1 New York      18832416  (1833394 2178657)
+2 Los Angeles   11885717 (-2032603 1468468)
+3 Chicago        8489066 (684628.3 2122698)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fort Collins</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>(<span class="at">foco =</span> <span class="fu">filter</span>(cities, city <span class="sc">==</span> <span class="st">"Fort Collins"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(city, population))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 1 feature and 2 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -760147.5 ymin: 1984620 xmax: -760147.5 ymax: 1984620
+Projected CRS: NAD83 / Conus Albers
+# A tibble: 1 × 3
+  city         population            geometry
+  &lt;chr&gt;             &lt;dbl&gt;         &lt;POINT [m]&gt;
+1 Fort Collins     339256 (-760147.5 1984620)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Distance from foco to population centers</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_distance</span>(big3, foco)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Units: [m]
+        [,1]
+[1,] 2600790
+[2,] 1373156
+[3,] 1451359</code></pre>
+</div>
+</div>
+<p>There are two notable things about this result:</p>
+<ol type="1">
+<li>It has <code>units</code></li>
+<li>It is returned as a matrix, even though foco only had one row</li>
+</ol>
+<p>This second point highlights a useful feature of <code>st_distance</code>, namley, its ability to return distance matrices between all combinations of features in <code>x</code> and <code>y</code>.</p>
+</section>
+<section id="units-review" class="level3">
+<h3 class="anchored" data-anchor-id="units-review"><code>units</code> review</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(big3)<span class="sc">$</span>units</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "m"</code></pre>
+</div>
+</div>
+<p>Units can be converted using <code>units::set_units</code>. For example, ‘m’ can be converted to ‘km’.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>big3 <span class="ot">=</span> <span class="fu">mutate</span>(big3, </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">dist_to_foco =</span> <span class="fu">st_distance</span>(big3, foco),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">dist_to_foco =</span> <span class="fu">set_units</span>(dist_to_foco, <span class="st">"km"</span>)) </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>(big3<span class="sc">$</span>dist_to_foco)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Units: [km]
+         [,1]
+[1,] 2600.790
+[2,] 1373.156
+[3,] 1451.359</code></pre>
+</div>
+</div>
+<p>If needed, drop units with <code>units::drop_units()</code> before numeric operations.</p>
+</section>
+<section id="geometry-review" class="level3">
+<h3 class="anchored" data-anchor-id="geometry-review"><code>Geometry</code> review</h3>
+<p><code>st_combine</code>, <code>st_union</code>, and <code>st_cast</code> are commonly used together to build line boundaries for distance calculations. Use <code>st_union()</code> to dissolve internal boundaries for an outer border and <code>st_combine()</code> to preserve internal state lines.</p>
+<pre><code># Example: cast to MULTILINESTRING for border distance calculations
+# line_border = st_cast(st_union(states), "MULTILINESTRING")</code></pre>
+</section>
+</section>
+<section id="question-3" class="level1">
+<h1>Question 3:</h1>
+<p>Examples of <code>gghighlight</code> and <code>ggrepel</code> usage are included below; use <code>stat = "sf_coordinates"</code> when labeling <code>sf</code> points.</p>
+<pre><code># Example mapping pattern:
+# ggplot() + geom_sf(data = states) + geom_sf(data = cities, aes(color = dist_to_border)) + 
+# ggrepel::geom_label_repel(data = top_cities, aes(label = city, geometry = geometry), stat = "sf_coordinates")</code></pre>
 <hr>
-<div class="section-heading">📋 Grading</div>
-<table class="grade-table caption-top table" data-quarto-postprocess="true">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th">Component</th>
-<th data-quarto-table-cell-role="th">Count</th>
-<th data-quarto-table-cell-role="th">Points Each</th>
-<th data-quarto-table-cell-role="th">Total</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Labs</td>
-<td>7</td>
-<td>950</td>
-<td>950</td>
-</tr>
-<tr class="even">
-<td>Final Project (optional)</td>
-<td>1</td>
-<td>150 EC</td>
-<td>+150</td>
-</tr>
-<tr class="odd">
-<td><strong>Total (required)</strong></td>
-<td></td>
-<td></td>
-<td><strong>950</strong></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Grade scale</strong> (percentage of 950 required points): A+ ≥ 96.67% · A ≥ 93.33% · A– ≥ 90% · B+ ≥ 86.67% · B ≥ 83.33% · B– ≥ 80% · C+ ≥ 76.67% · C ≥ 70% · D ≥ 60% · F &lt; 60%</p>
-<p>Labs - with the exception of Lab 0 - are assigned on Wednesdays and due the following Wednesday before class. All submissions are deployed as GitHub Pages. Collaboration on concepts is encouraged; code, writing, and results must be individually produced.</p>
-<hr>
-<div class="section-heading">📅 Schedule</div>
-
-<!-- ── WEEK 1 ── -->
-<div class="week-block">
-  <div class="week-header">
-    <span class="week-num">Week 1</span>
-    <span class="week-title">Data Science Tools &amp; Digital Environment</span>
-  </div>
-  <div class="week-items">
-    <div class="week-item">
-      <div class="item-icon icon-lecture">🎓</div>
-      <div class="item-type">Lecture</div>
-      <div class="item-link"><a href="slides/week-1-1.html">Day 1: Digital Environment — Files, Paths, URLs &amp; Git</a></div>
-      <span class="badge-old">complete</span>
-    </div>
-    <div class="week-item">
-      <div class="item-icon icon-hw">📝</div>
-      <div class="item-type">HW</div>
-      <div class="item-link"><a href="labs/lab-0.html">Lab 0: Verify Your Environment + Meet Your Tools</a></div>
-      <span class="badge-old">complete</span>
-    </div>
-    <div class="week-item">
-      <div class="item-icon icon-tech">⚙️</div>
-      <div class="item-type">Tech Talk</div>
-      <div class="item-link"><a href="slides/week-1-2.html">Day 2: Data Manipulation, Visualization &amp; Relational Data</a></div>
-      <span class="badge-old">complete</span>
-    </div>
-    <div class="week-item">
-      <div class="item-icon icon-lab">🔬</div>
-      <div class="item-type">Lab</div>
-      <div class="item-link"><a href="labs/lab-01.html">Lab 1: Streamflow Across the Colorado River Basin</a></div>
-      <span class="badge-new">Due 4/1/26</span>
-    </div>
-  </div>
-</div>
-<!-- ── WEEK 2 ── -->
-<div class="week-block">
-  <div class="week-header">
-    <span class="week-num">Week 2</span>
-    <span class="week-title">Vector Data — Features, Projections &amp; Measures</span>
-  </div>
-  <div class="week-items">
-    <div class="week-item">
-      <div class="item-icon icon-lecture">🎓</div>
-      <div class="item-type">Lecture</div>
-      <div class="item-link"><a href="slides/week-2-1.html">Spatial Data: Simple Features, CRS &amp; Measurements</a></div>
-      <span class="badge-old">complete</span>
-    </div>
-    <div class="week-item">
-      <div class="item-icon icon-tech">⚙️</div>
-      <div class="item-type">Tech Talk</div>
-      <div class="item-link"><a href="slides/week-2-2-1.html">Interactive Mapping with Leaflet</a></div>
-      <span class="badge-new">new</span>
-    </div>
-    <div class="week-item">
-      <div class="item-icon icon-lab">🔬</div>
-      <div class="item-type">Lab</div>
-      <div class="item-link"><a href="labs/lab-02.html">Lab 2: Measuring Distance to National Borders</a></div>
-      <span class="badge-new">Due 4/8/26</span>
-    </div>
-  </div>
-</div>
-<hr>
-<div class="appendix-note">
-  <strong>Reuse and licensing:</strong> Unless otherwise noted, all course materials are licensed under
-  <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a>.
-  Slides, labs, and code are built with <a href="https://quarto.org/">Quarto</a>.
-  Found something that needs fixing?
-  <a href="https://github.com/mikejohnson51/csu-523c-2026/issues">Submit an issue</a> on GitHub.
-</div>
+<p>These hints are intentionally practical; keep them as optional help for students who are stuck on geometry/CRS debugging and plotting mechanics.</p>
 
 
 </section>
 
 </main> <!-- /main -->
+<script>
+  Reveal.addEventListener( 'slidechanged', function( event ) {
+    console.log("hello")
+    
+    slide_id = event.currentSlide.id
+    link = "annotations" + ".html#" + slide_id
+    
+    var annotation_div = document.createElement('div')
+    annotation_div.setAttribute("class", "annotation-link")
+    
+    var notes_link = document.createElement('a')
+    notes_link.setAttribute("href", link)
+    notes_link.setAttribute("target", "_blank")
+    
+    var iii = document.createElement('i')
+    iii.setAttribute("class", "fa fa-info")
+    notes_link.appendChild(iii)
+    
+    annotation_div.appendChild(notes_link)
+    
+    var tmp = event.currentTarget.getElementsByClassName("annotation-link")
+    if (tmp.length === 1) {
+      tmp[0].remove()
+    }
+    
+    if (event.currentSlide.classList.contains("annotation")) {
+      event.currentTarget.append(annotation_div)
+    }
+  } );
+
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lab 2: Distances and Projections – ESS 523c</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-8ea72dc5fed832574809a9c94082fbbb.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5b6eb65566b1f8a996f1287d789c0740.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-c63d9198b28a859559c0f0cce9729cfa.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../csu-rams-logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">ESS 523c</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/mikejohnson51/csu-523c-2026/"> <i class="bi bi-github" role="img" aria-label="ESS 523c">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Set-up</a>
+  <ul class="collapse">
+  <li><a href="#repository" id="toc-repository" class="nav-link" data-scroll-target="#repository">Repository</a></li>
+  <li><a href="#libraries" id="toc-libraries" class="nav-link" data-scroll-target="#libraries">Libraries</a></li>
+  </ul></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a></li>
+  <li><a href="#q1" id="toc-q1" class="nav-link" data-scroll-target="#q1"><strong>Question 1</strong>: Build Your Spatial Dataset</a>
+  <ul class="collapse">
+  <li><a href="#define-a-projection" id="toc-define-a-projection" class="nav-link" data-scroll-target="#define-a-projection">1.1 Define a Projection</a></li>
+  <li><a href="#conus-state-boundaries" id="toc-conus-state-boundaries" class="nav-link" data-scroll-target="#conus-state-boundaries">1.2 CONUS State Boundaries</a></li>
+  <li><a href="#north-american-country-boundaries" id="toc-north-american-country-boundaries" class="nav-link" data-scroll-target="#north-american-country-boundaries">1.3 North American Country Boundaries</a></li>
+  <li><a href="#us-city-locations" id="toc-us-city-locations" class="nav-link" data-scroll-target="#us-city-locations">1.4 US City Locations</a></li>
+  </ul></li>
+  <li><a href="#q2" id="toc-q2" class="nav-link" data-scroll-target="#q2"><strong>Question 2</strong>: Distance Calculations</a>
+  <ul class="collapse">
+  <li><a href="#distance-to-us-national-border-km" id="toc-distance-to-us-national-border-km" class="nav-link" data-scroll-target="#distance-to-us-national-border-km">2.1 Distance to US National Border (km)</a></li>
+  <li><a href="#distance-to-nearest-state-border-km" id="toc-distance-to-nearest-state-border-km" class="nav-link" data-scroll-target="#distance-to-nearest-state-border-km">2.2 Distance to Nearest State Border (km)</a></li>
+  <li><a href="#distance-to-mexico-km" id="toc-distance-to-mexico-km" class="nav-link" data-scroll-target="#distance-to-mexico-km">2.3 Distance to Mexico (km)</a></li>
+  <li><a href="#distance-to-canada-km" id="toc-distance-to-canada-km" class="nav-link" data-scroll-target="#distance-to-canada-km">2.4 Distance to Canada (km)</a></li>
+  </ul></li>
+  <li><a href="#q3" id="toc-q3" class="nav-link" data-scroll-target="#q3"><strong>Question 3</strong>: Mapping Distance Patterns</a>
+  <ul class="collapse">
+  <li><a href="#reference-map" id="toc-reference-map" class="nav-link" data-scroll-target="#reference-map">3.1 Reference Map</a></li>
+  <li><a href="#distance-to-national-border" id="toc-distance-to-national-border" class="nav-link" data-scroll-target="#distance-to-national-border">3.2 Distance to National Border</a></li>
+  <li><a href="#distance-to-nearest-state-border" id="toc-distance-to-nearest-state-border" class="nav-link" data-scroll-target="#distance-to-nearest-state-border">3.3 Distance to Nearest State Border</a></li>
+  <li><a href="#equidistance-zone-mexico-and-canada" id="toc-equidistance-zone-mexico-and-canada" class="nav-link" data-scroll-target="#equidistance-zone-mexico-and-canada">3.4 Equidistance Zone: Mexico and Canada</a></li>
+  </ul></li>
+  <li><a href="#q4" id="toc-q4" class="nav-link" data-scroll-target="#q4"><strong>Question 4</strong>: Real-World Application — The 100-Mile Border Zone</a>
+  <ul class="collapse">
+  <li><a href="#background-1" id="toc-background-1" class="nav-link" data-scroll-target="#background-1">Background</a></li>
+  <li><a href="#quantify-the-zone" id="toc-quantify-the-zone" class="nav-link" data-scroll-target="#quantify-the-zone">4.1 Quantify the Zone</a></li>
+  <li><a href="#map-the-zone" id="toc-map-the-zone" class="nav-link" data-scroll-target="#map-the-zone">4.2 Map the Zone</a></li>
+  <li><a href="#most-populous-city-per-state-in-the-zone" id="toc-most-populous-city-per-state-in-the-zone" class="nav-link" data-scroll-target="#most-populous-city-per-state-in-the-zone">4.3 Most Populous City per State in the Zone</a></li>
+  </ul></li>
+  <li><a href="#question-5-interactive-leaflet-exercise-build-an-interactive-map" id="toc-question-5-interactive-leaflet-exercise-build-an-interactive-map" class="nav-link" data-scroll-target="#question-5-interactive-leaflet-exercise-build-an-interactive-map"><strong>Question 5</strong>: Interactive Leaflet Exercise — Build an interactive map</a>
+  <ul class="collapse">
+  <li><a href="#deliverables" id="toc-deliverables" class="nav-link" data-scroll-target="#deliverables">Deliverables</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#rubric" id="toc-rubric" class="nav-link" data-scroll-target="#rubric">Rubric</a></li>
+  <li><a href="#submission" id="toc-submission" class="nav-link" data-scroll-target="#submission">Submission</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+<script src="https://use.fontawesome.com/5235085b15.js"></script>
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 2: Distances and Projections</h1>
+<p class="subtitle lead">The Geometry of Place: Spatial Analysis Skills for Environmental Science</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/03-aclu.jpg" class="img-fluid quarto-figure quarto-figure-center figure-img" width="800"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The spatial analysis skills in this lab — building <code>sf</code> objects from multiple sources, transforming coordinate reference systems, computing distances to boundaries, and identifying features within threshold zones — are the same operations you will apply to watersheds, river networks, gauge networks, and dam inventories throughout this course.</p>
+<p>Before those datasets become available, we need the techniques to be automatic. This lab builds them on a familiar, nationally relevant dataset: US cities. Every operation you perform here — <code>st_union</code>, <code>st_combine</code>, <code>st_cast</code>, <code>st_distance</code>, <code>st_transform</code>, <code>gghighlight</code> — transfers directly to vector water resources data.</p>
+<p>The payoff is Q4: a real-world application of these spatial skills to a live federal policy question that affects more Americans than most people realize. When you finish, you will have the tools to apply the same analysis to any spatial threshold problem.</p>
+<p>This lab connects directly to recent policy discussions about border enforcement and the so-called “100-mile” border zone — for example, shifts in migration policy after the end of the pandemic-era Title 42 expulsions in 2023 have renewed attention on how proximity to the border affects enforcement, resource allocation, and civil liberties (see recent coverage: https://www.reuters.com/world/us/us-ceases-using-title-42-pandemic-order-control-migration-2023-05-11/).</p>
+<p>More recent operational discussions involving ICE and border enforcement through 2025–2026 have emphasized how interior and border-zone enforcement strategies depend on distance-to-border metrics; readers can consult summaries on civil-liberties implications (ACLU) or policy analyses that discuss the “100-mile” enforcement footprint for background: https://www.aclu.org/know-your-rights/border-zone, https://www.americanimmigrationcouncil.org/blog/border-patrol-charlotte-atlanta-100-mile-zone/.</p>
+<hr>
+<section id="setup" class="level1">
+<h1>Set-up</h1>
+<section id="repository" class="level2">
+<h2 class="anchored" data-anchor-id="repository">Repository</h2>
+<ol type="1">
+<li>Navigate to your <code>csu-523c</code> repository</li>
+<li>Create a new Quarto file called <code>lab-02.qmd</code></li>
+<li>Populate its YAML:</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Lab 2: Distances and Projections"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">subtitle</span><span class="kw">:</span><span class="at"> </span><span class="st">'ESS 523c: Environmental Data Science Applications'</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Your Name</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">email</span><span class="kw">:</span><span class="at"> your@colostate.edu</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span><span class="at"> html</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you dont have a project <code>_quarto.yml</code> file, be sure to set the output directory to <code>docs</code>.</p>
+</section>
+<section id="libraries" class="level2">
+<h2 class="anchored" data-anchor-id="libraries">Libraries</h2>
+<p>Install any missing packages with <code>install.packages("packagename")</code>, then load:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  tidyverse, sf, units, tigris, rnaturalearth, gghighlight, ggrepel, flextable</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">tigris_use_cache =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Optional hints and worked examples are available if you need extra help: <a href="../labs/hints/lab-02-hints.html">hints/lab-02-hints.qmd</a></p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="background" class="level1">
+<h1>Background</h1>
+<p>In this lab four main spatial skills are covered:</p>
+<ol type="1">
+<li><strong>Building</strong> <code>sf</code> objects from R packages and CSV files — Q1</li>
+<li><strong>Manipulating</strong> geometries and coordinate systems — Q2</li>
+<li><strong>Calculating</strong> distances using geometry type selection — Q2</li>
+<li><strong>Visualizing</strong> spatial patterns with <code>ggplot2</code>, <code>gghighlight</code>, and <code>ggrepel</code> — Q3 &amp; Q4</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why these skills matter for water resources
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Computing distance from a point to a boundary is one of the most common operations in spatial hydrology: distance from a gauge to a watershed outlet, distance from a city to the nearest floodplain, distance from a well to the nearest stream. The mechanics are identical regardless of what the features represent — master them here and they transfer everywhere.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="q1" class="level1">
+<h1><strong>Question 1</strong>: Build Your Spatial Dataset</h1>
+<p>For this lab we need three datasets:</p>
+<ol type="1">
+<li>CONUS state boundaries (1.1)</li>
+<li>North American country boundaries — US, Mexico, Canada (1.2)</li>
+<li>All US cities (1.3)</li>
+</ol>
+<section id="define-a-projection" class="level2">
+<h2 class="anchored" data-anchor-id="define-a-projection">1.1 Define a Projection</h2>
+<p>Distance calculations require a projected coordinate system that minimizes distance distortion at the scale of CONUS. We will use the <strong>North America Equidistant Conic</strong>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>eqdc <span class="ot">&lt;-</span> <span class="st">'+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This PROJ string defines:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>+proj=eqdc</code></td>
+<td>—</td>
+<td>Equidistant Conic projection</td>
+</tr>
+<tr class="even">
+<td><code>+lat_0=40</code></td>
+<td>40°N</td>
+<td>Latitude of projection center</td>
+</tr>
+<tr class="odd">
+<td><code>+lon_0=-96</code></td>
+<td>96°W</td>
+<td>Central meridian</td>
+</tr>
+<tr class="even">
+<td><code>+lat_1=20</code>, <code>+lat_2=60</code></td>
+<td>20°N, 60°N</td>
+<td>Standard parallels</td>
+</tr>
+<tr class="odd">
+<td><code>+datum=NAD83</code></td>
+<td>—</td>
+<td>North American Datum 1983</td>
+</tr>
+<tr class="even">
+<td><code>+units=m</code></td>
+<td>—</td>
+<td>Output in meters</td>
+</tr>
+</tbody>
+</table>
+<p>Distortion is minimized between the two standard parallels — 20°N and 60°N encompasses all of CONUS, making this projection well-suited for national-scale distance analysis.</p>
+</section>
+<section id="conus-state-boundaries" class="level2">
+<h2 class="anchored" data-anchor-id="conus-state-boundaries">1.2 CONUS State Boundaries</h2>
+<p>Use <code>tigris::states()</code> to get US state boundaries, filter to CONUS, and transform to the equidistant projection.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>tigris</code> is the modern, CRAN-stable replacement for <code>USAboundaries</code>. It pulls boundaries directly from the US Census Bureau TIGER/Line files. Load the data with <code>states(cb = TRUE, progress_bar = FALSE)</code>. Filter the state codes (<code>STUSPS</code> column) to exclude Alaska, Hawaii, and US territories, then apply <code>st_transform(eqdc)</code> to reproject.</p>
+</div>
+</div>
+</section>
+<section id="north-american-country-boundaries" class="level2">
+<h2 class="anchored" data-anchor-id="north-american-country-boundaries">1.3 North American Country Boundaries</h2>
+<p>Use <code>rnaturalearth::ne_countries()</code> to get country boundaries for the United States, Canada, and Mexico.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>ne_countries()</code> returns an <code>sf</code> object directly when you specify <code>returnclass = "sf"</code>. Filter on the <code>admin</code> column to keep only the three countries you need, then transform to <code>eqdc</code>. See <code>?rnaturalearth::ne_countries</code> for available scales and parameters.</p>
+</div>
+</div>
+</section>
+<section id="us-city-locations" class="level2">
+<h2 class="anchored" data-anchor-id="us-city-locations">1.4 US City Locations</h2>
+<p>Go to <a href="https://simplemaps.com/data/us-cities">simplemaps.com/data/us-cities</a> and download the free basic dataset into your <code>data/</code> directory.</p>
+<p>Read it in with <code>readr::read_csv()</code> and explore it — understand what columns are available before proceeding.</p>
+<p>The raw data is tabular — coordinates are stored as numeric columns, not geometry. Convert it to a spatial object using <code>st_as_sf()</code>, specifying which columns hold X and Y coordinates and what CRS they use. Raw lat/lon from a CSV is almost always WGS84 (EPSG:4326).</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>After creating the <code>sf</code> object, you’ll need to remove rows that fall outside CONUS. The <code>st_union(states)</code> geometry provides a boundary to filter against. See <code>?sf::st_filter</code> for how to select geometries that intersect or fall within a bounding polygon.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Verify all three datasets before proceeding
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Run these checks before moving to Q2 — a CRS mismatch here will silently corrupt every distance calculation downstream.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># All three must return the same CRS</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(states) <span class="sc">==</span> <span class="fu">st_crs</span>(countries)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(states) <span class="sc">==</span> <span class="fu">st_crs</span>(cities)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Row counts should be reasonable</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(states)    <span class="co"># should be 48</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(cities)    <span class="co"># should be ~28,000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="q2" class="level1">
+<h1><strong>Question 2</strong>: Distance Calculations</h1>
+<p>Here we calculate the distance from each US city to four boundaries:</p>
+<ol type="1">
+<li>The US national border (coastline + land borders, resolved)</li>
+<li>The nearest state border (internal boundaries preserved)</li>
+<li>The Mexican border</li>
+<li>The Canadian border</li>
+</ol>
+<p>In all cases, since we want distance to a <strong>border</strong> (a line), we must cast our polygon geometries to <code>MULTILINESTRING</code> before computing distances. The choice of <code>st_union</code> vs.&nbsp;<code>st_combine</code> determines whether interior boundaries are dissolved or preserved — a distinction that matters for questions 2.1 and 2.2.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The geometry type determines the answer
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><code>POLYGON</code> / <code>MULTIPOLYGON</code> → distance to the interior is <strong>0</strong> (you’re inside the area)</li>
+<li><code>MULTILINESTRING</code> → distance to the <strong>boundary line</strong> — what we actually want</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wrong: distance to a polygon</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_distance</span>(city_point, state_polygon)   <span class="co"># returns 0 if city is inside</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Right: distance to the border</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">st_distance</span>(city_point, state_polygon <span class="sc">|&gt;</span> <span class="fu">st_cast</span>(<span class="st">"MULTILINESTRING"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<section id="distance-to-us-national-border-km" class="level2">
+<h2 class="anchored" data-anchor-id="distance-to-us-national-border-km">2.1 Distance to US National Border (km)</h2>
+<p>The national border is the <strong>resolved</strong> outer boundary of all states — internal state lines dissolved, only the coastline and land borders remain.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use <code>st_union()</code> to merge all state polygons into a single boundary (dissolving internal borders), then cast to <code>MULTILINESTRING</code> so distances are measured to the <strong>border line</strong> rather than interior. Compute distance using <code>st_distance()</code> and convert the result to kilometers using <code>set_units()</code> from the <code>units</code> package — this ensures clean numeric output and correct unit handling downstream.</p>
+</div>
+</div>
+<p>Store the result as a new column <code>dist_to_border</code> in your cities data frame. Produce a <strong>flextable</strong> of the 5 cities farthest from the national border — include city name, state, and distance.</p>
+</section>
+<section id="distance-to-nearest-state-border-km" class="level2">
+<h2 class="anchored" data-anchor-id="distance-to-nearest-state-border-km">2.2 Distance to Nearest State Border (km)</h2>
+<p>The nearest state border uses <strong>preserved</strong> internal boundaries — we want every state line, not just the outer edge. Use <code>st_combine()</code> which keeps all boundaries, then cast to <code>MULTILINESTRING</code>.</p>
+<p>Store as <code>dist_to_state</code>. Produce a flextable of the 5 cities farthest from any state border.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Think carefully about why the answers for 2.1 and 2.2 differ. The city farthest from the national border might be close to a state line. The city farthest from any state line must be far from all internal AND external borders.</p>
+</div>
+</div>
+</section>
+<section id="distance-to-mexico-km" class="level2">
+<h2 class="anchored" data-anchor-id="distance-to-mexico-km">2.3 Distance to Mexico (km)</h2>
+<p>Isolate Mexico from your countries object. Cast to <code>MULTILINESTRING</code>. Compute distance from each city to the Mexican border. Store as <code>dist_to_mexico</code>. Produce a flextable of the 5 cities farthest from Mexico.</p>
+</section>
+<section id="distance-to-canada-km" class="level2">
+<h2 class="anchored" data-anchor-id="distance-to-canada-km">2.4 Distance to Canada (km)</h2>
+<p>Same approach as 2.3, for Canada. Store as <code>dist_to_canada</code>. Produce a flextable of the 5 cities farthest from Canada.</p>
+<hr>
+</section>
+</section>
+<section id="q3" class="level1">
+<h1><strong>Question 3</strong>: Mapping Distance Patterns</h1>
+<p>Now visualize the distance data you computed. You will use <code>ggplot2</code> for all maps, <code>ggrepel::geom_label_repel()</code> for non-overlapping city labels, and <code>gghighlight</code> to emphasize subsets.</p>
+<section id="reference-map" class="level2">
+<h2 class="anchored" data-anchor-id="reference-map">3.1 Reference Map</h2>
+<p>Create a base reference map showing:</p>
+<ul>
+<li>North America (US, Canada, Mexico) as filled grey polygons</li>
+<li>CONUS state boundaries as dashed lines</li>
+<li>The 10 largest US cities by population as labeled points</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use <code>geom_sf()</code> for spatial layers. For labels that don’t overlap:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ggrepel<span class="sc">::</span><span class="fu">geom_label_repel</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> big_cities,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">geometry =</span> geometry, <span class="at">label =</span> city),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">stat =</span> <span class="st">"sf_coordinates"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> <span class="dv">3</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>stat = "sf_coordinates"</code> extracts point coordinates from the geometry for label placement — required when using <code>ggrepel</code> with <code>sf</code> objects.</p>
+</div>
+</div>
+</section>
+<section id="distance-to-national-border" class="level2">
+<h2 class="anchored" data-anchor-id="distance-to-national-border">3.2 Distance to National Border</h2>
+<p>Color all US cities by their distance to the national border using a continuous color scale. Highlight and label the 5 cities farthest from the border.</p>
+<p>Your map should: - Use <code>scale_color_viridis_c()</code> for the distance gradient - Show the CONUS outline - Label the 5 farthest cities with <code>ggrepel</code></p>
+<p>In 2–3 sentences: (1) where are the cities farthest from the national border? (2) Does the geographic pattern make sense given the shape of CONUS? (3) Name one water resources application where distance to a national border would be a meaningful variable.</p>
+<blockquote class="blockquote">
+<p>…</p>
+</blockquote>
+</section>
+<section id="distance-to-nearest-state-border" class="level2">
+<h2 class="anchored" data-anchor-id="distance-to-nearest-state-border">3.3 Distance to Nearest State Border</h2>
+<p>Color all cities by distance to the nearest state border. Highlight and label the 5 cities farthest from any state line.</p>
+<p>In 2–3 sentences: (1) how does the pattern differ from 3.2? (2) Which states appear to have the largest interior areas — do any water resources features (large river basins, aquifer extents) correlate with the states where cities can be far from borders? (3) What would a hydrologist use this distance for?</p>
+<blockquote class="blockquote">
+<p>…</p>
+</blockquote>
+</section>
+<section id="equidistance-zone-mexico-and-canada" class="level2">
+<h2 class="anchored" data-anchor-id="equidistance-zone-mexico-and-canada">3.4 Equidistance Zone: Mexico and Canada</h2>
+<p>Identify cities that are <strong>approximately equidistant</strong> from the Mexican and Canadian borders — within ±100 km of equal distance from both.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Create a variable for the absolute difference between the two distances, then use <code>gghighlight()</code> to emphasize cities where that difference is less than 100 km. Label the 5 most populous cities in this zone with <code>ggrepel</code>.</p>
+</div>
+</div>
+<p>In 2–3 sentences: (1) describe where the equidistant zone runs geographically, (2) does it surprise you that this band cuts through the interior of the country where it does? (3) What does this zone imply about the relative influence of Canadian vs.&nbsp;Mexican climate systems on cities in this corridor?</p>
+<blockquote class="blockquote">
+<p>…</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="q4" class="level1">
+<h1><strong>Question 4</strong>: Real-World Application — The 100-Mile Border Zone</h1>
+<section id="background-1" class="level2">
+<h2 class="anchored" data-anchor-id="background-1">Background</h2>
+<p>Federal regulations give U.S. Customs and Border Protection (CBP) authority to operate within <strong>100 miles of any US “external boundary”</strong> — including both land borders and coastlines. Within this zone, CBP agents can conduct stops and searches without a warrant or reasonable suspicion. Federal courts have repeatedly upheld this authority.</p>
+<p>The American Civil Liberties Union has documented and challenged this policy. Their analysis is <a href="https://www.aclu.org/other/constitution-100-mile-border-zone">here</a>.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/03-aclu.jpg" class="img-fluid quarto-figure quarto-figure-center figure-img" width="800"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>100 miles ≈ <strong>160 kilometers</strong>. Your distance calculations are already in kilometers.</p>
+</section>
+<section id="quantify-the-zone" class="level2">
+<h2 class="anchored" data-anchor-id="quantify-the-zone">4.1 Quantify the Zone</h2>
+<p>Using your <code>dist_to_border</code> column, calculate:</p>
+<ul>
+<li>How many cities fall within the 100-mile zone?</li>
+<li>What is the total population living in cities within the zone?</li>
+<li>What percentage of the total US city population does this represent?</li>
+<li>Does your result match the ACLU’s published estimate?</li>
+</ul>
+<p>Present your findings as a formatted <strong>flextable</strong>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Filter to cities within 160 km, drop geometry if needed, then summarize: count rows (<code>n()</code>), sum population, and compute the percentage relative to total city population. You will need to reference total city population across the <em>entire dataset</em>, not just filtered rows — plan your calculation carefully.</p>
+</div>
+</div>
+<p>In 2–3 sentences: (1) report the percentage and compare it to the ACLU’s estimate, (2) explain why the result might be higher than many people expect given the geography of the US, (3) name one scenario where a water resources professional might need to navigate federal jurisdictional boundaries in a similar way — where a regulatory zone defined by distance from a physical boundary changes what analysis or permitting is required.</p>
+<blockquote class="blockquote">
+<p>…</p>
+</blockquote>
+</section>
+<section id="map-the-zone" class="level2">
+<h2 class="anchored" data-anchor-id="map-the-zone">4.2 Map the Zone</h2>
+<p>Create a map highlighting all cities within the 100-mile zone using <code>gghighlight</code>.</p>
+<ul>
+<li>Color cities by distance to the border using a gradient from <code>"orange"</code> to <code>"darkred"</code></li>
+<li>Label the <strong>10 most populous</strong> cities in the zone</li>
+</ul>
+</section>
+<section id="most-populous-city-per-state-in-the-zone" class="level2">
+<h2 class="anchored" data-anchor-id="most-populous-city-per-state-in-the-zone">4.3 Most Populous City per State in the Zone</h2>
+<p>Repeat the map from 4.2, but instead of the 10 most populous overall, label the <strong>most populous city in each state</strong> that falls within the zone.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(cities, <span class="fu">as.numeric</span>(dist_to_border) <span class="sc">&lt;</span> <span class="dv">160</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state_name) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(population, <span class="at">n =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<p>In 2–3 sentences: (1) how many states have at least one city in the zone? (2) Are there states where the most populous city is NOT in the zone — what does that tell you about that state’s geography? (3) How might the jurisdictional boundary created by this rule create challenges for environmental monitoring programs that cross state or national boundaries?</p>
+<blockquote class="blockquote">
+<p>…</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="question-5-interactive-leaflet-exercise-build-an-interactive-map" class="level1">
+<h1><strong>Question 5</strong>: Interactive Leaflet Exercise — Build an interactive map</h1>
+<p>This hands-on exercise ties the distance calculations and mapping skills from Q1–Q4 into a single interactive web map. The goal is a compact, well-documented Leaflet map with layer controls, informative popups, and two toggleable thematic layers: (A) the ±100 km equidistance band (Mexico vs Canada) and (B) the 100-mile (≈160 km) national-border zone.</p>
+<p>Learning objectives:</p>
+<ul>
+<li>Practice turning <code>sf</code> results into interactive HTML widgets with <code>leaflet</code>.</li>
+<li>Build informative popups that show computed distances and metadata.</li>
+<li>Implement layer groups and a legend so users can toggle overlays.</li>
+<li>Consider performance and projection issues when publishing web maps.</li>
+</ul>
+<section id="deliverables" class="level2">
+<h2 class="anchored" data-anchor-id="deliverables">Deliverables</h2>
+<p>Create an interactive <code>leaflet</code> map that includes:</p>
+<ul>
+<li><strong>Base layers</strong>: CONUS state boundaries and at least one provider tile basemap (e.g., CartoDB, OpenStreetMap)</li>
+<li><strong>Data layers</strong> (toggleable via <code>addLayersControl</code>):
+<ul>
+<li>All cities colored by distance to the national border (use a color palette like <code>colorNumeric("viridis")</code>; see <code>?leaflet::colorNumeric</code>)</li>
+<li>Cities in the equidistance zone (±100 km Mexico/Canada difference) highlighted separately</li>
+<li>Cities in the 100-mile border zone highlighted separately</li>
+</ul></li>
+<li><strong>Popups</strong>: When you click a city marker, display relevant information: city name, state, population, and distances to borders</li>
+<li><strong>Legend</strong>: Show what the color scale represents</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Key <code>leaflet</code> functions: - <code>leaflet()</code> to initialize - <code>addProviderTiles()</code> for basemaps - <code>addCircleMarkers()</code> or <code>addMarkers()</code> for point data - <code>addPolygons()</code> for state boundaries - <code>addLegend()</code> for a color scale legend - <code>addLayersControl()</code> to make layers toggleable</p>
+<p>See <code>?leaflet</code> and the <a href="https://rstudio.github.io/leaflet/">Leaflet for R documentation</a> for syntax and options. Remember that <code>leaflet</code> works with WGS84 coordinates (EPSG:4326), so you may need to transform your data before plotting.</p>
+</div>
+</div>
+<p><strong>Methods note</strong>: In 2–3 sentences, describe the CRS transformation needed to convert from <code>eqdc</code> to <code>leaflet</code>-compatible coordinates, and any design choices you made to keep the map responsive (e.g., filtering, clustering, or simplifying geometries).</p>
+<hr>
+</section>
+</section>
+<section id="summary" class="level1">
+<h1>Summary</h1>
+<p>In this lab you:</p>
+<ul>
+<li><strong>Built</strong> spatial datasets from three different sources: a CRAN package (<code>tigris</code>), a data package (<code>rnaturalearth</code>), and a downloaded CSV</li>
+<li><strong>Transformed</strong> coordinate reference systems and selected a projection appropriate for national-scale distance analysis</li>
+<li><strong>Manipulated</strong> geometry types — understanding when to use <code>st_union</code> vs.&nbsp;<code>st_combine</code>, and why casting to <code>MULTILINESTRING</code> is required before computing distances to borders</li>
+<li><strong>Computed</strong> four sets of distances using <code>st_distance()</code> and stored them as labeled unit vectors</li>
+<li><strong>Visualized</strong> spatial patterns with continuous color scales, <code>gghighlight</code>, and <code>ggrepel</code></li>
+<li><strong>Built</strong> an interactive web map using <code>leaflet</code> to present distance data to a general audience</li>
+</ul>
+<p>Every one of these operations recurs in the labs ahead — applied to watersheds, river networks, elevation grids, and gauge networks. The mechanics are now yours.</p>
+<hr>
+</section>
+<section id="rubric" class="level1">
+<h1>Rubric</h1>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 40%">
+<col style="width: 28%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>Topic</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Q1</td>
+<td>Build spatial dataset — 3 sources, correct CRS, verification</td>
+<td>25</td>
+</tr>
+<tr class="even">
+<td>Q2</td>
+<td>Distance calculations — 4 distances, correct geometry types, flextables</td>
+<td>35</td>
+</tr>
+<tr class="odd">
+<td>Q3</td>
+<td>Mapping — 4 maps, gghighlight, ggrepel, written interpretations</td>
+<td>20</td>
+</tr>
+<tr class="even">
+<td>Q4</td>
+<td>Border zone analysis — table, 2 maps, written interpretation</td>
+<td>35</td>
+</tr>
+<tr class="odd">
+<td>Q5</td>
+<td>Interactive Leaflet map with layers, popups, legend, and methods note</td>
+<td>35</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td></td>
+<td><strong>150</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="submission" class="level1">
+<h1>Submission</h1>
+<ol type="1">
+<li>Render: <code>quarto render lab-02.qmd</code></li>
+<li>Push: <code>git add -A &amp;&amp; git commit -m "lab 2 complete" &amp;&amp; git push</code></li>
+<li>Your lab will be live at: <code>https://USERNAME.github.io/csu-523c/lab-02.html</code></li>
+</ol>
+<p>Submit this URL to Canvas. Add the project to your personal website with a brief description of what you built — it counts toward end-of-semester extra credit.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+  Reveal.addEventListener( 'slidechanged', function( event ) {
+    console.log("hello")
+    
+    slide_id = event.currentSlide.id
+    link = "annotations" + ".html#" + slide_id
+    
+    var annotation_div = document.createElement('div')
+    annotation_div.setAttribute("class", "annotation-link")
+    
+    var notes_link = document.createElement('a')
+    notes_link.setAttribute("href", link)
+    notes_link.setAttribute("target", "_blank")
+    
+    var iii = document.createElement('i')
+    iii.setAttribute("class", "fa fa-info")
+    notes_link.appendChild(iii)
+    
+    annotation_div.appendChild(notes_link)
+    
+    var tmp = event.currentTarget.getElementsByClassName("annotation-link")
+    if (tmp.length === 1) {
+      tmp[0].remove()
+    }
+    
+    if (event.currentSlide.classList.contains("annotation")) {
+      event.currentTarget.append(annotation_div)
+    }
+  } );
+
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
