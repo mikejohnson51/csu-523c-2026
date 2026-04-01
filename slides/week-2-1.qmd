@@ -1452,10 +1452,9 @@ cities <- read_csv("data/uscities.csv") |>
 # 80.763  0.300   81.055
 ```
 
-. . .
-
 **Rule**: Transform geometry to projected CRS before expensive operations like `st_union()`, `st_intersection()`, etc.
 
+##
 ### Pitfall 2: Comparing Units
 
 ```{r}

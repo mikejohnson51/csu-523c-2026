@@ -3260,7 +3260,7 @@ margin-right: 0; }
 <span id="cb85-12"><a></a>  )</span>
 <span id="cb85-13"><a></a>})</span>
 <span id="cb85-14"><a></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb85-15"><a></a><span class="co">#&gt;   1.653   0.016   1.624</span></span>
+<span id="cb85-15"><a></a><span class="co">#&gt;   1.665   0.018   1.633</span></span>
 <span id="cb85-16"><a></a></span>
 <span id="cb85-17"><a></a><span class="co"># user  system elapsed </span></span>
 <span id="cb85-18"><a></a><span class="co"># 1.648   0.014   1.677</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3280,8 +3280,10 @@ margin-right: 0; }
 <span id="cb86-7"><a></a><span class="co"># user    system  elapsed</span></span>
 <span id="cb86-8"><a></a><span class="co"># 80.763  0.300   81.055</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>. . .</p>
 <p><strong>Rule</strong>: Transform geometry to projected CRS before expensive operations like <code>st_union()</code>, <code>st_intersection()</code>, etc.</p>
+</section>
+<section id="section-2" class="slide level2">
+<h2></h2>
 <h3 id="pitfall-2-comparing-units">Pitfall 2: Comparing Units</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb87"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a></a>dist <span class="ot">&lt;-</span> <span class="fu">st_distance</span>(cities, boundary)  <span class="co"># Returns [m]</span></span>
