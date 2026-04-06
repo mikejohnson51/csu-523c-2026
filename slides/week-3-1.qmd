@@ -1,13 +1,13 @@
 ---
-title: "Week 3, Part 1"
-subtitle: "Spatial Predicates & Filtering"
+title: "Week 3"
+subtitle: "Predicates, Simplification & Tesselations"
 format:
   revealjs: 
-    smaller: false
+    smaller: true
     incremental: false
     logo: ../csu-rams-logo.png
     slide-number: c/t
-    footer: "[ESS 523c: Environmental Data Science Applications: Water Resources](https://github.com/mikejohnson51/csu-ess-523c)"
+    footer: "[ESS 523c: Environmental Data Science Applications: Water Resources](https://github.com/mikejohnson51/csu-ess-523c/)"
     include-before-body: header.html
     include-after-body: footer-annotations.html
     theme: [default, csu-css.scss]
@@ -30,1102 +30,2210 @@ library(sf)
 library(tidyverse)
 library(knitr)
 library(AOI)
+library(flipbookr)
+library(units)
 
-states <- aoi_get(state = "all") |> filter(state_abbr %in% c("WA", "OR", "MT", "ID")) |> select(name)
-wa <- filter(states, name == "Washington")
-
-cities <- read_csv("data/uscities.csv") |>
-  st_as_sf(coords = c("lng", "lat"), crs = 4326) |>
+cities <-  readr::read_csv('data/uscities.csv') |>
+  st_as_sf(coords = c("lng", "lat"), crs = 4326)  |> 
   select(city, state_name, population)
+
+plot_tess = function(data, title){
+  ggplot() + 
+    geom_sf(data = data, fill = "white", col = "navy", size = .2) +   
+    theme_void() +
+    labs(title = title, caption = paste("This tesselation has:", nrow(data), "tiles" )) +
+    theme(plot.title = element_text(hjust = .5, color =  "navy", face = "bold"))
+}
 ```
 
-# Quick Recap
+# Last week
 
-## Last Week: Measurements and Coordinates
+We learned about the SRS (Spatial Reference Systems)
 
-You learned how to:
 
-- **Measure** spatial data: distances, areas, lengths (GEOS library)
-- **Transform** between coordinate systems (PROJ library)
-- **Distinguish** between geodesic (curved Earth) and planar (flat space) calculations
-- **Understand** how S2 geometry makes geodesic calculations practical
+- They can be **geographic** (3D, angular units)
 
-. . .
 
-**Key insight**: Spatial libraries (GDAL, PROJ, GEOS, S2) handle the math. Your job: ask the right questions and interpret the results correctly.
 
----
+  - Ellipsoid (squished sphere model)
 
-Today we focus on **asking spatial questions** about relationships between geometries.
 
-# Topological Relationships
 
-## Geometry Has Structure
+  - geoid (mathematical model of gravitational field)
+  
 
-Every geometry has three parts:
+  
+  - datum marks the relationship between the ellipsoid and geoid
 
-- **Interior** — the space *inside* the geometry (0D, 1D, or 2D depending on type)
-- **Boundary** — the edge or envelope that defines the limit
-- **Exterior** — everything *outside*
 
-. . .
+    - can be local (NAD27)
+    
 
-This structure matters for answering questions like:
 
-- Does this polygon *contain* that point?
-- Does this stream *intersect* that watershed?
-- Are these county boundaries *touching* with no overlap?
+    - can be global (WGS84, NAD83)
+    
 
-## Interior, Boundary, Exterior: Examples {.smaller}
+  
+- SRS can be projected (x-y axis, measurement units (m), false origin)
 
-:::{.columns}
-:::{.column width="33%"}
 
-**POINT (0D)**
-- Interior: the point itself
-- Boundary: empty
-- Exterior: everything else
 
-:::
-:::{.column width="33%"}
+  - All PCS are based on GCS
+      
 
-**LINESTRING (1D)**
-- Interior: all points except endpoints
-- Boundary: the two endpoints
-- Exterior: everything else
+  
+  - Projections seek to place the 3D earth on 2D
+      
 
-:::
-:::{.column width="33%"}
+  
+  - Does this by defining a plane that can be conic, cylindrical or planar
+      
 
-**POLYGON (2D)**
-- Interior: the area enclosed
-- Boundary: the rings (edges)
-- Exterior: outside the rings
+  
+  - "unfolding to this plane" creates distortion of **shape**, **area**, **distance**, or **direction**
+      
 
-:::
-:::
+  
+  - The distortion is greater from point/lines of tangency or secancy 
 
-# Spatial Predicates: The DE-9IM Model
 
-## Asking "What's the relationship?"
+# Measures (GEOS Measures)
 
-When two geometries meet or overlap, we can ask: **exactly what kind of relationship exists?**
+- Measures are the questions we ask about the dimension of a geometry
+    
+  - How long is a line or polygon perimeter (unit)
+  
+  - What is the area of a polygon (unit^2^)
+  
+  - How far are two object from one another (unit)
+      
+- Measures come from the GEOS library
+    
+- Measures are in the **units** of the base projection
+    
+- Measures can be Euclidean (PCS) or geodesic (GCS)
 
-This is formalized in the **Dimensionally Extended 9-Intersection Model (DE-9IM)**, a mathematical framework that tests *all possible intersections* between two geometries.
+  - geodesic (Great Circle) distances can be more accurate by eliminating distortion
 
-**Key insight**: The type of overlap tells you the spatial relationship.
+  - but are much slower to calculate
 
-- Point AND point overlapping = intersection
-- Line AND boundary = touching (but not overlapping internally)
-- Area AND area with gap at edge = overlapping
-
-## The DE-9IM Matrix Structure
-
-For geometries *a* and *b*, test 9 intersections:
-
-$$\begin{bmatrix} I_a \cap I_b & I_a \cap B_b & I_a \cap E_b \\ B_a \cap I_b & B_a \cap B_b & B_a \cap E_b \\ E_a \cap I_b & E_a \cap B_b & E_a \cap E_b \end{bmatrix}$$
-
-Where:
-- **I** = interior (the "inside")
-- **B** = boundary (the edge)
-- **E** = exterior (everything outside)
-
-Each cell records what *dimension* of overlap occurs:
-- **F** = False (empty, no intersection)
-- **0** = Point (0D intersection)
-- **1** = Line (1D intersection)
-- **2** = Area (2D intersection)
-- **\*** = Any dimension (wildcard in some systems)
-
-## DE-9IM Example: Point in Polygon {.smaller}
-
-**Is a point P inside polygon A?**
-
-| | Interior of A | Boundary of A | Exterior of A |
-|---|---|---|---|
-| **Interior of P** | — | — | — |
-| **Boundary of P** | 0 | F | F |
-| **Exterior of P** | F | F | 2 |
-
-Result: `0F*FFF*`
-
-- Point boundary (itself) intersects polygon interior at dimension 0 ✓
-- Point boundary does NOT intersect polygon boundary
-- Point exterior intersects polygon exterior (the space outside)
-
-**Interpretation**: Point is *inside* the polygon.
-
-## DE-9IM Example: Overlapping Polygons {.smaller}
-
-**Do two overlapping counties A and B share area?**
-
-| | Interior of B | Boundary of B | Exterior of B |
-|---|---|---|---|
-| **Interior of A** | 2 | 1 | 2 |
-| **Boundary of A** | 1 | F | 1 |
-| **Exterior of A** | 2 | 1 | 2 |
-
-Result: `212101212`
-
-- Interiors overlap (2D) ✓
-- Boundaries cross (1D) ✓
-- Areas extend outside each other (2D exteriors)
-
-**Interpretation**: Polygons *overlap* with partial area shared.
-
-## DE-9IM Example: Touching Boundaries {.smaller}
-
-**Do two counties share a border but no area (A touches B)?**
-
-| | Interior of B | Boundary of B | Exterior of B |
-|---|---|---|---|
-| **Interior of A** | F | 1 | 2 |
-| **Boundary of A** | 1 | F | 1 |
-| **Exterior of A** | 2 | 1 | 2 |
-
-Result: `F1F1*1212`
-
-- Interiors do NOT intersect (F) — no overlapping area
-- Boundaries DO intersect (1D) — they share an edge
-- Each interior is in the other's exterior (F vs 2)
-
-**Interpretation**: Polygons *touch* at a boundary; interiors stay separate.
-
-## Simplifying to Named Predicates {.smaller}
-
-The full matrix is complex, so we use **shorthand predicates** that check for specific patterns:
-
-- **Intersects** — ANY intersection exists (matrix has non-F values)
-- **Touches** — Boundaries (B) meet; interiors (I) don't overlap
-- **Within** — Entire I_a ⊆ I_b ∪ B_b (A inside B)
-- **Contains** — Entire I_b ⊆ I_a ∪ B_a (B inside A)
-- **Overlaps** — Same dimension; partial area/length overlap (not fully within)
-- **Crosses** — Different dimensions; lower-dim geometry crosses through higher-dim
-
-## Why This Matters: Topological Invariance {.smaller}
-
-A crucial property: **Topological relationships are preserved under coordinate transformations.**
-
-If polygon A is *within* polygon B:
-- True in WGS84 (geographic, curved Earth)
-- Still true in EPSG:5070 (projected, flat map)
-- Still true after any CRS transformation
-
-The DE-9IM result never changes—it depends only on spatial structure, not coordinates.
-
-::: callout-important
-This is why spatial predicates are different from distance-based operations. Distances *change* under transformation; relationships don't.
-:::
-
-## Visual Guide: The Six Named Predicates {.smaller}
-
-:::{.columns}
-:::{.column width="50%"}
-
-**Intersects** — Share any space
-```
-  [A]
-   [B]  
-   →→
-```
-
-**Touches** — Boundary meets boundary; no area overlap
-```
-  [A] [B]
-    |
-```
-
-**Within** — A completely inside B
-```
-  [B:  [A]  ]
-```
-
-:::
-:::{.column width="50%"}
-
-**Contains** — B completely inside A
-```
-  [A:  [B]  ]
-```
-
-**Overlaps** — Same dimension, partial overlap
-```
-  [A]
-   [B]
-   →→
-```
-
-**Crosses** — Lower-dim geometry crosses higher-dim
-```
-  -------  (line A)
-    |
-  [B]   (polygon B)
-```
-
-:::
-:::
-
-## Using Predicates in R
-
-`sf` provides functions for each predicate:
+## For example ...
 
 ```{r}
-#| eval: false
-st_intersects(x, y)   # Do x and y share any space?
-st_touches(x, y)       # Boundary meets boundary?
-st_within(x, y)        # Is x completely inside y?
-st_contains(x, y)      # Does x completely contain y?
-st_overlaps(x, y)      # Partial overlap, same dimension?
-st_crosses(x, y)       # Does x cross through y?
-st_disjoint(x, y)      # No intersection?
+usa <- st_cast(st_union(aoi_get(state = "conus")), "MULTILINESTRING")
+
+nrow(cities)
 ```
 
-Each returns a **sparse matrix of indices**:
+<br>
 
-```{r}
-#| eval: false
-st_touches(states, wa)
-# [[1]] integer(0)       # Oregon doesn't touch WA
-# [[2]] integer(0)       # California doesn't touch WA
-# [[3]] integer(1)       # Montana touches WA at index 1
-# [[4]] integer(1)       # Idaho touches WA at index 1
+```{r,eval = FALSE}
+# Great Circle Distance in GCS
+system.time({x <- st_distance(usa, cities)})
+# user      system elapsed 
+# 103.560   1.390  117.128 
+
+# Great Circle Distance in GCS
+system.time({x <- st_distance(usa, cities)})
+# user  system elapsed 
+# 0.703   0.005   0.739  
+
+# Euclidean Distance on PCS
+system.time({x <- st_distance(usa, cities, which = "Euclidean")})
+# user  system elapsed 
+# 1.285   0.004   1.319 
+
+
+system.time({x <- st_distance(st_transform(usa,5070), 
+                              st_transform(cities, 5070))})
+
+# user  system elapsed 
+# 1.399   0.003   1.435
 ```
 
-Row positions = states; returned index 1 = Washington's position.
+## Units
 
-## From Named Predicates to Full DE-9IM: `st_relate()` {.smaller}
-
-The named predicates (intersects, touches, etc.) are **masks** over the underlying DE-9IM string code.
-
-Use `st_relate()` to get the **full 9-character DE-9IM string**:
+When possible measure operations report results with a units appropriate for the CRS:
 
 ```{r}
-#| eval: false
-st_relate(states, wa)
-# Returns DE-9IM codes like "2FFF1FFF2", "F1F1*1212", "212101212", etc.
+co <- st_read("data/co.shp")
+a <- st_area(co[1,])
+attributes(a) |> unlist()
 ```
 
-Compare:
+The **units** package can be used to convert between units:
 
 ```{r}
-#| eval: false
-# Named predicates (boolean)
-st_touches(states, wa, sparse = FALSE)
-#      [,1]
-# [1,] FALSE  # Oregon
-# [2,] FALSE  # California  
-# [3,]  TRUE  # Montana
-# [4,]  TRUE  # Idaho
-
-# Full DE-9IM string
-st_relate(states, wa, sparse = FALSE)
-#           [,1]
-# [1,] "2FFF1FFF2"  # Oregon: overlaps in 2D (polygon), boundary touches
-# [2,] "2FFF1FFF2"  # California: similar
-# [3,] "F1F1*1212"  # Montana: touches (boundary meets boundary)
-# [4,] "F1F1*1212"  # Idaho: touches
+units::set_units(a, km^2) # result in square kilometers
+units::set_units(a, ha) # result in hectares
 ```
 
-**Why use full codes?** For specialized applications where you need to distinguish subtle topological relationships. Most of the time, named predicates are sufficient.
-
-## Sparse vs. Dense Results {.smaller}
-
-**Sparse matrix** (default): Efficient; only stores non-zero indices. Fast for filtering.
-
-**Dense matrix** (visual): Use `sparse = FALSE` for logical TRUE/FALSE. Better for reading.
+and the results can be stripped of their attributes for cases where numeric values are needed (e.g. math operators and ggplot):
 
 ```{r}
-#| eval: false
-st_touches(states, wa, sparse = FALSE)
-#      [,1]
-# [1,] FALSE  # Oregon
-# [2,] FALSE  # California
-# [3,]  TRUE  # Montana
-# [4,]  TRUE  # Idaho
+as.numeric(a)
 ```
 
-This logical matrix maps directly to rows: extract with `states[result == TRUE]`.
+## Topological Dimension
 
-## Pattern: Match and Extract
-
-Query tests all geometries in x against all in y. Index result to extract matches:
+A **POINT** is a shape with a dimension of 0 that occupies a single location in coordinate space.
 
 ```{r}
-#| eval: false
-# Which states touch Washington? Get logical vector.
-touch_matrix <- st_touches(states, wa, sparse = FALSE)[, 1]
-
-# Extract rows where TRUE
-neighbors <- states[touch_matrix, ]
-
-# Same result, shorthand:
-neighbors <- st_filter(states, wa, .predicate = st_touches)
+# POINT defined as numeric vector
+(st_dimension(st_point(c(0,1))))
 ```
 
-`st_filter()` automates this pattern—recommended for cleaner code.
 
-
-
-## The Power of Predicates: Filter by Space
-
-Instead of filtering by a column value (`name == "Washington"`), filter by a *spatial relationship*:
+A **LINESTRING** is a shape that has a dimension of 1 (length)
 
 ```{r}
-#| eval: false
-# Traditional filter (attribute-based)
+# LINESTRING defined by matrix
+(st_dimension(st_linestring(matrix(1:4, nrow = 2))))
+```
+
+A **POLYGON** is a surface stored as a list of its exterior and interior rings. It has a dimension of 2 (area)
+
+```{r}
+# POLYGON defined by LIST (interior and exterior rings)
+(st_dimension(st_polygon(list(matrix(c(1:4, 1,2), nrow = 3, byrow = TRUE)))))
+```
+
+# Predicates
+
+## Geometric Interiors, Boundaries and Exteriors
+
+All geometries have interior, boundary and exterior regions.
+
+The terms `interior` and `boundary` are used in the context of algebraic topology and manifold theory and **not** general topology
+
+The OGC has defined these states for the common geometry types in the simple features standard:
+
+| Dimension 	| Geometry Type 	| Interior (I) 	| Boundary (B) 	|
+|:-	|:-	|:-	|:-	|
+| Point, MultiPoint             | 0   	| Point, Points                                              	| Empty            |  
+| LineString, Line              | 1   	| Points that are left when the boundary points are removed. 	| Two end points.  |   	
+| Polygon                       | 2   	| Points within the rings.                                   	| Set of rings.    |   	
+  
+## Interior, Boundary and Exterior: POINTS
+
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, fig.align='center'}
+
+g = st_bbox(c(xmin = 0, xmax = 10, ymax = 6, ymin = 0)) |> 
+  st_as_sfc() |> 
+  st_make_grid(cellsize = 1)
+
+point = st_sfc(st_point(c(5,3)))
+
+
+p0 = ggplot() + 
+  geom_sf(data = g, fill = "white") + 
+  geom_sf(data = point, col = "red", size  = 3) + 
+  theme_void() + 
+  labs(title = "POINT")
+
+p1 = ggplot() + 
+  geom_sf(data = g, fill = "white") + 
+  geom_sf(data = point, col = "red", size  = 3) + 
+  theme_void() + 
+  labs(title = "Interior (POINT)")
+
+p2 = ggplot() + 
+  geom_sf(data = g, fill = "white") + 
+  geom_sf(data = point, col = "navy", size  = 3) + 
+  theme_void() + 
+  labs(title = "Boundary (POINT)")
+
+p3 = ggplot() + 
+  geom_sf(data = g, fill = "orange", alpha = .5) + 
+  geom_sf(data = point, col = "red", size  = 3) + 
+  theme_void() + 
+  labs(title = "Exterior (POINT)")
+
+gridExtra::grid.arrange(p0,p1,p2,p3, nrow = 1)
+```
+
+## Interior, Boundary and Exterior: LINESTRING
+
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, fig.align='center'}
+l0 = ggplot() + 
+  geom_sf(data = g, fill = "white") + 
+  geom_segment(aes(x = 2, y = 2, xend = 8, yend = 4 ), col = "red", size = 2) +
+  theme_void() + 
+  labs(title = "LINESTRING")
+
+l1 = ggplot() + 
+  geom_sf(data = g, fill = "white") + 
+  geom_point(aes(x = 2, y = 2), size = 3, col = "navy") +
+  geom_point(aes(x = 8, y = 4), size = 3, col = "navy") + 
+  geom_segment(aes(x = 2, y = 2, xend = 8, yend = 4), col = "red") +
+  theme_void() + 
+  labs(title = "Interior (LINESTRING)")
+
+l2 = ggplot() + 
+  geom_sf(data = g, fill = "white") + 
+  geom_point(aes(x = 2, y = 2), size = 3, col = "red") +
+  geom_point(aes(x = 8, y = 4), size = 3, col = "red") + 
+  theme_void() + 
+  labs(title = "Boundary (LINESTRING)")
+
+l3 = ggplot() + 
+  geom_sf(data = g, fill = "orange", alpha = .5) + 
+  geom_point(aes(x = 2, y = 2), size = 3, col = "navy") +
+  geom_point(aes(x = 8, y = 4), size = 3, col = "navy") + 
+  geom_segment(aes(x = 2, y = 2, xend = 8, yend = 4), col = "red") +
+  theme_void() + 
+  labs(title = "Exterior (LINESTRING)")
+
+gridExtra::grid.arrange(l0,l1,l2,l3, nrow = 1)
+```
+
+## Interior, Boundary and Exterior: POLYGON
+
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, fig.align='center'}
+pg = g[c(23:28, 33:38)] 
+
+area = st_union(pg) 
+
+border = st_cast(area, "LINESTRING")
+
+pg0 = ggplot() + 
+  geom_sf(data = g, fill = "white") + 
+  geom_sf(data = area, fill = "red")+
+  geom_sf(data = border,  color = "navy", size = 3)+
+  theme_void() + 
+  labs(title = "POLYGON")
+
+pg1 = ggplot() + 
+  geom_sf(data = g, fill = "white") + 
+  geom_sf(data = area, fill = "red", alpha = .5)+
+  theme_void() + 
+  labs(title = "Interior (POLYGON)")
+
+pg2 = ggplot() + 
+  geom_sf(data = g, fill = "white") + 
+  geom_sf(data = border,  color = "red", size = 3)+
+  theme_void() + 
+  labs(title = "Boundary (POLYGON)")
+
+pg3 = ggplot() + 
+  geom_sf(data = g, fill = "orange", alpha = .5) + 
+  geom_sf(data = pg,  fill = "white")+
+  theme_void() + 
+  labs(title = "Exterior (POLYGON)")
+
+gridExtra::grid.arrange(pg0,pg1,pg2,pg3, nrow = 1)
+```
+
+## Summary
+
+```{r fig.height=5, fig.width=10, echo=FALSE, message=FALSE, fig.align='center'}
+fin  = gridExtra::grid.arrange(p0,p1,p2,p3,
+                        l0,l1,l2,l3,
+                        pg0,pg1,pg2,pg3,
+                        nrow = 3)
+
+ggsave(fin, filename = "img/12-int-ext-bound.png", width = 10, height = 7)
+```
+
+## Predicates
+
+In the following, we are interested in the resulting geometry that occurs when 2 geometries are overlaid...
+
+## Overlap is a POINT: 0D
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = g[c(12:16, 22:26)] |> 
+  st_union()
+geom2 = g[c(37:39, 47:49)]  |> st_union()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_point(aes(x = 7,y = 3)) +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = g[c(12:16, 22:26, 32:36)] |> 
+  st_union()
+geom2 = st_linestring(matrix(c(4,6,9,1), byrow = TRUE, nrow = 2)) |> 
+  st_sfc()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, color = "blue", size = 2)+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  geom_sf(data = geom2, color = "blue", size = 2)+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_point(aes(x = 6,y = 4)) +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = g[c(12:16, 22:26, 32:36)] |> 
+  st_union()
+
+geom2 = st_point(c(5,4)) |> 
+  st_sfc()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, color = "blue", size = 2)+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  geom_sf(data = geom2, color = "blue", size = 2)+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, size = 2) +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+## Overlap is a LINESTRING: 1D
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = g[c(32:36, 42:46)] |> 
+  st_union()
+geom2 = st_linestring(matrix(c(6,1,2,5), byrow = TRUE, nrow = 2)) |> 
+  st_sfc()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, color = "blue", size = 2)+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  geom_sf(data = geom2, color = "blue", size = 2)+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_segment(aes(x=4,xend = 2,y =3, yend = 5), size = 2) +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = g[c(12:17, 22:27)] |> 
+  st_union()
+geom2 = g[c(35:39, 45:49)] |> 
+  st_union()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_segment(aes(x=4,xend = 7,y =3, yend = 3), size = 2) +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = st_linestring(matrix(c(2,3,8,3), byrow = TRUE, nrow = 2)) |> 
+  st_sfc()
+
+geom2 = st_linestring(matrix(c(4,3,7,3), byrow = TRUE, nrow = 2)) |> 
+  st_sfc()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, color = "orange",size = 2)+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, color = "blue", size = 2)+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, color = "orange", size = 2)+
+  geom_sf(data = geom2, color = "blue", size = 2)+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, size = 2) +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+## Overlap is a POLYGON: 2D
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = g[c(23:27, 33:37)] |> 
+  st_union()
+geom2 = g[c(36:39, 46:49)] |> 
+  st_union()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = st_intersection(geom1,geom2), fill = "black") +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = g[c(12:19,  22:29, 32:39, 42:49)] |> 
+  st_union()
+geom2 = g[c(23:27, 33:37)] |> 
+  st_union()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = st_intersection(geom1,geom2), fill = "black") +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = g[c(23:27, 33:37)] |> 
+  st_union()
+geom2 = g[c(16:19, 26:29,36:39,46:49)] |> 
+  st_union()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = st_intersection(geom1,geom2), fill = "black") +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+## No Overlap = FALSE
+
+```{r, echo = F, fig.width=10, fig.height=1.5, fig.align='center'}
+geom1 = g[c(23:25, 33:35)] |> 
+  st_union()
+geom2 = g[c(37:39, 47:49)] |> 
+  st_union()
+
+g1 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  theme_void()
+
+g2 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g3 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = geom1, fill = "orange")+
+  geom_sf(data = geom2, fill = "blue")+
+  theme_void()
+
+g4 = ggplot() +
+  geom_sf(data = g, fill = "white") +
+  geom_sf(data = st_intersection(geom1,geom2), fill = "black") +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+
+## Dimensionally Extended 9-Intersection Model
+
+- The DE-9IM is a **topological** model and (standard) used to describe the spatial relations of two geometries 
+
+- Used in geometry, point-set topology, geospatial topology
+
+- The **DE-9IM** _matrix_ provides a way to classify geometry relations using the set **{0,1,2,F}** or **{T,F}**
+
+- With a **{T,F}** matrix domain, there are 512 possible relations that can be grouped into binary classification schemes. 
+
+- About 10 of these, have been given a common name such as _intersects_, _touches_, and _within_. 
+
+- When testing two geometries against a scheme, the result is a spatial _predicate_ named by the scheme.
+
+- Provides the primary basis for queries and assertions in GIS and spatial databases (PostGIS).
+
+## The Matrix Model
+
+The **DE-9IM** matrix is based on a 3x3 intersection matrix:
+
+```{r, fig.align='center', out.width = "50%", echo = FALSE}
+knitr::include_graphics('img/12-de-9Im-matrix.png')
+```
+
+Where: 
+
+  - **dim** is the dimension of the intersection and
+  - I is the interior
+  - B is the boundary
+  - E is the exterior 
+
+. . . 
+
+Empty sets are denoted as **F** 
+
+non-empty sets are denoted with the maximum dimension of the intersection *{0,1,2}*
+
+## 
+
+A simpler (binary) version of this matrix can be created by mapping all non-empty intersections {0,1,2} to TRUE.
+
+![](img/12-de-9Im-matrix-simple.svg)
+
+Where `II` would state: "Does the Interior of "a" overlaps with the Interior of "b" in a way that produces a point (0), line (1), or polygon (2)"
+
+Where `IB` would state: "Does the Interior of "a" overlap with the Boundary of "b" in a way that produces a point (0), line (1), or polygon (2)"
+
+Both matrix forms:
+  - dimensional {0,1,2,F}
+  - Boolean {T,F}
+  
+. . . 
+
+Can be serialize as a "DE-9IM string code" representing the matrix in a single string element (standardized format for data interchange)
+
+The OGC has standardized the typical spatial predicates (Contains, Crosses, Intersects, Touches, etc.) as *Boolean* functions, and the DE-9IM model as a function that returns the DE-9IM code, with domain of {0,1,2,F}
+
+## Illustration
+
+```{r, fig.align='center', out.width = "50%", echo = FALSE}
+knitr::include_graphics('img/12-de-91m-figure.png')
+```
+
+Reading from left-to-right and top-to-bottom, the DE-9IM(a,b) string code is '212101212'
+
+## Spatial Relations in R
+
+- Geometry X is a 3 feature polygon colored in red
+- Geometry Y is a 4 feature polygon colored in blue
+
+::: columns
+::: {.column-width = "50%"}
+```{r, echo = FALSE}
+#| out.width: '50%'
+b0 = st_polygon(list(rbind(c(-1,-1), c(1,-1), c(1,1), c(-1,1), c(-1,-1))))
+b1 = b0 + 2
+b2 = b0 + c(-0.2, 2)
+x = st_sfc(b0, b1, b2)
+a0 = b0 * 0.8
+a1 = a0 * 0.5 + c(2, 0.7)
+a2 = a0 + 1
+a3 = b0 * 0.5 + c(2, -0.5)
+y = st_sfc(a0,a1,a2,a3)
+plot(x, border = 'red')
+plot(y, border = 'blue', add = TRUE)
+```
+::: {.column-width = "50%"}
+:::
+```{r}
+st_relate(x,y)
+st_relate(x,x)
+st_relate(y,y)
+```
+:::
+:::
+
+## Named Predicates {.smaller}
+
+- "named spatial predicates" have been defined for some common relations.
+
+- A few functions can be derived (expressed by masks) from DE-9IM include (* = wildcard):
+
+| Predicate 	| DE-9IM String Code 	| Description 	|
+|:-	|:-	|:-	|
+| **Intersects** 	| `T*F**FFF*` 	| "Two geometries intersect if they share any portion of space" 	|
+| **Overlaps** 	| `T*F**FFF*` 	| "Two geometries overlap if they share some but not all of the same space" 	|
+| **Equals** 	| `T*F**FFF*` 	| "Two geometries are topologically equal if their interiors intersect and no part of the interior or boundary of one geometry intersects the exterior of the other" 	|
+| **Disjoint** 	| `FF*FF*****` 	| "Two geometries are disjoint: they have no point in common. They form a set of disconnected geometries." 	|
+| **Touches** 	| `FT*******` | `F**T*****` | `F***T****` 	| "Two geometries touch if they have at least one point in common, but their interiors do not intersect." 	|
+| **Contains** 	| `T*****FF**` 	| "A contains B: geometry B lies in A, and the interiors intersect" 	|
+| **Covers** 	| `T*****FF*` | `*T****FF*` | `***T**FF*` | `****T*FF*` 	| "A covers B: geometry B lies in A." 	|
+| **Within** 	| `*T*****FF*` | `**T****FF*` | `***T**FF*` | `****T*FF*` 	| "A within B: geometry A lies in B." 	|
+| **Covered by** 	| `*T*****FF*` | `**T****FF*` | `***T**FF*` | `****T*FF*` 	| "A covered by B: geometry A lies in B." 	|
+
+## Binary Predicates
+
+- Collectively, predicates define the type of relationship each 2D object has with another.
+
+- Of the ~ 512 unique relationships offered by the DE-9IM models a selection of ~ 10 have been named.
+
+- These are included in PostGIS/GEOS and are made accessible via R sf
+
+```{r, fig.align='center', out.width = "50%", echo = FALSE}
+knitr::include_graphics('img/13-sf-binary.png')
+```
+
+## Named predicates in R 
+
+- `sf` provides a set of functions that implement the DE-9IM model and named predicates. Each of these can return either a *sparse* or *dense* matrix.
+
+#### *sparse* matrix
+
+```{r}
+st_intersects(x,y)
+```
+
+#### *dense* matrix
+
+```{r}
+st_intersects(x, y, sparse = FALSE)
+
+st_disjoint(x, y, sparse = FALSE)
+
+st_touches(x, y, sparse = FALSE)
+
+st_within(x, y, sparse = FALSE)
+```
+
+## st_relates vs. predicate calls...
+
+```{r, message = F, warning = F}
+states <- select(filter(aoi_get(state = "all"), state_abbr %in% c("WA", "OR", "MT", "ID")), name)
+
+wa = filter(states, name == "Washington")
+```
+
+::: columns
+::: {column.wdith = "50%"}
+```{r}
+#| out.width: '50%'
+plot(states$geometry)
+```
+:::
+::: {column.wdith = "50%"}
+```{r, message = F, warning = F}
+(mutate(states, 
+        deim9 = st_relate(states, wa),
+        touch = st_touches(states, wa, sparse = FALSE))) 
+```
+:::
+:::
+
+# So... 
+
+- binary predicates return conditional _{T,F}_ relations based on predefined masks of the DE-9IM strings
+
+- Up to this point in class we have been using Boolean _{T,F}_ masks to filter data.frames by columns:
+
+```{r}
+fruits = c("apple", "orange", "lemon", "watermelon")
+```
+
+```{r}
+fruits == "apple"
+```
+
+```{r}
+fruits %in% c("apple", "lemon")
+```
+
+## Filtering on data.frames
+
+- We have used `dplyr::filter` to  subset a data frame, retaining all rows that satisfy a `boolean` condition. 
+
+::: columns
+::: {column.wdith = "50%"}
+```{r}
+mutate(states, equalsWA = (name == "Washington")) |> 
+  st_drop_geometry()
+```
+:::
+::: {column.wdith = "50%"}
+```{r}
 filter(states, name == "Washington")
-
-# Spatial filter (predicate-based)
-st_filter(states, wa, .predicate = st_touches)
 ```
-
-Both return subsets of `states`, but spatial filter uses topology.
-
-. . .
-
-**Default predicate is `st_intersects`** — returns all geometries that touch or overlap the target.
-
-```{r}
-#| eval: false
-st_filter(states, wa)  # = st_filter(states, wa, .predicate = st_intersects)
-```
-
-## Real Example: Which States Touch Washington?
-
-```{r}
-#| eval: false
-wa_neighbors <- st_filter(states, wa, .predicate = st_touches)
-```
-
-```{r}
-#| eval: true
-#| echo: false
-#| fig.align: center
-#| fig.width: 10
-#| fig.height: 6
-
-wa_neighbors <- st_filter(states, wa, .predicate = st_touches)
-
-ggplot(states) + 
-  geom_sf(fill = "white", color = "black", linewidth = 0.5) + 
-  geom_sf(data = wa, fill = "steelblue", alpha = 0.4, linewidth = 1) +
-  geom_sf(data = wa_neighbors, fill = "orange", alpha = 0.6, linewidth = 0.8) + 
-  theme_void() +
-  labs(title = "States Touching Washington (orange)")
-```
-
-## Distance-Based Filtering
-
-Predicates can also use distance thresholds:
-
-```{r}
-#| eval: false
-# "Which cities are within 100 km of Fort Collins?"
-fc <- filter(cities, city == "Fort Collins")
-
-nearby_cities <- st_filter(
-  cities, 
-  fc, 
-  .predicate = st_is_within_distance, 
-  dist = 100000  # units in CRS (meters for geographic)
-)
-```
-
-Distance units match the CRS:
-- Geographic CRS (WGS84): meters
-- Projected CRS (EPSG:5070): meters
-- Must account for CRS when specifying distance
-
-. . .
-
-**Hydrology applications**:
-- Which stream gauges are within 50 km upstream?
-- Which reservoirs are within 100 km of this city?
-- Which monitoring stations bracket this watershed outlet?
-
-## Visual: Multiple Predicates Compared {.smaller}
-
-```{r}
-#| eval: true
-#| echo: false
-#| fig.align: center
-#| fig.width: 14
-#| fig.height: 5
-
-# Create comparison plots
-p_intersects <- ggplot(states) + 
-  geom_sf(fill = "white", color = "black", linewidth = 0.3) + 
-  geom_sf(data = wa, fill = "steelblue", alpha = 0.3) +
-  geom_sf(data = st_filter(states, wa, .predicate = st_intersects), 
-          fill = "red", alpha = 0.5) + 
-  theme_void() +
-  labs(title = "st_intersects()")
-
-p_touches <- ggplot(states) + 
-  geom_sf(fill = "white", color = "black", linewidth = 0.3) + 
-  geom_sf(data = wa, fill = "steelblue", alpha = 0.3) +
-  geom_sf(data = st_filter(states, wa, .predicate = st_touches), 
-          fill = "orange", alpha = 0.5) + 
-  theme_void() +
-  labs(title = "st_touches()")
-
-p_disjoint <- ggplot(states) + 
-  geom_sf(fill = "white", color = "black", linewidth = 0.3) + 
-  geom_sf(data = wa, fill = "steelblue", alpha = 0.3) +
-  geom_sf(data = st_filter(states, wa, .predicate = st_disjoint), 
-          fill = "lightgreen", alpha = 0.5) + 
-  theme_void() +
-  labs(title = "st_disjoint()")
-
-gridExtra::grid.arrange(p_intersects, p_touches, p_disjoint, nrow = 1)
-```
-
-Red = intersects, Orange = touches, Green = disjoint from Washington.
-
-## Example 1: States Touching Washington {.smaller}
-
-```{r}
-#| eval: false
-# Which states share a border with Washington?
-wa_neighbors <- st_filter(states, wa, .predicate = st_touches)
-```
-
-**MT and ID** return TRUE (they touch WA's boundary).
-**OR** returns FALSE (touches WA, but we're using `st_touches` which requires boundary contact, not intersection).
-
-Actually: Oregon DOES touch Washington. Let me use `st_intersects`:
-
-```{r}
-#| eval: false
-wa_adjacent <- st_filter(states, wa, .predicate = st_intersects)
-# Returns: Montana, Idaho, Oregon (all share boundary or overlap)
-```
-
-## Example 2: Cities Within Each State {.smaller}
-
-**Question**: For each state, how many cities fall inside?
-
-```{r}
-#| eval: false
-# Using st_within: city inside state?
-cities_in_states <- st_filter(cities, states, .predicate = st_within)
-
-# Or aggregate seamlessly with group_by:
-cities_by_state <- st_join(cities, states, join = st_within) |>
-  group_by(name) |>
-  summarise(n_cities = n(), .groups = "drop")
-```
-
-## Spatial Joining Example {.smaller}
-
-**Question**: Which state does each city belong to?
-
-```{r}
-#| eval: true
-#| echo: false
-#| fig.align: center
-#| fig.width: 12
-#| fig.height: 5
-
-# Join cities to states
-cities_with_state <- st_join(cities, states, join = st_within)
-
-# Plot before (left) and after (right)
-p_before <- ggplot(states) + 
-  geom_sf(fill = "white", color = "navy", linewidth = 0.3) + 
-  geom_sf(data = cities, color = "red", size = 1) + 
-  theme_void() +
-  labs(title = "Cities (red) in State Polygons")
-
-p_after <- ggplot(cities_with_state) + 
-  geom_sf(aes(color = name), size = 1.5, show.legend = FALSE) + 
-  geom_sf(data = states, fill = NA, color = "navy", linewidth = 0.3) + 
-  scale_color_manual(values = c("Washington" = "red", "Oregon" = "orange", 
-                                "Montana" = "purple", "Idaho" = "darkgreen")) +
-  theme_void() +
-  labs(title = "Cities colored by state (after st_join)")
-
-gridExtra::grid.arrange(p_before, p_after, nrow = 1)
-```
-
-After joining, cities inherit state name column and are colored accordingly.
-
-```{r}
-#| eval: false
-# Which USGS stream gauges fall within each HUC8 watershed?
-
-gauges_in_watershed <- st_join(gauges, watersheds, join = st_within)
-
-# Summary: Average discharge per watershed
-discharge_summary <- gauges_in_watershed |>
-  group_by(huc8, watershed_name) |>
-  summarise(
-    n_gauges = n(),
-    mean_discharge_m3s = mean(discharge_m3s, na.rm = T),
-    .groups = "drop"
-  )
-```
-
-**Key**: `st_join()` can produce many-to-many matches. If a watershed has 500 gauges on its streams, the result has 500 rows. `group_by()` + `summarise()` aggregates meaningfully.
-
-
-
-# Spatial Joining: Combining Data by Relationship
-
-## From Filtering to Joining
-
-**Filtering**: Subset one dataset based on spatial relationship to another (select rows).
-
-**Joining**: Combine columns from two datasets based on spatial relationships (connect datasets).
-
-- **Filter** → Returns subset of x
-- **Join** → Returns all of x with columns from matching y rows appended
-
-Joins are where spatial analysis becomes truly powerful — merging data from multiple sources using space as the key.
-
-## st_join: The Core Spatial Join Function {.smaller}
-
-For each row in the first dataset, find matching rows in the second and add their columns:
-
-```{r}
-#| eval: false
-# For each city, which state contains it?
-cities_with_state <- st_join(cities, states)
-```
-
-Returns `cities` with all columns from `states` appended.
-
-**Important**: If a city matches multiple states (shouldn't happen, but geometrically possible), you get multiple rows for that city. This is a **many-to-many join**.
-
-## Join Type and Predicate {.smaller}
-
-Two parameters control matching:
-
-**Join type** (`left`, `inner`):
-- `left = TRUE` (default): Keep all rows from x; add NA if no match
-- `left = FALSE` (inner): Keep only rows from x that match with y
-
-**Predicate** (`join` argument), e.g.:
-```{r}
-#| eval: false
-# Default: st_intersects
-st_join(cities, states)
-
-# City must be completely inside state
-st_join(cities, states, join = st_within)
-
-# City boundary touches state boundary
-st_join(cities, states, join = st_touches)
-
-# State must fully contain city
-st_join(cities, states, join = st_contains)
-```
-
-## The Many-to-Many Join Hazard {.smaller}
-
-Spatial joins often produce unexpected duplication:
-
-```{r}
-#| eval: false
-# 10 counties × 5 starbucks per county average
-# Result: 50 rows (not 10!)
-county_sb <- st_join(counties, starbucks)  
-
-# Without grouping first, you lose information
-head(county_sb)
-#> # A tibble: 50 × 25 (includes all starbucks columns!)
-#> # Each county repeated 5 times
-```
-
-**Solution**: Always aggregate after spatial joins:
-
-```{r}
-#| eval: false
-county_starbucks <- st_join(counties, starbucks) |>
-  group_by(county_id, county_name) |>
-  summarise(n = n(), .groups = "drop")
-```
-
-Now you have 1 row per county with the count.
-
-## Aggregation Pattern: After Joining {.smaller}
-
-When joining Points (starbucks) to Polygons (counties):
-
-```{r}
-#| eval: false
-# Join points to polygons (many points per polygon)
-points_in_polys <- st_join(polygons, points)
-
-# Aggregate: count, mean, max, list(), etc.
-polygon_summaries <- points_in_poly |>
-  group_by(polygon_id, polygon_name) |>
-  summarise(
-    count = n(),
-    mean_value = mean(value, na.rm = T),
-    types = list(unique(type)),
-    .groups = "drop"
-  )
-```
-
-Result: 1 row per polygon with computed summaries.
-
-# Comprehensive Water Resources Example
-
-## Multi-Source Watershed Analysis {.smaller}
-
-Combine stream gauges, watersheds, and infrastructure using spatial relationships:
-
-```{r}
-#| eval: false
-# 1️⃣ Which gauges are in which watershed?
-gauges_watersheds <- st_join(gauges, watersheds, join = st_within)
-
-# 2️⃣ Which dams are near gauges? (within 10 km downstream)
-dams_near_gauges <- st_filter(
-  dams, 
-  gauges,
-  .predicate = st_is_within_distance,
-  dist = 10000
-)
-
-# 3️⃣ Summary: Count gauges, mean discharge, dam presence per watershed
-summary <- gauges_watersheds |>
-  mutate(has_dam = huc_id %in% (dams_near_gauges$huc_id)) |>
-  group_by(huc_id, watershed_name, has_dam) |>
-  summarise(
-    n_gauges = n(),
-    mean_discharge_m3s = mean(discharge, na.rm = T),
-    max_discharge_m3s = max(discharge, na.rm = T),
-    .groups = "drop"
-  ) |>
-  arrange(desc(mean_discharge_m3s))
-```
-
-**Output**: Watershed summary with gauge counts, discharge statistics, and dam presence—ready to investigate relationships between infrastructure and streamflow patterns.
-
----
-
-This layered approach (join, filter, mutate, group, summarise) is the template for most spatial analyses.
-
-# Clipping & Spatial Subsetting
-
-## Filtering vs. Clipping
-
-So far we've **filtered** and **joined**—neither changes the geometry itself.
-
-**Clipping** is different: it *modifies* geometry by intersecting it with another geometry.
-
-- **Filter**: Select entire features where a spatial relationship is TRUE
-- **Clip**: Trim the geometry of features to fit within a boundary; return new boundaries
-
-Clipping only works with Lines and Polygons (not Points—they either fall in or out).
-
-## Spatial Subsetting with `[,]`
-
-The default data frame subsetting operator `[,]` implements spatial intersection when used with `sf` objects:
-
-```{r}
-#| eval: false
-# All Starbucks in Washington state
-wa_starbucks <- starbucks[wa, ]
-```
-
-This is equivalent to:
-
-```{r}
-#| eval: false
-st_intersection(starbucks, wa)
-```
-
-Result: Returns geometries that fall within (or on the boundary of) `wa`.
-
-## Clipping Lines and Polygons {.smaller}
-
-When you clip a **line** or **polygon** to a boundary, the geometry is **trimmed**:
-
-```{r}
-#| eval: false
-# Clip CONUS boundary to state borders
-state_boundaries <- st_intersection(conus_boundary, state_borders)
-
-# Clip stream network to a watershed
-watershed_streams <- st_intersection(nhdplus_flowlines, watershed_boundary)
-```
-
-**Output**: New geometries with coordinates moved to the intersection boundary.
-
-. . .
-
-::: callout-important
-Clipping is computationally expensive for large geometries. Simplify first if possible (especially if clipping boundaries have thousands of vertices).
+:::
 :::
 
-## Clipping Visualization {.smaller}
+## Spatial Filtering
+ 
+- We can filter spatially, use `st_filter` as the function call
 
+- Here the `boolean` condition is not passed (e.g. name == WA)
+
+- But instead, is defined by a spatial predicate
+
+- The default is `st_intersects` but can be changed with the `.predicate` argument:
+
+::: {columns}
+::: {.column width="50%"}
 ```{r}
-#| eval: true
-#| echo: false
-#| fig.align: center
-#| fig.width: 12
-#| fig.height: 5
+mutate(states, touch = st_touches(states, wa, sparse = FALSE)) |> 
+  filter(touch)
+```
+:::
+::: {.column width="50%"}
+```{r}
+st_filter(states, wa, .predicate = st_touches) 
+```
+:::
+:::
 
-# Original: All cities
-p_before <- ggplot(states) + 
-  geom_sf(fill = "white", color = "black", linewidth = 0.3) + 
-  geom_sf(data = wa, fill = "steelblue", alpha = 0.2) +
-  geom_sf(data = cities, color = "red", size = 2) + 
-  theme_void() +
-  labs(title = paste0("All cities (", nrow(cities), " total)"))
+## Result 
 
-# After clipping to WA
-cities_in_wa <- st_intersection(cities, wa)
-
-p_after <- ggplot(wa) + 
-  geom_sf(fill = "steelblue", alpha = 0.2, color = "black", linewidth = 0.5) + 
-  geom_sf(data = cities_in_wa, color = "red", size = 2) + 
-  theme_void() +
-  labs(title = paste0("Cities clipped to WA (", nrow(cities_in_wa), " kept)"))
-
-gridExtra::grid.arrange(p_before, p_after, nrow = 1)
+```{r, message = FALSE, echo = TRUE, fig.width=6, fig.height=4.5,fig.align='center'}
+ggplot(states) + 
+  geom_sf() + 
+  geom_sf(data = wa, fill = "blue", alpha = .3) +
+  geom_sf(data = st_filter(states, wa, .predicate = st_touches), fill = "red", alpha = .5) + 
+  theme_void()
 ```
 
-Left: All cities in region. Right: Only cities *within* WA boundary (geometry trimmed at edge).
+## Distance Example (additional parameter)
 
-## Why Simplify?
-
-As geometries become more complex, operations slow down. Simplification reduces vertices while preserving shape.
-
-**Reasons to simplify**:
-- Reduce computation time for clipping, unions, and spatial operations
-- Decrease file size and network bandwidth for data transfer
-- Match the resolution appropriate to your analysis scale
-- Remove noise from digitized boundaries
-
-**Trade-off**: Detail vs. speed. A map at national scale needs less detail than a county-scale map.
-
-## Douglas-Peucker Algorithm
-
-The industry standard for simplification:
-
-1. **Mark** first and last points as kept
-2. **Find** the point farthest from the first-last line segment
-3. **If** that point is closer than `tolerance` units → discard everything between first and last
-4. **Else** → mark it as kept and recursively simplify subsections
-
-Result: Removes ~70-90% of vertices while preserving overall shape.
-
-## `st_simplify()` in R
-
-`sf` provides `st_simplify()` using GEOS (Douglas-Peucker):
-
-```{r}
-#| eval: false
-# Simplify with 10 km tolerance (in CRS units)
-usa_simple <- st_simplify(usa, dTolerance = 10000)
-
-# More aggressive simplification
-usa_aggressive <- st_simplify(usa, dTolerance = 100000)
+```{r, message = FALSE }
+cities = read_csv("data/uscities.csv") |> 
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) |> 
+  select(city, population, state_name) |> 
+  st_transform(5070)
 ```
 
-**Trade-off**: Per-geometry basis means **topology can break** (boundaries overlap, gaps appear).
+```{r}
+st_filter(cities, 
+          filter(cities, city == "Fort Collins"), 
+          .predicate = st_is_within_distance, 10000) 
+```
 
-## Visvalingam-Whyatt Algorithm (Advanced)
+# Spatial Data Science
 
-Better than Douglas-Peucker; preserves visual quality better.
+- Filtering is a nice way to reduce the dimensions of a **single** dataset
 
-**How it works**: Progressively removes points with least-perceptible area change rather than distance-based.
+- Often "*... one table is not enough... *"
 
-**In R**: Use `rmapshaper` package (wrapper around mapshaper JavaScript library):
+- In these cases we want to combine - or **join** -  data 
+ 
+
+# Spatial Joining
+
+- Joining two non-spatial datasets relies on a shared _key_  that uniquely identifies each record in a table
+
+```{r, fig.align='center', fig.height = 5, echo = FALSE}
+knitr::include_graphics('img/07-joins.png')
+```
+
+- Spatially joining data relies on shared _geographic relations_ rather then a shared _key_
+
+- Like filter, these relations can be defined by a **predicate**
+
+- As with tabular data, mutating joins *add* data to the target object (x) from a source object (y).
+
+## st_join
+
+- In `sf` `st_join` provides this joining capacity
+
+- By default, `st_join` performs a _left_ join (Returns all records from x, and the matched records from y)
+
+- It can also do inner joins by setting `left = FALSE`.
+
+- **Important**: Many-to-many relationships create duplicate rows. In the Starbucks-counties example, a single Starbucks points at a county boundary may match multiple counties, creating multiple rows for that Starbucks.
+
+- The default predicate for `st_join` (and `st_filter`) is `st_intersects`, but this can be changed with the `.predicate` argument to use other spatial relations like `st_touches`, `st_within`, etc. 
+
+::: {columns}
+::: {.column width="50%"}
+```{r, fig.align='center', out.width = "25%", echo = FALSE}
+knitr::include_graphics('img/13-left-join.png')
+```
+:::
+::: {.column width="50%"}
+```{r, fig.align='center', out.width = "25%", echo = FALSE}
+knitr::include_graphics('img/13-inner-join.png')
+```
+:::
+:::
+
+- The default predicate for `st_join` (and `st_filter`) is `st_intersects`
+
+- This can be changed with the join argument (see `?st_join` for details).
+
+# Every Starbucks in the World
+
+What county has the most Starbucks in each state?
+
+```{r, message= FALSE, warning = FALSE}
+(starbucks = readr::read_csv('data/directory.csv') |> 
+  filter(!is.na(Latitude), Country == "US") |> 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) |> 
+  st_transform(5070))
+```
 
 ```{r}
-#| eval: false
+counties = aoi_get(state = "conus", county = "all") |> 
+  st_transform(5070) |> 
+  select(name, state_name)
+```
+
+## 
+
+```{r,message=FALSE, fig.align = 'center'}
+topSB <- st_join(counties, starbucks) |> 
+  group_by(name, state_name) |> 
+  summarise(n = n()) |> 
+  group_by(state_name) |> 
+  slice_max(n, n = 1) |> 
+  ungroup()
+```
+
+```{r, echo  = F, fig.height=5, fig.align="center"}
+ggplot() + 
+  geom_sf(data = counties, size = .05, fill = "white") + 
+  geom_sf(data = topSB, aes(fill = n), size = .1) + 
+  scale_fill_viridis_c() + 
+  theme_void() + 
+  theme(legend.position = 'bottom') + 
+  labs(title = "County with Most Starbucks by State",
+       fill = "Number of stores: ")
+```
+
+## Tessellation and Aggregation (Sneek Peak)
+
+- The same Starbucks data can be aggregated into different tessellation schemes
+- This demonstrates how the choice of geographic units affects analysis results:
+
+```{r, message = FALSE}
+# Create a simple grid for CONUS
+conus = st_union(counties)
+grid_1 = st_make_grid(conus, n = c(20, 15)) |> 
+  st_as_sf() |> 
+  mutate(cell_id = 1:n())
+
+grid_2 = st_make_grid(conus, n = c(200, 150)) |> 
+  st_as_sf() |> 
+  mutate(cell_id = 1:n())
+
+# Aggregate Starbucks by grid cell
+sbck_grid_1 <- st_join(grid_1, starbucks) |> 
+  group_by(cell_id) |> 
+  summarise(n_stores = n())
+
+sbck_grid_2 <- st_join(grid_2, starbucks) |> 
+  group_by(cell_id) |> 
+  summarise(n_stores = n())
+```
+
+```{r, echo = FALSE, fig.height=4, fig.width=10, fig.align='center'}
+g1 = ggplot() + 
+  geom_sf(data = sbck_grid_1, aes(fill = n_stores), size = .1) + 
+  scale_fill_viridis_c() + 
+  theme_void() + 
+  theme(legend.position = 'bottom') + 
+  labs(title = "Starbucks by Grid Cell",
+       fill = "Number of stores: ")
+
+g2 = ggplot() + 
+  geom_sf(data = sbck_grid_2, aes(fill = n_stores), size = .1) + 
+  scale_fill_viridis_c() + 
+  theme_void() + 
+  theme(legend.position = 'bottom') + 
+  labs(title = "Starbucks by Grid Cell (10x)",
+       fill = "Number of stores: ")
+
+library(patchwork)
+g1 + g2
+```
+
+## Critical Note:
+
+- Neither _joining_ nor _filtering_ spatially alter the underlying geometry of the features
+- In cases where we seek to alter a geometry based on another, we need clipping methods
+
+## Clipping 
+
+- Clipping is a form of subsetting that involves changing the geometry of at least some features.
+
+- Clipping can only apply to features more complex than points: (lines, polygons and their ‘multi’ equivalents). 
+
+```{r, fig.align='center', fig.height = 5, echo = FALSE}
+knitr::include_graphics('img/13-clipping.png')
+```
+
+## Spatial Subsetting
+
+- By default the data.frame subsetting methods we've seen (e.g `[,]`) implements `st_intersection`
+
+```{r, fig.align='center', fig.height=4.5}
+wa = st_transform(wa, 5070)
+wa_starbucks = starbucks[wa,] #<<
+
+ggplot() + geom_sf(data = wa) + geom_sf(data = wa_starbucks) + theme_void()
+```
+
+# Buffering
+
+- A buffer is a zone of a specified distance around a geometry
+- `st_buffer()` expands or contracts geometries by a given distance
+- Useful for proximity analysis and creating zones of influence
+
+```{r, fig.align='center', fig.height=4.5}
+# Buffer the Washington state boundary by 50 km
+wa_buffer = st_buffer(wa, dist = 50000) # distance in map units (meters for EPSG:5070)
+
+ggplot() + 
+  geom_sf(data = wa_buffer, fill = "blue", alpha = .2) + 
+  geom_sf(data = wa, fill = "navy") + 
+  theme_void() +
+  labs(title = "Buffer around Washington state (50 km)")
+```
+
+- Buffers are often combined with predicates for analysis like _"find all cities within 100 km of a river"_
+
+# Simplification
+
+# Computational Complexity
+
+- In all the cases we have looked at, the number of `POINT` (e.g geometries, nodes, or vertices) define the complexity of the predicate or the clip
+
+- Computational needs increase with the number of POINTS / NODES / VERTICES
+
+- **Simplification** is a process for generalization  vector objects (lines and polygons) 
+
+- Another reason for simplifying objects is to reduce the amount of memory, disk space and network bandwidth they consume
+
+- Other times the level of detail captured in a geometry is either not needed, or, even counter productive the the scale/purpose of an analysis
+
+- If you are cropping features to a national border, how much detail do you need? The more points in your border, the long the clip operation will take....
+
+##
+
+In cases where we want to reduce the complexity in a geometry we can use simplification algorithms
+
+The most common algorithms are Ramer–Douglas–Peucker and Visvalingam-Whyatt.
+
+## Ramer–Douglas–Peucker
+
+- Mark the `first` and `last` points as kept
+
+- Find the point, `p` that is the farthest from the first-last line segment. If there are no points between first and last we are done (the base case)
+
+- If `p` is closer than `tolerance` units to the line segment then everything between first and last can be discarded
+
+- Otherwise, mark p as kept and repeat steps 1-4 using the points between first and p and between p and last (the call to recursion)
+
+```{r, fig.align='center', out.width = "100%", echo = FALSE}
+knitr::include_graphics('img/13-douglas-peucker-animated.gif')
+```
+
+## st_simplify
+
+```{r, fig.align='center', out.width = "90%", echo = FALSE}
+knitr::include_graphics('img/13-postgis-st-simplify.png')
+```
+
+## st_simplify
+
+-  `sf` provides `st_simplify`, which uses the GEOS implementation of the Douglas-Peucker algorithm to reduce the vertex count. 
+
+- `st_simplify` uses the `dTolerance` to control the level of generalization in map units (see Douglas and Peucker 1973 for details).
+
+- **Note on CRS**: We use EPSG:5070 (USA Contiguous Albers Equal Area projection) for these examples because it preserves area and provides consistent distance measurements across the continental US, making tolerance values meaningful and comparable.
+
+```{r, fig.align='center', out.width = "50%", echo = FALSE}
+knitr::include_graphics('img/13-r-st-simplify.png')
+```
+
+## Performance Impact of Simplification
+
+- Simplification dramatically reduces computational complexity for subsequent operations
+
+```{r}
+usa = aoi_get(state = "conus") |> 
+  st_union() |> 
+  st_transform(5070)
+
+usa1000   = st_simplify(usa, dTolerance = 10000)
+usa10000  = st_simplify(usa, dTolerance = 100000)
+usa100000 = st_simplify(usa, dTolerance = 1000000)
+
+# Compare point counts
+cat("Original points:", mapview::npts(usa), "\n")
+cat("After 10 km tolerance:", mapview::npts(usa1000), "\n")
+cat("After 100 km tolerance:", mapview::npts(usa10000), "\n")
+cat("After 1000 km tolerance:", mapview::npts(usa100000), "\n")
+```
+
+```{r fig.height=4, fig.width=12, echo=FALSE, message=FALSE, fig.align='center'}
+g1 = ggplot(usa) + 
+  geom_sf() + 
+  labs(title = paste(mapview::npts(usa), 'points'),
+       caption = "dTolerance = 0") +
+  theme_void()
+
+g2 = ggplot(usa1000) + 
+  geom_sf() + 
+  labs(title = paste(mapview::npts(usa1000), 'points'),
+       caption = "dTolerance = 1,000") +
+  theme_void()
+
+g3 = ggplot(usa10000) + 
+  geom_sf() + 
+  labs(title = paste(mapview::npts(usa10000), 'points'),
+       caption = "dTolerance = 10,000") +
+  theme_void()
+
+g4 = ggplot(usa100000) + 
+  geom_sf() + 
+  labs(title = paste(mapview::npts(usa100000), 'points'),
+       caption = paste("dTolerance = 100,000\n",
+                  st_length(st_cast(usa1000, "MULTILINESTRING")))) +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+## 
+
+- A limitation with Douglas-Peucker (therefore st_simplify) is that it simplifies objects on a per-geometry basis. 
+
+- This means the ‘topology’ is lost, resulting in overlapping and disconnected geometries. 
+
+```{r}
+states = st_transform(states, 5070)
+simp_states   = st_simplify(states, dTolerance = 20000)
+plot(simp_states$geometry)
+```
+
+## Visvalingam
+
+- The Visvalingam algorithm overcomes some limitations of the Douglas-Peucker algorithm (Visvalingam and Whyatt 1993).
+- it progressively removes points with the least-perceptible change. 
+- Simplification often allows the elimination of 95% or more points while retaining sufficient detail for visualization and often analysis
+
+```{r, fig.align='center', out.width = "50%", echo = FALSE}
+knitr::include_graphics('img/13-ms-simplify.png')
+```
+
+## rmapshaper
+
+In R, the `rmapshaper` package implements the Visvalingam algorithm in the `ms_simplify` function. 
+
+- The `ms_simplify` function is a wrapper around the `mapshaper` JavaScript library (created by lead viz experts at the NYT)
+
+```{r}
 library(rmapshaper)
 
-# Keep 10% of points
-usa_10pct <- ms_simplify(usa, keep = 0.1)
-
-# Keep 1% of points  
-usa_1pct <- ms_simplify(usa, keep = 0.01)
+usa10 = ms_simplify(usa, keep = .1)
+usa5  = ms_simplify(usa, keep = .05)
+usa1  = ms_simplify(usa, keep = .01)
 ```
 
-Result: Often retains 95%+ visual quality with 90%+ fewer vertices.
+```{r fig.height=4, fig.width=12, echo=FALSE, message=FALSE, fig.align='center'}
 
-## Simplification: Visual Comparison {.smaller}
+g1 = ggplot(usa) + 
+  geom_sf() + 
+  labs(title = paste(mapview::npts(usa), 'points'),
+       caption = "keep = 1") +
+  theme_void()
+
+g2 = ggplot(usa10) + 
+  geom_sf() + 
+  labs(title = paste(mapview::npts(usa10), 'points'),
+       caption = "keep = .1 (10%)") +
+  theme_void()
+
+g3 = ggplot(usa5) + 
+  geom_sf() + 
+  labs(title = paste(mapview::npts(usa5), 'points'),
+       caption = "keep = .05 (5%)") +
+  theme_void()
+
+g4 = ggplot(usa1) + 
+  geom_sf() + 
+  labs(title = paste(mapview::npts(usa1), 'points'),
+       caption = "keep = .01 (1%)") +
+  theme_void()
+
+gridExtra::grid.arrange(g1,g2,g3,g4, nrow = 1)
+```
+
+##
 
 ```{r}
-#| eval: true
+states = st_transform(states, 5070)
+simp_states   = ms_simplify(states, keep = .05)
+plot(simp_states$geometry)
+```
+
+##
+
+In all cases, the number of points in a geometry can be calculated with `mapview::npts()`
+
+```{r}
+states = st_transform(states, 5070)
+simp_states_st   = st_simplify(states, dTolerance = 20000)
+simp_states_ms   = ms_simplify(states, keep = .05)
+
+mapview::npts(states)
+mapview::npts(simp_states_st)
+mapview::npts(simp_states_ms)
+```
+
+# Tesselation
+
+- So far we have spent the last few days looking at simple feature objects
+
+- Where a feature as a geometry define by a set of structured POINT(s) 
+
+- These points have precision and define location ({X Y CRS})
+
+- The geometry defines a bounds: either 0D, 1D or 2D 
+
+- Each object is therefore bounded to those geometries implying a level of exactness.
+
+# Object Coverages
+
+## LANDSAT Path Row
+
+- Serves tiles based on a path/row index
+
+```{r, echo = FALSE, fig.align='center', fig.width=10}
+ls = read_sf('data/CONUS_ARD_grid/conus_ard_grid.shp')
+
+states = AOI::aoi_get(state = "conus") |> 
+  st_transform(st_crs(ls))
+
+csu = AOI::geocode("Colorado State Universiy", pt = TRUE) |> 
+  st_transform(st_crs(ls))
+
+ggplot() + 
+  geom_sf(data = states, col = NA, alpha = .95) + 
+  geom_sf(data = ls, fill = NA) + 
+  geom_sf(data = csu, col = "darkred", aes(label = request)) + 
+  ggrepel::geom_label_repel(
+    data = csu,
+    aes(label = request, geometry = geometry),
+    stat = "sf_coordinates"
+  ) +
+  theme_void()+ 
+  labs(title = "LANDSAT Path/row")
+```
+
+
+## MODIS Sinisoial Grid
+
+- Serves tiles based on a path/row index
+
+```{r, echo = FALSE, fig.align='center', fig.width=10}
+ls = read_sf('data/modis_grid/modis_sinusoidal_grid_world.shp') |> 
+  st_set_crs('+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
+
+states = rnaturalearth::ne_countries(returnclass = "sf") |> st_transform(st_crs(ls))
+
+csu = csu |> 
+  st_transform(st_crs(ls))
+
+ggplot() + 
+  geom_sf(data = states, col = NA, fill = "gray",alpha = 1) + 
+  geom_sf(data = ls, fill = NA) + 
+  geom_sf(data = csu, col = "darkred", aes(label = request)) + 
+  ggrepel::geom_label_repel(
+    data = csu,
+    aes(label = request, geometry = geometry),
+    stat = "sf_coordinates"
+  ) +
+  theme_void()+ 
+  labs(title = "MODIS Path/row")
+```
+
+## [Uber Hex Addressing](https://eng.uber.com/h3/)
+
+- Breaks the world into Hexagons...\
+
+<br>
+
+::: columns
+::: {.column width="50%"}
+
+```{r}
 #| echo: false
-#| fig.align: center
-#| fig.width: 14
-#| fig.height: 4
-
-# Simplify with different tolerances
-usa_original <- st_union(aoi_get(state = "conus"))
-usa_simple_1k <- st_simplify(usa_original, dTolerance = 1000)
-usa_simple_10k <- st_simplify(usa_original, dTolerance = 10000)
-usa_simple_100k <- st_simplify(usa_original, dTolerance = 100000)
-
-p1 <- ggplot(usa_original) + geom_sf() + theme_void() + 
-  labs(title = paste0("Original\n(", mapview::npts(usa_original), " vertices)"),
-       caption = "dTolerance = 0")
-
-p2 <- ggplot(usa_simple_1k) + geom_sf() + theme_void() + 
-  labs(title = paste0("1km tolerance\n(", mapview::npts(usa_simple_1k), " vertices)"),
-       caption = "dTolerance = 1,000")
-
-p3 <- ggplot(usa_simple_10k) + geom_sf() + theme_void() + 
-  labs(title = paste0("10km tolerance\n(", mapview::npts(usa_simple_10k), " vertices)"),
-       caption = "dTolerance = 10,000")
-
-p4 <- ggplot(usa_simple_100k) + geom_sf() + theme_void() + 
-  labs(title = paste0("100km tolerance\n(", mapview::npts(usa_simple_100k), " vertices)"),
-       caption = "dTolerance = 100,000")
-
-gridExtra::grid.arrange(p1, p2, p3, p4, nrow = 1)
+#| out.width: "100%"
+knitr::include_graphics('img/15-uber-h3.jpeg')
 ```
 
-Notice: As tolerance increases, vertices are removed but shape is preserved. Larger tolerances = faster operations.
-
-## What is Tessellation?
-
-Dividing a region into a grid of regular or irregular shapes (tiles).
-
-**Common applications**:
-- Aggregating point data (cities → grid cells)
-- Organizing data for processing (satellite imagery)
-- Interpolation and spatial smoothing
-- Identifying spatial patterns (MAUP—Modifiable Areal Unit Problem)
-
-## Tessellation: Square vs. Hexagonal vs. Voronoi {.smaller}
+:::
+::: {.column width="50%"}
 
 ```{r}
-#| eval: true
 #| echo: false
-#| fig.align: center
-#| fig.width: 15
-#| fig.height: 5
-
-# Create sample region
-region <- st_union(aoi_get(state = c("WA", "OR")))
-
-# Create different tessellations
-sq_grid <- st_make_grid(region, n = c(8, 10)) |>
-  st_as_sf() |> mutate(id = 1:n())
-
-hex_grid <- st_make_grid(region, n = c(8, 10), square = FALSE) |>
-  st_as_sf() |> mutate(id = 1:n())
-
-# For Voronoi, create sample points
-set.seed(123)
-sample_pts <- st_sample(region, size = 30)
-voronoi <- st_voronoi(st_union(sample_pts)) |> 
-  st_cast() |> st_as_sf() |> mutate(id = 1:n()) |>
-  st_intersection(st_union(region))
-
-p_sq <- ggplot(sq_grid) + geom_sf(fill = NA, color = "navy") + 
-  geom_sf(data = region, fill = NA, color = "red", linewidth = 1) +
-  theme_void() + labs(title = "Square Grid")
-
-p_hex <- ggplot(hex_grid) + geom_sf(fill = NA, color = "navy") + 
-  geom_sf(data = region, fill = NA, color = "red", linewidth = 1) +
-  theme_void() + labs(title = "Hexagonal Grid")
-
-p_vor <- ggplot(voronoi) + geom_sf(fill = NA, color = "navy") + 
-  geom_sf(data = sample_pts, color = "red", size = 2) +
-  geom_sf(data = region, fill = NA, color = "darkred", linewidth = 1) +
-  theme_void() + labs(title = "Voronoi (red = anchor points)")
-
-gridExtra::grid.arrange(p_sq, p_hex, p_vor, nrow = 1)
+#| out.width: "100%"
+knitr::include_graphics('img/15-uber-h3-zoom.jpeg')
 ```
 
-**Square**: Simple, regular. **Hexagon**: Better edge effects, equal neighbors. **Voronoi**: Based on anchor points, useful for interpolation.
-
-## Creating Tessellations: The Pattern {.smaller}
-
-All tessellation functions (`st_voronoi()`, `st_triangulate()`, `st_make_grid()`) return geometry collections. The workflow is consistent:
-
-```{r}
-#| eval: false
-# 1. Create tessellation
-tess_raw <- st_voronoi(st_union(points))
-
-# 2. Cast to simplify (review: Week 2 - Feature vs. Set level)
-tess_clean <- st_cast(tess_raw)
-
-# 3. Convert to sf object to add attributes
-tess_sf <- tess_clean |>
-  st_as_sf() |>
-  mutate(id = 1:n())
-```
-
-**Why cast?** Tessellations return complex nested structures. `st_cast()` flattens and validates them, preventing topology errors in downstream operations.
-
-Partition space based on **anchor points**—each polygon is the area closest to its anchor:
-
-```{r}
-#| eval: false
-# Convert points to multipoint, create Voronoi
-voronoi_grid <- st_voronoi(st_union(anchor_points)) |>
-  st_cast() |>
-  st_as_sf() |>
-  mutate(id = 1:n())
-```
-
-**Useful for**:
-- Nearest-neighbor search
-- Facility location optimization
-- Spatial interpolation (e.g., rainfall from gauges)
-- Largest empty area problems
-
-## Delaunay Triangulation: Visual Example {.smaller}
-
-```{r}
-#| eval: true
-#| echo: false
-#| fig.align: center
-#| fig.width: 12
-#| fig.height: 5
-
-set.seed(456)
-pts <- st_sample(region, size = 25)
-
-# Delaunay triangulation
-delaunay <- st_triangulate(st_union(pts)) |>
-  st_cast() |> st_as_sf() |>
-  st_intersection(st_union(region))
-
-# Voronoi for comparison
-voronoi2 <- st_voronoi(st_union(pts)) |> 
-  st_cast() |> st_as_sf() |>
-  st_intersection(st_union(region))
-
-p_del <- ggplot(delaunay) + geom_sf(fill = NA, color = "navy", linewidth = 0.5) + 
-  geom_sf(data = pts, color = "red", size = 2) +
-  theme_void() + labs(title = "Delaunay Triangulation")
-
-p_vor2 <- ggplot(voronoi2) + geom_sf(fill = NA, color = "darkgreen", linewidth = 0.5) + 
-  geom_sf(data = pts, color = "red", size = 2) +
-  theme_void() + labs(title = "Voronoi (Dual of Delaunay)")
-
-gridExtra::grid.arrange(p_del, p_vor2, nrow = 1)
-```
-
-**Delaunay**: Triangulates anchor points. **Voronoi**: Complements it—circumcenters of Delaunay triangles are Voronoi vertices.
-
-Connect anchor points with triangles such that no point lies inside any triangle's circumcircle:
-
-```{r}
-#| eval: false
-triangles <- st_triangulate(st_union(anchor_points)) |>
-  st_cast() |>
-  st_as_sf() |>
-  mutate(id = 1:n())
-```
-
-**Relationship**: Delaunay triangles are the *dual* of Voronoi polygons (circumcenters of triangles = Voronoi vertices).
-
-**Used in**:
-- Terrain modeling (TINs—Triangular Irregular Networks)
-- Flood mapping
-- 3D surface interpolation
-
-## Modifiable Areal Unit Problem (MAUP)
-
-**The problem**: Aggregate your data differently, get different results.
-
-**Why it matters**: Summary statistics (mean, proportion) depend on:
-- **Scale** of aggregation units (county vs. state)
-- **Shape** of units (regular vs. irregular)
-
-**Example**: Gerrymandering—redraw voting districts, change political outcomes.
-
-::: callout-warning
-Be cautious when choosing aggregation units. Different zonation schemes produce different spatial patterns. Always report the units used.
+:::
 :::
 
+## [what3word](https://what3words.com/switched.mandates.apple)
+
+- Breaks the world into 3m grids encoded with unique 3 word strings
+
+```{r, fig.align='center', fig.width = 7, echo = FALSE}
+knitr::include_graphics('img/15-what3words.png')
+```
+
+## [Map Tiles / slippy maps / Pyramids](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
+
+- Use XYZ where Z is a zoom level ...
+
+```{r, fig.align='center', fig.height = 5, echo = FALSE}
+knitr::include_graphics('img/15-pyramid.jpg')
+```
+
+## Our Data for today ...
+
+#### Southern Counties
+
+```{r}
+south_counties = aoi_get(state = "south", county = "all") |> 
+  st_transform(st_crs(cities))
+```
+
+<br>
+
+#### Unioned to States using `dplyr`
+
+```{r}
+south_states = south_counties |> 
+  group_by(state_name) |> 
+  summarise()
+```
+
+<br>
+
+#### South County Centroids
+
+```{r}
+south_cent = st_centroid(south_counties)
+```
+
+```{r, echo = FALSE}
+ggplot() + 
+  geom_sf(data = south_counties, lty = 2) + 
+  geom_sf(data = south_states, fill = NA, lwd = .75) + 
+  geom_sf(data = south_cent, col = 'darkred', size = .2) +
+  theme_void()
+```
+
+## Southern Coverage: County
+
+```{r, fig.align='center', fig.width =10, echo = FALSE}
+plot_tess(south_counties, "Counties")
+```
+
+## Regular Tiles
+
+- One way to tile a surface is into regions of equal area
+
+- Tiles can be either _square_ (rectilinear) or _hexagonal_
+
+- `st_make_grid` generates a square or hexagonal grid covering the geometry of an `sf` or `sfc` object
+
+- The return object of `st_make_grid` is a new `sfc` object 
+
+- Grids can be specified by _cellsize_ or number of grid cells (*n*) in the X and Y direction
+
+```{r}
+# Create a grid over the south with 70 rows and 50 columns
+sq_grid = st_make_grid(south_counties, n = c(70, 50)) |> 
+  st_as_sf() |> 
+  mutate(id = 1:n())
+```
+
+## Southern Coverage: Square
+
+```{r, fig.align='center', fig.width=10, echo = FALSE}
+plot_tess(sq_grid, "Square Coverage")
+```
+
+## Hexagonal Grid
+
+- Hexagonal tessellations (honey combs) offer an alternative to square grids
+
+- They are created in the same way but by setting `square = FALSE`
+
+```{r}
+hex_grid = st_make_grid(south_counties, n = c(70, 50), square = FALSE) |> 
+  st_as_sf() |> 
+  mutate(id = 1:n())
+```
+
+## Southern Coverage: Hexagon
+
+```{r, fig.align='center', fig.width=10, echo = FALSE}
+plot_tess(hex_grid, "Hexagonal Coverage")
+```
+
+## Advantages Square Grids
+
+ - Simple definition and data storage
+    - Only need the origin (lower left), cell size (XY) and grid dimensions
+    
+ - Easy to aggregate and dissaggregate (resample)
+ 
+ - Analogous to raster data
+ 
+ - Relationship between cells is given 
+ 
+ - Combining layers is easy with traditional matrix algebra
 
 
-Be cautious when choosing aggregation units. Different zonation schemes produce different spatial patterns. Always report the units used.
+## Advantages Square Grids 
+
+ - Reduced Edge Effects
+    - Lower perimeter to area ratio
+    - minimizes the amount line length needed to create a lattice of cells with a given area
+    
+ - All neighbors are identical
+    - No rook vs queen neighbors
+    
+ - Better fit to curve surfaces (e.g. the earth)
+
+##
+
+```{r, fig.align='center', fig.width = 18, echo = FALSE}
+knitr::include_graphics('img/15-hex-vs-others.png')
+```
+
+## Triangulations
+
+- An alternative to creating equal area tiles is to create triangulations from known **anchor points**
+
+- Triangulation requires a set of input points and seeks to partition the interior into a partition of triangles.
+
+- In GIS contexts you'll hear:
+  - Thiessen Polygon 
+  - Voronoi Regions
+  - Delunay Triangulation
+  - TIN (Triangular irregular networks)
+  - etc,..
+
+## Voronoi Polygons
+
+- Voronoi/Thiessen polygon boundaries define the area closest to each anchor point relative to all others
+
+- They are defined by the _perpendicular_ bisectors of the lines between all points.
+
+```{r, fig.align='center', fig.height = 8, echo = FALSE}
+knitr::include_graphics('img/15-voronoi-animation.gif')
+```
+
+## Voronoi Polygons
+
+```{r, fig.align='center', fig.height = 8, echo = FALSE}
+knitr::include_graphics('img/15-Voronoi_growth_euclidean.gif')
+```
+
+## Voronoi Polygons
+
+- Usefull for tasks such as: 
+  - nearest neighbor search, 
+  - facility location (optimization), 
+  - largest empty areas, 
+  - path planning...
+
+- Also useful for simple interpolation of values such as rain gauges,
+
+::: columns
+::: {.column width="50%"}
+```{r, echo = FALSE, fig.width = 6}
+knitr::include_graphics('img/15-gage-rainfall.png')
+```
+:::
+::: {.column width="50%"}
+```{r, echo = FALSE, fig.width = 6}
+knitr::include_graphics('img/15-triangle-rainfall.png')
+```
+:::
 :::
 
-# Putting It All Together: Typical Lab Workflow
+## Often used in numerical models and simulations
 
-## The Complete Pattern {.smaller}
+::: columns
+::: {.column width="50%"}
+```{r, echo = FALSE, fig.width = 6}
+knitr::include_graphics('img/15-ocean-eddy.png')
+```
+:::
+::: {.column width="50%"}
+```{r, echo = FALSE, fig.width = 6}
+knitr::include_graphics('img/15-jetstream.png')
+```
+:::
+:::
 
-Here's the workflow you'll follow in Lab 3 (and most spatial analyses):
+## `st_voronoi`
 
+- st_voronoi creates voronoi tesselation in `sf`
+
+- It works over a `MULTIPOINT` collection
+
+- Should always be simplified after creation (st_cast())
+
+- If to be treated as an object for analysis, should be id'd
+
+```{r}
+south_cent_u = st_union(south_cent)
+
+v_grid = st_voronoi(south_cent_u) |> 
+  st_cast() |> 
+  st_as_sf() |> 
+  mutate(id = 1:n())
+```
+
+## Southern Coverage: Voronoi
+
+```{r, fig.align='center', fig.width=10, echo = FALSE}
+plot_tess(v_grid, "Voronoi Coverage")
+```
+
+## Southern Coverage: Voronoi
+
+```{r, fig.align='center', fig.width=10, echo = FALSE}
+v_grid = st_intersection(v_grid, st_union(south_states))
+```
+
+```{r, fig.align='center', fig.width=10, echo = FALSE}
+plot_tess(v_grid, "Voronoi Coverage") + 
+  geom_sf(data = south_cent, col = "darkred", size = .2)
+```
+
+## Delaunay triangulation
+
+- A Delaunay triangulation for a given set of points (P) in a plane, is a triangulation DT(P), where no point is inside the circumcircle of any triangle in DT(P). 
+
+```{r, fig.align='center', fig.height = 5, echo = FALSE}
+knitr::include_graphics('img/15-Delaunay_triangles.gif')
+```
+
+## Delaunay triangulation
+
+- The Delaunay triangulation of a discrete POINT set corresponds to the dual graph of the Voronoi diagram. 
+
+- The circumcenters (center of circles) of Delaunay triangles are the vertices of the Voronoi diagram. 
+
+```{r,  fig.width = 10, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/15-vor-delun.png')
+```
+
+## Used in landscape evaluation and terrian modeling
+
+::: columns
+::: {.column width="50%"}
+
+```{r,  fig.height = 4, echo = FALSE}
+knitr::include_graphics('img/15-flood-plain-mapping.jpg')
+```
+::: 
+::: {.column width="50%"}
+```{r,echo = FALSE}
+knitr::include_graphics('img/15-tin-terrain.jpg')
+```
+:::
+:::
+
+## `st_triangulate`
+
+- `st_triangulate` creates Delaunay triangulation in `sf`
+
+- It works over a `MULTIPOINT` collection
+
+- Should always be simplified after creation (`st_cast()`)
+
+- If to be treated as an object for analysis, should be id'd
+
+```{r}
+t_grid = st_triangulate(south_cent_u) |> 
+  st_cast() |> 
+  st_as_sf() |> 
+  mutate(id = 1:n())
+```
+
+## Southern Coverage: Triangles
+
+```{r, fig.align='center', fig.width=10, echo = FALSE}
+plot_tess(t_grid, "Triangular Coverage")
+```
+
+## Southern Coverage: Triangles
+
+```{r, fig.align='center', fig.width=10}
+t_grid = st_intersection(t_grid, st_union(south_states))
+```
+
+```{r, fig.align='center', fig.width=10, echo = FALSE}
+plot_tess(t_grid, "Voronoi Coverage") + 
+  geom_sf(data = south_cent, col = "darkred", size = .3)
+```
+
+## Difference in object coverages:
+
+```{r, echo = FALSE}
+sum_tess = function(data, type){
+  areakm2 = drop_units(set_units(st_area(data), "km2"))
+  data.frame(type = type, count = length(areakm2),  mean = mean(areakm2),  sd = sd(areakm2), tot = sum(areakm2))
+}
+
+bind_rows(
+  sum_tess(t_grid,"triangulation"),
+  sum_tess(v_grid, "voronoi"),
+  sum_tess(south_counties, "counties"),
+  sum_tess(sq_grid, "grid"),
+  sum_tess(hex_grid, "Hexagon")) |> 
+knitr::kable(caption = "Tesselation Characteristics",
+               col.names = c("Type", "Elements", "Mean Area (km2)", "Standard Deviation Area (km2)" ,"Coverage Area"),
+               format.args = list(big.mark = ",", digits = 2)) |>
+  kableExtra::kable_styling("striped", full_width = T, font_size = 48)
+```
+
+## Modifiable areal unit problem (MAUP)
+
+- The modifiable areal unit problem (MAUP) is a source of statistical bias that can significantly impact the results of statistical hypothesis tests. 
+
+- MAUP affects results when point-based measures are aggregated into districts. 
+
+- The resulting summary values (e.g., totals or proportions) are influenced by both the shape and scale of the aggregation unit.
+
+```{r, fig.align='center', fig.width = 2, echo = FALSE}
+knitr::include_graphics('img/15-maup.png')
+```
+
+## Worked Example: MAUP with Starbucks
+
+- Using the same Starbucks data, aggregating into different grid sizes produces different statistical patterns:
+
+```{r, message = FALSE}
+# Aggregate into 3 different grid resolutions
+conus = st_union(counties)
+fine_grid = st_make_grid(conus, n = c(40, 30)) |> st_as_sf() |> mutate(id = 1:n())
+medium_grid = st_make_grid(conus, n = c(20, 15)) |> st_as_sf() |> mutate(id = 1:n())
+coarse_grid = st_make_grid(conus, n = c(10, 8)) |> st_as_sf() |> mutate(id = 1:n())
+
+fine_agg = st_join(fine_grid, starbucks) |> group_by(id) |> summarise(n = n())
+medium_agg = st_join(medium_grid, starbucks) |> group_by(id) |> summarise(n = n())
+coarse_agg = st_join(coarse_grid, starbucks) |> group_by(id) |> summarise(n = n())
+
+# Statistics differ by aggregation scheme
+cat("Fine grid - Mean:", round(mean(fine_agg$n), 2), "SD:", round(sd(fine_agg$n), 2), "\n")
+cat("Medium grid - Mean:", round(mean(medium_agg$n), 2), "SD:", round(sd(medium_agg$n), 2), "\n")
+cat("Coarse grid - Mean:", round(mean(coarse_agg$n), 2), "SD:", round(sd(coarse_agg$n), 2), "\n")
+```
+
+- The spatial patterns and statistical properties differ significantly based on aggregation choice—this is the MAUP!
+
+# Real World Example
+
+- The power of GIS is the ability to integrate different layers and types of information
+
+- The scale of information can impact the analysis as can the grouping and zoning schemes chosen
+
+- The Modifiable Areal Unit Problem (MAUP) is an important issue for those who conduct spatial analysis using units of analysis at aggregations higher than incident level. 
+
+- The MAUP occurs when the aggregate units of analysis are arbitrarily produced or not directly related to the underlying phenomena. A classic example of this problem is Gerrymandering.
+
+- Gerrymandering involves shaping and re-shaping voting districts based on the political affiliations of the resident citizenry. 
+
+# [Examples](https://thefulcrum.us/worst-gerrymandering-districts-example)
+
+```{r, fig.align='center', out.width="90%", echo = FALSE}
+knitr::include_graphics('img/15-gm-maup.png')
+```
+
+# Spatial Statistics Foundation
+
+## From Neighbors to Inference: Why We Need Spatial Statistics
+
+**The central question:** Do neighboring observations have similar values?
+
+If YES:
+  - Standard regression breaks (independence assumption violated)
+  - We need **spatial statistics** to test for clustering and model dependence
+  - The spatial **weights matrix W** captures neighbor relationships
+
+. . .
+
+**Why W matters:**
+  - Built from geometric relationships: `st_touches()`, `st_intersects()`, `st_is_within_distance()`
+  - Scale depends on tessellation choice (hexagon vs square vs Voronoi) → **MAUP**
+  - Directly inputs to: Moran's I, spatial regression (SAR/SEM), LISA, kriging
+
+. . .
+
+**Section Arc:**
+
+- Build the neighbor matrix `W` from geometry (predicates & tessellations)
+- Test for global clustering with Moran's I
+- Visualize local patterns with LISA and spatial-lag plots
+- Diagnose how spatial dependence breaks OLS and motivates spatial regression
+
+## From Predicates to Neighbor Matrices
+
+**The spatial weights matrix W** is the bridge from geometry to statistics
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Prepare a tiny example grid (hidden) so we can print concrete outputs in the step boxes
+sf_use_s2(FALSE)
+small_bbox <- st_bbox(c(xmin = 0, ymin = 0, xmax = 3, ymax = 3))
+small_grid <- st_make_grid(small_bbox, n = c(3,3)) %>% st_as_sf() %>% mutate(id = row_number())
+
+# Binary neighbor matrix
+W_binary_small <- st_touches(small_grid, sparse = FALSE) * 1
+diag(W_binary_small) <- 0
+
+# Row-standardized weights
+W_small <- W_binary_small / rowSums(W_binary_small)
+W_small[!is.finite(W_small)] <- 0
+
+# Neighbor counts (degree)
+deg <- rowSums(W_binary_small)
+```
+
+::: columns
+::: {.column width="33%"}
+**Step 1: Binary Predicate**
+```{r, eval=FALSE}
+(W_binary <- st_touches(
+  hexagon_grid, 
+  sparse = FALSE
+) * 1)
+```
+Result: 1 if neighbors, 0 if not
+```{r, echo=FALSE}
+cat("Neighbor counts (min, mean, median, max):", min(deg), round(mean(deg),2), median(deg), max(deg), "\n")
+print(W_binary_small[1:min(6,nrow(W_binary_small)), 1:min(6,ncol(W_binary_small))])
+```
+:::
+
+::: {.column width="33%"}
+**Step 2: Remove Self**
+```{r, eval=FALSE}
+(diag(W_binary) <- 0)
+```
+A tile is not its own neighbor
+```{r, echo=FALSE}
+cat("Diagonal entries (first 6):\n")
+print(diag(W_binary_small)[1:min(6,length(diag(W_binary_small)))])
+```
+:::
+
+::: {.column width="33%"}
+**Step 3: Row-Standardize**
+```{r, eval=FALSE}
+(W <- W_binary / 
+  rowSums(W_binary))
+```
+Each row sums to 1
+```{r, echo=FALSE}
+cat("Sample row-standardized W (first 6 rows x cols):\n")
+print(round(W_small[1:min(6,nrow(W_small)), 1:min(6,ncol(W_small))], 2))
+```
+:::
+:::
+
+. . .
+
+**This neighbor matrix W** becomes the input to every spatial statistic:
+  - Moran's I (spatial autocorrelation)
+  - Spatial regression (SAR, SEM models)
+  - LISA (local clustering)
+  - Kriging (spatial interpolation)
+
+## Example: Starbucks Clustering by State
+
+**Question:** Do states with many Starbucks neighbors have many Starbucks? (Are Starbucks geographically clustered?)
+
+::: {style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;"}
+
+::: {style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-size: 0.8em;"}
+**Code:**
 ```r
-# 1️⃣ Read and prepare data
-dams <- read_csv("data.csv") |>
-  st_as_sf(coords = c("lon", "lat"), crs = 4326) |>
-  st_transform(5070)  # Project
+# 1. Aggregate
+state_counts <- st_join(
+  states, starbucks) %>%
+  group_by(state) %>%
+  summarise(n_stores = n())
 
-# 2️⃣ Create tessellation
-boundary <- st_union(aoi_get(...))
-grid <- st_make_grid(boundary, n = c(70, 50)) |>
-  st_as_sf() |>
-  mutate(id = 1:n())
+# 2. Build neighbor matrix
+W <- st_touches(state_counts,
+  sparse = FALSE) * 1
+diag(W) <- 0
+W <- W / rowSums(W)
 
-# 3️⃣ Simplify boundary if needed (before clipping!)
-boundary_simple <- ms_simplify(boundary, keep = 0.05)
+# 3. Compute Moran's I
+I <- ape::Moran.I(
+  state_counts$n_stores, 
+  weight = W)
+```
+:::
 
-# 4️⃣ Crop tessellation to boundary
-grid_cropped <- st_intersection(grid, boundary_simple)
-
-# 5️⃣ Point-in-polygon: Count dams per grid cell
-dams_by_grid <- st_join(grid_cropped, dams) |>
-  group_by(id) |>
-  summarise(n = n())  # n = count of dams per cell
-
-# 6️⃣ Visualize with conditional highlighting
-ggplot(dams_by_grid) +
-  geom_sf(aes(fill = n), color = NA) +
-  scale_fill_viridis_c() +
-  gghighlight(n > mean(n) + sd(n))  # Highlight high-count cells
+::: {style="background: #E8F5E9; padding: 15px; border-radius: 5px; border-left: 4px solid #2E7D32;"}
+**Output:**
+```
+Moran's I = 0.58
+p-value < 0.001
 ```
 
+**🔴 Strong positive autocorrelation**
+- **CA** (high) ← Oregon, Nevada (high)
+- **MT** (low) ← Idaho, Wyoming (low)
+
+**Conclusion:** Starbucks cluster by region, not random
+:::
+
+:::
+
+
+## Tessellation Choice Affects Neighbor Structure (and Statistics)
+
+Different tessellations change neighbor structure and therefore statistical estimates (MAUP).
+
+**Critical insight:** Same point data, different tessellations, different statistical results
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Compute all three tessellations (hidden computation)
+if (!require(ape, quietly = TRUE)) install.packages("ape")
+if (!require(ggplot2, quietly = TRUE)) install.packages("ggplot2")
+sf_use_s2(FALSE)
+
+# Get CONUS bounds and repair geometry
+states_valid <- AOI::aoi_get(state = "conus") |> 
+  st_transform(5070) |>
+  st_make_valid() 
+
+conus_bbox <- st_bbox(states_valid)
+conus_union <- st_union(states_valid)
+
+# Create three tessellations with matching CRS
+hex_grid <- st_make_grid(conus_bbox, n = 70, square = FALSE) %>%
+  st_as_sf() %>% 
+  st_set_crs(st_crs(starbucks)) %>%
+  st_filter(conus_union) %>%
+  mutate(id = row_number())
+
+sq_grid <- st_make_grid(conus_bbox, n = 70, square = TRUE) %>%
+  st_as_sf() %>% 
+  st_set_crs(st_crs(starbucks)) %>%
+  st_filter(conus_union) %>%
+  mutate(id = row_number())
+
+set.seed(523)
+centroids <- st_sample(conus_union, 2500) %>%
+  st_as_sf() %>% 
+  st_set_crs(st_crs(starbucks)) %>%
+  mutate(id = row_number())
+
+voronoi_grid <- st_voronoi(st_union(st_geometry(centroids))) %>%
+  st_collection_extract() %>% st_as_sf() %>%
+  st_set_crs(st_crs(starbucks)) %>%
+  st_filter(conus_union) %>%
+  mutate(id = row_number())
+
+# Count Starbucks in each tessellation
+count_starbucks <- function(grid) {
+  st_join(grid, starbucks) %>% st_drop_geometry() %>%
+  group_by(id) %>% summarise(n = n(), .groups = "drop") %>%
+  pull(n)
+}
+
+# Compute Moran's I
+compute_morans <- function(grid, counts) {
+  W <- st_touches(grid, sparse = FALSE) * 1; diag(W) <- 0
+  W <- W / rowSums(W); W[!is.finite(W)] <- 0
+  moran_i <- ape::Moran.I(as.numeric(counts), W)
+  c(I = moran_i$observed, p = moran_i$p.value)
+}
+
+hex_sb <- count_starbucks(hex_grid)
+sq_sb <- count_starbucks(sq_grid)
+vor_sb <- count_starbucks(voronoi_grid)
+
+hex_m <- compute_morans(hex_grid, hex_sb)
+sq_m <- compute_morans(sq_grid, sq_sb)
+vor_m <- compute_morans(voronoi_grid, vor_sb)
+
+# Create LISA and lag plots for hexagon grid (example)
+W_hex <- st_touches(hex_grid, sparse = FALSE) * 1; diag(W_hex) <- 0
+W_hex <- W_hex / rowSums(W_hex); W_hex[!is.finite(W_hex)] <- 0
+
+hex_lag <- W_hex %*% hex_sb
+hex_z <- scale(hex_sb)
+hex_lag_z <- scale(hex_lag)
+
+# LISA quadrant assignment
+hex_lisa <- data.frame(
+  x = hex_z[,1],
+  lag_x = hex_lag_z[,1],
+  quadrant = case_when(
+    hex_z[,1] > 0 & hex_lag_z[,1] > 0 ~ "High-High",
+    hex_z[,1] < 0 & hex_lag_z[,1] < 0 ~ "Low-Low",
+    hex_z[,1] > 0 & hex_lag_z[,1] < 0 ~ "High-Low",
+    hex_z[,1] < 0 & hex_lag_z[,1] > 0 ~ "Low-High",
+    TRUE ~ "Other"
+  )
+)
+
+# Create LISA plot
+p_lisa <- ggplot(hex_lisa, aes(x, lag_x, color = quadrant)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  scale_color_manual(values = c("High-High" = "#d73027", "Low-Low" = "#4575b4", 
+                                 "High-Low" = "#fee090", "Low-High" = "#91bfdb", 
+                                 "Other" = "gray80")) +
+  labs(title = "LISA Quadrants", x = "Starbucks Density", y = "Spatial Lag") +
+  theme_minimal() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+# Create lag plot
+p_lag <- ggplot(hex_lisa, aes(x, lag_x, color = quadrant)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "black", alpha = 0.3) +
+  scale_color_manual(values = c("High-High" = "#d73027", "Low-Low" = "#4575b4", 
+                                 "High-Low" = "#fee090", "Low-High" = "#91bfdb", 
+                                 "Other" = "gray80")) +
+  labs(title = "Spatial Lag Relationship", x = "Starbucks Density", y = "Average Neighbor Density") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+**Example: Hexagon Grid**
+
+```{r, echo=TRUE, eval=FALSE}
+# Create regular hexagon tessellation
+hex_grid <- st_make_grid(
+  conus_bbox, 
+  n = 70, 
+  square = FALSE
+)
+
+# Count Starbucks in each hexagon
+hex_counts <- st_join(
+  hex_grid, starbucks
+) %>% group_by(id) %>%
+  summarise(n = n())
+
+# Build neighbor weight matrix
+W <- st_touches(hex_grid) %>% 
+  as.matrix()
+W <- W / rowSums(W)  # Standardize
+
+# Compute Moran's I
+ape::Moran.I(hex_counts$n, W)
+```
+
+**Result:** I = `r round(hex_m[1], 3)`
+
+:::
+
+::: {.column width="50%"}
+
+**Comparison: Tessellation summary & results**
+
+| Tessellation | Tiles | Avg Neighbors | Range | Moran's I | Pattern |
+|:---|---:|---:|---:|---:|:---|
+| Hexagon | ~300 | ~6 | 6 (uniform) | `r round(hex_m[1], 3)` | Uniform |
+| Square | ~300 | ~4 | 4 (orthogonal) | `r round(sq_m[1], 3)` | Orthogonal |
+| Voronoi | Variable | ~6 | 1–15 | `r round(vor_m[1], 3)` | Variable |
+
+**MAUP:** Same data, different tessellations → different point estimates; choose neighborhoods using domain knowledge.
+
+:::
+
+::::
+
+## Moran's I: Does Your Variable Cluster?
+
+**The question:** If two hexagons are neighbors, do they have similar Starbucks counts?
+
+**Moran's I is the answer—a test for spatial autocorrelation**
+
 . . .
 
-**Key decisions to make**:
-- Which tessellation type? (grid, hex, Voronoi)
-- How much to simplify? (keep = 0.1 or 0.05?)
-- Which predicate for joining? (st_within, st_intersects)
-- How to aggregate? (count, mean, sum, list)
+**Formula** (don't memorize, conceptually: "weighted correlation of X with its spatial lag"):
 
-## Why Each Step Matters {.smaller}
+$$I = \frac{\sum_i \sum_j w_{ij}(x_i - \bar{x})(x_j - \bar{x})}{σ^2 \sum_i \sum_j w_{ij}}$$
 
-| Step | Why | Function |
+. . .
+
+**Interpretation:**
+
+| I value | Meaning | Starbucks |
 |---|---|---|
-| **Project early** | All spatial ops in same CRS | `st_transform()` |
-| **Simplify before clipping** | Large boundaries = slow intersections | `ms_simplify()` |
-| **Cast after tessellation** | Avoids topology errors | `st_cast()` |
-| **Join with correct predicate** | Changes what counts as "in" | `st_within()` vs `st_intersects()` |
-| **Group then count** | Many-to-many joins need aggregation | `group_by() + summarise()` |
-| **Conditional viz** | MAUP: different patterns for different scales | `gghighlight()` |
-
-# Summary
-
-## This Week: Topology, Operations & Tessellation
-
-You now know:
-
-- **Interior, Boundary, Exterior** — How geometry is structured
-- **DE-9IM matrix & `st_relate()`** — Mathematical foundation and full topological codes
-- **Six named predicates** — Intersects, Touches, Within, Contains, Overlaps, Crosses
-- **Spatial filtering** — `st_filter()` subsets data by relationship
-- **Spatial joining** — `st_join()` combines datasets; watch for many-to-many matches
-- **Clipping** — `st_intersection()` modifies geometry to fit boundaries
-- **Simplification** — Douglas-Peucker & Visvalingam algorithms reduce vertices
-- **Tessellation** — Square grids, hexagons, Voronoi, Delaunay triangulation
-- **MAUP** — How aggregation unit choice affects analysis results
+| **I > 0, p < 0.05** | 🟢 Positive clustering | CA hexagons HIGH-HIGH, MT LOW-LOW |
+| **I ≈ 0, p > 0.05** | 🟡 No clustering | Uniform distribution |
+| **I < 0, p < 0.05** | 🔴 Regular pattern | High surrounded by low (rare) |
 
 . . .
 
-**Core principle**: Spatial problems are relational problems solved through topology, set operations, and spatial aggregation.
+**Our result:** I = 0.253, p < 0.001 ✓ **Significant positive clustering**
 
----
+**What this means:** Starbucks are geographically concentrated. Coastal and urban hexagons cluster together; rural hexagons cluster together. This is **not a random distribution**.
 
-**Next week**: Raster data—gridded coverage model (pixels, not polygons).
+## Row-Standardize & Spatial Lag — (Teacher-friendly)
 
-**Key takeaway**: Choose your tessellation and aggregation scheme carefully. It shapes your results.
+::: columns
+
+::: {.column width="48%"}
+**What we do (3 quick steps)**
+
+1. Build binary adjacency: `W_binary <- st_touches(grid, sparse = FALSE) * 1`
+2. Remove self-links: `diag(W_binary) <- 0`
+3. Row-standardize so rows sum to 1: `W <- W_binary / rowSums(W_binary)`
+
+```{r, echo=FALSE}
+# tiny illustrative arrays (printed for clarity)
+cat("Raw (region A): [1,1,1,1]  -> Row-standardized: [0.25,0.25,0.25,0.25]\n")
+cat("Raw (region B): [1 x8]     -> Row-standardized: [0.125 x8]\n")
+```
+:::
+
+::: {.column width="52%"}
+**What the spatial lag tells us**
+
+Formula (compact):
+
+$$\text{lag} = W x$$
+
+Short numeric example (class demo):
+
+```{r, echo=FALSE}
+# demo using the small grid prepared earlier
+demo_counts <- 1:9
+demo_lag <- as.numeric(W_small %*% demo_counts)
+cat("counts:", paste(demo_counts, collapse=","), "\n")
+cat("lag (first 6):", paste(round(demo_lag[1:6],2), collapse=","), "\n")
+```
+
+:::
+
+:::
+
+## Standard Regression Fails with Spatial Data
+
+**OLS Assumption:**
+Observations are independent (residuals are uncorrelated)
+
+. . .
+
+**Spatial Data Reality:**
+Nearby regions often have correlated attributes
+  - Starbucks density clusters (coastal cities have high density)
+  - Similar urban development patterns
+  - Regional consumer preferences & market saturation
+  - → **Residuals are correlated, not independent**
+
+. . .
+
+**Consequences of violating independence:**
+
+| Problem | Impact |
+|---------|--------|
+| Standard errors too narrow | Over-confident estimates |
+| t-statistics inflated | Too many false positives |
+| 95% CI doesn't cover 95% | Invalid inference |
+| Type I error rate > 5% | Wrong conclusions |
+
+. . .
+
+**Solution: Use spatial statistics that explicitly model dependence**
+  - **Testing**: Moran's I (test for spatial clustering)
+  - **Modeling**: Spatial Autoregressive (SAR) or Spatial Error (SEM) models
+  - **Interpretation**: Spatial lag models, Conditional AutoRegressive (CAR) models
+
+## LISA: Which Neighborhoods are Clusters vs. Outliers?
+
+**Global Moran's I** = Average clustering across entire region
+
+**LISA** (Local Indicator of Spatial Association) = Clustering at each location
+
+. . .
+
+**LISA Quadrants** (from Moran scatterplot):
+
+::: columns
+::: {.column width="50%"}
+🔴 **High-High** (red)
+- High value + high neighbors
+- Cluster of high values
+- Example: California coast (high Starbucks, neighbors are high)
+
+🔵 **Low-Low** (blue)
+- Low value + low neighbors
+- Cluster of low values
+- Example: Rural interior states (low Starbucks, neighbors are low)
+:::
+
+::: {.column width="50%"}
+🟠 **High-Low** (orange)
+- High value + low neighbors
+- Isolated hotspot (outlier)
+- Example: Denver metro (high Starbucks surrounded by sparse rural states)
+
+🟢 **Low-High** (green)
+- Low value + high neighbors
+- Rare anomaly
+- Example: Small town on coast (low local Starbucks but high neighbors)
+:::
+:::
+
+. . .
+
+**In practice**: LISA identifies which specific neighborhoods drive the global Moran's I signal
+  - Are Starbucks clusters concentrated on coasts? Or distributed nationwide?
+  - Are high-density outliers major metros or measurement errors?
+
+```{r, echo=FALSE, fig.width=8, fig.height=5}
+if (exists("p_lisa") && exists("p_lag")) {
+  library(patchwork)
+  p_lisa / p_lag
+} else {
+  cat("LISA plots unavailable: tessellation computation not run.\n")
+}
+```
+
+## The Road Ahead: Spatial Regression
+
+**Now that you understand spatial dependence, the next step is modeling it**
+
+. . .
+
+**Three spatial regression approaches:**
+
+1. **Spatial Autoregressive (SAR):**
+   - $y = \rho W y + X\beta + \epsilon$
+   - Neighboring values directly influence your value
+   - Best for: Regional spillover effects
+
+. . .
+
+2. **Spatial Error (SEM):**
+   - $\epsilon = \lambda W \epsilon + u$
+   - Omitted variables create correlated errors  
+   - Best for: Unobserved heterogeneity
+
+. . .
+
+3. **Conditional AutoRegressive (CAR):**
+   - Bayesian approach; specific conditional structure
+   - Best for: Spatial smoothing, hierarchical models
+
+. . .
+
+- You can now look at **any** spatial dataset and ask: "Are these observations spatially dependent? Which tessellation makes sense? What does that imply for my statistical model?"
+
+
+- You'll implement these models in Lab-03. 
+

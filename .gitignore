@@ -8,4 +8,4 @@ docs/labs/keys/*
 /.quarto/
 .DS_Store
 README.html
-labs/*_cache/
+labs/*_cache/slides/img/geoconnex_features.parquet

@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lab 3: Tessellations, Point-in-Polygon – ESS 523c</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-8ea72dc5fed832574809a9c94082fbbb.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5b6eb65566b1f8a996f1287d789c0740.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-c63d9198b28a859559c0f0cce9729cfa.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../csu-rams-logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">ESS 523c</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/mikejohnson51/csu-523c-2026/"> <i class="bi bi-github" role="img" aria-label="ESS 523c">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a>
+  <ul class="collapse">
+  <li><a href="#graduate-level-expectations" id="toc-graduate-level-expectations" class="nav-link" data-scroll-target="#graduate-level-expectations">Graduate-Level Expectations</a>
+  <ul class="collapse">
+  <li><a href="#libraries" id="toc-libraries" class="nav-link" data-scroll-target="#libraries">Libraries</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#question-1" id="toc-question-1" class="nav-link" data-scroll-target="#question-1">Question 1:</a>
+  <ul class="collapse">
+  <li><a href="#step-1.1" id="toc-step-1.1" class="nav-link" data-scroll-target="#step-1.1">Step 1.1</a></li>
+  <li><a href="#step-1.2" id="toc-step-1.2" class="nav-link" data-scroll-target="#step-1.2">Step 1.2</a></li>
+  <li><a href="#step-1.3" id="toc-step-1.3" class="nav-link" data-scroll-target="#step-1.3">Step 1.3</a></li>
+  <li><a href="#step-1.4" id="toc-step-1.4" class="nav-link" data-scroll-target="#step-1.4">Step 1.4</a></li>
+  <li><a href="#step-1.5" id="toc-step-1.5" class="nav-link" data-scroll-target="#step-1.5">Step 1.5</a></li>
+  <li><a href="#step-1.6" id="toc-step-1.6" class="nav-link" data-scroll-target="#step-1.6">Step 1.6</a></li>
+  <li><a href="#step-1.7" id="toc-step-1.7" class="nav-link" data-scroll-target="#step-1.7">Step 1.7</a></li>
+  </ul></li>
+  <li><a href="#question-2" id="toc-question-2" class="nav-link" data-scroll-target="#question-2">Question 2:</a>
+  <ul class="collapse">
+  <li><a href="#step-2.1" id="toc-step-2.1" class="nav-link" data-scroll-target="#step-2.1">Step 2.1</a></li>
+  <li><a href="#step-2.2" id="toc-step-2.2" class="nav-link" data-scroll-target="#step-2.2">Step 2.2</a></li>
+  <li><a href="#step-2.3" id="toc-step-2.3" class="nav-link" data-scroll-target="#step-2.3">Step 2.3</a></li>
+  <li><a href="#step-2.4" id="toc-step-2.4" class="nav-link" data-scroll-target="#step-2.4">Step 2.4</a></li>
+  <li><a href="#step-2.5" id="toc-step-2.5" class="nav-link" data-scroll-target="#step-2.5">Step 2.5</a></li>
+  </ul></li>
+  <li><a href="#question-3-dam-distribution-analysis-tessellation-selection" id="toc-question-3-dam-distribution-analysis-tessellation-selection" class="nav-link" data-scroll-target="#question-3-dam-distribution-analysis-tessellation-selection">Question 3: Dam Distribution Analysis &amp; Tessellation Selection</a>
+  <ul class="collapse">
+  <li><a href="#step-3.1" id="toc-step-3.1" class="nav-link" data-scroll-target="#step-3.1">Step 3.1</a></li>
+  <li><a href="#step-3.2" id="toc-step-3.2" class="nav-link" data-scroll-target="#step-3.2">Step 3.2</a></li>
+  <li><a href="#step-3.3" id="toc-step-3.3" class="nav-link" data-scroll-target="#step-3.3">Step 3.3</a></li>
+  <li><a href="#step-3.4" id="toc-step-3.4" class="nav-link" data-scroll-target="#step-3.4">Step 3.4</a></li>
+  <li><a href="#step-3.5" id="toc-step-3.5" class="nav-link" data-scroll-target="#step-3.5">Step 3.5</a></li>
+  <li><a href="#step-3.6" id="toc-step-3.6" class="nav-link" data-scroll-target="#step-3.6">Step 3.6</a></li>
+  </ul></li>
+  <li><a href="#question-4-spatial-predicates-and-dam-boundary-relationships" id="toc-question-4-spatial-predicates-and-dam-boundary-relationships" class="nav-link" data-scroll-target="#question-4-spatial-predicates-and-dam-boundary-relationships">Question 4: Spatial Predicates and Dam-Boundary Relationships</a>
+  <ul class="collapse">
+  <li><a href="#step-4.1" id="toc-step-4.1" class="nav-link" data-scroll-target="#step-4.1">Step 4.1</a></li>
+  <li><a href="#step-4.2" id="toc-step-4.2" class="nav-link" data-scroll-target="#step-4.2">Step 4.2</a></li>
+  <li><a href="#step-4.3" id="toc-step-4.3" class="nav-link" data-scroll-target="#step-4.3">Step 4.3</a></li>
+  </ul></li>
+  <li><a href="#question-5-simplification-impact-computational-cost-vs.-accuracy-trade-off" id="toc-question-5-simplification-impact-computational-cost-vs.-accuracy-trade-off" class="nav-link" data-scroll-target="#question-5-simplification-impact-computational-cost-vs.-accuracy-trade-off">Question 5: Simplification Impact — Computational Cost vs.&nbsp;Accuracy Trade-off</a>
+  <ul class="collapse">
+  <li><a href="#step-5.1" id="toc-step-5.1" class="nav-link" data-scroll-target="#step-5.1">Step 5.1</a></li>
+  <li><a href="#step-5.2" id="toc-step-5.2" class="nav-link" data-scroll-target="#step-5.2">Step 5.2</a></li>
+  <li><a href="#step-5.3" id="toc-step-5.3" class="nav-link" data-scroll-target="#step-5.3">Step 5.3</a></li>
+  </ul></li>
+  <li><a href="#question-6-spatial-autocorrelation-and-scale-dependent-inference" id="toc-question-6-spatial-autocorrelation-and-scale-dependent-inference" class="nav-link" data-scroll-target="#question-6-spatial-autocorrelation-and-scale-dependent-inference">Question 6: Spatial Autocorrelation and Scale-Dependent Inference</a>
+  <ul class="collapse">
+  <li><a href="#step-6.1" id="toc-step-6.1" class="nav-link" data-scroll-target="#step-6.1">Step 6.1</a></li>
+  <li><a href="#step-6.2" id="toc-step-6.2" class="nav-link" data-scroll-target="#step-6.2">Step 6.2</a></li>
+  <li><a href="#step-6.3" id="toc-step-6.3" class="nav-link" data-scroll-target="#step-6.3">Step 6.3</a></li>
+  <li><a href="#step-6.4-graduate-level-extension" id="toc-step-6.4-graduate-level-extension" class="nav-link" data-scroll-target="#step-6.4-graduate-level-extension">Step 6.4 <em>(Graduate-Level Extension)</em></a></li>
+  </ul></li>
+  <li><a href="#question-7-spatial-correlation-of-dam-attributes-introduction-to-spatial-regression" id="toc-question-7-spatial-correlation-of-dam-attributes-introduction-to-spatial-regression" class="nav-link" data-scroll-target="#question-7-spatial-correlation-of-dam-attributes-introduction-to-spatial-regression">Question 7: Spatial Correlation of Dam Attributes — Introduction to Spatial Regression</a>
+  <ul class="collapse">
+  <li><a href="#step-7.1" id="toc-step-7.1" class="nav-link" data-scroll-target="#step-7.1">Step 7.1</a></li>
+  <li><a href="#step-7.2" id="toc-step-7.2" class="nav-link" data-scroll-target="#step-7.2">Step 7.2</a></li>
+  <li><a href="#step-7.3" id="toc-step-7.3" class="nav-link" data-scroll-target="#step-7.3">Step 7.3</a></li>
+  <li><a href="#step-7.4" id="toc-step-7.4" class="nav-link" data-scroll-target="#step-7.4">Step 7.4</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+<script src="https://use.fontawesome.com/5235085b15.js"></script>
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 3: Tessellations, Point-in-Polygon</h1>
+<p class="subtitle lead">National Dam Inventory</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/04-dams.jpg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="background" class="level1">
+<h1>Background</h1>
+<p>In this lab we will explore the impacts of tessellated surfaces and the modifiable areal unit problem (MAUP) using the National Dam Inventory maintained by the United States Army Corps of Engineers. The work requires writing reusable functions and careful consideration of feature aggregation/simplification, spatial joins, and data visualization. The end goal is to visualize the distribution of dams and their purposes across the country.</p>
+<p><strong>DISCLAIMER</strong>: This lab can be computationally intensive. For some steps you may be processing hundreds of millions of relations; run code chunk-by-chunk during development rather than knitting the whole document repeatedly. Your final knit may take a few minutes. Be proud — the report will summarize analyses over very large geometric relations.</p>
+<hr>
+<p>This lab covers 4 main skills:</p>
+<ol type="1">
+<li><strong>Tessellating surfaces</strong> to discretize space</li>
+<li><strong>Geometry simplification</strong> to expedite expensive intersections</li>
+<li><strong>Writing functions</strong> to automate repetitive reporting and mapping tasks</li>
+<li><strong>Point-in-polygon counts</strong> to aggregate point data</li>
+</ol>
+<section id="graduate-level-expectations" class="level2">
+<h2 class="anchored" data-anchor-id="graduate-level-expectations">Graduate-Level Expectations</h2>
+<p>In addition to producing correct code and outputs, your submission should:</p>
+<ul>
+<li><strong>Justify methodological choices</strong>: Why did you choose a particular tessellation <code>keep</code> percentage for simplification? How did you balance computational efficiency with map detail?</li>
+<li><strong>Document performance impacts</strong>: Measure and report computation time and geometric accuracy changes resulting from simplification. How do results differ?</li>
+<li><strong>Apply spatial reasoning</strong>: Use spatial predicates (e.g., <code>st_touches</code>, <code>st_contains</code>) to identify and describe geometric relationships in the dam dataset that raw counts cannot reveal.</li>
+<li><strong>Compare across methods</strong>: When multiple tessellation approaches yield different clustering patterns, explain which pattern better supports real-world dam management decisions and why.</li>
+<li><strong>Connect to lecture</strong>: Explicitly cite the MAUP problem, simplification algorithms (Douglas-Peucker vs.&nbsp;Visvalingam), and spatial predicate definitions from week 3 lectures in your analysis.</li>
+</ul>
+<section id="libraries" class="level3">
+<h3 class="anchored" data-anchor-id="libraries">Libraries</h3>
+<hr>
+</section>
+</section>
+</section>
+<section id="question-1" class="level1">
+<h1>Question 1:</h1>
+<p>Here we will prepare five tessellated surfaces from CONUS and write a function to plot them in a descriptive way.</p>
+<section id="step-1.1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.1">Step 1.1</h3>
+<p>First, we need a spatial file of CONUS counties. For future area calculations we want these in an equal area projection (<code>EPSG:5070</code>).</p>
+<p>To achieve this:</p>
+<ul>
+<li><p>get an <code>sf</code> object of US counties (<code>AOI::aoi_get(state = "conus", county = "all")</code>)</p></li>
+<li><p>transform the data to <code>EPSG:5070</code></p></li>
+</ul>
+</section>
+<section id="step-1.2" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.2">Step 1.2</h3>
+<p>For triangle based tessellations we need point locations to serve as our “anchors”.</p>
+<p>To achieve this:</p>
+<ul>
+<li><p>generate county centroids using <code>st_centroid</code></p></li>
+<li><p>Since, we can only tessellate over a feature we need to <em>combine</em> or <em>union</em> the resulting 3,108 <code>POINT</code> features into a single <code>MULTIPOINT</code> feature</p></li>
+<li><p>Since these are point objects, the difference between union/combine is mute</p></li>
+</ul>
+</section>
+<section id="step-1.3" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.3">Step 1.3</h3>
+<p>Tessellations/Coverage’s describe the <strong>extent</strong> of a region with geometric shapes, called <strong>tiles</strong>, with <em>no</em> overlaps or gaps.</p>
+<p><strong>Tiles</strong> can range in <em>size</em>, <em>shape</em>, <em>area</em> and have different methods for being created.</p>
+<p>Some methods generate triangular tiles across a set of defined points (e.g.&nbsp;<code>Voronoi</code> and Delaunay triangulation)</p>
+<p>Others generate equal area tiles over a known extent (<code>st_make_grid</code>)</p>
+<p>For this lab, we will create surfaces of CONUS using using 4 methods, 2 based on an extent and 2 based on point anchors:</p>
+<p><strong>Tessellations</strong> :</p>
+<ul>
+<li><p><code>st_voronoi</code>: creates a Voronoi tessellation</p></li>
+<li><p><code>st_triangulate</code>: triangulates a set of points (not constrained)</p></li>
+</ul>
+<p><strong>Coverages</strong>:</p>
+<ul>
+<li><p><code>st_make_grid</code>: creates a square grid covering the geometry of an sf or sfc object</p></li>
+<li><p><code>st_make_grid(square = FALSE)</code>: creates a hexagonal grid covering the geometry of an sf or sfc object</p></li>
+<li><p>The side of coverage tiles can be defined by a cell resolution or a specified number of cell in the X and Y direction</p></li>
+</ul>
+<hr>
+<p>For this step:</p>
+<ul>
+<li>Make a voroni tessellation over your county centroids (<code>MULTIPOINT</code>)</li>
+<li>Make a triangulated tessellation over your county centroids (<code>MULTIPOINT</code>)</li>
+<li>Make a gridded coverage with n = 70, over your counties object</li>
+<li>Make a hexagonal coverage with n = 70, over your counties object</li>
+</ul>
+<p>In addition to creating these 4 coverage’s we need to add an ID to each <em>tile</em>.</p>
+<p>To do this:</p>
+<ul>
+<li><p>add a new column to each tessellation that spans from <code>1:n()</code>.</p></li>
+<li><p>Remember that <strong>ALL</strong> tessellation methods return an <code>sfc</code> <code>GEOMETRYCOLLECTION</code>, and to add attribute information - like our ID - you will have to coerce the <code>sfc</code> list into an <code>sf</code> object (<code>st_sf</code> or <code>st_as_sf</code>)</p></li>
+</ul>
+<p>Last, we want to ensure that our surfaces are topologically valid/simple.</p>
+<ul>
+<li><p>To ensure this, we can pass our surfaces through <code>st_cast</code>.</p></li>
+<li><p>Remember that casting an object explicitly (e.g.&nbsp;<code>st_cast(x, "POINT")</code>) changes a geometry</p></li>
+<li><p>If no output type is specified (e.g.&nbsp;<code>st_cast(x)</code>) then the cast attempts to simplify the geometry.</p></li>
+<li><p>If you don’t do this you might get unexpected “TopologyException” errors.</p></li>
+</ul>
+</section>
+<section id="step-1.4" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.4">Step 1.4</h3>
+<p>If you plot the above tessellations you’ll see the triangulated surfaces produce regions far beyond the boundaries of CONUS.</p>
+<p>We need to cut these boundaries to CONUS border.</p>
+<p>To do this, we will call on <code>st_intersection</code>, but will first need a geometry of CONUS to serve as our differencing feature. We can get this by unioning our existing county boundaries.</p>
+</section>
+<section id="step-1.5" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.5">Step 1.5</h3>
+<p>With a single feature boundary, we must carefully consider the complexity of the geometry. Remember, the more points our geometry contains, the more computations needed for spatial predicates our differencing. For a task like ours, we do not need a finely resolved coastal boarder.</p>
+<p>To achieve this:</p>
+<ul>
+<li><p>Simplify your unioned border using the Visvalingam algorithm provided by <code>rmapshaper::ms_simplify</code>.</p></li>
+<li><p>Choose what percentage of vertices to retain using the <code>keep</code> argument and work to find the highest number that provides a shape <em>you</em> are comfortable with for the analysis:</p></li>
+</ul>
+<ul>
+<li><p>Once you are happy with your simplification, use the <code>mapview::npts</code> function to report the number of points in your original object, and the number of points in your simplified object.</p></li>
+<li><p>How many points were you able to remove? What are the consequences of doing this computationally?</p></li>
+</ul>
+<ul>
+<li>Finally, use your simplified object to crop the two triangulated tessellations with <code>st_intersection</code>:</li>
+</ul>
+</section>
+<section id="step-1.6" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.6">Step 1.6</h3>
+<p>The last step is to plot your tessellations. We don’t want to write out 5 ggplots (or mindlessly copy and paste 😄)</p>
+<p>Instead, lets make a function that takes an <code>sf</code> object as <em>arg1</em> and a character string as <em>arg2</em> and returns a ggplot object showing <em>arg1</em> titled with <em>arg2</em>.</p>
+<hr>
+<p>The form of a function is:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>name <span class="ot">=</span> <span class="cf">function</span>(arg1, arg2) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  ... code goes here ...</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<hr>
+<p>For this function:</p>
+<ul>
+<li><p>The name can be anything you chose, <em>arg1</em> should take an <code>sf</code> object, and <em>arg2</em> should take a character string that will title the plot</p></li>
+<li><p>In your function, the code should follow our standard <code>ggplot</code> practice where your data is <em>arg1</em>, and your title is <em>arg2</em></p></li>
+<li><p>The function should also enforce the following:</p>
+<ul>
+<li><p>a <code>white</code> fill</p></li>
+<li><p>a <code>navy</code> border</p></li>
+<li><p>a <code>size</code> of 0.2</p></li>
+<li><p>`theme_void``</p></li>
+<li><p>a caption that reports the number of features in <em>arg1</em></p>
+<ul>
+<li>You will need to paste character stings and variables together.</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="step-1.7" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.7">Step 1.7</h3>
+<p>Use your new function to plot each of your tessellated surfaces and the original county data (5 plots in total):</p>
+</section>
+</section>
+<section id="question-2" class="level1">
+<h1>Question 2:</h1>
+<p>In this question, we will write out a function to summarize our tessellated surfaces. Most of this should have been done in your daily assignments.</p>
+<section id="step-2.1" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.1">Step 2.1</h3>
+<p>First, we need a function that takes a <code>sf</code> object and a <code>character</code> string and returns a <code>data.frame</code>.</p>
+<p>For this function:</p>
+<ul>
+<li><p>The function name can be anything you chose, <em>arg1</em> should take an <code>sf</code> object, and <em>arg2</em> should take a character string describing the object</p></li>
+<li><p>In your function, calculate the area of <code>arg1</code>; convert the units to km<sup>2</sup>; and then drop the units</p></li>
+<li><p>Next, create a <code>data.frame</code> containing the following:</p>
+<ol type="1">
+<li><p>text from <em>arg2</em></p></li>
+<li><p>the number of features in <em>arg1</em></p></li>
+<li><p>the mean area of the features in <em>arg1</em> (km<sup>2</sup>)</p></li>
+<li><p>the standard deviation of the features in <em>arg1</em></p></li>
+<li><p>the total area (km<sup>2</sup>) of <em>arg1</em></p></li>
+</ol></li>
+<li><p>Return this <code>data.frame</code></p></li>
+</ul>
+</section>
+<section id="step-2.2" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.2">Step 2.2</h3>
+<p>Use your new function to summarize each of your tessellations and the original counties.</p>
+</section>
+<section id="step-2.3" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.3">Step 2.3</h3>
+<p>Multiple <code>data.frame</code> objects can bound row-wise with <code>bind_rows</code> into a single <code>data.frame</code></p>
+<p>For example, if your function is called <code>sum_tess</code>, the following would bind your summaries of the triangulation and voroni object.</p>
+</section>
+<section id="step-2.4" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.4">Step 2.4</h3>
+<p>Once your 5 summaries are bound (2 tessellations, 2 coverage’s, and the raw counties) print the <code>data.frame</code> as a nice table using <code>knitr</code>/<code>kableExtra.</code></p>
+</section>
+<section id="step-2.5" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.5">Step 2.5</h3>
+<p>Comment on the traits of each tessellation. Be specific about how these traits might impact the results of a point-in-polygon analysis in the contexts of the modifiable areal unit problem and with respect computational requirements.</p>
+<hr>
+</section>
+</section>
+<section id="question-3-dam-distribution-analysis-tessellation-selection" class="level1">
+<h1>Question 3: Dam Distribution Analysis &amp; Tessellation Selection</h1>
+<p>The data we will analyze in this lab are from the U.S. Army Corps of Engineers National Dam Inventory (NID). This dataset documents ~91,000 dams in the United States and includes attributes such as design specifications, risk level, age, and purpose.</p>
+<p>Dam management agencies face a critical question: <strong>Where are dams actually clustered, and how do I visualize that clustering in a way that supports infrastructure planning decisions?</strong> The answer depends on your choice of geographic boundaries—that is, your tessellation. Different tessellations will reveal different patterns of dam concentration. Your job in this question is to:</p>
+<ol type="1">
+<li>Quantify dam distributions across multiple tessellation methods</li>
+<li>Understand how the <strong>modifiable areal unit problem (MAUP)</strong> creates different narratives from the same underlying data</li>
+<li><strong>Select and justify the tessellation that best supports management decisions</strong> about dam clustering</li>
+</ol>
+<p>For the remainder of this lab we will analyze the distributions of these dams using point-in-polygon analysis.</p>
+<section id="step-3.1" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.1">Step 3.1</h3>
+<p>In the tradition of this class - and true to data science/GIS work - you need to find, download, and manage raw data. While the raw NID data is no longer easy to get with the transition of the USACE services to ESRI Features Services, I staged the data in the resources directory of this class. To get it, navigate to that location and download the raw file into you lab data directory.</p>
+<ul>
+<li>Return to your RStudio Project and read the data in using the <code>readr::read_csv</code>
+<ul>
+<li>Use <code>janitor::clean_names()</code> to standardize column names to snake_case (tidy data convention)</li>
+<li>After reading the data in, be sure to remove rows that don’t have location values (<code>!is.na()</code>)</li>
+<li>Convert the data.frame to a sf object by defining the coordinates and CRS</li>
+<li>Transform the data to a CONUS AEA (EPSG:5070) projection - matching your tessellation</li>
+<li>Filter to include only those within your CONUS boundary</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Data Cleaning with janitor
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The NID CSV has messy column names (all caps with spaces). The <code>janitor::clean_names()</code> function converts them to clean snake_case (<code>LONGITUDE</code> → <code>longitude</code>, <code>DAM NAME</code> → <code>dam_name</code>). This is a lightweight utility that saves time and prevents typos in downstream code. It’s part of data wrangling best practice.</p>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prefer a local NID CSV named `nation.csv`; otherwise download to that filename</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>nid_url <span class="ot">&lt;-</span> <span class="st">"https://nid.sec.usace.army.mil/api/nation/csv"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"data"</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>nid_dest <span class="ot">&lt;-</span> <span class="st">"data/nation.csv"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(nid_dest)) {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Using local NID file: "</span>, nid_dest)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"Downloading NID CSV to: "</span>, nid_dest)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">download.file</span>(nid_url, nid_dest, <span class="at">quiet =</span> <span class="cn">FALSE</span>, <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"NID download failed: "</span>, e<span class="sc">$</span>message)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># read the CSV (will error if download failed and file missing)</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(nid_dest)) <span class="fu">stop</span>(<span class="st">"NID CSV not found at "</span>, nid_dest)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>dams <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(nid_dest, <span class="at">skip =</span><span class="dv">1</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>usa <span class="ot">&lt;-</span> AOI<span class="sc">::</span><span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"conus"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_union</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">5070</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>dams2 <span class="ot">&lt;-</span> dams <span class="sc">%&gt;%</span> </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(latitude)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">5070</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_filter</span>(usa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="step-3.2" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.2">Step 3.2</h3>
+<p>Following the in-class examples develop an efficient point-in-polygon function that takes:</p>
+<ul>
+<li>points as <code>arg1</code>,</li>
+<li>polygons as <code>arg2</code>,</li>
+<li>The name of the id column as <code>arg3</code></li>
+</ul>
+<p>The function should make use of spatial and non-spatial joins, sf coercion and <code>dplyr::count</code>. The returned object should be input <code>sf</code> object with a column - <code>n</code> - counting the number of points in each tile.</p>
+</section>
+<section id="step-3.3" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.3">Step 3.3</h3>
+<p>Apply your point-in-polygon function to each of your five tessellated surfaces where:</p>
+<ul>
+<li>Your points are the dams</li>
+<li>Your polygons are the respective tessellation</li>
+<li>The id column is the name of the id columns you defined.</li>
+</ul>
+</section>
+<section id="step-3.4" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.4">Step 3.4</h3>
+<p>Lets continue the trend of automating our repetitive tasks through function creation. This time make a new function that extends your previous plotting function.</p>
+<p>For this function:</p>
+<ul>
+<li><p>The name can be anything you chose, <em>arg1</em> should take an <code>sf</code> object, and <em>arg2</em> should take a character string that will title the plot</p></li>
+<li><p>The function should also enforce the following:</p>
+<ul>
+<li><p>the fill aesthetic is driven by the count column <code>n</code></p></li>
+<li><p>the col is <code>NA</code></p></li>
+<li><p>the fill is scaled to a continuous <code>viridis</code> color ramp</p></li>
+<li><p><code>theme_void</code></p></li>
+<li><p>a caption that reports the number of dams in <em>arg1</em> (e.g.&nbsp;<code>sum(n)</code>)</p>
+<ul>
+<li>You will need to paste character stings and variables together.</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="step-3.5" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.5">Step 3.5</h3>
+<p>Apply your plotting function to each of the 5 tessellated surfaces with Point-in-Polygon counts:</p>
+</section>
+<section id="step-3.6" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.6">Step 3.6</h3>
+<p><strong>Policy Analysis: Tessellation and Decision-Making</strong></p>
+<p>Now that you have dam counts across all five tessellation methods, compare the results. Specifically:</p>
+<p><strong>a.</strong> Create a side-by-side visualization (faceted or small multiples) showing dam clustering under each of the five tessellations. Use <code>patchwork</code> or <code>cowplot</code> to arrange the 5 plots you created in Step 3.5 for direct visual comparison.</p>
+<p><strong>b.</strong> Identify <strong>2–3 geographic regions</strong> where tessellation choice produces substantially <em>different</em> patterns (e.g., one method shows a clear hotspot while another shows diffuse distribution). For each region, describe the pattern difference and explain <em>why</em> the tessellation geometry creates divergent results. Reference the characteristics from your Q2 summary (number of tiles, mean area, standard deviation).</p>
+<p><strong>c.</strong> <strong>Which single tessellation would you recommend to a dam operations manager seeking to understand geographic clustering?</strong> Justify your choice by addressing: - Does the tessellation align with natural or management decision-making units (e.g., river basins, states, hydrologic regions)? - Does it reveal meaningful patterns without over-fragmenting the landscape or creating artificial boundaries? - How does MAUP influence your recommendation—are other tessellations equally valid, just for different questions? - How did simplification affect your choice? Would a coarser or finer simplification (different <code>keep</code> percentage) change your recommendation? - What does “best supports management decisions” mean concretely in your context—does it matter more that hot spots are obvious, or that boundaries align with jurisdictions?</p>
+<p>Your answer should be <strong>3–4 paragraphs</strong> and grounded in the actual visualizations and patterns you observe from your tessellation comparisons.</p>
+<hr>
+</section>
+</section>
+<section id="question-4-spatial-predicates-and-dam-boundary-relationships" class="level1">
+<h1>Question 4: Spatial Predicates and Dam-Boundary Relationships</h1>
+<p>County, state, and river basin boundaries play a central role in dam management—dams near boundaries may be governed differently, funded differently, or managed by different agencies. This question uses <strong>spatial predicates</strong> (from week 3 lectures) to identify and characterize these boundary relationships.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Spatial Predicates Review (Week 3 Lecture Content)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Spatial predicates test the <strong>topological relationship</strong> between two geometries using the Dimensionally Extended 9-Intersection Model (DE-9IM). Common ones include:</p>
+<ul>
+<li><code>st_intersects(x, y)</code>: do x and y share any space? (Interior, boundary, or both)</li>
+<li><code>st_touches(x, y)</code>: do x and y touch at boundaries <em>only</em>, with no interior overlap?</li>
+<li><code>st_contains(x, y)</code>: does x completely contain y in its interior?</li>
+<li><code>st_within(x, y)</code>: is x completely contained within y?</li>
+</ul>
+<p>These return logical vectors (<code>TRUE</code>/<code>FALSE</code>) and are the foundation of spatial filtering with <code>st_filter()</code>. See week 3 slides for detailed DE-9IM definitions and illustrations.</p>
+</div>
+</div>
+<section id="step-4.1" class="level3">
+<h3 class="anchored" data-anchor-id="step-4.1">Step 4.1</h3>
+<p>Use <code>st_filter()</code> with different spatial predicates to classify dams relative to your chosen tessellation from Q3.</p>
+<p><strong>a.</strong> Create a subset of dams that <code>st_touches</code> the tessellation tile boundaries (dams exactly on borders—their point geometry touches the boundary line).</p>
+<p><strong>b.</strong> Create a subset of dams completely <code>st_within</code> tiles (dams in the interior, not touching boundaries).</p>
+<p><strong>c.</strong> Use <code>st_join()</code> to identify dams at multi-tile corners: join dams to the tessellation and count how many tiles each dam intersects. Filter for dams with <code>n_tiles &gt; 1</code>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Implementation hints:</strong> - <code>st_filter(dams, tessellation, .predicate = st_touches)</code> returns dams touching tile boundaries - <code>st_filter(dams, tessellation, .predicate = st_within)</code> returns dams fully contained within tiles - For corner dams: <code>st_join(tessellation, dams) %&gt;% count(dam_id_or_index)</code> then <code>filter(n &gt; 1)</code></p>
+</div>
+</div>
+</section>
+<section id="step-4.2" class="level3">
+<h3 class="anchored" data-anchor-id="step-4.2">Step 4.2</h3>
+<p>Produce summary statistics for each predicate class:</p>
+<p><strong>a.</strong> How many dams fall into each category (touching, within, at multi-tile corners)? Create a summary table.</p>
+<p><strong>b.</strong> Are dams at boundaries (touching/corner dams) systematically different from interior dams? If the NID dataset includes: - <strong>Purpose codes</strong>: Do boundary vs.&nbsp;interior dams serve different functions? - <strong>Dam type or construction material</strong>: Are they built differently? - <strong>Construction date</strong>: Do boundary dams differ in age?</p>
+<p>Produce a brief summary (table or text) of any differences you find.</p>
+<p><strong>c.</strong> Create a map showing your tessellation with dams colored by predicate class: - Interior dams = one color (e.g., blue) - Boundary dams = another color (e.g., orange)<br>
+- Multi-tile corner dams = third color (e.g., red)</p>
+</section>
+<section id="step-4.3" class="level3">
+<h3 class="anchored" data-anchor-id="step-4.3">Step 4.3</h3>
+<p>Write 2–3 sentences addressing: - What fraction of dams fall at boundaries (touching) or multi-tile corners vs.&nbsp;in the interior? - Do dams cluster at boundaries preferentially, or are they randomly distributed? - What governance or management challenges might arise from dams at multi-agency (multi-tile) boundaries?</p>
+<hr>
+</section>
+</section>
+<section id="question-5-simplification-impact-computational-cost-vs.-accuracy-trade-off" class="level1">
+<h1>Question 5: Simplification Impact — Computational Cost vs.&nbsp;Accuracy Trade-off</h1>
+<p>In Step 1.5, you simplified your CONUS boundary using the Visvalingam algorithm. That simplification was necessary for computational speed—but at what cost? This question quantifies the trade-off between <strong>computation time</strong> and <strong>geometric accuracy</strong> by comparing point-in-polygon results using original vs.&nbsp;simplified boundaries.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why Simplification Matters (Week 3 Content)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Spatial intersections (like <code>st_intersection()</code>) are expensive: they test every pair of vertices between two polygons. A boundary with 100,000 vertices costs far more to intersect than one with 1,000 vertices. Your Week 3 lecture on simplification algorithms (Douglas-Peucker vs.&nbsp;Visvalingam) found that you can eliminate 95% of vertices while retaining visual shape. But <strong>do your analysis results change?</strong></p>
+</div>
+</div>
+<section id="step-5.1" class="level3">
+<h3 class="anchored" data-anchor-id="step-5.1">Step 5.1</h3>
+<p><strong>Measure Computation Time</strong>: Re-run your tessellation clipping operation <strong>twice</strong>, measuring elapsed time with both original and simplified boundaries.</p>
+<p><strong>a.</strong> Retrieve or recreate your unsimplified CONUS boundary and your simplified version from Step 1.5:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>usa_unsimplified <span class="ot">&lt;-</span> AOI<span class="sc">::</span><span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"conus"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_union</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">5070</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># If you completed Step 1.5, usa_simplified should already exist</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># If not, create it here with your chosen keep percentage:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">exists</span>(<span class="st">"usa_simplified"</span>)) {</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  usa_simplified <span class="ot">&lt;-</span> rmapshaper<span class="sc">::</span><span class="fu">ms_simplify</span>(usa_unsimplified, <span class="at">keep =</span> <span class="fl">0.10</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Count original vertices</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>original_vertices <span class="ot">&lt;-</span> mapview<span class="sc">::</span><span class="fu">npts</span>(usa_unsimplified)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>simplified_vertices <span class="ot">&lt;-</span> mapview<span class="sc">::</span><span class="fu">npts</span>(usa_simplified)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Original boundary vertices:"</span>, original_vertices, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Original boundary vertices: 11292 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Simplified boundary vertices:"</span>, simplified_vertices, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simplified boundary vertices: 1145 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Vertices retained:"</span>, <span class="dv">100</span> <span class="sc">*</span> simplified_vertices <span class="sc">/</span> original_vertices, <span class="st">"%</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Vertices retained: 10.13992 %</code></pre>
+</div>
+</div>
+<p><strong>b.</strong> Wrap your tessellation clipping in <code>system.time()</code> for both boundaries. Time the clipping of your Voronoi and triangulated tessellations:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clipping with UNSIMPLIFIED boundary</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>time_unsimplified <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  voronoi_unsimplified <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(voronoi_grid, usa_unsimplified)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  triangles_unsimplified <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(triangulate_grid, usa_unsimplified)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Clipping with SIMPLIFIED boundary (from Step 1.5)</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>time_simplified <span class="ot">&lt;-</span> <span class="fu">system.time</span>({</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  voronoi_simplified <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(voronoi_grid, usa_simplified)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  triangles_simplified <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(triangulate_grid, usa_simplified)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Unsimplified elapsed time:"</span>, time_unsimplified[<span class="st">"elapsed"</span>], <span class="st">"seconds</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Simplified elapsed time:"</span>, time_simplified[<span class="st">"elapsed"</span>], <span class="st">"seconds</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Speed-up factor:"</span>, time_unsimplified[<span class="st">"elapsed"</span>] <span class="sc">/</span> time_simplified[<span class="st">"elapsed"</span>], <span class="st">"x</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="step-5.2" class="level3">
+<h3 class="anchored" data-anchor-id="step-5.2">Step 5.2</h3>
+<p><strong>Compare Geometric Accuracy</strong>: For both the Voronoi and triangulated tessellations, do the simplified and unsimplified results have meaningful differences?</p>
+<p><strong>a.</strong> Create a comparison table showing: - Number of tiles in each result - Total area clipped with unsimplified boundary (km²) - Total area clipped with simplified boundary (km²) - Percent difference in area</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>compare_accuracy <span class="ot">&lt;-</span> <span class="cf">function</span>(simplified_result, unsimplified_result, method_name) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  unsimplified_area <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">st_area</span>(unsimplified_result)) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    units<span class="sc">::</span><span class="fu">set_units</span>(<span class="st">"km2"</span>) <span class="sc">%&gt;%</span> <span class="fu">as.numeric</span>()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  simplified_area <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">st_area</span>(simplified_result)) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    units<span class="sc">::</span><span class="fu">set_units</span>(<span class="st">"km2"</span>) <span class="sc">%&gt;%</span> <span class="fu">as.numeric</span>()</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  area_diff_pct <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> (simplified_area <span class="sc">-</span> unsimplified_area) <span class="sc">/</span> unsimplified_area</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> method_name,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_tiles_unsimplified =</span> <span class="fu">nrow</span>(unsimplified_result),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_tiles_simplified =</span> <span class="fu">nrow</span>(simplified_result),</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">area_unsimplified_km2 =</span> <span class="fu">round</span>(unsimplified_area, <span class="dv">0</span>),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">area_simplified_km2 =</span> <span class="fu">round</span>(simplified_area, <span class="dv">0</span>),</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">area_diff_pct =</span> <span class="fu">round</span>(area_diff_pct, <span class="dv">2</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>voronoi_compare <span class="ot">&lt;-</span> <span class="fu">compare_accuracy</span>(voronoi_simplified, voronoi_unsimplified, <span class="st">"Voronoi"</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>triangles_compare <span class="ot">&lt;-</span> <span class="fu">compare_accuracy</span>(triangles_simplified, triangles_unsimplified, <span class="st">"Triangles"</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(voronoi_compare, triangles_compare) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Simplification Impact on Geometry"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>b.</strong> Check for <strong>missing regions</strong>: Did the simplified boundary omit important coastal or border areas? Visual check: overlay the clipped results and note any missing tiles around CONUS edges.</p>
+</section>
+<section id="step-5.3" class="level3">
+<h3 class="anchored" data-anchor-id="step-5.3">Step 5.3</h3>
+<p><strong>Decision and Recommendation</strong></p>
+<p>Write 3–4 paragraphs addressing:</p>
+<p><strong>a.</strong> <strong>Speed-up assessment</strong>: How much faster was the simplified version? Was the speedup worth the simplification effort, or would unsimplified be more appropriate? (A 10x speedup is significant; a 1.2x speedup may not justify added complexity.)</p>
+<p><strong>b.</strong> <strong>Accuracy assessment</strong>: How much geometric accuracy was lost? - If area difference &lt; 1%, simplification was appropriate. - If 1–3%, simplification was reasonable with minor artifacts.<br>
+- If &gt; 3%, simplification was too aggressive.</p>
+<p>Did the simplified boundary miss important regions? How does the percent difference relate to the Visvalingam <code>keep</code> percentage you chose?</p>
+<p><strong>c.</strong> <strong>Parameter sensitivity</strong>: How sensitive are the results to your <code>keep</code> choice? Would <code>keep = 0.05</code> (coarser) or <code>keep = 0.20</code> (finer) have been better? Justify based on your speed/accuracy trade-off.</p>
+<p><strong>d.</strong> <strong>Guidance for others</strong>: Would you recommend simplification to other students working with US boundary data? If yes, what would you advise about the <code>keep</code> threshold? If no, why not?</p>
+<hr>
+</section>
+</section>
+<section id="question-6-spatial-autocorrelation-and-scale-dependent-inference" class="level1">
+<h1>Question 6: Spatial Autocorrelation and Scale-Dependent Inference</h1>
+<p>One of the key insights from Week 3-1 is that <strong>spatial predicates and tessellation choices directly drive spatial statistical inference</strong>. In this question, you’ll compute a foundational spatial statistic—<strong>Moran’s I</strong> (spatial autocorrelation)—across your different tessellations to understand how geographic scale affects conclusions about dam clustering.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Spatial Autocorrelation Foundation (Week 3-1 Concept)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Spatial autocorrelation</strong> tests whether nearby regions have similar values (positive autocorrelation), dissimilar values (negative), or independent values. Moran’s I is the most common test:</p>
+<ul>
+<li><strong>I &gt; 0</strong>: Positive autocorrelation — neighboring tiles tend to have similar dam counts (clustering suggests natural/hydrologic patterns)</li>
+<li><strong>I ≈ 0</strong>: No spatial autocorrelation — dam distribution is random</li>
+<li><strong>I &lt; 0</strong>: Negative autocorrelation — neighboring tiles have dissimilar values (dams push away from each other)</li>
+</ul>
+<p>Moran’s I depends critically on the <strong>neighborhood matrix</strong> (which tiles are neighbors), which you create using spatial predicates (<code>st_touches</code>, <code>st_intersects</code>). Different tessellations produce different neighborhood structures, leading to <strong>different I values from the same underlying dam data</strong>—this is the spatial statistics manifestation of MAUP.</p>
+</div>
+</div>
+<section id="step-6.1" class="level3">
+<h3 class="anchored" data-anchor-id="step-6.1">Step 6.1</h3>
+<p><strong>Create Neighbor Matrices</strong> for your tessellations (use your chosen tessellation from Q3 and 1–2 others for comparison).</p>
+<p>For each tessellation, create a <strong>binary neighbor matrix</strong> where entry (i,j) = 1 if tiles i and j share a boundary (<code>st_touches</code>), and 0 otherwise:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key Implementation Details
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><p><strong><code>st_touches(..., sparse = FALSE)</code></strong> returns a dense matrix (all 0s and 1s); <strong><code>sparse = TRUE</code></strong> returns a sparse object (memory-efficient for large datasets). Use <code>sparse = FALSE</code> for clarity.</p></li>
+<li><p><strong><code>diag(...) &lt;- 0</code></strong> removes self-neighbors (tiles are not their own neighbors). This is critical to avoid inflating the neighborhood count.</p></li>
+<li><p><strong>Row-standardization</strong>: Dividing each row by its sum scales the weights so each tile has equal influence regardless of how many neighbors it has. Always use row-standardized weights for Moran’s I.</p></li>
+<li><p><strong>Isolated tiles</strong>: If a tile has 0 neighbors (island geometry), <code>rowSums()</code> = 0, causing division-by-zero → <code>Inf</code>. The line <code>neighbor_weights[!is.finite(...)] &lt;- 0</code> replaces these with 0.</p></li>
+<li><p><strong>Quick check</strong>: <code>rowSums(neighbor_weights)</code> should be 1 (or 0 for isolated tiles).</p></li>
+</ol>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP A: Create for your chosen tessellation (e.g., hex_grid_dams)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Assumes your aggregated tessellation has an ID column (e.g., tile_id) </span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># and dam count column (e.g., n)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>neighbor_matrix_hex <span class="ot">&lt;-</span> <span class="fu">st_touches</span>(hex_grid_dams, <span class="at">sparse =</span> <span class="cn">FALSE</span>) <span class="sc">*</span> <span class="dv">1</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(neighbor_matrix_hex) <span class="ot">&lt;-</span> <span class="dv">0</span>  <span class="co"># Exclude self-neighbors</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Row-standardized weights (each row sums to 1)</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>neighbor_weights_hex <span class="ot">&lt;-</span> neighbor_matrix_hex <span class="sc">/</span> <span class="fu">rowSums</span>(neighbor_matrix_hex)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>neighbor_weights_hex[<span class="sc">!</span><span class="fu">is.finite</span>(neighbor_weights_hex)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick diagnostics</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"HEXAGON GRID:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of tiles:"</span>, <span class="fu">nrow</span>(neighbor_matrix_hex), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Total edges (neighbor pairs):"</span>, <span class="fu">sum</span>(neighbor_matrix_hex) <span class="sc">/</span> <span class="dv">2</span>, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Average neighbors per tile:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(neighbor_matrix_hex)), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Min/Max neighbors:"</span>, <span class="fu">min</span>(<span class="fu">rowSums</span>(neighbor_matrix_hex)), <span class="st">"/"</span>, <span class="fu">max</span>(<span class="fu">rowSums</span>(neighbor_matrix_hex)), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP B: Repeat for square grid</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>neighbor_matrix_square <span class="ot">&lt;-</span> <span class="fu">st_touches</span>(square_grid_dams, <span class="at">sparse =</span> <span class="cn">FALSE</span>) <span class="sc">*</span> <span class="dv">1</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(neighbor_matrix_square) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>neighbor_weights_square <span class="ot">&lt;-</span> neighbor_matrix_square <span class="sc">/</span> <span class="fu">rowSums</span>(neighbor_matrix_square)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>neighbor_weights_square[<span class="sc">!</span><span class="fu">is.finite</span>(neighbor_weights_square)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"SQUARE GRID:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of tiles:"</span>, <span class="fu">nrow</span>(neighbor_matrix_square), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Average neighbors per tile:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(neighbor_matrix_square)), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Min/Max neighbors:"</span>, <span class="fu">min</span>(<span class="fu">rowSums</span>(neighbor_matrix_square)), <span class="st">"/"</span>, <span class="fu">max</span>(<span class="fu">rowSums</span>(neighbor_matrix_square)), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP C: Repeat for Voronoi</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>neighbor_matrix_vor <span class="ot">&lt;-</span> <span class="fu">st_touches</span>(voronoi_dams, <span class="at">sparse =</span> <span class="cn">FALSE</span>) <span class="sc">*</span> <span class="dv">1</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(neighbor_matrix_vor) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>neighbor_weights_vor <span class="ot">&lt;-</span> neighbor_matrix_vor <span class="sc">/</span> <span class="fu">rowSums</span>(neighbor_matrix_vor)</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>neighbor_weights_vor[<span class="sc">!</span><span class="fu">is.finite</span>(neighbor_weights_vor)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"VORONOI:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of tiles:"</span>, <span class="fu">nrow</span>(neighbor_matrix_vor), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Average neighbors per tile:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(neighbor_matrix_vor)), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Min/Max neighbors:"</span>, <span class="fu">min</span>(<span class="fu">rowSums</span>(neighbor_matrix_vor)), <span class="st">"/"</span>, <span class="fu">max</span>(<span class="fu">rowSums</span>(neighbor_matrix_vor)), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Expected Observation</strong>: Regular tessellations (hexagon, square) have <em>uniform</em> neighbor counts (~6 for hex, ~4 for square, boundary tiles have fewer). Voronoi has <em>variable</em> neighbor counts (often 3–8, rarely 1–15 for edge cases). <strong>Why does this matter?</strong> Neighbor structure directly affects Moran’s I stability—uniform neighborhoods lead to more stable autocorrelation estimates.</p>
+</section>
+<section id="step-6.2" class="level3">
+<h3 class="anchored" data-anchor-id="step-6.2">Step 6.2</h3>
+<p><strong>Compute Moran’s I</strong> for dam density (counts per tile) under different tessellations.</p>
+<p>Moran’s I is calculated as:</p>
+<p><span class="math display">\[I = \frac{n}{\sum_i \sum_j w_{ij}} \frac{\sum_i \sum_j w_{ij} (x_i - \bar{x})(x_j - \bar{x})}{\sum_i (x_i - \bar{x})^2}\]</span></p>
+<p>Where: - <span class="math inline">\(x_i\)</span> = dam count in tile i - <span class="math inline">\(\bar{x}\)</span> = mean dam count across all tiles - <span class="math inline">\(w_{ij}\)</span> = neighborhood weight (1 if neighbors, 0 otherwise, then row-standardized) - <span class="math inline">\(n\)</span> = number of tiles</p>
+<p>The <code>ape</code> package provides <code>Moran.I()</code> for this calculation:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Install ape first
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ape"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Moran.I() Function Signature
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<pre><code>ape::Moran.I(x = vector, weight = weight_matrix)</code></pre>
+<p><strong>Arguments:</strong> - <code>x</code>: Vector of values (dam counts per tile). Must be same length as <code>nrow(weight)</code>. Any NAs will cause the function to fail—handle these BEFORE calling Moran.I(). - <code>weight</code>: Row-standardized neighbor weight matrix (from Step 6.1).</p>
+<p><strong>Returns:</strong> - <code>observed</code>: The calculated Moran’s I value - <code>expected</code>: Expected I value if data were random (~0 for most datasets) - <code>sd</code>: Standard deviation (not always provided; use p.value instead) - <code>p.value</code>: Two-tailed p-value testing <span class="math inline">\(H_0: I = 0\)</span> (no autocorrelation)</p>
+<p><strong>Interpretation:</strong> - <code>observed &gt; expected</code> and <code>p.value &lt; 0.05</code>: <strong>Significant positive autocorrelation</strong> — nearby tiles have similar values (clustering) - <code>observed ≈ expected</code> and <code>p.value &gt; 0.05</code>: <strong>No significant pattern</strong> — random distribution<br>
+- <code>observed &lt; expected</code> and <code>p.value &lt; 0.05</code>: <strong>Negative autocorrelation</strong> — neighbors differ (rare for dam data; would suggest dams push away from each other)</p>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ape)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP A: HEX GRID - Extract dam counts</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>dam_counts_hex <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>n  <span class="co"># Ensure column name matches your data</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute Moran's I</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>morans_hex <span class="ot">&lt;-</span> ape<span class="sc">::</span><span class="fu">Moran.I</span>(<span class="at">x =</span> dam_counts_hex, <span class="at">weight =</span> neighbor_weights_hex)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"HEXAGON GRID RESULTS:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Moran's I observed:"</span>, <span class="fu">round</span>(morans_hex<span class="sc">$</span>observed, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Expected (random):"</span>, <span class="fu">round</span>(morans_hex<span class="sc">$</span>expected, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"P-value:"</span>, <span class="fu">round</span>(morans_hex<span class="sc">$</span>p.value, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (morans_hex<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>) {</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"✓ SIGNIFICANT positive autocorrelation (p &lt; 0.05)</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"✗ No significant autocorrelation</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP B: SQUARE GRID</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>dam_counts_sq <span class="ot">&lt;-</span> square_grid_dams<span class="sc">$</span>n</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>morans_sq <span class="ot">&lt;-</span> ape<span class="sc">::</span><span class="fu">Moran.I</span>(<span class="at">x =</span> dam_counts_sq, <span class="at">weight =</span> neighbor_weights_square)</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"SQUARE GRID RESULTS:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Moran's I observed:"</span>, <span class="fu">round</span>(morans_sq<span class="sc">$</span>observed, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"P-value:"</span>, <span class="fu">round</span>(morans_sq<span class="sc">$</span>p.value, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP C: VORONOI</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>dam_counts_vor <span class="ot">&lt;-</span> voronoi_dams<span class="sc">$</span>n</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>morans_vor <span class="ot">&lt;-</span> ape<span class="sc">::</span><span class="fu">Moran.I</span>(<span class="at">x =</span> dam_counts_vor, <span class="at">weight =</span> neighbor_weights_vor)</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"VORONOI RESULTS:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Moran's I observed:"</span>, <span class="fu">round</span>(morans_vor<span class="sc">$</span>observed, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"P-value:"</span>, <span class="fu">round</span>(morans_vor<span class="sc">$</span>p.value, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Assemble Summary Table</strong> (use these results):</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>morans_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">tessellation =</span> <span class="fu">c</span>(<span class="st">"Hexagon"</span>, <span class="st">"Square"</span>, <span class="st">"Voronoi"</span>),</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">tiles_n =</span> <span class="fu">c</span>(<span class="fu">nrow</span>(hex_grid_dams), <span class="fu">nrow</span>(square_grid_dams), <span class="fu">nrow</span>(voronoi_dams)),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">morans_i =</span> <span class="fu">c</span>(</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_hex<span class="sc">$</span>observed, <span class="dv">4</span>),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_sq<span class="sc">$</span>observed, <span class="dv">4</span>),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_vor<span class="sc">$</span>observed, <span class="dv">4</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_value =</span> <span class="fu">c</span>(</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_hex<span class="sc">$</span>p.value, <span class="dv">4</span>),</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_sq<span class="sc">$</span>p.value, <span class="dv">4</span>),</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_vor<span class="sc">$</span>p.value, <span class="dv">4</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">avg_neighbors =</span> <span class="fu">c</span>(</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(neighbor_matrix_hex)), <span class="dv">2</span>),</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(neighbor_matrix_square)), <span class="dv">2</span>),</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(neighbor_matrix_vor)), <span class="dv">2</span>)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">significant =</span> <span class="fu">c</span>(</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(morans_hex<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"Yes"</span>, <span class="st">"No"</span>),</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(morans_sq<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"Yes"</span>, <span class="st">"No"</span>),</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(morans_vor<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"Yes"</span>, <span class="st">"No"</span>)</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(morans_summary, </span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>             <span class="at">caption =</span> <span class="st">"Moran's I: Spatial Autocorrelation across Tessellations"</span>,</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>             <span class="at">digits =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="step-6.3" class="level3">
+<h3 class="anchored" data-anchor-id="step-6.3">Step 6.3</h3>
+<p><strong>Interpret Scale-Dependent Results</strong></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Interpretation Checklist
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Before writing your response, verify you can answer: - [ ] What is the range of Moran’s I values across your 3 tessellations? (e.g., 0.32–0.41) - [ ] Are all results significant at p &lt; 0.05? If not, which tessellation(s) show random distribution? - [ ] Which tessellation has the highest Moran’s I? (This shows the strongest clustering signal.) - [ ] How many neighbors does each tessellation average? (From Step 6.1 diagnostics.) - [ ] Can you explain <em>why</em> regular tessellations (hex/square) might differ from Voronoi in I values?</p>
+</div>
+</div>
+<p>Write 2–3 paragraphs (aim for ~400 words) addressing the following explicitly:</p>
+<p><strong>a. Tessellation Differences in Moran’s I</strong> - Do the three tessellations show noticeably different I values? (Typically they’re similar, ±0.03 of each other.) - Which tessellation has the strongest positive autocorrelation? Is it a surprise? - Are all results significant at p &lt; 0.05, or do some show random distribution?</p>
+<p><strong>b. Why Tessellation Choice Drives Differences</strong> - Regular tessellations (hex/square): predictable neighbor counts → stable I estimates - Voronoi: variable neighbor counts → potentially different I because neighborhood structure is irregular - Finer tessellations (more tiles): smaller areas per tile → may capture local clustering better or create artificial boundaries - Use your Step 6.1 diagnostics (number of tiles, average neighbors) to ground this explanation</p>
+<p><strong>c.&nbsp;What Moran’s I Tells Us About Dams</strong> - Positive I &gt; 0.3 (significant): Genuine clustering — dams preferentially locate in high-density zones (e.g., Tennessee Valley, California, Pacific Northwest) - Positive I &lt; 0.1 or non-significant: Random or weakly structured — dam distribution doesn’t follow strong geographic neighborhoods - Your results likely show 0.3–0.4 range and significance, meaning dam clustering is real and not random</p>
+<p><strong>d.&nbsp;MAUP in Practice — The Policy Implication (Most Important)</strong> - <strong>The problem</strong>: A policy maker receives two reports using the same dam data but different tessellations. Report 1 claims “I=0.41, dams highly clustered.” Report 2 claims “I=0.35, clustering weaker.” Both are true depending on tessellation choice. - <strong>Your explanation</strong>: The tessellation defines what “neighbors” means. Regular grids produce consistent neighborhoods; Voronoi produces irregular ones. Different neighborhoods → different statistical results → potentially different policy conclusions. - <strong>Defensibility</strong>: Which scale is best for policy? - If policy cares about state-level coordination: use counties or larger grid cells - If policy cares about local projects: use smaller tessellations (hexagons, squares) - Your answer should identify which tessellation you’d recommend from Q3 and <em>why its scale aligns with decision-making units</em></p>
+</section>
+<section id="step-6.4-graduate-level-extension" class="level3">
+<h3 class="anchored" data-anchor-id="step-6.4-graduate-level-extension">Step 6.4 <em>(Graduate-Level Extension)</em></h3>
+<p><strong>Sensitivity Analysis: How does Moran’s I change with distance-based neighborhoods?</strong></p>
+<p>The touching-predicate (<code>st_touches</code>) captures <strong>immediate geographic neighbors</strong> (tiles that share boundaries). But spatial clustering can occur at <em>multiple scales</em>. A dam built in 2020 in Colorado might correlate with others built in 2020 in neighboring Arizona (immediate scale) <em>and</em> with others across the Mountain West (regional scale, 200+ km away). This extension tests: <strong>At what spatial scale does dam age (or count) clustering become apparent?</strong></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Extension Design
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Instead of touching boundaries, compute Moran’s I using <strong>distance-based neighborhoods</strong>: two tile centroids are considered neighbors if they’re within X km of each other.</p>
+<p>Test three distance thresholds: - <strong>25 km</strong>: Local neighborhood (1–2 tile widths apart; captures immediate clustering) - <strong>50 km</strong>: Regional neighborhood (3–5 tile widths; captures sub-regional patterns) - <strong>100 km</strong>: Macro neighborhood (10+ tile widths; captures large-scale structure)</p>
+<p>Compare Moran’s I across thresholds. If dam clustering is strongest at 25 km, it’s <strong>locally driven</strong> (adjacency matters). If strongest at 100 km, clustering is <strong>regional</strong> (state/basin-level hydrology). If similar across all scales, clustering is <strong>robust</strong> at multiple scales.</p>
+<p><strong>Estimate time: 15 minutes</strong></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Distance Computation Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>st_distance()</code> returns a dense matrix where <code>[i, j]</code> = distance from tile i to tile j. For 300+ tiles, this creates a ~300×300 matrix (~90K entries). This is fine in memory but noticeably slower to compute than sparse boolean matrices. For real projects with 10,000+ tiles, sparse distance matrices or geohash-based indices are preferred.</p>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP A: Compute distance matrix between tile centroids (hexagon grid)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the centroids of your hexagon tiles</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>hex_centroids <span class="ot">&lt;-</span> <span class="fu">st_centroid</span>(hex_grid_dams)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>distance_matrix <span class="ot">&lt;-</span> <span class="fu">st_distance</span>(hex_centroids)  <span class="co"># Returns units::units object in meters</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to km</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>distance_matrix_km <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(distance_matrix) <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(distance_matrix_km) <span class="ot">&lt;-</span> <span class="fu">dim</span>(distance_matrix)  <span class="co"># Restore matrix structure</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP B: Create neighbor matrices for three distance thresholds</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co"># A tile is its own neighbor at distance 0; exclude self with diag() &lt;- 0</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>create_distance_neighbors <span class="ot">&lt;-</span> <span class="cf">function</span>(dist_matrix_km, threshold_km) {</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  neighbor_matrix <span class="ot">&lt;-</span> (dist_matrix_km <span class="sc">&lt;=</span> threshold_km) <span class="sc">*</span> <span class="dv">1</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">diag</span>(neighbor_matrix) <span class="ot">&lt;-</span> <span class="dv">0</span>  <span class="co"># Exclude self-neighbors</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Row-standardize</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  neighbor_weights <span class="ot">&lt;-</span> neighbor_matrix <span class="sc">/</span> <span class="fu">rowSums</span>(neighbor_matrix)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  neighbor_weights[<span class="sc">!</span><span class="fu">is.finite</span>(neighbor_weights)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(neighbor_weights)</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>weights_25km <span class="ot">&lt;-</span> <span class="fu">create_distance_neighbors</span>(distance_matrix_km, <span class="at">threshold_km =</span> <span class="dv">25</span>)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>weights_50km <span class="ot">&lt;-</span> <span class="fu">create_distance_neighbors</span>(distance_matrix_km, <span class="at">threshold_km =</span> <span class="dv">50</span>)</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>weights_100km <span class="ot">&lt;-</span> <span class="fu">create_distance_neighbors</span>(distance_matrix_km, <span class="at">threshold_km =</span> <span class="dv">100</span>)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify neighbor counts change as expected</span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Neighbors within 25 km:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Average neighbors per tile:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(weights_25km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Range:"</span>, <span class="fu">min</span>(<span class="fu">rowSums</span>(weights_25km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="st">"to"</span>, <span class="fu">max</span>(<span class="fu">rowSums</span>(weights_25km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Neighbors within 50 km:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Average neighbors per tile:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(weights_50km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Range:"</span>, <span class="fu">min</span>(<span class="fu">rowSums</span>(weights_50km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="st">"to"</span>, <span class="fu">max</span>(<span class="fu">rowSums</span>(weights_50km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Neighbors within 100 km:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Average neighbors per tile:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(weights_100km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Range:"</span>, <span class="fu">min</span>(<span class="fu">rowSums</span>(weights_100km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="st">"to"</span>, <span class="fu">max</span>(<span class="fu">rowSums</span>(weights_100km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP C: Recompute Moran's I for each distance threshold</span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>dam_counts_hex <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>n</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>morans_25 <span class="ot">&lt;-</span> ape<span class="sc">::</span><span class="fu">Moran.I</span>(<span class="at">x =</span> dam_counts_hex, <span class="at">weight =</span> weights_25km)</span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>morans_50 <span class="ot">&lt;-</span> ape<span class="sc">::</span><span class="fu">Moran.I</span>(<span class="at">x =</span> dam_counts_hex, <span class="at">weight =</span> weights_50km)</span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a>morans_100 <span class="ot">&lt;-</span> ape<span class="sc">::</span><span class="fu">Moran.I</span>(<span class="at">x =</span> dam_counts_hex, <span class="at">weight =</span> weights_100km)</span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP D: Compare results in a summary table</span></span>
+<span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a>distance_sensitivity <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb16-51"><a href="#cb16-51" aria-hidden="true" tabindex="-1"></a>  <span class="at">distance_threshold_km =</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">50</span>, <span class="dv">100</span>),</span>
+<span id="cb16-52"><a href="#cb16-52" aria-hidden="true" tabindex="-1"></a>  <span class="at">morans_i =</span> <span class="fu">c</span>(</span>
+<span id="cb16-53"><a href="#cb16-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_25<span class="sc">$</span>observed, <span class="dv">4</span>),</span>
+<span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_50<span class="sc">$</span>observed, <span class="dv">4</span>),</span>
+<span id="cb16-55"><a href="#cb16-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_100<span class="sc">$</span>observed, <span class="dv">4</span>)</span>
+<span id="cb16-56"><a href="#cb16-56" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_value =</span> <span class="fu">c</span>(</span>
+<span id="cb16-58"><a href="#cb16-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_25<span class="sc">$</span>p.value, <span class="dv">4</span>),</span>
+<span id="cb16-59"><a href="#cb16-59" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_50<span class="sc">$</span>p.value, <span class="dv">4</span>),</span>
+<span id="cb16-60"><a href="#cb16-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(morans_100<span class="sc">$</span>p.value, <span class="dv">4</span>)</span>
+<span id="cb16-61"><a href="#cb16-61" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-62"><a href="#cb16-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">avg_neighbors =</span> <span class="fu">c</span>(</span>
+<span id="cb16-63"><a href="#cb16-63" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(weights_25km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="dv">2</span>),</span>
+<span id="cb16-64"><a href="#cb16-64" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(weights_50km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="dv">2</span>),</span>
+<span id="cb16-65"><a href="#cb16-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">rowSums</span>(weights_100km <span class="sc">&gt;</span> <span class="dv">0</span>)), <span class="dv">2</span>)</span>
+<span id="cb16-66"><a href="#cb16-66" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-67"><a href="#cb16-67" aria-hidden="true" tabindex="-1"></a>  <span class="at">significant =</span> <span class="fu">c</span>(</span>
+<span id="cb16-68"><a href="#cb16-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(morans_25<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"Yes***"</span>, <span class="st">"No"</span>),</span>
+<span id="cb16-69"><a href="#cb16-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(morans_50<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"Yes***"</span>, <span class="st">"No"</span>),</span>
+<span id="cb16-70"><a href="#cb16-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(morans_100<span class="sc">$</span>p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"Yes***"</span>, <span class="st">"No"</span>)</span>
+<span id="cb16-71"><a href="#cb16-71" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-72"><a href="#cb16-72" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-73"><a href="#cb16-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-74"><a href="#cb16-74" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb16-75"><a href="#cb16-75" aria-hidden="true" tabindex="-1"></a>  distance_sensitivity,</span>
+<span id="cb16-76"><a href="#cb16-76" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Moran's I Sensitivity to Spatial Scale: Distance-Based Neighborhoods"</span>,</span>
+<span id="cb16-77"><a href="#cb16-77" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">4</span></span>
+<span id="cb16-78"><a href="#cb16-78" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-79"><a href="#cb16-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-80"><a href="#cb16-80" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">### Interpretation Guide:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-81"><a href="#cb16-81" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"- If Moran's I **decreases** as distance increases (e.g., 0.40 → 0.25 → 0.10):</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-82"><a href="#cb16-82" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Dam clustering is **LOCAL** (immediate neighbors matter most). Dams tend to cluster</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-83"><a href="#cb16-83" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  in small regions; distant dams don't share the clustering pattern.</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb16-84"><a href="#cb16-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-85"><a href="#cb16-85" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"- If Moran's I **stays similar** across all distances (e.g., 0.35 → 0.34 → 0.36):</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-86"><a href="#cb16-86" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Clustering is **ROBUST** (operates at multiple scales). Dam patterns persist whether</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-87"><a href="#cb16-87" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  you look at immediate or regional neighborhoods. Suggests water strategy is coherent</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-88"><a href="#cb16-88" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  across large geographic extents (e.g., nationwide infrastructure policy).</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb16-89"><a href="#cb16-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-90"><a href="#cb16-90" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"- If Moran's I **stays low/insignificant** across all distances:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-91"><a href="#cb16-91" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  Dam distribution is **RANDOM** (not spatially structured). No clustering at any scale.</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Write 2–3 sentences summarizing your findings:</strong></p>
+<hr>
+</section>
+</section>
+<section id="question-7-spatial-correlation-of-dam-attributes-introduction-to-spatial-regression" class="level1">
+<h1>Question 7: Spatial Correlation of Dam Attributes — Introduction to Spatial Regression</h1>
+<p>Dam characteristics—such as <strong>age, surface area, storage capacity, and purpose</strong>—vary geographically. Understanding the spatial structure of these relationships is foundational to spatial regression modeling (upcoming topics). In this question, you’ll examine whether dam attributes exhibit <strong>spatial dependence</strong> and assess whether neighboring tiles have correlated characteristics.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Spatial Regression Motivation (Week 3-1 Foundation)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Standard regression assumes observations are <strong>independent</strong>. But spatial data often violates this: dams in the Pacific Northwest likely share design and management practices, leading to <strong>spatially correlated residuals</strong>. This spatial dependence can bias confidence intervals and inflate significance tests in standard OLS regression.</p>
+<p>The solution involves <strong>spatial lag models</strong> (Spatial Autoregressive, SAR) or <strong>spatial error models</strong> (SEM) that explicitly model dependence via neighbor relationships. This lab asks: <em>Do your tessellation neighborhoods reveal spatial structure in dam attributes?</em></p>
+</div>
+</div>
+<section id="step-7.1" class="level3">
+<h3 class="anchored" data-anchor-id="step-7.1">Step 7.1</h3>
+<p><strong>Aggregate Dam Attributes by Tile</strong></p>
+<p>Using your chosen tessellation from Q3, compute <strong>mean and variance</strong> of key dam attributes within each tile. The NID dataset typically includes:</p>
+<ul>
+<li><strong>Age</strong>: <code>year_completed</code> or similar (compute mean age per tile)</li>
+<li><strong>Size</strong>: <code>surface_area_acres</code> or <code>normal_pool_elevation</code> (compute mean per tile)</li>
+<li><strong>Purpose codes</strong>: <code>purposes</code> field (compute dominant purpose per tile; count of dams by purpose)</li>
+</ul>
+<p>Aggregate as follows:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step A: Join dams to tessellation tiles</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>dams_by_tile <span class="ot">&lt;-</span> <span class="fu">st_join</span>(your_tessellation, dams2) <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tile_id) <span class="sc">%&gt;%</span>  <span class="co"># assumes tile_id column exists</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_dams =</span> <span class="fu">n</span>(),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_year_completed =</span> <span class="fu">mean</span>(year_completed, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_surface_area =</span> <span class="fu">mean</span>(surface_area_acres, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Step B: Re-join to tessellation geometry</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>tile_attributes <span class="ot">&lt;-</span> your_tessellation <span class="sc">%&gt;%</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dams_by_tile, <span class="at">by =</span> <span class="st">"tile_id"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">n_dams =</span> <span class="dv">0</span>, <span class="at">mean_year_completed =</span> <span class="cn">NA</span>, <span class="at">mean_surface_area =</span> <span class="cn">NA</span>))</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Step C: Inspect the distribution</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tile_attributes<span class="sc">$</span>mean_year_completed)</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tile_attributes<span class="sc">$</span>mean_surface_area)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Produce visualizations</strong> showing spatial patterns:</p>
+<ul>
+<li>Map 1: Mean dam age by tile (use viridis scale)</li>
+<li>Map 2: Mean surface area by tile</li>
+<li>Map 3: Dam count by tile (you already have this from Q3)</li>
+</ul>
+<p>Do you see geographic clustering of old vs.&nbsp;new dams? Large vs.&nbsp;small dams?</p>
+</section>
+<section id="step-7.2" class="level3">
+<h3 class="anchored" data-anchor-id="step-7.2">Step 7.2</h3>
+<p><strong>Neighbor Correlation: Local Spatial Variation</strong></p>
+<p>For your tessellation’s neighbor matrix (from Q6), compute the <strong>spatial lag</strong> of dam attributes: the average value of an attribute in a tile’s neighbors. This reveals whether <em>spatial neighbors have similar dam attributes</em>—a key signal that observations are <strong>not independent</strong> (violating OLS assumptions).</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Critical: NA Handling in Spatial Lag Calculations
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Many tiles may have <strong>zero dams</strong> (NAs for attributes like mean_year_completed, mean_surface_area). When you compute the spatial lag via matrix multiplication, these NAs propagate and can cause <code>cor()</code> to fail with “no complete element pairs.”</p>
+<p><strong>Solution: Impute before spatial lag calculation</strong></p>
+<ol type="1">
+<li>Replace NAs in the attribute with the <strong>global mean</strong> (mean across all tiles, ignoring NAs)</li>
+<li>Compute the spatial lag on the imputed data</li>
+<li>When correlating, use <strong>only tiles that had original data</strong> (not imputed)</li>
+</ol>
+<p>This preserves statistical integrity: neighbors’ contributions are computed correctly, but you only correlate where real observations exist.</p>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP A: Prepare attributes with NA imputation</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Using your hexagon tessellation from Q3 (or whichever you chose)</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Attribute 1: Dam count (likely complete, but handle nulls just in case)</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>dam_count <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>n</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>dam_count[<span class="fu">is.na</span>(dam_count)] <span class="ot">&lt;-</span> <span class="dv">0</span>  <span class="co"># Count is 0 if no dams in tile</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Attribute 2: Mean year completed (will have NAs for tiles with 0 dams)</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>year_completed <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>mean_year_completed</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>year_completed_impute <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">is.na</span>(year_completed),</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(year_completed, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),  <span class="co"># Global mean</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  year_completed</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>valid_year <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.na</span>(hex_grid_dams<span class="sc">$</span>mean_year_completed)  <span class="co"># Track original data</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Attribute 3: Mean surface area</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>surface_area <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>mean_surface_area</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>surface_area_impute <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">is.na</span>(surface_area),</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(surface_area, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>  surface_area</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>valid_area <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.na</span>(hex_grid_dams<span class="sc">$</span>mean_surface_area)</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP B: Compute spatial lags using imputed data</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Reuse neighbor_weights_hex from Q6.1</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>spatial_lag_count <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(neighbor_weights_hex <span class="sc">%*%</span> dam_count)</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>spatial_lag_year <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(neighbor_weights_hex <span class="sc">%*%</span> year_completed_impute)</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>spatial_lag_area <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(neighbor_weights_hex <span class="sc">%*%</span> surface_area_impute)</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP C: Correlate original (non-imputed) values with spatial lag</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Use logical flags to filter</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>cor_count <span class="ot">&lt;-</span> <span class="fu">cor</span>(dam_count, spatial_lag_count, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>cor_year <span class="ot">&lt;-</span> <span class="fu">cor</span>(</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>  year_completed[valid_year],</span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>  spatial_lag_year[valid_year],</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">use =</span> <span class="st">"complete.obs"</span></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>cor_area <span class="ot">&lt;-</span> <span class="fu">cor</span>(</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>  surface_area[valid_area],</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>  spatial_lag_area[valid_area],</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">use =</span> <span class="st">"complete.obs"</span></span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Correlations between attributes and spatial lag:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Dam count:"</span>, <span class="fu">round</span>(cor_count, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean year completed:"</span>, <span class="fu">round</span>(cor_year, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean surface area:"</span>, <span class="fu">round</span>(cor_area, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Interpretation ranges:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"0.6–1.0: Strong spatial clustering</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"0.3–0.6: Moderate spatial dependence</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"0.0–0.3: Weak spatial structure</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Negative: Spatial anticorrelation (rare)</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Summarize in a table</strong>:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>attribute_spatial_dependence <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">attribute =</span> <span class="fu">c</span>(<span class="st">"Dam Count"</span>, <span class="st">"Mean Year Completed"</span>, <span class="st">"Mean Surface Area"</span>),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">correlation_with_lag =</span> <span class="fu">c</span>(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(cor_count, <span class="dv">3</span>),</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(cor_year, <span class="dv">3</span>),</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(cor_area, <span class="dv">3</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">strength =</span> <span class="fu">c</span>(</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(cor_count <span class="sc">&gt;</span> <span class="fl">0.6</span>, <span class="st">"Strong"</span>, <span class="fu">ifelse</span>(cor_count <span class="sc">&gt;</span> <span class="fl">0.3</span>, <span class="st">"Moderate"</span>, <span class="st">"Weak"</span>)),</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(cor_year <span class="sc">&gt;</span> <span class="fl">0.6</span>, <span class="st">"Strong"</span>, <span class="fu">ifelse</span>(cor_year <span class="sc">&gt;</span> <span class="fl">0.3</span>, <span class="st">"Moderate"</span>, <span class="st">"Weak"</span>)),</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(cor_area <span class="sc">&gt;</span> <span class="fl">0.6</span>, <span class="st">"Strong"</span>, <span class="fu">ifelse</span>(cor_area <span class="sc">&gt;</span> <span class="fl">0.3</span>, <span class="st">"Moderate"</span>, <span class="st">"Weak"</span>))</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  attribute_spatial_dependence,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Spatial Lag Correlation: Do Neighboring Tiles Have Similar Attributes?"</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">→ If all correlations are &gt; 0.5, strong spatial dependence is present.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  This violates OLS independence assumption → spatial regression needed.</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="step-7.3" class="level3">
+<h3 class="anchored" data-anchor-id="step-7.3">Step 7.3</h3>
+<p><strong>Visualize Spatial Autocorrelation: Scatterplot of Attribute vs.&nbsp;Spatial Lag</strong></p>
+<p>Create a <strong>Moran’s I scatterplot</strong> (also called a Moran plot) showing: - X-axis: Original dam attribute (e.g., mean year completed) — standardized - Y-axis: Spatial lag of that attribute — standardized<br>
+- Points: One per tile, colored by quadrant - Quadrants: High-High (both high), Low-Low (both low), High-Low (outlier high), Low-High (outlier low)</p>
+<p>This visualizes <strong>Local Indicators of Spatial Association (LISA)</strong>: which tiles are clusters vs.&nbsp;outliers relative to their neighbors.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Standardization Details
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Why standardize?</strong> Centering and scaling puts the attribute and spatial lag on the same scale (mean=0, SD=1), making it easy to identify quadrants and interpret outliers.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scale</span>(x, <span class="at">center=</span><span class="cn">TRUE</span>, <span class="at">scale=</span><span class="cn">TRUE</span>)[, <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Returns a numeric vector (not a matrix). Use <code>[, 1]</code> to extract it, or use <code>as.vector()</code> explicitly.</p>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using your hexagon tiles with mean_year_completed (or your chosen attribute)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP A: Standardize the original attribute (careful with NAs!)</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Only standardize tiles with actual data (not imputed)</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>year_data <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>mean_year_completed[valid_year]</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>lag_data <span class="ot">&lt;-</span> spatial_lag_year[valid_year]</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>x_std <span class="ot">&lt;-</span> <span class="fu">scale</span>(year_data, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale =</span> <span class="cn">TRUE</span>)[, <span class="dv">1</span>]</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>lag_std <span class="ot">&lt;-</span> <span class="fu">scale</span>(lag_data, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale =</span> <span class="cn">TRUE</span>)[, <span class="dv">1</span>]</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP B: Create a data frame for plotting (only tiles with valid data)</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">x_std =</span> x_std,</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag_std =</span> lag_std,</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">tile_id =</span> <span class="fu">which</span>(valid_year)  <span class="co"># Index of valid tiles</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">x_cat =</span> <span class="fu">ifelse</span>(x_std <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"High"</span>, <span class="st">"Low"</span>),</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">lag_cat =</span> <span class="fu">ifelse</span>(lag_std <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"High"</span>, <span class="st">"Low"</span>),</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">quadrant =</span> <span class="fu">paste</span>(x_cat, lag_cat, <span class="at">sep =</span> <span class="st">"-"</span>)</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">quadrant =</span> <span class="fu">factor</span>(quadrant, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"High-High"</span>, <span class="st">"Low-Low"</span>, <span class="st">"High-Low"</span>, <span class="st">"Low-High"</span>))</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Count points in each quadrant</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>quadrant_counts <span class="ot">&lt;-</span> <span class="fu">table</span>(plot_data<span class="sc">$</span>quadrant)</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Tiles by quadrant:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(quadrant_counts)</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP C: Create Moran scatterplot</span></span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> x_std, <span class="at">y =</span> lag_std, <span class="at">color =</span> quadrant, <span class="at">fill =</span> quadrant)) <span class="sc">+</span></span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.65</span>) <span class="sc">+</span></span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray40"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray40"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add a regression line through origin (optional, illustrates positive slope)</span></span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"gray50"</span>, <span class="at">linetype =</span> <span class="st">"dotted"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-High"</span> <span class="ot">=</span> <span class="st">"#e41a1c"</span>,</span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-Low"</span> <span class="ot">=</span> <span class="st">"#377eb8"</span>,</span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-Low"</span> <span class="ot">=</span> <span class="st">"#ff7f00"</span>,</span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-High"</span> <span class="ot">=</span> <span class="st">"#4daf4a"</span></span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(</span>
+<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-High"</span> <span class="ot">=</span> <span class="st">"#e41a1c"</span>,</span>
+<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-Low"</span> <span class="ot">=</span> <span class="st">"#377eb8"</span>,</span>
+<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-Low"</span> <span class="ot">=</span> <span class="st">"#ff7f00"</span>,</span>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-High"</span> <span class="ot">=</span> <span class="st">"#4daf4a"</span></span>
+<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Moran Scatterplot: Dam Age and Spatial Lag"</span>,</span>
+<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"LISA (Local Indicators of Spatial Association) by Quadrant"</span>,</span>
+<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Mean Dam Age (standardized)"</span>,</span>
+<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Spatial Lag of Mean Dam Age (standardized)"</span>,</span>
+<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Quadrant"</span>,</span>
+<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Quadrant"</span>,</span>
+<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="fu">paste0</span>(</span>
+<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-High (red): clusters of old dams | Low-Low (blue): clusters of young dams</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-Low (orange): isolated old regions | Low-High (green): isolated young regions"</span></span>
+<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"gray50"</span>)</span>
+<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Alternative: Map the quadrants geographically</strong></p>
+<p>If you want to see <em>where</em> the clusters and outliers are:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>hex_grid_dams_for_map <span class="ot">&lt;-</span> hex_grid_dams[valid_year, ] <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">x_std =</span> x_std,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">lag_std =</span> lag_std,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">quadrant =</span> plot_data<span class="sc">$</span>quadrant</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(hex_grid_dams_for_map) <span class="sc">+</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> quadrant), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-High"</span> <span class="ot">=</span> <span class="st">"#e41a1c"</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-Low"</span> <span class="ot">=</span> <span class="st">"#377eb8"</span>,</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-Low"</span> <span class="ot">=</span> <span class="st">"#ff7f00"</span>,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-High"</span> <span class="ot">=</span> <span class="st">"#4daf4a"</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Geographic Distribution of LISA Quadrants (Dam Age)"</span>,</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Quadrant"</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="step-7.4" class="level3">
+<h3 class="anchored" data-anchor-id="step-7.4">Step 7.4</h3>
+<p><strong>Interpretation and Implication for Spatial Regression</strong></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Writing Guide: Spatial Correlation Interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use this structure to organize your response:</p>
+<ol type="1">
+<li><strong>State your findings clearly</strong> — cite specific correlation values and quadrant counts from your Moran plot.</li>
+<li><strong>Connect to underlying geography</strong> — which regions show clustering? (e.g., “High-High points cluster in Tennessee Valley…”)</li>
+<li><strong>Explain why</strong> — relate to dam history, geology, hydrology, or policy (e.g., “TVA region constructed multiple dams in 1930s–1950s, explaining age clustering”)</li>
+<li><strong>Conclude on spatial regression necessity</strong> — if correlations &gt;0.5, OLS assumes violate independence; SAR models needed.</li>
+</ol>
+</div>
+</div>
+<p>Write 2–3 paragraphs (400–600 words) addressing:</p>
+<p><strong>a. Spatial Clustering of Dam Attributes (Quantitative)</strong></p>
+<p>Which attributes show the strongest spatial lag correlations (from your Step 7.2 table)? Are correlations &gt; 0.5 (strong) or 0.2–0.5 (moderate)? Are some attributes more clustered than others? For example:</p>
+<ul>
+<li><strong>Dam <em>count</em></strong>: Often strongly correlated (r &gt; 0.6) because dam density physically creates neighbors with many dams.</li>
+<li><strong>Dam <em>age</em></strong>: May show moderate to strong clustering (r = 0.4–0.7) if dams were built in regionally-coherent eras (e.g., 1930s TVA construction, 1960s-70s Western expansion).</li>
+<li><strong>Dam <em>size</em></strong>: Moderate clustering expected if geology/hydrology favors larger dams in certain regions.</li>
+</ul>
+<p>For each attribute, interpret: does the correlation make geographic sense? Why should dam age or size be similar in neighboring regions?</p>
+<p><strong>b. Outliers and Anomalies (Qualitative + Geographic)</strong></p>
+<p>From your Moran scatterplot / LISA map:</p>
+<ul>
+<li><strong>High-High clusters</strong> (e.g., upper right quadrant, red points): These are regions where old dams are surrounded by old dams (or high-count tiles surrounded by high-count tiles). Where are they? (e.g., Tennessee Valley, Arkansas River, California Central Valley)</li>
+<li><strong>Low-Low clusters</strong> (e.g., lower left, blue): Young dams or sparse dams surrounded by similar neighbors. Typical of Mountain West or recent development areas.</li>
+<li><strong>High-Low outliers</strong> (orange): Isolated regions of old/dense dams surrounded by young/sparse neighbors. Can you spot any? These might represent historical dam sites (single large project) or regional anomalies.</li>
+<li><strong>Low-High outliers</strong> (green): Rare—regions of young/sparse dams surrounded by old/dense. Think about where this occurs and why.</li>
+</ul>
+<p><strong>If you have a geographic map</strong> of the LISA quadrants, describe 1–2 specific regions and why they’re outliers. If you created a visualization, reference it.</p>
+<p><strong>c.&nbsp;Spatial Regression Necessity (Statistical Inference)</strong></p>
+<p>This is the crux: <strong>If dam attributes are spatially autocorrelated, OLS regression violates the independence assumption</strong>, leading to: - Biased standard errors (usually too narrow) → inflated t-statistics and false positives - Inefficient parameter estimates - Invalid confidence intervals and p-values</p>
+<p><strong>Your conclusion should address:</strong></p>
+<ul>
+<li><strong>Do your results support spatial modeling?</strong> If correlations &gt; 0.5 across attributes and Moran’s I was significant in Q6, yes.</li>
+<li><strong>Which spatial model?</strong>
+<ul>
+<li><strong>Spatial Lag (SAR)</strong> model if dependent variable depends on neighbors (e.g., dam size influenced by neighbor sizes)</li>
+<li><strong>Spatial Error (SEM)</strong> model if omitted variables create spatial structure in residuals</li>
+<li>For dam attributes, <strong>SAR is more intuitive</strong>: managing one dam influences decisions about neighboring dams (environmental flows, coordination).</li>
+</ul></li>
+<li><strong>Which tessellation for spatial models?</strong> The tessellation from Q3 with <strong>regular neighborhoods</strong> (hexagons or squares) and <strong>moderate tile counts</strong> (e.g., 100–500 tiles) provides stable neighbors. Too fine → too many neighbors; too coarse → not enough detail.</li>
+</ul>
+<p><strong>Closing sentence</strong>: “Given evidence of spatial autocorrelation in dam attributes (r = X–Y), a spatial regression model is warranted for any subsequent analysis of dam characteristics. Standard OLS would underestimate uncertainty and potentially mislead policy decisions.”</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script>
+  Reveal.addEventListener( 'slidechanged', function( event ) {
+    console.log("hello")
+    
+    slide_id = event.currentSlide.id
+    link = "annotations" + ".html#" + slide_id
+    
+    var annotation_div = document.createElement('div')
+    annotation_div.setAttribute("class", "annotation-link")
+    
+    var notes_link = document.createElement('a')
+    notes_link.setAttribute("href", link)
+    notes_link.setAttribute("target", "_blank")
+    
+    var iii = document.createElement('i')
+    iii.setAttribute("class", "fa fa-info")
+    notes_link.appendChild(iii)
+    
+    annotation_div.appendChild(notes_link)
+    
+    var tmp = event.currentTarget.getElementsByClassName("annotation-link")
+    if (tmp.length === 1) {
+      tmp[0].remove()
+    }
+    
+    if (event.currentSlide.classList.contains("annotation")) {
+      event.currentTarget.append(annotation_div)
+    }
+  } );
+
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
