@@ -706,7 +706,7 @@
 <div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a>ca_sb <span class="ot">=</span> <span class="fu">point_in_polygon</span>(starbucks, </span>
 <span id="cb27-2"><a></a>                         <span class="fu">filter</span>(counties, state_name <span class="sc">==</span> <span class="st">"California"</span>))</span>
-<span id="cb27-3"><a></a><span class="fu">plot</span>(co_sb[<span class="st">'n'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-3"><a></a><span class="fu">plot</span>(ca_sb[<span class="st">'n'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
@@ -931,7 +931,7 @@
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a><span class="fu">point_in_polygon3</span>(starbucks, states, <span class="at">var =</span> <span class="st">"name"</span>) <span class="sc">|&gt;</span> </span>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a><span class="fu">point_in_polygon3</span>(starbucks, states, <span class="at">var =</span> <span class="st">"geoid"</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb43-2"><a></a>  <span class="fu">plot_pip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -1049,7 +1049,13 @@
 <span id="cb48-4"><a></a>       (x<span class="sc">$</span>geometry[[<span class="dv">1</span>]]<span class="sc">$</span>y <span class="sc">-</span> y<span class="sc">$</span>geometry[[<span class="dv">1</span>]]<span class="sc">$</span>y)<span class="sc">^</span><span class="dv">2</span>)</span>
 <span id="cb48-5"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Problems: - Assumes x and y have geometry columns - Assumes geometry is simple point data - No error handling if data is missing or malformed - Cryptic error messages if something goes wrong</p>
+<p><strong>Problems:</strong></p>
+<ul>
+<li>Assumes x and y have geometry columns</li>
+<li>Assumes geometry is simple point data</li>
+<li>No error handling if data is missing or malformed</li>
+<li>Cryptic error messages if something goes wrong</li>
+</ul>
 </section>
 <section id="trycatch-error-handling-in-r" class="slide level2">
 <h2>tryCatch: Error Handling in R</h2>
@@ -1116,7 +1122,13 @@
 <span id="cb51-6"><a></a><span class="fu">log_warn</span>(<span class="st">"Missing data found in column {col}"</span>)</span>
 <span id="cb51-7"><a></a><span class="fu">log_error</span>(<span class="st">"Critical error: unable to read file {filename}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Benefits: - <strong>Structured output</strong> - timestamps, log levels, consistent format - <strong>Easy filtering</strong> - can set thresholds for verbosity - <strong>Production-ready</strong> - can write to files or streaming services - <strong>Namespace-aware</strong> - tracks which function is logging</p>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li><strong>Structured output</strong> — timestamps, log levels, consistent format</li>
+<li><strong>Easy filtering</strong> — can set thresholds for verbosity</li>
+<li><strong>Production-ready</strong> — can write to files or streaming services</li>
+<li><strong>Namespace-aware</strong> — tracks which function is logging</li>
+</ul>
 </section>
 <section id="setting-log-thresholds" class="slide level2">
 <h2>Setting Log Thresholds</h2>
@@ -1133,139 +1145,71 @@
 </section>
 <section id="combining-trycatch-and-logger" class="slide level2">
 <h2>Combining tryCatch and Logger</h2>
-<div class="cell">
+<div class="cell" style="font-size: 0.95em;">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a></a>smart_point_in_polygon <span class="ot">=</span> <span class="cf">function</span>(points, polygon, var) {</span>
-<span id="cb53-2"><a></a>  </span>
-<span id="cb53-3"><a></a>  <span class="fu">log_info</span>(<span class="st">"Starting point_in_polygon: {nrow(points)} points, {nrow(polygon)} polygons"</span>)</span>
-<span id="cb53-4"><a></a>  </span>
-<span id="cb53-5"><a></a>  <span class="co"># Input validation</span></span>
-<span id="cb53-6"><a></a>  <span class="fu">tryCatch</span>(</span>
-<span id="cb53-7"><a></a>    {</span>
-<span id="cb53-8"><a></a>      <span class="cf">if</span> (<span class="sc">!</span><span class="fu">inherits</span>(points, <span class="st">"sf"</span>)) {</span>
-<span id="cb53-9"><a></a>        <span class="fu">log_error</span>(<span class="st">"Points input is not an sf object"</span>)</span>
-<span id="cb53-10"><a></a>        <span class="fu">stop</span>(<span class="st">"Points must be an sf object"</span>)</span>
-<span id="cb53-11"><a></a>      }</span>
-<span id="cb53-12"><a></a>      </span>
-<span id="cb53-13"><a></a>      <span class="cf">if</span> (<span class="sc">!</span><span class="fu">inherits</span>(polygon, <span class="st">"sf"</span>)) {</span>
-<span id="cb53-14"><a></a>        <span class="fu">log_error</span>(<span class="st">"Polygon input is not an sf object"</span>)</span>
-<span id="cb53-15"><a></a>        <span class="fu">stop</span>(<span class="st">"Polygon must be an sf object"</span>)</span>
-<span id="cb53-16"><a></a>      }</span>
-<span id="cb53-17"><a></a>      </span>
-<span id="cb53-18"><a></a>      <span class="cf">if</span> (<span class="sc">!</span>var <span class="sc">%in%</span> <span class="fu">names</span>(polygon)) {</span>
-<span id="cb53-19"><a></a>        <span class="fu">log_error</span>(<span class="st">"Variable '{var}' not found in polygon data"</span>)</span>
-<span id="cb53-20"><a></a>        <span class="fu">stop</span>(<span class="fu">paste</span>(<span class="st">"Variable"</span>, var, <span class="st">"not found"</span>))</span>
-<span id="cb53-21"><a></a>      }</span>
-<span id="cb53-22"><a></a>      </span>
-<span id="cb53-23"><a></a>      <span class="fu">log_debug</span>(<span class="st">"Inputs validated successfully"</span>)</span>
-<span id="cb53-24"><a></a>    },</span>
-<span id="cb53-25"><a></a>    <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
-<span id="cb53-26"><a></a>      <span class="fu">log_error</span>(<span class="st">"Input validation failed: {e$message}"</span>)</span>
-<span id="cb53-27"><a></a>      <span class="fu">stop</span>(e)</span>
-<span id="cb53-28"><a></a>    }</span>
-<span id="cb53-29"><a></a>  )</span>
-<span id="cb53-30"><a></a>  </span>
-<span id="cb53-31"><a></a>  <span class="co"># Main computation with error handling</span></span>
-<span id="cb53-32"><a></a>  <span class="fu">tryCatch</span>(</span>
-<span id="cb53-33"><a></a>    {</span>
-<span id="cb53-34"><a></a>      <span class="fu">log_debug</span>(<span class="st">"Performing spatial join..."</span>)</span>
-<span id="cb53-35"><a></a>      result <span class="ot">=</span> <span class="fu">st_join</span>(polygon, points) <span class="sc">|&gt;</span></span>
-<span id="cb53-36"><a></a>        <span class="fu">st_drop_geometry</span>() <span class="sc">|&gt;</span></span>
-<span id="cb53-37"><a></a>        <span class="fu">count</span>(<span class="fu">get</span>(var)) <span class="sc">|&gt;</span></span>
-<span id="cb53-38"><a></a>        <span class="fu">setNames</span>(<span class="fu">c</span>(var, <span class="st">"n"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb53-39"><a></a>        <span class="fu">left_join</span>(polygon, <span class="at">by =</span> var) <span class="sc">|&gt;</span></span>
-<span id="cb53-40"><a></a>        <span class="fu">st_as_sf</span>()</span>
-<span id="cb53-41"><a></a>      </span>
-<span id="cb53-42"><a></a>      <span class="fu">log_info</span>(<span class="st">"Success: {nrow(result)} polygons returned with point counts"</span>)</span>
-<span id="cb53-43"><a></a>      result</span>
-<span id="cb53-44"><a></a>    },</span>
-<span id="cb53-45"><a></a>    <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
-<span id="cb53-46"><a></a>      <span class="fu">log_error</span>(<span class="st">"Spatial join failed: {e$message}"</span>)</span>
-<span id="cb53-47"><a></a>      <span class="fu">stop</span>(e)</span>
-<span id="cb53-48"><a></a>    }</span>
-<span id="cb53-49"><a></a>  )</span>
-<span id="cb53-50"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb53-2"><a></a>  <span class="fu">log_info</span>(<span class="st">"Starting point_in_polygon: {nrow(points)} points, {nrow(polygon)} polygons"</span>)</span>
+<span id="cb53-3"><a></a>  </span>
+<span id="cb53-4"><a></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb53-5"><a></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">inherits</span>(points, <span class="st">"sf"</span>)) <span class="fu">stop</span>(<span class="st">"Points must be sf object"</span>)</span>
+<span id="cb53-6"><a></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">inherits</span>(polygon, <span class="st">"sf"</span>)) <span class="fu">stop</span>(<span class="st">"Polygon must be sf object"</span>)</span>
+<span id="cb53-7"><a></a>    <span class="cf">if</span> (<span class="sc">!</span>var <span class="sc">%in%</span> <span class="fu">names</span>(polygon)) <span class="fu">stop</span>(<span class="fu">paste</span>(<span class="st">"Variable"</span>, var, <span class="st">"not found"</span>))</span>
+<span id="cb53-8"><a></a>    <span class="fu">log_debug</span>(<span class="st">"Inputs validated successfully"</span>)</span>
+<span id="cb53-9"><a></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb53-10"><a></a>    <span class="fu">log_error</span>(<span class="st">"Input validation failed: {e$message}"</span>)</span>
+<span id="cb53-11"><a></a>    <span class="fu">stop</span>(e)</span>
+<span id="cb53-12"><a></a>  })</span>
+<span id="cb53-13"><a></a>  </span>
+<span id="cb53-14"><a></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb53-15"><a></a>    <span class="fu">log_debug</span>(<span class="st">"Performing spatial join..."</span>)</span>
+<span id="cb53-16"><a></a>    result <span class="ot">=</span> <span class="fu">st_join</span>(polygon, points) <span class="sc">|&gt;</span></span>
+<span id="cb53-17"><a></a>      <span class="fu">st_drop_geometry</span>() <span class="sc">|&gt;</span> <span class="fu">count</span>(<span class="fu">get</span>(var)) <span class="sc">|&gt;</span></span>
+<span id="cb53-18"><a></a>      <span class="fu">setNames</span>(<span class="fu">c</span>(var, <span class="st">"n"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb53-19"><a></a>      <span class="fu">left_join</span>(polygon, <span class="at">by =</span> var) <span class="sc">|&gt;</span> <span class="fu">st_as_sf</span>()</span>
+<span id="cb53-20"><a></a>    </span>
+<span id="cb53-21"><a></a>    <span class="fu">log_info</span>(<span class="st">"Success: {nrow(result)} polygons returned"</span>)</span>
+<span id="cb53-22"><a></a>    result</span>
+<span id="cb53-23"><a></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb53-24"><a></a>    <span class="fu">log_error</span>(<span class="st">"Spatial join failed: {e$message}"</span>)</span>
+<span id="cb53-25"><a></a>    <span class="fu">stop</span>(e)</span>
+<span id="cb53-26"><a></a>  })</span>
+<span id="cb53-27"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="verbose-function-example-defensive-pip" class="slide level2">
 <h2>Verbose Function Example: Defensive PIP</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a></a><span class="fu">library</span>(logger)</span>
-<span id="cb54-2"><a></a></span>
-<span id="cb54-3"><a></a>point_in_polygon_safe <span class="ot">=</span> <span class="cf">function</span>(points, polygon, var) {</span>
-<span id="cb54-4"><a></a>  </span>
-<span id="cb54-5"><a></a>  <span class="fu">log_info</span>(<span class="st">"="</span><span class="sc">*</span><span class="dv">50</span>)</span>
-<span id="cb54-6"><a></a>  <span class="fu">log_info</span>(<span class="st">"Starting point_in_polygon_safe()"</span>)</span>
-<span id="cb54-7"><a></a>  <span class="fu">log_info</span>(<span class="st">"Input: {nrow(points)} points"</span>)</span>
-<span id="cb54-8"><a></a>  <span class="fu">log_info</span>(<span class="st">"Input: {nrow(polygon)} polygons"</span>)</span>
-<span id="cb54-9"><a></a>  <span class="fu">log_info</span>(<span class="st">"Variable: {var}"</span>)</span>
-<span id="cb54-10"><a></a>  </span>
-<span id="cb54-11"><a></a>  <span class="co"># Validate and report on inputs</span></span>
-<span id="cb54-12"><a></a>  <span class="fu">tryCatch</span>(</span>
-<span id="cb54-13"><a></a>    {</span>
-<span id="cb54-14"><a></a>      <span class="fu">log_debug</span>(<span class="st">"Checking point geometry type..."</span>)</span>
-<span id="cb54-15"><a></a>      <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(<span class="fu">st_geometry_type</span>(points) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"POINT"</span>, <span class="st">"MULTIPOINT"</span>))) {</span>
-<span id="cb54-16"><a></a>        <span class="fu">log_warn</span>(<span class="st">"Some point geometries are not simple points"</span>)</span>
-<span id="cb54-17"><a></a>      } <span class="cf">else</span> {</span>
-<span id="cb54-18"><a></a>        <span class="fu">log_debug</span>(<span class="st">"All points are valid POINT geometries"</span>)</span>
-<span id="cb54-19"><a></a>      }</span>
-<span id="cb54-20"><a></a>      </span>
-<span id="cb54-21"><a></a>      <span class="fu">log_debug</span>(<span class="st">"Checking polygon geometry type..."</span>)</span>
-<span id="cb54-22"><a></a>      <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(<span class="fu">st_geometry_type</span>(polygon) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"POLYGON"</span>, <span class="st">"MULTIPOLYGON"</span>))) {</span>
-<span id="cb54-23"><a></a>        <span class="fu">log_error</span>(<span class="st">"Not all geometries are polygons!"</span>)</span>
-<span id="cb54-24"><a></a>        <span class="fu">stop</span>(<span class="st">"Polygon input must contain polygon geometries"</span>)</span>
-<span id="cb54-25"><a></a>      }</span>
-<span id="cb54-26"><a></a>      <span class="fu">log_debug</span>(<span class="st">"All polygons are valid POLYGON geometries"</span>)</span>
-<span id="cb54-27"><a></a>      </span>
-<span id="cb54-28"><a></a>      <span class="co"># Check CRS match</span></span>
-<span id="cb54-29"><a></a>      <span class="cf">if</span> (<span class="fu">st_crs</span>(points) <span class="sc">!=</span> <span class="fu">st_crs</span>(polygon)) {</span>
-<span id="cb54-30"><a></a>        <span class="fu">log_warn</span>(<span class="st">"CRS mismatch detected"</span>)</span>
-<span id="cb54-31"><a></a>        <span class="fu">log_info</span>(<span class="st">"Transforming points to polygon CRS"</span>)</span>
-<span id="cb54-32"><a></a>        points <span class="ot">=</span> <span class="fu">st_transform</span>(points, <span class="fu">st_crs</span>(polygon))</span>
-<span id="cb54-33"><a></a>      } <span class="cf">else</span> {</span>
-<span id="cb54-34"><a></a>        <span class="fu">log_debug</span>(<span class="st">"CRS match confirmed: {st_crs(polygon)$epsg}"</span>)</span>
-<span id="cb54-35"><a></a>      }</span>
-<span id="cb54-36"><a></a>      </span>
-<span id="cb54-37"><a></a>    },</span>
-<span id="cb54-38"><a></a>    <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
-<span id="cb54-39"><a></a>      <span class="fu">log_error</span>(<span class="st">"Validation failed: {e$message}"</span>)</span>
-<span id="cb54-40"><a></a>      <span class="fu">stop</span>(e)</span>
-<span id="cb54-41"><a></a>    }</span>
-<span id="cb54-42"><a></a>  )</span>
-<span id="cb54-43"><a></a>  </span>
-<span id="cb54-44"><a></a>  <span class="co"># Perform computation</span></span>
-<span id="cb54-45"><a></a>  <span class="fu">tryCatch</span>(</span>
-<span id="cb54-46"><a></a>    {</span>
-<span id="cb54-47"><a></a>      <span class="fu">log_info</span>(<span class="st">"Beginning spatial join..."</span>)</span>
-<span id="cb54-48"><a></a>      start_time <span class="ot">=</span> <span class="fu">Sys.time</span>()</span>
-<span id="cb54-49"><a></a>      </span>
-<span id="cb54-50"><a></a>      result <span class="ot">=</span> <span class="fu">st_join</span>(polygon, points) <span class="sc">|&gt;</span></span>
-<span id="cb54-51"><a></a>        <span class="fu">st_drop_geometry</span>() <span class="sc">|&gt;</span></span>
-<span id="cb54-52"><a></a>        <span class="fu">count</span>(<span class="fu">get</span>(var)) <span class="sc">|&gt;</span></span>
-<span id="cb54-53"><a></a>        <span class="fu">setNames</span>(<span class="fu">c</span>(var, <span class="st">"n"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb54-54"><a></a>        <span class="fu">left_join</span>(polygon, <span class="at">by =</span> var) <span class="sc">|&gt;</span></span>
-<span id="cb54-55"><a></a>        <span class="fu">st_as_sf</span>()</span>
-<span id="cb54-56"><a></a>      </span>
-<span id="cb54-57"><a></a>      elapsed <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>() <span class="sc">-</span> start_time)</span>
-<span id="cb54-58"><a></a>      <span class="fu">log_info</span>(<span class="st">"Spatial join completed in {round(elapsed, 2)} seconds"</span>)</span>
-<span id="cb54-59"><a></a>      <span class="fu">log_info</span>(<span class="st">"Results: {nrow(result)} features with point counts"</span>)</span>
-<span id="cb54-60"><a></a>      <span class="fu">log_info</span>(<span class="st">"Range of points per feature: {min(result$n, na.rm=T)} to {max(result$n, na.rm=T)}"</span>)</span>
-<span id="cb54-61"><a></a>      </span>
-<span id="cb54-62"><a></a>      result</span>
-<span id="cb54-63"><a></a>      </span>
-<span id="cb54-64"><a></a>    },</span>
-<span id="cb54-65"><a></a>    <span class="at">warning =</span> <span class="cf">function</span>(w) {</span>
-<span id="cb54-66"><a></a>      <span class="fu">log_warn</span>(<span class="st">"Warning during computation: {w$message}"</span>)</span>
-<span id="cb54-67"><a></a>    },</span>
-<span id="cb54-68"><a></a>    <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
-<span id="cb54-69"><a></a>      <span class="fu">log_error</span>(<span class="st">"Computation failed: {e$message}"</span>)</span>
-<span id="cb54-70"><a></a>      <span class="fu">stop</span>(e)</span>
-<span id="cb54-71"><a></a>    },</span>
-<span id="cb54-72"><a></a>    <span class="at">finally =</span> {</span>
-<span id="cb54-73"><a></a>      <span class="fu">log_info</span>(<span class="st">"point_in_polygon_safe() completed"</span>)</span>
-<span id="cb54-74"><a></a>      <span class="fu">log_info</span>(<span class="st">"="</span><span class="sc">*</span><span class="dv">50</span>)</span>
-<span id="cb54-75"><a></a>    }</span>
-<span id="cb54-76"><a></a>  )</span>
-<span id="cb54-77"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" style="font-size: 0.95em;">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(logger)</span>
+<span id="cb54-2"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-3"><a aria-hidden="true" tabindex="-1"></a>point_in_polygon_safe <span class="ot">=</span> <span class="cf">function</span>(points, polygon, var) {</span>
+<span id="cb54-4"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_info</span>(<span class="st">"Starting point_in_polygon_safe()"</span>)</span>
+<span id="cb54-5"><a aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb54-6"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb54-7"><a aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(<span class="fu">st_geometry_type</span>(points) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"POINT"</span>, <span class="st">"MULTIPOINT"</span>))) </span>
+<span id="cb54-8"><a aria-hidden="true" tabindex="-1"></a>      <span class="fu">log_warn</span>(<span class="st">"Some point geometries are not simple points"</span>)</span>
+<span id="cb54-9"><a aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(<span class="fu">st_geometry_type</span>(polygon) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"POLYGON"</span>, <span class="st">"MULTIPOLYGON"</span>))) </span>
+<span id="cb54-10"><a aria-hidden="true" tabindex="-1"></a>      <span class="fu">stop</span>(<span class="st">"Polygon input must contain polygon geometries"</span>)</span>
+<span id="cb54-11"><a aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">st_crs</span>(points) <span class="sc">!=</span> <span class="fu">st_crs</span>(polygon)) {</span>
+<span id="cb54-12"><a aria-hidden="true" tabindex="-1"></a>      <span class="fu">log_warn</span>(<span class="st">"CRS mismatch—transforming points..."</span>)</span>
+<span id="cb54-13"><a aria-hidden="true" tabindex="-1"></a>      points <span class="ot">=</span> <span class="fu">st_transform</span>(points, <span class="fu">st_crs</span>(polygon))</span>
+<span id="cb54-14"><a aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb54-15"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">log_debug</span>(<span class="st">"Validation passed"</span>)</span>
+<span id="cb54-16"><a aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb54-17"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">log_error</span>(<span class="st">"Validation failed: {e$message}"</span>)</span>
+<span id="cb54-18"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(e)</span>
+<span id="cb54-19"><a aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb54-20"><a aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb54-21"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb54-22"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">log_debug</span>(<span class="st">"Beginning spatial join..."</span>)</span>
+<span id="cb54-23"><a aria-hidden="true" tabindex="-1"></a>    result <span class="ot">=</span> <span class="fu">st_join</span>(polygon, points) <span class="sc">|&gt;</span></span>
+<span id="cb54-24"><a aria-hidden="true" tabindex="-1"></a>      <span class="fu">st_drop_geometry</span>() <span class="sc">|&gt;</span> <span class="fu">count</span>(<span class="fu">get</span>(var)) <span class="sc">|&gt;</span></span>
+<span id="cb54-25"><a aria-hidden="true" tabindex="-1"></a>      <span class="fu">setNames</span>(<span class="fu">c</span>(var, <span class="st">"n"</span>)) <span class="sc">|&gt;</span> <span class="fu">left_join</span>(polygon, <span class="at">by =</span> var) <span class="sc">|&gt;</span> <span class="fu">st_as_sf</span>()</span>
+<span id="cb54-26"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">log_info</span>(<span class="st">"✓ Success: {nrow(result)} features returned"</span>)</span>
+<span id="cb54-27"><a aria-hidden="true" tabindex="-1"></a>    result</span>
+<span id="cb54-28"><a aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb54-29"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">log_error</span>(<span class="st">"Computation failed: {e$message}"</span>)</span>
+<span id="cb54-30"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(e)</span>
+<span id="cb54-31"><a aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb54-32"><a aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="using-the-safe-version" class="slide level2">
@@ -1275,11 +1219,20 @@
 <span id="cb55-2"><a></a><span class="fu">log_threshold</span>(DEBUG)</span>
 <span id="cb55-3"><a></a></span>
 <span id="cb55-4"><a></a><span class="co"># Run with full diagnostic output</span></span>
-<span id="cb55-5"><a></a>result <span class="ot">=</span> <span class="fu">point_in_polygon_safe</span>(starbucks, <span class="fu">filter</span>(counties, state_name <span class="sc">==</span> <span class="st">"Colorado"</span>), <span class="st">"geoid"</span>)</span>
-<span id="cb55-6"><a></a></span>
-<span id="cb55-7"><a></a><span class="fu">plot_pip</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb55-5"><a></a>result <span class="ot">=</span> <span class="fu">point_in_polygon_safe</span>(</span>
+<span id="cb55-6"><a></a>  starbucks, </span>
+<span id="cb55-7"><a></a>  <span class="fu">filter</span>(counties, state_name <span class="sc">==</span> <span class="st">"Colorado"</span>), </span>
+<span id="cb55-8"><a></a>  <span class="st">"geoid"</span></span>
+<span id="cb55-9"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+<section id="section-3" class="slide level2">
+<h2></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a></a><span class="fu">plot_pip</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="week-3-2_files/figure-revealjs/unnamed-chunk-62-1.png" width="960" class="r-stretch"></section>
 <section id="key-takeaways" class="slide level2">
 <h2>Key Takeaways</h2>
 <p>✅ <strong>Write defensive functions:</strong> - Validate all inputs - Check data structure and types - Handle edge cases</p>

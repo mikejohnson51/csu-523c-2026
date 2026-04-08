@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Lab 3: Tessellations, Point-in-Polygon – ESS 523c</title>
+<title>Lab 3: MAUP in Practice — Tessellations and Point-in-Polygon – ESS 523c</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -251,8 +251,8 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Lab 3: Tessellations, Point-in-Polygon</h1>
-<p class="subtitle lead">National Dam Inventory</p>
+<h1 class="title">Lab 3: MAUP in Practice — Tessellations and Point-in-Polygon</h1>
+<p class="subtitle lead">National Dam Inventory (NID): From Counts to Local Clustering</p>
 </div>
 
 
@@ -372,7 +372,8 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="step-1.4">Step 1.4</h3>
 <p>If you plot the above tessellations you’ll see that the <strong>Voronoi</strong>, <strong>Delaunay triangulation</strong>, <strong>hexagon</strong>, and <strong>square grids</strong> all produce regions far beyond the boundaries of CONUS.</p>
 <p>We need to cut these boundaries to CONUS borders.</p>
-<p>To do this, we will call on <code>st_intersection</code>, but will first need a geometry of CONUS to serve as our clipping feature. We can get this by unioning our existing county boundaries.</p>
+<p>To do this, we need two different approaches: - <strong><code>st_intersection()</code></strong> for Voronoi and Delaunay (these tessellations create geometries that extend infinitely/far beyond the study area; intersection clips them at the exact boundary) - <strong><code>st_filter()</code></strong> for hexagon and square grids (these regular grids are already designed to fit; filtering keeps only the tiles that intersect CONUS)</p>
+<p>Either way, we’ll need a geometry of CONUS to serve as our clipping feature. We can get this by unioning our existing county boundaries.</p>
 </section>
 <section id="step-1.5" class="level3">
 <h3 class="anchored" data-anchor-id="step-1.5">Step 1.5</h3>
@@ -427,8 +428,30 @@ Simplification: Boundary Only, Not Tessellation
 <li><p>How many points were you able to remove? What are the consequences of doing this computationally?</p></li>
 </ul>
 <ul>
-<li>Finally, use your simplified object to crop <strong>all four grids</strong> (Voronoi, Delaunay triangulation, hexagons, and squares) to the CONUS boundary with <code>st_intersection</code>:</li>
+<li>Finally, crop <strong>all four grids</strong> to the CONUS boundary—but using different methods:
+<ul>
+<li><strong>Voronoi &amp; Delaunay</strong> (geometry-based tessellations): Use <code>st_intersection()</code> to <em>cut</em> these geometries at the CONUS boundary. These tessellations create boundaries that extend well beyond CONUS; intersection actually trims them.</li>
+<li><strong>Hexagon &amp; Square grids</strong> (regular grids): Use <code>st_filter()</code> to keep only tiles that touch CONUS. These grids are already regularly aligned; filtering just discards edge tiles without modifying them.</li>
+</ul></li>
 </ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why Different Cropping Methods?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>The distinction matters for your spatial analysis:</strong></p>
+<ul>
+<li><p><strong><code>st_intersection()</code> on Voronoi/Delaunay</strong>: Produces edges/boundaries that align precisely with the CONUS border. Tiles at the edge are cut, not discarded. This is geometrically accurate but creates irregular edge shapes.</p></li>
+<li><p><strong><code>st_filter()</code> on hexagon/square grids</strong>: Keeps only complete regular tiles that touch CONUS, discarding edge tiles. The boundary is a stair-step pattern following the regular grid.</p></li>
+</ul>
+<p><strong>In Q3</strong>, when you compare these tessellations, you’ll notice that Voronoi and Delaunay have denser tile coverage (e.g., ~2800–6200 tiles) because they extend to the exact boundary. Hexagons and squares have fewer tiles (e.g., ~1900–2000) because they’re bound to a regular grid. <strong>This difference affects spatial statistics</strong>: denser tessellations reveal finer-grained patterns; coarser tessellations show broader regional structure. This is part of the Modifiable Areal Unit Problem (MAUP).</p>
+</div>
+</div>
 </section>
 <section id="step-1.6" class="level3">
 <h3 class="anchored" data-anchor-id="step-1.6">Step 1.6</h3>
@@ -825,25 +848,11 @@ Spatial Regression Motivation (Week 3-1 Foundation)
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step A: Join dams to tessellation tiles</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dams_by_tile <span class="ot">&lt;-</span> <span class="fu">st_join</span>(your_tessellation, dams2) <span class="sc">%&gt;%</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tile_id) <span class="sc">%&gt;%</span>  <span class="co"># assumes tile_id column exists</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_dams =</span> <span class="fu">n</span>(),</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_year_completed =</span> <span class="fu">mean</span>(year_completed, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_surface_area =</span> <span class="fu">mean</span>(surface_area_acres, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Step B: Re-join to tessellation geometry</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>tile_attributes <span class="ot">&lt;-</span> your_tessellation <span class="sc">%&gt;%</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dams_by_tile, <span class="at">by =</span> <span class="st">"tile_id"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">n_dams =</span> <span class="dv">0</span>, <span class="at">mean_year_completed =</span> <span class="cn">NA</span>, <span class="at">mean_surface_area =</span> <span class="cn">NA</span>))</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Step C: Inspect the distribution</span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tile_attributes<span class="sc">$</span>mean_year_completed)</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tile_attributes<span class="sc">$</span>mean_surface_area)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Suggested workflow (write your own implementation):</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) spatial join dams to your cropped tessellation</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) group by tile id and summarize n_dams, mean_year_completed, mean_surface_area</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) join summaries back to geometry and preserve zero-dam tiles</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) inspect distributions before mapping</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p><strong>Produce visualizations</strong> showing spatial patterns:</p>
@@ -881,98 +890,32 @@ Critical: NA Handling in Spatial Lag Calculations
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP A: Prepare attributes with NA imputation</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Using your hexagon tessellation from Q3 (or whichever you chose)</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Attribute 1: Dam count (likely complete, but handle nulls just in case)</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>dam_count <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>n</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>dam_count[<span class="fu">is.na</span>(dam_count)] <span class="ot">&lt;-</span> <span class="dv">0</span>  <span class="co"># Count is 0 if no dams in tile</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Attribute 2: Mean year completed (will have NAs for tiles with 0 dams)</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>year_completed <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>mean_year_completed</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>year_completed_impute <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">is.na</span>(year_completed),</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(year_completed, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),  <span class="co"># Global mean</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  year_completed</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>valid_year <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.na</span>(hex_grid_dams<span class="sc">$</span>mean_year_completed)  <span class="co"># Track original data</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Attribute 3: Mean surface area</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>surface_area <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>mean_surface_area</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>surface_area_impute <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">is.na</span>(surface_area),</span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(surface_area, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  surface_area</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>valid_area <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.na</span>(hex_grid_dams<span class="sc">$</span>mean_surface_area)</span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP B: Compute spatial lags using imputed data</span></span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Reuse neighbor_weights_hex from Q6.1</span></span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>spatial_lag_count <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(neighbor_weights_hex <span class="sc">%*%</span> dam_count)</span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>spatial_lag_year <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(neighbor_weights_hex <span class="sc">%*%</span> year_completed_impute)</span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>spatial_lag_area <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(neighbor_weights_hex <span class="sc">%*%</span> surface_area_impute)</span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP C: Correlate original (non-imputed) values with spatial lag</span></span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Use logical flags to filter</span></span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>cor_count <span class="ot">&lt;-</span> <span class="fu">cor</span>(dam_count, spatial_lag_count, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>cor_year <span class="ot">&lt;-</span> <span class="fu">cor</span>(</span>
-<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>  year_completed[valid_year],</span>
-<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>  spatial_lag_year[valid_year],</span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">use =</span> <span class="st">"complete.obs"</span></span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>cor_area <span class="ot">&lt;-</span> <span class="fu">cor</span>(</span>
-<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>  surface_area[valid_area],</span>
-<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>  spatial_lag_area[valid_area],</span>
-<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">use =</span> <span class="st">"complete.obs"</span></span>
-<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Correlations between attributes and spatial lag:</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Dam count:"</span>, <span class="fu">round</span>(cor_count, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean year completed:"</span>, <span class="fu">round</span>(cor_year, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean surface area:"</span>, <span class="fu">round</span>(cor_area, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Interpretation ranges:</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"0.6–1.0: Strong spatial clustering</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"0.3–0.6: Moderate spatial dependence</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"0.0–0.3: Weak spatial structure</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Negative: Spatial anticorrelation (rare)</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Suggested workflow (write your own implementation):</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) build vectors for count, age, and size attributes by tile</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) handle NAs explicitly before matrix multiplication</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) compute spatial lag as W_std %*% attribute</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) correlate each attribute with its lag</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 5) report values and classify as weak/moderate/strong with your own thresholds</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p><strong>Summarize in a table</strong>:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>attribute_spatial_dependence <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">attribute =</span> <span class="fu">c</span>(<span class="st">"Dam Count"</span>, <span class="st">"Mean Year Completed"</span>, <span class="st">"Mean Surface Area"</span>),</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">correlation_with_lag =</span> <span class="fu">c</span>(</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(cor_count, <span class="dv">3</span>),</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(cor_year, <span class="dv">3</span>),</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(cor_area, <span class="dv">3</span>)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">strength =</span> <span class="fu">c</span>(</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(cor_count <span class="sc">&gt;</span> <span class="fl">0.6</span>, <span class="st">"Strong"</span>, <span class="fu">ifelse</span>(cor_count <span class="sc">&gt;</span> <span class="fl">0.3</span>, <span class="st">"Moderate"</span>, <span class="st">"Weak"</span>)),</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(cor_year <span class="sc">&gt;</span> <span class="fl">0.6</span>, <span class="st">"Strong"</span>, <span class="fu">ifelse</span>(cor_year <span class="sc">&gt;</span> <span class="fl">0.3</span>, <span class="st">"Moderate"</span>, <span class="st">"Weak"</span>)),</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(cor_area <span class="sc">&gt;</span> <span class="fl">0.6</span>, <span class="st">"Strong"</span>, <span class="fu">ifelse</span>(cor_area <span class="sc">&gt;</span> <span class="fl">0.3</span>, <span class="st">"Moderate"</span>, <span class="st">"Weak"</span>))</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  attribute_spatial_dependence,</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Spatial Lag Correlation: Do Neighboring Tiles Have Similar Attributes?"</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">→ If all correlations are &gt; 0.5, strong spatial dependence is present.</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"  This violates OLS independence assumption → spatial regression needed.</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a compact summary table with:</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># - attribute name</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># - correlation with spatial lag</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># - qualitative strength label</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Then add a 1-2 sentence interpretation below the table.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
 <section id="step-5.3" class="level3">
 <h3 class="anchored" data-anchor-id="step-5.3">Step 5.3</h3>
-<p><strong>Visualize Spatial Autocorrelation: Scatterplot of Attribute vs.&nbsp;Spatial Lag</strong></p>
-<p>Create a <strong>Moran’s I scatterplot</strong> (also called a Moran plot) showing: - X-axis: Original dam attribute (e.g., mean year completed) — standardized - Y-axis: Spatial lag of that attribute — standardized<br>
-- Points: One per tile, colored by quadrant - Quadrants: High-High (both high), Low-Low (both low), High-Low (outlier high), Low-High (outlier low)</p>
-<p>This visualizes <strong>Local Indicators of Spatial Association (LISA)</strong>: which tiles are clusters vs.&nbsp;outliers relative to their neighbors.</p>
+<p><strong>Global Question:</strong> Do neighboring tiles resemble each other overall, or is the pattern weak?</p>
+<p>Create a single <strong>Moran’s I scatterplot</strong> for one dam attribute from Step 5.2 (for example, mean year completed or dam count). Use standardized values on both axes: the attribute on the x-axis and the spatial lag on the y-axis. The plot should show whether points concentrate along the diagonal or remain widely dispersed.</p>
+<p>Your interpretation should focus on the <strong>overall pattern</strong>, not on specific regions. In particular, explain whether the correlation from Step 5.2 suggests strong, moderate, or weak spatial dependence and whether the scatterplot supports that conclusion.</p>
+<p>Do <strong>not</strong> create a geographic map here. Save local hotspot mapping for Q6.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -991,163 +934,55 @@ Standardization Details
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using your hexagon tiles with mean_year_completed (or your chosen attribute)</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP A: Standardize the original attribute (careful with NAs!)</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Only standardize tiles with actual data (not imputed)</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>year_data <span class="ot">&lt;-</span> hex_grid_dams<span class="sc">$</span>mean_year_completed[valid_year]</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>lag_data <span class="ot">&lt;-</span> spatial_lag_year[valid_year]</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>x_std <span class="ot">&lt;-</span> <span class="fu">scale</span>(year_data, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale =</span> <span class="cn">TRUE</span>)[, <span class="dv">1</span>]</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>lag_std <span class="ot">&lt;-</span> <span class="fu">scale</span>(lag_data, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale =</span> <span class="cn">TRUE</span>)[, <span class="dv">1</span>]</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP B: Create a data frame for plotting (only tiles with valid data)</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">x_std =</span> x_std,</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag_std =</span> lag_std,</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">tile_id =</span> <span class="fu">which</span>(valid_year)  <span class="co"># Index of valid tiles</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">x_cat =</span> <span class="fu">ifelse</span>(x_std <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"High"</span>, <span class="st">"Low"</span>),</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">lag_cat =</span> <span class="fu">ifelse</span>(lag_std <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"High"</span>, <span class="st">"Low"</span>),</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">quadrant =</span> <span class="fu">paste</span>(x_cat, lag_cat, <span class="at">sep =</span> <span class="st">"-"</span>)</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">quadrant =</span> <span class="fu">factor</span>(quadrant, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"High-High"</span>, <span class="st">"Low-Low"</span>, <span class="st">"High-Low"</span>, <span class="st">"Low-High"</span>))</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Count points in each quadrant</span></span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>quadrant_counts <span class="ot">&lt;-</span> <span class="fu">table</span>(plot_data<span class="sc">$</span>quadrant)</span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Tiles by quadrant:</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(quadrant_counts)</span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP C: Create Moran scatterplot</span></span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> x_std, <span class="at">y =</span> lag_std, <span class="at">color =</span> quadrant, <span class="at">fill =</span> quadrant)) <span class="sc">+</span></span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.65</span>) <span class="sc">+</span></span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray40"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray40"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add a regression line through origin (optional, illustrates positive slope)</span></span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"gray50"</span>, <span class="at">linetype =</span> <span class="st">"dotted"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
-<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-High"</span> <span class="ot">=</span> <span class="st">"#e41a1c"</span>,</span>
-<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-Low"</span> <span class="ot">=</span> <span class="st">"#377eb8"</span>,</span>
-<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-Low"</span> <span class="ot">=</span> <span class="st">"#ff7f00"</span>,</span>
-<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-High"</span> <span class="ot">=</span> <span class="st">"#4daf4a"</span></span>
-<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(</span>
-<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-High"</span> <span class="ot">=</span> <span class="st">"#e41a1c"</span>,</span>
-<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-Low"</span> <span class="ot">=</span> <span class="st">"#377eb8"</span>,</span>
-<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-Low"</span> <span class="ot">=</span> <span class="st">"#ff7f00"</span>,</span>
-<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-High"</span> <span class="ot">=</span> <span class="st">"#4daf4a"</span></span>
-<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Moran Scatterplot: Dam Age and Spatial Lag"</span>,</span>
-<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"LISA (Local Indicators of Spatial Association) by Quadrant"</span>,</span>
-<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Mean Dam Age (standardized)"</span>,</span>
-<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Spatial Lag of Mean Dam Age (standardized)"</span>,</span>
-<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Quadrant"</span>,</span>
-<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Quadrant"</span>,</span>
-<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="fu">paste0</span>(</span>
-<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-High (red): clusters of old dams | Low-Low (blue): clusters of young dams</span><span class="sc">\n</span><span class="st">"</span>,</span>
-<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-Low (orange): isolated old regions | Low-High (green): isolated young regions"</span></span>
-<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb15-67"><a href="#cb15-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb15-68"><a href="#cb15-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb15-69"><a href="#cb15-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"gray50"</span>)</span>
-<span id="cb15-70"><a href="#cb15-70" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<p><strong>Alternative: Map the quadrants geographically</strong></p>
-<p>If you want to see <em>where</em> the clusters and outliers are:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>hex_grid_dams_for_map <span class="ot">&lt;-</span> hex_grid_dams[valid_year, ] <span class="sc">%&gt;%</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">x_std =</span> x_std,</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">lag_std =</span> lag_std,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">quadrant =</span> plot_data<span class="sc">$</span>quadrant</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(hex_grid_dams_for_map) <span class="sc">+</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> quadrant), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-High"</span> <span class="ot">=</span> <span class="st">"#e41a1c"</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-Low"</span> <span class="ot">=</span> <span class="st">"#377eb8"</span>,</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"High-Low"</span> <span class="ot">=</span> <span class="st">"#ff7f00"</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Low-High"</span> <span class="ot">=</span> <span class="st">"#4daf4a"</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Geographic Distribution of LISA Quadrants (Dam Age)"</span>,</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Quadrant"</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Suggested workflow (write your own implementation):</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) standardize the selected attribute and its spatial lag</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) assign HH / LL / HL / LH quadrants by sign of (z, lag_z)</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) produce a Moran scatterplot with dashed axes at 0</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) report quadrant counts and interpret what dominates</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
 <section id="step-5.4" class="level3">
 <h3 class="anchored" data-anchor-id="step-5.4">Step 5.4</h3>
-<p><strong>Interpretation and Implication for Spatial Regression</strong></p>
+<p><strong>Global Interpretation of Spatial Patterns</strong></p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Writing Guide: Spatial Correlation Interpretation
+Writing Guide: Interpreting Spatial Correlation
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <p>Use this structure to organize your response:</p>
 <ol type="1">
-<li><strong>State your findings clearly</strong> — cite specific correlation values and quadrant counts from your Moran plot.</li>
-<li><strong>Connect to underlying geography</strong> — which regions show clustering? (e.g., “High-High points cluster in Tennessee Valley…”)</li>
-<li><strong>Explain why</strong> — relate to dam history, geology, hydrology, or policy (e.g., “TVA region constructed multiple dams in 1930s–1950s, explaining age clustering”)</li>
-<li><strong>Conclude on spatial regression necessity</strong> — if correlations &gt;0.5, OLS assumes violate independence; SAR models needed.</li>
+<li><strong>State your findings clearly</strong> — cite specific correlation values from your Step 5.2 table. Which attributes show the strongest clustering?</li>
+<li><strong>Connect to structure</strong> — what does the scatterplot suggest about broad spatial organization, without moving into local mapping yet?</li>
+<li><strong>Explain why</strong> — relate to dam history, geology, hydrology, or policy at the regional scale</li>
+<li><strong>Analyze patterns</strong> — describe what the Moran scatterplot and correlation values reveal about overall dam distributions</li>
 </ol>
 </div>
 </div>
 <p>Write 2–3 paragraphs (400–600 words) addressing:</p>
-<p><strong>a. Spatial Clustering of Dam Attributes (Quantitative)</strong></p>
-<p>Which attributes show the strongest spatial lag correlations (from your Step 7.2 table)? Are correlations &gt; 0.5 (strong) or 0.2–0.5 (moderate)? Are some attributes more clustered than others? For example:</p>
+<p><strong>a. Spatial Clustering Patterns (Quantitative + Geographic)</strong></p>
+<p>Which attributes show the strongest spatial lag correlations (from your Step 5.2 table)? Are correlations &gt; 0.5 (strong) or 0.2–0.5 (moderate)?</p>
 <ul>
-<li><strong>Dam <em>count</em></strong>: Often strongly correlated (r &gt; 0.6) because dam density physically creates neighbors with many dams.</li>
-<li><strong>Dam <em>age</em></strong>: May show moderate to strong clustering (r = 0.4–0.7) if dams were built in regionally-coherent eras (e.g., 1930s TVA construction, 1960s-70s Western expansion).</li>
-<li><strong>Dam <em>size</em></strong>: Moderate clustering expected if geology/hydrology favors larger dams in certain regions.</li>
+<li><strong>Dam <em>count</em></strong>: Often strongly correlated because high dam density naturally creates neighbors with many dams.</li>
+<li><strong>Dam <em>age</em></strong>: Likely shows clustering if dams were built in regionally-coherent eras (e.g., 1930s TVA construction, 1960s–70s Western expansion).</li>
+<li><strong>Dam <em>size</em></strong>: May be clustered if geology/hydrology favors larger dams in specific regions.</li>
 </ul>
-<p>For each attribute, interpret: does the correlation make geographic sense? Why should dam age or size be similar in neighboring regions?</p>
-<p><strong>b. Outliers and Anomalies (Qualitative + Geographic)</strong></p>
-<p>From your Moran scatterplot / LISA map:</p>
+<p>For each attribute, describe whether the clustering seems broad or weak. Does the correlation make geographic sense? Why should dam characteristics be similar in neighboring areas?</p>
+<p><strong>b. Moran Scatterplot Interpretation (Visualization)</strong></p>
+<p>From your Moran scatterplot, describe the spatial distribution of points:</p>
 <ul>
-<li><strong>High-High clusters</strong> (e.g., upper right quadrant, red points): These are regions where old dams are surrounded by old dams (or high-count tiles surrounded by high-count tiles). Where are they? (e.g., Tennessee Valley, Arkansas River, California Central Valley)</li>
-<li><strong>Low-Low clusters</strong> (e.g., lower left, blue): Young dams or sparse dams surrounded by similar neighbors. Typical of Mountain West or recent development areas.</li>
-<li><strong>High-Low outliers</strong> (orange): Isolated regions of old/dense dams surrounded by young/sparse neighbors. Can you spot any? These might represent historical dam sites (single large project) or regional anomalies.</li>
-<li><strong>Low-High outliers</strong> (green): Rare—regions of young/sparse dams surrounded by old/dense. Think about where this occurs and why.</li>
+<li>Do points cluster near the diagonal, suggesting positive spatial autocorrelation?</li>
+<li>Are there many outliers away from the diagonal, suggesting weaker dependence or heterogeneous neighborhoods?</li>
+<li>Does the pattern appear stronger for some attributes than others?</li>
 </ul>
-<p><strong>If you have a geographic map</strong> of the LISA quadrants, describe 1–2 specific regions and why they’re outliers. If you created a visualization, reference it.</p>
-<p><strong>c.&nbsp;Spatial Regression Necessity (Statistical Inference)</strong></p>
-<p>This is the crux: <strong>If dam attributes are spatially autocorrelated, OLS regression violates the independence assumption</strong>, leading to: - Biased standard errors (usually too narrow) → inflated t-statistics and false positives - Inefficient parameter estimates - Invalid confidence intervals and p-values</p>
-<p><strong>Your conclusion should address:</strong></p>
-<ul>
-<li><strong>Do your results support spatial modeling?</strong> If correlations &gt; 0.5 across attributes and Moran’s I was significant in Q6, yes.</li>
-<li><strong>Which spatial model?</strong>
-<ul>
-<li><strong>Spatial Lag (SAR)</strong> model if dependent variable depends on neighbors (e.g., dam size influenced by neighbor sizes)</li>
-<li><strong>Spatial Error (SEM)</strong> model if omitted variables create spatial structure in residuals</li>
-<li>For dam attributes, <strong>SAR is more intuitive</strong>: managing one dam influences decisions about neighboring dams (environmental flows, coordination).</li>
-</ul></li>
-<li><strong>Which tessellation for spatial models?</strong> The tessellation from Q3 with <strong>regular neighborhoods</strong> (hexagons or squares) and <strong>moderate tile counts</strong> (e.g., 100–500 tiles) provides stable neighbors. Too fine → too many neighbors; too coarse → not enough detail.</li>
-</ul>
-<p><strong>Closing sentence</strong>: “Given evidence of spatial autocorrelation in dam attributes (r = X–Y), a spatial regression model is warranted for any subsequent analysis of dam characteristics. Standard OLS would underestimate uncertainty and potentially mislead policy decisions.”</p>
+<p><strong>c.&nbsp;Spatial Structure Implications</strong></p>
+<p>What do these correlation values and Moran scatterplot patterns tell us about dam infrastructure spatial organization? Given your findings, write a brief conclusion synthesizing: - Are neighboring tiles genuinely similar in dam characteristics, or is the clustering weak? - What management or hydrologic factors drive these patterns? - How do findings from your Moran analysis here compare to what you observed in Q4 (dam purposes geography)?</p>
+<p><strong>Note</strong>: In future weeks, we’ll explore how spatial structure revealed here relates to statistical modeling of dam attributes.</p>
 </section>
 <section id="step-5.5-optional-hypothesis-checkpoint" class="level3">
 <h3 class="anchored" data-anchor-id="step-5.5-optional-hypothesis-checkpoint">Step 5.5 (Optional) — Hypothesis Checkpoint</h3>
@@ -1164,9 +999,9 @@ Writing Guide: Spatial Correlation Interpretation
 </section>
 <section id="question-6-local-spatial-autocorrelation-lisa-mapping-hotspots-and-coldspots" class="level1">
 <h1>Question 6: Local Spatial Autocorrelation (LISA) — Mapping Hotspots and Coldspots</h1>
-<p><strong>In this question, you’ll analyze LISA using your recommended tessellation from Q3 AND a second tessellation (e.g., square grid if you chose hexagon, or vice versa).</strong> This tessellation comparison will reveal how MAUP affects local clustering patterns.</p>
+<p><strong>In this question, you’ll analyze LISA using your recommended tessellation from Q3 AND counties as a required comparison unit.</strong> This contrast (regular tessellation vs administrative boundaries) reveals MAUP much more clearly than comparing two regular grids.</p>
 <p>While global statistics like Moran’s I (Q5) test for clustering “on average,” spatial patterns are <strong>rarely uniform</strong>. Some regions have dense hotspots (e.g., TVA region with concentrated dam infrastructure), while others are sparse coldspots (remote areas, deserts). <strong>Local Indicator of Spatial Autocorrelation (LISA)</strong> decomposes global clustering into local patterns, revealing <strong>where</strong> hotspots and coldspots occur—critical for targeted management interventions.</p>
-<p>In this question, you’ll compute LISA using <strong>cropped tessellations</strong> (your recommended one from Q3, plus comparison grids) to identify geographic clustering patterns. You’ll work with both your chosen tessellation AND at least one alternative (e.g., hexagon and square grids), both clipped to ensure proper boundary handling.</p>
+<p>In this question, you’ll compute LISA using your <strong>cropped recommended tessellation</strong> (from Q1.4) and <strong>CONUS counties</strong> as the alternative support. This gives a direct test of how local clustering changes when analysis units shift from equal-area tiles to administrative units.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1187,8 +1022,8 @@ LISA Concept (Week 3-1 Lectures)
 <section id="step-6.1" class="level3">
 <h3 class="anchored" data-anchor-id="step-6.1">Step 6.1</h3>
 <p>Crop your tessellations to ensure consistent boundaries:</p>
-<p><strong>a.</strong> Use your recommended tessellation from Q3 (e.g., hexagon grid). Clip it to the CONUS boundary with <code>st_intersection(tessellation, boundary)</code>.</p>
-<p><strong>b.</strong> Also clip <strong>at least one alternative</strong> tessellation (e.g., square grid) using the same boundary clipping.</p>
+<p><strong>a.</strong> Use your recommended tessellation from Q3 (e.g., hexagon grid). Clip it to the CONUS boundary with <code>st_filter(tessellation, boundary)</code>.</p>
+<p><strong>b.</strong> Use <strong>counties</strong> as the required alternative comparison unit (no extra clipping needed if your counties object is already CONUS-only).</p>
 <p><strong>c.</strong> For each clipped tessellation, recompute dam counts using point-in-polygon joining to ensure correct aggregation within the cropped geometry.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1201,10 +1036,10 @@ Cropping Tessellations Correctly
 </div>
 <div class="callout-body-container callout-body">
 <pre><code># Recommended tessellation (e.g., hexagon_grid)
-hex_cropped &lt;- st_intersection(hexagon_grid, usa_boundary)
+hex_cropped &lt;- st_filter(hexagon_grid, usa_boundary)
 
-# Alternative for comparison (e.g., square_grid)
-square_cropped &lt;- st_intersection(square_grid, usa_boundary)
+# Required comparison unit: counties (already CONUS)
+county_units &lt;- counties_sf
 
 # Recompute dam counts on cropped grids
 # (Use your point_in_polygon function or st_join + count pattern)
@@ -1212,7 +1047,7 @@ hex_dams &lt;- st_join(hex_cropped, dams_sf) %&gt;%
   group_by(id) %&gt;%
   summarise(n = n(), .groups = "drop")
 
-square_dams &lt;- st_join(square_cropped, dams_sf) %&gt;%
+county_dams &lt;- st_join(county_units, dams_sf) %&gt;%
   group_by(id) %&gt;%
   summarise(n = n(), .groups = "drop")</code></pre>
 <p><strong>Important</strong>: Cropping changes tile counts and boundary geometries. Re-aggregate dam counts <em>after</em> cropping to match the new tile geometry.</p>
@@ -1241,16 +1076,16 @@ Validation Checkpoint (Optional but Recommended)
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 1: Is the matrix symmetric? (for undirected adjacency)</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(neighbor_matrix <span class="sc">==</span> <span class="fu">t</span>(neighbor_matrix))</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 2: Are all rows row-standardized (divide by row sum)?</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rowSums</span>(neighbor_weights)  <span class="co"># Should all be 1 (or 0 for isolated tiles)</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 3: Are there isolated tiles (no neighbors)?</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">rowSums</span>(neighbor_weights) <span class="sc">==</span> <span class="dv">0</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># If any isolated tiles, document how you'll handle them in spatial lag calculation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 1: Is the matrix symmetric? (for undirected adjacency)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(neighbor_matrix <span class="sc">==</span> <span class="fu">t</span>(neighbor_matrix))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 2: Are all rows row-standardized (divide by row sum)?</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rowSums</span>(neighbor_weights)  <span class="co"># Should all be 1 (or 0 for isolated tiles)</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check 3: Are there isolated tiles (no neighbors)?</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">rowSums</span>(neighbor_weights) <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co"># If any isolated tiles, document how you'll handle them in spatial lag calculation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -1258,18 +1093,19 @@ Validation Checkpoint (Optional but Recommended)
 </section>
 <section id="step-6.3" class="level3">
 <h3 class="anchored" data-anchor-id="step-6.3">Step 6.3</h3>
-<p>Assign <strong>LISA quadrants</strong> and create visualizations:</p>
-<p><strong>a.</strong> Assign each tile to a quadrant (HH, LL, HL, LH) based on the signs of <span class="math inline">\(z\)</span> and <span class="math inline">\(\text{lag}_z\)</span>.</p>
-<p><strong>b.</strong> Create a <strong>Moran scatter plot</strong>: Plot <span class="math inline">\(z\)</span> (x-axis) vs.&nbsp;<span class="math inline">\(\text{lag}_z\)</span> (y-axis), with points colored by quadrant. Add dashed reference lines at (0, 0). Interpretation: do points cluster on the axes (strong local dependence) or scatter widely?</p>
-<p><strong>c.</strong> Create a <strong>LISA map</strong>: Choropleth of your cropped tessellation colored by LISA quadrant (HH=red, LL=blue, HL=yellow, LH=cyan). Overlay state or county boundaries for geographic reference. Interpretation: where are hotspots concentrated? Are coldspots in deserts/mountains as expected?</p>
+<p><strong>LOCAL Question: WHERE specifically are high-high, low-low, high-low, and low-high clusters?</strong> (Answer: Geographic map showing which regions belong to which quadrant)</p>
+<p><strong>Two Visualizations:</strong></p>
+<p><strong>a) Moran Scatterplot (Reference):</strong> - Same as Q5, showing which tile belongs to which quadrant - Primarily for reference; the interesting insight is now <em>geographic</em></p>
+<p><strong>b) LISA Geographic Map (PRIMARY OUTPUT):</strong> - Choropleth map of your tessellation colored by LISA quadrant - HH (red) = hotspots with hotspot neighbors → TVA region, Colorado Basin, etc. - LL (blue) = coldspots with coldspot neighbors → Great Basin, deserts, etc. - HL (yellow) = anomalies: high counts surrounded by sparse tiles (cluster edges) - LH (cyan) = anomalies: sparse tiles surrounded by high-count neighbors (rare)</p>
+<p><strong>Key Interpretation:</strong> The LISA map reveals <em>which specific regions</em> exhibit local clustering. This is actionable: dense regions need intensive management; sparse regions need different strategies. The quadrant distribution (% of tiles in HH vs.&nbsp;LL) reveals whether the landscape is dominated by hotspots, coldspots, or mixed.</p>
 </section>
 <section id="step-6.4" class="level3">
 <h3 class="anchored" data-anchor-id="step-6.4">Step 6.4</h3>
-<p><strong>Comparison with alternative tessellation</strong> (e.g., square grid):</p>
-<p><strong>a.</strong> Repeat Steps 6.2–6.3 for your alternative tessellation.</p>
-<p><strong>b.</strong> Create side-by-side maps (recommended vs.&nbsp;alternative) showing LISA quadrant distributions. Do they tell the same story, or does tessellation geometry affect local clustering patterns?</p>
-<p><strong>c.</strong> <strong>Quantitative comparison</strong>: For both tessellations, count the number of tiles in each quadrant. Example output: - Hexagon: HH=15 tiles, LL=23 tiles, HL=5 tiles, LH=2 tiles - Square: HH=18 tiles, LL=20 tiles, HL=8 tiles, LH=3 tiles - <strong>Interpretation</strong>: Are quadrant distributions similar (robust LISA pattern) or different (MAUP sensitive at local scale)?</p>
-<p><strong>d.</strong> Interpret: Which tessellation reveals clustering more clearly? Do LISA patterns align between methods, or does MAUP (modifiable areal unit problem) create divergent local structure?</p>
+<p><strong>Comparison with required county baseline</strong>:</p>
+<p><strong>a.</strong> Repeat Steps 6.2–6.3 for counties.</p>
+<p><strong>b. REQUIRED DELIVERABLE:</strong> Create side-by-side LISA maps of <strong>your chosen tessellation (from Q3)</strong> and <strong>counties</strong> in the same figure. Use identical quadrant labels and color mapping in both panels so visual differences reflect unit choice, not styling.</p>
+<p><strong>c.</strong> <strong>Quantitative comparison</strong>: For both units, count the number of polygons in each quadrant. Example output: - Hexagon: HH=15 tiles, LL=23 tiles, HL=5 tiles, LH=2 tiles - Counties: HH=205 counties, LL=1300 counties, HL=240 counties, LH=360 counties - <strong>Interpretation</strong>: Are quadrant distributions similar (robust LISA pattern) or different (MAUP sensitive at local scale)?</p>
+<p><strong>d.</strong> Interpret: Which unit reveals clustering more clearly for your purpose? Do patterns align between your chosen tessellation and counties, or does MAUP (modifiable areal unit problem) create divergent local structure?</p>
 </section>
 <section id="step-6.5" class="level3">
 <h3 class="anchored" data-anchor-id="step-6.5">Step 6.5</h3>
@@ -1278,7 +1114,7 @@ Validation Checkpoint (Optional but Recommended)
 <p><strong>a.</strong> <strong>Geographic hotspots and coldspots</strong>: Identify major clustering regions: - Which dams are in HH hotspots? (E.g., TVA dams, Colorado River dams, others?) - Which regions are LL coldspots? (Mountains, deserts, sparse-development areas?) - What management or hydrologic factors explain these patterns?</p>
 <p><strong>Specific region example:</strong> Choose one HH hotspot (e.g., Tennessee Valley Authority region, Colorado River Basin, California Central Valley) and describe three factors that explain why TVA dams or Colorado River dams cluster. Use geographic knowledge or brief web research if needed.</p>
 <p><strong>b.</strong> <strong>Outliers and anomalies</strong>: Are there notable HL or LH tiles? What might explain them?</p>
-<p><strong>c.</strong> <strong>Tessellation comparison</strong>: Does tessellation choice (hexagon vs.&nbsp;square vs.&nbsp;other) affect LISA conclusions? How does MAUP operate at the local scale?</p>
+<p><strong>c.</strong> <strong>Unit comparison</strong>: Does analysis unit choice (hexagon vs.&nbsp;county) affect LISA conclusions? How does MAUP operate at the local scale?</p>
 <p><strong>d.</strong> <strong>Implications for management</strong>: How does LISA output inform dam operations, reporting, or policy? - Where should multi-state coordination efforts focus? (HH hotspots) - Which regions have simple management structures? (LL coldspots) - How do your LISA findings from Q6 compare to the dam purpose patterns you identified in Q4? (E.g., do irrigation dams cluster the same way as all dams?) - Where do policies need special attention to local anomalies? (HL/LH outliers)</p>
 
 

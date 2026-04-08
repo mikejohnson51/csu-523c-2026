@@ -1,6 +1,6 @@
 ---
-title: 'Lab 3: Tessellations, Point-in-Polygon'
-subtitle: 'National Dam Inventory'
+title: "Lab 3: MAUP in Practice — Tessellations and Point-in-Polygon"
+subtitle: "National Dam Inventory (NID): From Counts to Local Clustering"
 format:
   html:
     code-fold: true
@@ -178,7 +178,11 @@ If you plot the above tessellations you'll see that the **Voronoi**, **Delaunay 
 
 We need to cut these boundaries to CONUS borders. 
 
-To do this, we will call on `st_intersection`, but will first need a geometry of CONUS to serve as our clipping feature. We can get this by unioning our existing county boundaries.
+To do this, we need two different approaches:
+- **`st_intersection()`** for Voronoi and Delaunay (these tessellations create geometries that extend infinitely/far beyond the study area; intersection clips them at the exact boundary)
+- **`st_filter()`** for hexagon and square grids (these regular grids are already designed to fit; filtering keeps only the tiles that intersect CONUS)
+
+Either way, we'll need a geometry of CONUS to serve as our clipping feature. We can get this by unioning our existing county boundaries.
 
 ```{r, eval = TRUE}
 
@@ -231,11 +235,26 @@ plot(boundary_simplified, main = "Simplified")
 ```{r}
 ```
 
-- Finally, use your simplified object to crop **all four grids** (Voronoi, Delaunay triangulation, hexagons, and squares) to the CONUS boundary with `st_intersection`:
+- Finally, crop **all four grids** to the CONUS boundary—but using different methods:
+  - **Voronoi & Delaunay** (geometry-based tessellations): Use `st_intersection()` to *cut* these geometries at the CONUS boundary. These tessellations create boundaries that extend well beyond CONUS; intersection actually trims them.
+  - **Hexagon & Square grids** (regular grids): Use `st_filter()` to keep only tiles that touch CONUS. These grids are already regularly aligned; filtering just discards edge tiles without modifying them.
 
 ```{r}
 
 ```
+
+::: callout-tip
+## Why Different Cropping Methods?
+
+**The distinction matters for your spatial analysis:**
+
+- **`st_intersection()` on Voronoi/Delaunay**: Produces edges/boundaries that align precisely with the CONUS border. Tiles at the edge are cut, not discarded. This is geometrically accurate but creates irregular edge shapes.
+
+- **`st_filter()` on hexagon/square grids**: Keeps only complete regular tiles that touch CONUS, discarding edge tiles. The boundary is a stair-step pattern following the regular grid.
+
+**In Q3**, when you compare these tessellations, you'll notice that Voronoi and Delaunay have denser tile coverage (e.g., ~2800–6200 tiles) because they extend to the exact boundary. Hexagons and squares have fewer tiles (e.g., ~1900–2000) because they're bound to a regular grid. **This difference affects spatial statistics**: denser tessellations reveal finer-grained patterns; coarser tessellations show broader regional structure. This is part of the Modifiable Areal Unit Problem (MAUP).
+
+:::
 
 ### Step 1.6
 
@@ -667,25 +686,11 @@ Aggregate as follows:
 
 ```{r}
 #| eval: false
-# Step A: Join dams to tessellation tiles
-dams_by_tile <- st_join(your_tessellation, dams2) %>%
-  st_drop_geometry() %>%
-  group_by(tile_id) %>%  # assumes tile_id column exists
-  summarise(
-    n_dams = n(),
-    mean_year_completed = mean(year_completed, na.rm = TRUE),
-    mean_surface_area = mean(surface_area_acres, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# Step B: Re-join to tessellation geometry
-tile_attributes <- your_tessellation %>%
-  left_join(dams_by_tile, by = "tile_id") %>%
-  replace_na(list(n_dams = 0, mean_year_completed = NA, mean_surface_area = NA))
-
-# Step C: Inspect the distribution
-summary(tile_attributes$mean_year_completed)
-summary(tile_attributes$mean_surface_area)
+# Suggested workflow (write your own implementation):
+# 1) spatial join dams to your cropped tessellation
+# 2) group by tile id and summarize n_dams, mean_year_completed, mean_surface_area
+# 3) join summaries back to geometry and preserve zero-dam tiles
+# 4) inspect distributions before mapping
 ```
 
 **Produce visualizations** showing spatial patterns:
@@ -722,89 +727,23 @@ This preserves statistical integrity: neighbors' contributions are computed corr
 
 ```{r}
 #| eval: false
-# STEP A: Prepare attributes with NA imputation
-# Using your hexagon tessellation from Q3 (or whichever you chose)
-
-# Attribute 1: Dam count (likely complete, but handle nulls just in case)
-dam_count <- hex_grid_dams$n
-dam_count[is.na(dam_count)] <- 0  # Count is 0 if no dams in tile
-
-# Attribute 2: Mean year completed (will have NAs for tiles with 0 dams)
-year_completed <- hex_grid_dams$mean_year_completed
-year_completed_impute <- ifelse(
-  is.na(year_completed),
-  mean(year_completed, na.rm = TRUE),  # Global mean
-  year_completed
-)
-valid_year <- !is.na(hex_grid_dams$mean_year_completed)  # Track original data
-
-# Attribute 3: Mean surface area
-surface_area <- hex_grid_dams$mean_surface_area
-surface_area_impute <- ifelse(
-  is.na(surface_area),
-  mean(surface_area, na.rm = TRUE),
-  surface_area
-)
-valid_area <- !is.na(hex_grid_dams$mean_surface_area)
-
-# STEP B: Compute spatial lags using imputed data
-# Reuse neighbor_weights_hex from Q6.1
-
-spatial_lag_count <- as.vector(neighbor_weights_hex %*% dam_count)
-spatial_lag_year <- as.vector(neighbor_weights_hex %*% year_completed_impute)
-spatial_lag_area <- as.vector(neighbor_weights_hex %*% surface_area_impute)
-
-# STEP C: Correlate original (non-imputed) values with spatial lag
-# Use logical flags to filter
-
-cor_count <- cor(dam_count, spatial_lag_count, use = "complete.obs")
-cor_year <- cor(
-  year_completed[valid_year],
-  spatial_lag_year[valid_year],
-  use = "complete.obs"
-)
-cor_area <- cor(
-  surface_area[valid_area],
-  spatial_lag_area[valid_area],
-  use = "complete.obs"
-)
-
-cat("Correlations between attributes and spatial lag:\n")
-cat("Dam count:", round(cor_count, 3), "\n")
-cat("Mean year completed:", round(cor_year, 3), "\n")
-cat("Mean surface area:", round(cor_area, 3), "\n")
-cat("\nInterpretation ranges:\n")
-cat("0.6–1.0: Strong spatial clustering\n")
-cat("0.3–0.6: Moderate spatial dependence\n")
-cat("0.0–0.3: Weak spatial structure\n")
-cat("Negative: Spatial anticorrelation (rare)\n")
+# Suggested workflow (write your own implementation):
+# 1) build vectors for count, age, and size attributes by tile
+# 2) handle NAs explicitly before matrix multiplication
+# 3) compute spatial lag as W_std %*% attribute
+# 4) correlate each attribute with its lag
+# 5) report values and classify as weak/moderate/strong with your own thresholds
 ```
 
 **Summarize in a table**:
 
 ```{r}
 #| eval: false
-attribute_spatial_dependence <- data.frame(
-  attribute = c("Dam Count", "Mean Year Completed", "Mean Surface Area"),
-  correlation_with_lag = c(
-    round(cor_count, 3),
-    round(cor_year, 3),
-    round(cor_area, 3)
-  ),
-  strength = c(
-    ifelse(cor_count > 0.6, "Strong", ifelse(cor_count > 0.3, "Moderate", "Weak")),
-    ifelse(cor_year > 0.6, "Strong", ifelse(cor_year > 0.3, "Moderate", "Weak")),
-    ifelse(cor_area > 0.6, "Strong", ifelse(cor_area > 0.3, "Moderate", "Weak"))
-  )
-)
-
-knitr::kable(
-  attribute_spatial_dependence,
-  caption = "Spatial Lag Correlation: Do Neighboring Tiles Have Similar Attributes?"
-)
-
-cat("\n→ If all correlations are > 0.5, strong spatial dependence is present.\n")
-cat("  This violates OLS independence assumption → spatial regression needed.\n")
+# Create a compact summary table with:
+# - attribute name
+# - correlation with spatial lag
+# - qualitative strength label
+# Then add a 1-2 sentence interpretation below the table.
 ```
 
 ```{r}
@@ -813,15 +752,13 @@ cat("  This violates OLS independence assumption → spatial regression needed.\
 
 ### Step 5.3
 
-**Visualize Spatial Autocorrelation: Scatterplot of Attribute vs. Spatial Lag**
+**Global Question:** Do neighboring tiles resemble each other overall, or is the pattern weak?
 
-Create a **Moran's I scatterplot** (also called a Moran plot) showing:
-- X-axis: Original dam attribute (e.g., mean year completed) — standardized
-- Y-axis: Spatial lag of that attribute — standardized  
-- Points: One per tile, colored by quadrant
-- Quadrants: High-High (both high), Low-Low (both low), High-Low (outlier high), Low-High (outlier low)
+Create a single **Moran's I scatterplot** for one dam attribute from Step 5.2 (for example, mean year completed or dam count). Use standardized values on both axes: the attribute on the x-axis and the spatial lag on the y-axis. The plot should show whether points concentrate along the diagonal or remain widely dispersed.
 
-This visualizes **Local Indicators of Spatial Association (LISA)**: which tiles are clusters vs. outliers relative to their neighbors.
+Your interpretation should focus on the **overall pattern**, not on specific regions. In particular, explain whether the correlation from Step 5.2 suggests strong, moderate, or weak spatial dependence and whether the scatterplot supports that conclusion.
+
+Do **not** create a geographic map here. Save local hotspot mapping for Q6.
 
 ::: callout-tip
 ## Standardization Details
@@ -837,107 +774,11 @@ Returns a numeric vector (not a matrix). Use `[, 1]` to extract it, or use `as.v
 
 ```{r}
 #| eval: false
-# Using your hexagon tiles with mean_year_completed (or your chosen attribute)
-
-# STEP A: Standardize the original attribute (careful with NAs!)
-# Only standardize tiles with actual data (not imputed)
-year_data <- hex_grid_dams$mean_year_completed[valid_year]
-lag_data <- spatial_lag_year[valid_year]
-
-x_std <- scale(year_data, center = TRUE, scale = TRUE)[, 1]
-lag_std <- scale(lag_data, center = TRUE, scale = TRUE)[, 1]
-
-# STEP B: Create a data frame for plotting (only tiles with valid data)
-plot_data <- data.frame(
-  x_std = x_std,
-  lag_std = lag_std,
-  tile_id = which(valid_year)  # Index of valid tiles
-) %>%
-  mutate(
-    x_cat = ifelse(x_std > 0, "High", "Low"),
-    lag_cat = ifelse(lag_std > 0, "High", "Low"),
-    quadrant = paste(x_cat, lag_cat, sep = "-")
-  ) %>%
-  mutate(
-    quadrant = factor(quadrant, levels = c("High-High", "Low-Low", "High-Low", "Low-High"))
-  )
-
-# Count points in each quadrant
-quadrant_counts <- table(plot_data$quadrant)
-cat("Tiles by quadrant:\n")
-print(quadrant_counts)
-
-# STEP C: Create Moran scatterplot
-ggplot(plot_data, aes(x = x_std, y = lag_std, color = quadrant, fill = quadrant)) +
-  geom_point(size = 3, alpha = 0.65) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.5) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.5) +
-  # Add a regression line through origin (optional, illustrates positive slope)
-  geom_abline(intercept = 0, slope = 1, color = "gray50", linetype = "dotted", alpha = 0.5) +
-  scale_color_manual(
-    values = c(
-      "High-High" = "#e41a1c",
-      "Low-Low" = "#377eb8",
-      "High-Low" = "#ff7f00",
-      "Low-High" = "#4daf4a"
-    )
-  ) +
-  scale_fill_manual(
-    values = c(
-      "High-High" = "#e41a1c",
-      "Low-Low" = "#377eb8",
-      "High-Low" = "#ff7f00",
-      "Low-High" = "#4daf4a"
-    )
-  ) +
-  labs(
-    title = "Moran Scatterplot: Dam Age and Spatial Lag",
-    subtitle = "LISA (Local Indicators of Spatial Association) by Quadrant",
-    x = "Mean Dam Age (standardized)",
-    y = "Spatial Lag of Mean Dam Age (standardized)",
-    color = "Quadrant",
-    fill = "Quadrant",
-    caption = paste0(
-      "High-High (red): clusters of old dams | Low-Low (blue): clusters of young dams\n",
-      "High-Low (orange): isolated old regions | Low-High (green): isolated young regions"
-    )
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 14, face = "bold"),
-    plot.caption = element_text(size = 9, hjust = 0, color = "gray50")
-  )
-```
-
-**Alternative: Map the quadrants geographically**
-
-If you want to see _where_ the clusters and outliers are:
-
-```{r}
-#| eval: false
-hex_grid_dams_for_map <- hex_grid_dams[valid_year, ] %>%
-  mutate(
-    x_std = x_std,
-    lag_std = lag_std,
-    quadrant = plot_data$quadrant
-  )
-
-ggplot(hex_grid_dams_for_map) +
-  geom_sf(aes(fill = quadrant), color = "white", size = 0.1) +
-  scale_fill_manual(
-    values = c(
-      "High-High" = "#e41a1c",
-      "Low-Low" = "#377eb8",
-      "High-Low" = "#ff7f00",
-      "Low-High" = "#4daf4a"
-    )
-  ) +
-  labs(
-    title = "Geographic Distribution of LISA Quadrants (Dam Age)",
-    fill = "Quadrant"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "right")
+# Suggested workflow (write your own implementation):
+# 1) standardize the selected attribute and its spatial lag
+# 2) assign HH / LL / HL / LH quadrants by sign of (z, lag_z)
+# 3) produce a Moran scatterplot with dashed axes at 0
+# 4) report quadrant counts and interpret what dominates
 ```
 
 ```{r}
@@ -946,59 +787,47 @@ ggplot(hex_grid_dams_for_map) +
 
 ### Step 5.4
 
-**Interpretation and Implication for Spatial Regression**
+**Global Interpretation of Spatial Patterns**
 
 ::: callout-tip
-## Writing Guide: Spatial Correlation Interpretation
+## Writing Guide: Interpreting Spatial Correlation
 
 Use this structure to organize your response:
 
-1. **State your findings clearly** — cite specific correlation values and quadrant counts from your Moran plot.
-2. **Connect to underlying geography** — which regions show clustering? (e.g., "High-High points cluster in Tennessee Valley...")
-3. **Explain why** — relate to dam history, geology, hydrology, or policy (e.g., "TVA region constructed multiple dams in 1930s–1950s, explaining age clustering")
-4. **Conclude on spatial regression necessity** — if correlations >0.5, OLS assumes violate independence; SAR models needed.
+1. **State your findings clearly** — cite specific correlation values from your Step 5.2 table. Which attributes show the strongest clustering?
+2. **Connect to structure** — what does the scatterplot suggest about broad spatial organization, without moving into local mapping yet?
+3. **Explain why** — relate to dam history, geology, hydrology, or policy at the regional scale
+4. **Analyze patterns** — describe what the Moran scatterplot and correlation values reveal about overall dam distributions
 :::
 
 Write 2–3 paragraphs (400–600 words) addressing:
 
-**a. Spatial Clustering of Dam Attributes (Quantitative)**
+**a. Spatial Clustering Patterns (Quantitative + Geographic)**
 
-Which attributes show the strongest spatial lag correlations (from your Step 7.2 table)? Are correlations > 0.5 (strong) or 0.2–0.5 (moderate)? Are some attributes more clustered than others? For example:
+Which attributes show the strongest spatial lag correlations (from your Step 5.2 table)? Are correlations > 0.5 (strong) or 0.2–0.5 (moderate)? 
 
-- **Dam _count_**: Often strongly correlated (r > 0.6) because dam density physically creates neighbors with many dams.
-- **Dam _age_**: May show moderate to strong clustering (r = 0.4–0.7) if dams were built in regionally-coherent eras (e.g., 1930s TVA construction, 1960s-70s Western expansion).
-- **Dam _size_**: Moderate clustering expected if geology/hydrology favors larger dams in certain regions.
+- **Dam _count_**: Often strongly correlated because high dam density naturally creates neighbors with many dams.
+- **Dam _age_**: Likely shows clustering if dams were built in regionally-coherent eras (e.g., 1930s TVA construction, 1960s–70s Western expansion).
+- **Dam _size_**: May be clustered if geology/hydrology favors larger dams in specific regions.
 
-For each attribute, interpret: does the correlation make geographic sense? Why should dam age or size be similar in neighboring regions?
+For each attribute, describe whether the clustering seems broad or weak. Does the correlation make geographic sense? Why should dam characteristics be similar in neighboring areas?
 
-**b. Outliers and Anomalies (Qualitative + Geographic)**
+**b. Moran Scatterplot Interpretation (Visualization)**
 
-From your Moran scatterplot / LISA map:
+From your Moran scatterplot, describe the spatial distribution of points:
 
-- **High-High clusters** (e.g., upper right quadrant, red points): These are regions where old dams are surrounded by old dams (or high-count tiles surrounded by high-count tiles). Where are they? (e.g., Tennessee Valley, Arkansas River, California Central Valley)
-- **Low-Low clusters** (e.g., lower left, blue): Young dams or sparse dams surrounded by similar neighbors. Typical of Mountain West or recent development areas.
-- **High-Low outliers** (orange): Isolated regions of old/dense dams surrounded by young/sparse neighbors. Can you spot any? These might represent historical dam sites (single large project) or regional anomalies.
-- **Low-High outliers** (green): Rare—regions of young/sparse dams surrounded by old/dense. Think about where this occurs and why.
+- Do points cluster near the diagonal, suggesting positive spatial autocorrelation?
+- Are there many outliers away from the diagonal, suggesting weaker dependence or heterogeneous neighborhoods?
+- Does the pattern appear stronger for some attributes than others?
 
-**If you have a geographic map** of the LISA quadrants, describe 1–2 specific regions and why they're outliers. If you created a visualization, reference it.
+**c. Spatial Structure Implications**
 
-**c. Spatial Regression Necessity (Statistical Inference)**
+What do these correlation values and Moran scatterplot patterns tell us about dam infrastructure spatial organization? Given your findings, write a brief conclusion synthesizing:
+- Are neighboring tiles genuinely similar in dam characteristics, or is the clustering weak?
+- What management or hydrologic factors drive these patterns?
+- How do findings from your Moran analysis here compare to what you observed in Q4 (dam purposes geography)?
 
-This is the crux: **If dam attributes are spatially autocorrelated, OLS regression violates the independence assumption**, leading to:
-- Biased standard errors (usually too narrow) → inflated t-statistics and false positives
-- Inefficient parameter estimates
-- Invalid confidence intervals and p-values
-
-**Your conclusion should address:**
-
-- **Do your results support spatial modeling?** If correlations > 0.5 across attributes and Moran's I was significant in Q6, yes.
-- **Which spatial model?** 
-  - **Spatial Lag (SAR)** model if dependent variable depends on neighbors (e.g., dam size influenced by neighbor sizes)
-  - **Spatial Error (SEM)** model if omitted variables create spatial structure in residuals
-  - For dam attributes, **SAR is more intuitive**: managing one dam influences decisions about neighboring dams (environmental flows, coordination).
-- **Which tessellation for spatial models?** The tessellation from Q3 with **regular neighborhoods** (hexagons or squares) and **moderate tile counts** (e.g., 100–500 tiles) provides stable neighbors. Too fine → too many neighbors; too coarse → not enough detail.
-
-**Closing sentence**: "Given evidence of spatial autocorrelation in dam attributes (r = X–Y), a spatial regression model is warranted for any subsequent analysis of dam characteristics. Standard OLS would underestimate uncertainty and potentially mislead policy decisions."
+**Note**: In future weeks, we'll explore how spatial structure revealed here relates to statistical modeling of dam attributes.
 
 ```{r}
 
@@ -1020,11 +849,11 @@ Write 2–3 sentences predicting Q6 outcomes before you compute LISA. After Q6, 
 
 # Question 6: Local Spatial Autocorrelation (LISA) — Mapping Hotspots and Coldspots
 
-**In this question, you'll analyze LISA using your recommended tessellation from Q3 AND a second tessellation (e.g., square grid if you chose hexagon, or vice versa).** This tessellation comparison will reveal how MAUP affects local clustering patterns.
+**In this question, you'll analyze LISA using your recommended tessellation from Q3 AND counties as a required comparison unit.** This contrast (regular tessellation vs administrative boundaries) reveals MAUP much more clearly than comparing two regular grids.
 
 While global statistics like Moran's I (Q5) test for clustering "on average," spatial patterns are **rarely uniform**. Some regions have dense hotspots (e.g., TVA region with concentrated dam infrastructure), while others are sparse coldspots (remote areas, deserts). **Local Indicator of Spatial Autocorrelation (LISA)** decomposes global clustering into local patterns, revealing **where** hotspots and coldspots occur—critical for targeted management interventions.
 
-In this question, you'll compute LISA using **cropped tessellations** (your recommended one from Q3, plus comparison grids) to identify geographic clustering patterns. You'll work with both your chosen tessellation AND at least one alternative (e.g., hexagon and square grids), both clipped to ensure proper boundary handling.
+In this question, you'll compute LISA using your **cropped recommended tessellation** (from Q1.4) and **CONUS counties** as the alternative support. This gives a direct test of how local clustering changes when analysis units shift from equal-area tiles to administrative units.
 
 ::: callout-note
 ## LISA Concept (Week 3-1 Lectures)
@@ -1046,9 +875,9 @@ The resulting **LISA quadrants** reveal:
 
 Crop your tessellations to ensure consistent boundaries:
 
-**a.** Use your recommended tessellation from Q3 (e.g., hexagon grid). Clip it to the CONUS boundary with `st_intersection(tessellation, boundary)`.
+**a.** Use your recommended tessellation from Q3 (e.g., hexagon grid). Clip it to the CONUS boundary with `st_filter(tessellation, boundary)`.
 
-**b.** Also clip **at least one alternative** tessellation (e.g., square grid) using the same boundary clipping.
+**b.** Use **counties** as the required alternative comparison unit (no extra clipping needed if your counties object is already CONUS-only).
 
 **c.** For each clipped tessellation, recompute dam counts using point-in-polygon joining to ensure correct aggregation within the cropped geometry.
 
@@ -1057,10 +886,10 @@ Crop your tessellations to ensure consistent boundaries:
 
 ```
 # Recommended tessellation (e.g., hexagon_grid)
-hex_cropped <- st_intersection(hexagon_grid, usa_boundary)
+hex_cropped <- st_filter(hexagon_grid, usa_boundary)
 
-# Alternative for comparison (e.g., square_grid)
-square_cropped <- st_intersection(square_grid, usa_boundary)
+# Required comparison unit: counties (already CONUS)
+county_units <- counties_sf
 
 # Recompute dam counts on cropped grids
 # (Use your point_in_polygon function or st_join + count pattern)
@@ -1068,7 +897,7 @@ hex_dams <- st_join(hex_cropped, dams_sf) %>%
   group_by(id) %>%
   summarise(n = n(), .groups = "drop")
 
-square_dams <- st_join(square_cropped, dams_sf) %>%
+county_dams <- st_join(county_units, dams_sf) %>%
   group_by(id) %>%
   summarise(n = n(), .groups = "drop")
 ```
@@ -1120,13 +949,23 @@ sum(rowSums(neighbor_weights) == 0)
 
 ### Step 6.3
 
-Assign **LISA quadrants** and create visualizations:
+**LOCAL Question: WHERE specifically are high-high, low-low, high-low, and low-high clusters?** (Answer: Geographic map showing which regions belong to which quadrant)
 
-**a.** Assign each tile to a quadrant (HH, LL, HL, LH) based on the signs of $z$ and $\text{lag}_z$.
+**Two Visualizations:**
 
-**b.** Create a **Moran scatter plot**: Plot $z$ (x-axis) vs. $\text{lag}_z$ (y-axis), with points colored by quadrant. Add dashed reference lines at (0, 0). Interpretation: do points cluster on the axes (strong local dependence) or scatter widely?
+**a) Moran Scatterplot (Reference):**
+- Same as Q5, showing which tile belongs to which quadrant
+- Primarily for reference; the interesting insight is now *geographic*
 
-**c.** Create a **LISA map**: Choropleth of your cropped tessellation colored by LISA quadrant (HH=red, LL=blue, HL=yellow, LH=cyan). Overlay state or county boundaries for geographic reference. Interpretation: where are hotspots concentrated? Are coldspots in deserts/mountains as expected?
+**b) LISA Geographic Map (PRIMARY OUTPUT):**
+- Choropleth map of your tessellation colored by LISA quadrant
+- HH (red) = hotspots with hotspot neighbors → TVA region, Colorado Basin, etc.
+- LL (blue) = coldspots with coldspot neighbors → Great Basin, deserts, etc.
+- HL (yellow) = anomalies: high counts surrounded by sparse tiles (cluster edges)
+- LH (cyan) = anomalies: sparse tiles surrounded by high-count neighbors (rare)
+
+**Key Interpretation:**
+The LISA map reveals *which specific regions* exhibit local clustering. This is actionable: dense regions need intensive management; sparse regions need different strategies. The quadrant distribution (% of tiles in HH vs. LL) reveals whether the landscape is dominated by hotspots, coldspots, or mixed.
 
 ```{r}
 
@@ -1134,18 +973,18 @@ Assign **LISA quadrants** and create visualizations:
 
 ### Step 6.4
 
-**Comparison with alternative tessellation** (e.g., square grid):
+**Comparison with required county baseline**:
 
-**a.** Repeat Steps 6.2–6.3 for your alternative tessellation.
+**a.** Repeat Steps 6.2–6.3 for counties.
 
-**b.** Create side-by-side maps (recommended vs. alternative) showing LISA quadrant distributions. Do they tell the same story, or does tessellation geometry affect local clustering patterns?
+**b. REQUIRED DELIVERABLE:** Create side-by-side LISA maps of **your chosen tessellation (from Q3)** and **counties** in the same figure. Use identical quadrant labels and color mapping in both panels so visual differences reflect unit choice, not styling.
 
-**c.** **Quantitative comparison**: For both tessellations, count the number of tiles in each quadrant. Example output:
+**c.** **Quantitative comparison**: For both units, count the number of polygons in each quadrant. Example output:
    - Hexagon: HH=15 tiles, LL=23 tiles, HL=5 tiles, LH=2 tiles
-   - Square: HH=18 tiles, LL=20 tiles, HL=8 tiles, LH=3 tiles
+  - Counties: HH=205 counties, LL=1300 counties, HL=240 counties, LH=360 counties
    - **Interpretation**: Are quadrant distributions similar (robust LISA pattern) or different (MAUP sensitive at local scale)?
 
-**d.** Interpret: Which tessellation reveals clustering more clearly? Do LISA patterns align between methods, or does MAUP (modifiable areal unit problem) create divergent local structure?
+**d.** Interpret: Which unit reveals clustering more clearly for your purpose? Do patterns align between your chosen tessellation and counties, or does MAUP (modifiable areal unit problem) create divergent local structure?
 
 ```{r}
 
@@ -1166,7 +1005,7 @@ Write a 3–4 paragraph synthesis addressing:
 
 **b.** **Outliers and anomalies**: Are there notable HL or LH tiles? What might explain them?
 
-**c.** **Tessellation comparison**: Does tessellation choice (hexagon vs. square vs. other) affect LISA conclusions? How does MAUP operate at the local scale?
+**c.** **Unit comparison**: Does analysis unit choice (hexagon vs. county) affect LISA conclusions? How does MAUP operate at the local scale?
 
 **d.** **Implications for management**: How does LISA output inform dam operations, reporting, or policy?
    - Where should multi-state coordination efforts focus? (HH hotspots)
