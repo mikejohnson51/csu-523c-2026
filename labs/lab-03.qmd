@@ -69,7 +69,7 @@ library(rmapshaper)# Simplify geometries
 library(units)     # manage your units
 
 # Data
-# remotes::install_github("mikejohnson/AOI") # get US counties
+# remotes::install_github("mikejohnson51/AOI") # get US counties
 library(AOI) # county boundaries
 
 # Visualization
