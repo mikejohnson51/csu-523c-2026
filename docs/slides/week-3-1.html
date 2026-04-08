@@ -249,86 +249,48 @@
 <section id="for-example" class="slide level2">
 <h2>For example …</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a>usa <span class="ot">&lt;-</span> <span class="fu">st_cast</span>(<span class="fu">st_union</span>(<span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"conus"</span>)), <span class="st">"MULTILINESTRING"</span>)</span>
-<span id="cb1-2"><a></a></span>
-<span id="cb1-3"><a></a><span class="fu">nrow</span>(cities)</span>
-<span id="cb1-4"><a></a><span class="co">#&gt; [1] 31254</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; [1] 31254</code></pre>
 </div>
 <p><br></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a><span class="co"># Great Circle Distance in GCS</span></span>
-<span id="cb2-2"><a></a><span class="fu">system.time</span>({x <span class="ot">&lt;-</span> <span class="fu">st_distance</span>(usa, cities)})</span>
-<span id="cb2-3"><a></a><span class="co"># user      system elapsed </span></span>
-<span id="cb2-4"><a></a><span class="co"># 103.560   1.390  117.128 </span></span>
-<span id="cb2-5"><a></a></span>
-<span id="cb2-6"><a></a><span class="co"># Great Circle Distance in GCS</span></span>
-<span id="cb2-7"><a></a><span class="fu">system.time</span>({x <span class="ot">&lt;-</span> <span class="fu">st_distance</span>(usa, cities)})</span>
-<span id="cb2-8"><a></a><span class="co"># user  system elapsed </span></span>
-<span id="cb2-9"><a></a><span class="co"># 0.703   0.005   0.739  </span></span>
-<span id="cb2-10"><a></a></span>
-<span id="cb2-11"><a></a><span class="co"># Euclidean Distance on PCS</span></span>
-<span id="cb2-12"><a></a><span class="fu">system.time</span>({x <span class="ot">&lt;-</span> <span class="fu">st_distance</span>(usa, cities, <span class="at">which =</span> <span class="st">"Euclidean"</span>)})</span>
-<span id="cb2-13"><a></a><span class="co"># user  system elapsed </span></span>
-<span id="cb2-14"><a></a><span class="co"># 1.285   0.004   1.319 </span></span>
-<span id="cb2-15"><a></a></span>
-<span id="cb2-16"><a></a></span>
-<span id="cb2-17"><a></a><span class="fu">system.time</span>({x <span class="ot">&lt;-</span> <span class="fu">st_distance</span>(<span class="fu">st_transform</span>(usa,<span class="dv">5070</span>), </span>
-<span id="cb2-18"><a></a>                              <span class="fu">st_transform</span>(cities, <span class="dv">5070</span>))})</span>
-<span id="cb2-19"><a></a></span>
-<span id="cb2-20"><a></a><span class="co"># user  system elapsed </span></span>
-<span id="cb2-21"><a></a><span class="co"># 1.399   0.003   1.435</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
 <section id="units" class="slide level2">
 <h2>Units</h2>
 <p>When possible measure operations report results with a units appropriate for the CRS:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>co <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/co.shp"</span>)</span>
-<span id="cb3-2"><a></a><span class="co">#&gt; Reading layer `co' from data source </span></span>
-<span id="cb3-3"><a></a><span class="co">#&gt;   `/Users/mikejohnson/github/csu-523c-2026/slides/data/co.shp' </span></span>
-<span id="cb3-4"><a></a><span class="co">#&gt;   using driver `ESRI Shapefile'</span></span>
-<span id="cb3-5"><a></a><span class="co">#&gt; Simple feature collection with 64 features and 4 fields</span></span>
-<span id="cb3-6"><a></a><span class="co">#&gt; Geometry type: MULTIPOLYGON</span></span>
-<span id="cb3-7"><a></a><span class="co">#&gt; Dimension:     XY</span></span>
-<span id="cb3-8"><a></a><span class="co">#&gt; Bounding box:  xmin: -109.0602 ymin: 36.99246 xmax: -102.0415 ymax: 41.00342</span></span>
-<span id="cb3-9"><a></a><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
-<span id="cb3-10"><a></a>a <span class="ot">&lt;-</span> <span class="fu">st_area</span>(co[<span class="dv">1</span>,])</span>
-<span id="cb3-11"><a></a><span class="fu">attributes</span>(a) <span class="sc">|&gt;</span> <span class="fu">unlist</span>()</span>
-<span id="cb3-12"><a></a><span class="co">#&gt; units.numerator1 units.numerator2            class </span></span>
-<span id="cb3-13"><a></a><span class="co">#&gt;              "m"              "m"          "units"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Reading layer `co' from data source 
+#&gt;   `/Users/mikejohnson/github/csu-523c-2026/slides/data/co.shp' 
+#&gt;   using driver `ESRI Shapefile'
+#&gt; Simple feature collection with 64 features and 4 fields
+#&gt; Geometry type: MULTIPOLYGON
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -109.0602 ymin: 36.99246 xmax: -102.0415 ymax: 41.00342
+#&gt; Geodetic CRS:  WGS 84
+#&gt; units.numerator1 units.numerator2            class 
+#&gt;              "m"              "m"          "units"</code></pre>
 </div>
 <p>The <strong>units</strong> package can be used to convert between units:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(a, km<span class="sc">^</span><span class="dv">2</span>) <span class="co"># result in square kilometers</span></span>
-<span id="cb4-2"><a></a><span class="co">#&gt; 3062.85 [km^2]</span></span>
-<span id="cb4-3"><a></a>units<span class="sc">::</span><span class="fu">set_units</span>(a, ha) <span class="co"># result in hectares</span></span>
-<span id="cb4-4"><a></a><span class="co">#&gt; 306285 [ha]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; 3062.85 [km^2]
+#&gt; 306285 [ha]</code></pre>
 </div>
 <p>and the results can be stripped of their attributes for cases where numeric values are needed (e.g.&nbsp;math operators and ggplot):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="fu">as.numeric</span>(a)</span>
-<span id="cb5-2"><a></a><span class="co">#&gt; [1] 3062849758</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; [1] 3062849758</code></pre>
 </div>
 </section>
 <section id="topological-dimension" class="slide level2">
 <h2>Topological Dimension</h2>
 <p>A <strong>POINT</strong> is a shape with a dimension of 0 that occupies a single location in coordinate space.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="co"># POINT defined as numeric vector</span></span>
-<span id="cb6-2"><a></a>(<span class="fu">st_dimension</span>(<span class="fu">st_point</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>))))</span>
-<span id="cb6-3"><a></a><span class="co">#&gt; [1] 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; [1] 0</code></pre>
 </div>
 <p>A <strong>LINESTRING</strong> is a shape that has a dimension of 1 (length)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co"># LINESTRING defined by matrix</span></span>
-<span id="cb7-2"><a></a>(<span class="fu">st_dimension</span>(<span class="fu">st_linestring</span>(<span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">nrow =</span> <span class="dv">2</span>))))</span>
-<span id="cb7-3"><a></a><span class="co">#&gt; [1] 1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; [1] 1</code></pre>
 </div>
 <p>A <strong>POLYGON</strong> is a surface stored as a list of its exterior and interior rings. It has a dimension of 2 (area)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="co"># POLYGON defined by LIST (interior and exterior rings)</span></span>
-<span id="cb8-2"><a></a>(<span class="fu">st_dimension</span>(<span class="fu">st_polygon</span>(<span class="fu">list</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">1</span>,<span class="dv">2</span>), <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)))))</span>
-<span id="cb8-3"><a></a><span class="co">#&gt; [1] 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; [1] 2</code></pre>
 </div>
 </section></section>
 <section>
@@ -526,7 +488,11 @@
 
 <img data-src="img/12-de-9Im-matrix-simple.svg" class="r-stretch"><p>Where <code>II</code> would state: “Does the Interior of”a” overlaps with the Interior of “b” in a way that produces a point (0), line (1), or polygon (2)”</p>
 <p>Where <code>IB</code> would state: “Does the Interior of”a” overlap with the Boundary of “b” in a way that produces a point (0), line (1), or polygon (2)”</p>
-<p>Both matrix forms: - dimensional {0,1,2,F} - Boolean {T,F}</p>
+<p>Both matrix forms:</p>
+<ul>
+<li>dimensional {0,1,2,F}</li>
+<li>Boolean {T,F}</li>
+</ul>
 <div class="fragment">
 <p>Can be serialize as a “DE-9IM string code” representing the matrix in a single string element (standardized format for data interchange)</p>
 <p>The OGC has standardized the typical spatial predicates (Contains, Crosses, Intersects, Touches, etc.) as <em>Boolean</em> functions, and the DE-9IM model as a function that returns the DE-9IM code, with domain of {0,1,2,F}</p>
@@ -544,7 +510,7 @@
 <li>Geometry Y is a 4 feature polygon colored in blue</li>
 </ul>
 <div class="columns">
-<div class="{.column-width=&quot;50%&quot;}">
+<div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -554,29 +520,24 @@
 </div>
 </div>
 </div>
-<div class="{.column-width=&quot;50%&quot;}">
+<div class="column" style="width:50%;">
 
+</div><div class="cell">
+<pre><code>#&gt;      [,1]        [,2]        [,3]        [,4]       
+#&gt; [1,] "212FF1FF2" "FF2FF1212" "212101212" "FF2FF1212"
+#&gt; [2,] "FF2FF1212" "212101212" "212101212" "FF2FF1212"
+#&gt; [3,] "FF2FF1212" "FF2FF1212" "212101212" "FF2FF1212"
+#&gt;      [,1]        [,2]        [,3]       
+#&gt; [1,] "2FFF1FFF2" "FF2F01212" "FF2F11212"
+#&gt; [2,] "FF2F01212" "2FFF1FFF2" "FF2FF1212"
+#&gt; [3,] "FF2F11212" "FF2FF1212" "2FFF1FFF2"
+#&gt;      [,1]        [,2]        [,3]        [,4]       
+#&gt; [1,] "2FFF1FFF2" "FF2FF1212" "212101212" "FF2FF1212"
+#&gt; [2,] "FF2FF1212" "2FFF1FFF2" "212101212" "FF2FF1212"
+#&gt; [3,] "212101212" "212101212" "2FFF1FFF2" "FF2FF1212"
+#&gt; [4,] "FF2FF1212" "FF2FF1212" "FF2FF1212" "2FFF1FFF2"</code></pre>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="fu">st_relate</span>(x,y)</span>
-<span id="cb9-2"><a></a><span class="co">#&gt;      [,1]        [,2]        [,3]        [,4]       </span></span>
-<span id="cb9-3"><a></a><span class="co">#&gt; [1,] "212FF1FF2" "FF2FF1212" "212101212" "FF2FF1212"</span></span>
-<span id="cb9-4"><a></a><span class="co">#&gt; [2,] "FF2FF1212" "212101212" "212101212" "FF2FF1212"</span></span>
-<span id="cb9-5"><a></a><span class="co">#&gt; [3,] "FF2FF1212" "FF2FF1212" "212101212" "FF2FF1212"</span></span>
-<span id="cb9-6"><a></a><span class="fu">st_relate</span>(x,x)</span>
-<span id="cb9-7"><a></a><span class="co">#&gt;      [,1]        [,2]        [,3]       </span></span>
-<span id="cb9-8"><a></a><span class="co">#&gt; [1,] "2FFF1FFF2" "FF2F01212" "FF2F11212"</span></span>
-<span id="cb9-9"><a></a><span class="co">#&gt; [2,] "FF2F01212" "2FFF1FFF2" "FF2FF1212"</span></span>
-<span id="cb9-10"><a></a><span class="co">#&gt; [3,] "FF2F11212" "FF2FF1212" "2FFF1FFF2"</span></span>
-<span id="cb9-11"><a></a><span class="fu">st_relate</span>(y,y)</span>
-<span id="cb9-12"><a></a><span class="co">#&gt;      [,1]        [,2]        [,3]        [,4]       </span></span>
-<span id="cb9-13"><a></a><span class="co">#&gt; [1,] "2FFF1FFF2" "FF2FF1212" "212101212" "FF2FF1212"</span></span>
-<span id="cb9-14"><a></a><span class="co">#&gt; [2,] "FF2FF1212" "2FFF1FFF2" "212101212" "FF2FF1212"</span></span>
-<span id="cb9-15"><a></a><span class="co">#&gt; [3,] "212101212" "212101212" "2FFF1FFF2" "FF2FF1212"</span></span>
-<span id="cb9-16"><a></a><span class="co">#&gt; [4,] "FF2FF1212" "FF2FF1212" "FF2FF1212" "2FFF1FFF2"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
+</div></div>
 </section>
 <section id="named-predicates" class="slide level2 smaller">
 <h2>Named Predicates</h2>
@@ -662,51 +623,37 @@
 </ul>
 <h4 id="sparse-matrix"><em>sparse</em> matrix</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">st_intersects</span>(x,y)</span>
-<span id="cb10-2"><a></a><span class="co">#&gt; Sparse geometry binary predicate list of length 3, where the predicate</span></span>
-<span id="cb10-3"><a></a><span class="co">#&gt; was `intersects'</span></span>
-<span id="cb10-4"><a></a><span class="co">#&gt;  1: 1, 3</span></span>
-<span id="cb10-5"><a></a><span class="co">#&gt;  2: 2, 3</span></span>
-<span id="cb10-6"><a></a><span class="co">#&gt;  3: 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Sparse geometry binary predicate list of length 3, where the predicate
+#&gt; was `intersects'
+#&gt;  1: 1, 3
+#&gt;  2: 2, 3
+#&gt;  3: 3</code></pre>
 </div>
 <h4 id="dense-matrix"><em>dense</em> matrix</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="fu">st_intersects</span>(x, y, <span class="at">sparse =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb11-2"><a></a><span class="co">#&gt;       [,1]  [,2] [,3]  [,4]</span></span>
-<span id="cb11-3"><a></a><span class="co">#&gt; [1,]  TRUE FALSE TRUE FALSE</span></span>
-<span id="cb11-4"><a></a><span class="co">#&gt; [2,] FALSE  TRUE TRUE FALSE</span></span>
-<span id="cb11-5"><a></a><span class="co">#&gt; [3,] FALSE FALSE TRUE FALSE</span></span>
-<span id="cb11-6"><a></a></span>
-<span id="cb11-7"><a></a><span class="fu">st_disjoint</span>(x, y, <span class="at">sparse =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb11-8"><a></a><span class="co">#&gt;       [,1]  [,2]  [,3] [,4]</span></span>
-<span id="cb11-9"><a></a><span class="co">#&gt; [1,] FALSE  TRUE FALSE TRUE</span></span>
-<span id="cb11-10"><a></a><span class="co">#&gt; [2,]  TRUE FALSE FALSE TRUE</span></span>
-<span id="cb11-11"><a></a><span class="co">#&gt; [3,]  TRUE  TRUE FALSE TRUE</span></span>
-<span id="cb11-12"><a></a></span>
-<span id="cb11-13"><a></a><span class="fu">st_touches</span>(x, y, <span class="at">sparse =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb11-14"><a></a><span class="co">#&gt;       [,1]  [,2]  [,3]  [,4]</span></span>
-<span id="cb11-15"><a></a><span class="co">#&gt; [1,] FALSE FALSE FALSE FALSE</span></span>
-<span id="cb11-16"><a></a><span class="co">#&gt; [2,] FALSE FALSE FALSE FALSE</span></span>
-<span id="cb11-17"><a></a><span class="co">#&gt; [3,] FALSE FALSE FALSE FALSE</span></span>
-<span id="cb11-18"><a></a></span>
-<span id="cb11-19"><a></a><span class="fu">st_within</span>(x, y, <span class="at">sparse =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb11-20"><a></a><span class="co">#&gt;       [,1]  [,2]  [,3]  [,4]</span></span>
-<span id="cb11-21"><a></a><span class="co">#&gt; [1,] FALSE FALSE FALSE FALSE</span></span>
-<span id="cb11-22"><a></a><span class="co">#&gt; [2,] FALSE FALSE FALSE FALSE</span></span>
-<span id="cb11-23"><a></a><span class="co">#&gt; [3,] FALSE FALSE FALSE FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt;       [,1]  [,2] [,3]  [,4]
+#&gt; [1,]  TRUE FALSE TRUE FALSE
+#&gt; [2,] FALSE  TRUE TRUE FALSE
+#&gt; [3,] FALSE FALSE TRUE FALSE
+#&gt;       [,1]  [,2]  [,3] [,4]
+#&gt; [1,] FALSE  TRUE FALSE TRUE
+#&gt; [2,]  TRUE FALSE FALSE TRUE
+#&gt; [3,]  TRUE  TRUE FALSE TRUE
+#&gt;       [,1]  [,2]  [,3]  [,4]
+#&gt; [1,] FALSE FALSE FALSE FALSE
+#&gt; [2,] FALSE FALSE FALSE FALSE
+#&gt; [3,] FALSE FALSE FALSE FALSE
+#&gt;       [,1]  [,2]  [,3]  [,4]
+#&gt; [1,] FALSE FALSE FALSE FALSE
+#&gt; [2,] FALSE FALSE FALSE FALSE
+#&gt; [3,] FALSE FALSE FALSE FALSE</code></pre>
 </div>
 </section>
 <section id="st_relates-vs.-predicate-calls" class="slide level2">
 <h2>st_relates vs.&nbsp;predicate calls…</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a>states <span class="ot">&lt;-</span> <span class="fu">select</span>(<span class="fu">filter</span>(<span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"all"</span>), state_abbr <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"WA"</span>, <span class="st">"OR"</span>, <span class="st">"MT"</span>, <span class="st">"ID"</span>)), name)</span>
-<span id="cb12-2"><a></a></span>
-<span id="cb12-3"><a></a>wa <span class="ot">=</span> <span class="fu">filter</span>(states, name <span class="sc">==</span> <span class="st">"Washington"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="columns">
-<div data-column.wdith="50%">
+<div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a><span class="fu">plot</span>(states<span class="sc">$</span>geometry)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
@@ -715,24 +662,20 @@
 </div>
 </div>
 </div>
-</div><div data-column.wdith="50%">
+</div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a>(<span class="fu">mutate</span>(states, </span>
-<span id="cb14-2"><a></a>        <span class="at">deim9 =</span> <span class="fu">st_relate</span>(states, wa),</span>
-<span id="cb14-3"><a></a>        <span class="at">touch =</span> <span class="fu">st_touches</span>(states, wa, <span class="at">sparse =</span> <span class="cn">FALSE</span>))) </span>
-<span id="cb14-4"><a></a><span class="co">#&gt; Simple feature collection with 4 features and 3 fields</span></span>
-<span id="cb14-5"><a></a><span class="co">#&gt; Geometry type: MULTIPOLYGON</span></span>
-<span id="cb14-6"><a></a><span class="co">#&gt; Dimension:     XY</span></span>
-<span id="cb14-7"><a></a><span class="co">#&gt; Bounding box:  xmin: -124.8485 ymin: 41.98818 xmax: -104.0397 ymax: 49.00244</span></span>
-<span id="cb14-8"><a></a><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
-<span id="cb14-9"><a></a><span class="co">#&gt;         name                       geometry     deim9 touch</span></span>
-<span id="cb14-10"><a></a><span class="co">#&gt; 1      Idaho MULTIPOLYGON (((-111.0455 4... FF2F11212  TRUE</span></span>
-<span id="cb14-11"><a></a><span class="co">#&gt; 2    Montana MULTIPOLYGON (((-109.7985 4... FF2FF1212 FALSE</span></span>
-<span id="cb14-12"><a></a><span class="co">#&gt; 3     Oregon MULTIPOLYGON (((-117.22 44.... FF2F11212  TRUE</span></span>
-<span id="cb14-13"><a></a><span class="co">#&gt; 4 Washington MULTIPOLYGON (((-121.5237 4... 2FFF1FFF2 FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Simple feature collection with 4 features and 3 fields
+#&gt; Geometry type: MULTIPOLYGON
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -124.8485 ymin: 41.98818 xmax: -104.0397 ymax: 49.00244
+#&gt; Geodetic CRS:  WGS 84
+#&gt;         name                       geometry     deim9 touch
+#&gt; 1      Idaho MULTIPOLYGON (((-111.0455 4... FF2F11212  TRUE
+#&gt; 2    Montana MULTIPOLYGON (((-109.7985 4... FF2FF1212 FALSE
+#&gt; 3     Oregon MULTIPOLYGON (((-117.22 44.... FF2F11212  TRUE
+#&gt; 4 Washington MULTIPOLYGON (((-121.5237 4... 2FFF1FFF2 FALSE</code></pre>
 </div>
-</div>
-</div>
+</div></div>
 </section></section>
 <section>
 <section id="so" class="title-slide slide level1 center">
@@ -742,15 +685,10 @@
 <li><p>Up to this point in class we have been using Boolean <em>{T,F}</em> masks to filter data.frames by columns:</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>fruits <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"apple"</span>, <span class="st">"orange"</span>, <span class="st">"lemon"</span>, <span class="st">"watermelon"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; [1]  TRUE FALSE FALSE FALSE</code></pre>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a>fruits <span class="sc">==</span> <span class="st">"apple"</span></span>
-<span id="cb16-2"><a></a><span class="co">#&gt; [1]  TRUE FALSE FALSE FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a>fruits <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"apple"</span>, <span class="st">"lemon"</span>)</span>
-<span id="cb17-2"><a></a><span class="co">#&gt; [1]  TRUE FALSE  TRUE FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; [1]  TRUE FALSE  TRUE FALSE</code></pre>
 </div>
 </section>
 <section id="filtering-on-data.frames" class="slide level2">
@@ -759,29 +697,25 @@
 <li>We have used <code>dplyr::filter</code> to subset a data frame, retaining all rows that satisfy a <code>boolean</code> condition.</li>
 </ul>
 <div class="columns">
-<div data-column.wdith="50%">
+<div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">mutate</span>(states, <span class="at">equalsWA =</span> (name <span class="sc">==</span> <span class="st">"Washington"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb18-2"><a></a>  <span class="fu">st_drop_geometry</span>()</span>
-<span id="cb18-3"><a></a><span class="co">#&gt;         name equalsWA</span></span>
-<span id="cb18-4"><a></a><span class="co">#&gt; 1      Idaho    FALSE</span></span>
-<span id="cb18-5"><a></a><span class="co">#&gt; 2    Montana    FALSE</span></span>
-<span id="cb18-6"><a></a><span class="co">#&gt; 3     Oregon    FALSE</span></span>
-<span id="cb18-7"><a></a><span class="co">#&gt; 4 Washington     TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt;         name equalsWA
+#&gt; 1      Idaho    FALSE
+#&gt; 2    Montana    FALSE
+#&gt; 3     Oregon    FALSE
+#&gt; 4 Washington     TRUE</code></pre>
 </div>
-</div><div data-column.wdith="50%">
+</div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">filter</span>(states, name <span class="sc">==</span> <span class="st">"Washington"</span>)</span>
-<span id="cb19-2"><a></a><span class="co">#&gt; Simple feature collection with 1 feature and 1 field</span></span>
-<span id="cb19-3"><a></a><span class="co">#&gt; Geometry type: MULTIPOLYGON</span></span>
-<span id="cb19-4"><a></a><span class="co">#&gt; Dimension:     XY</span></span>
-<span id="cb19-5"><a></a><span class="co">#&gt; Bounding box:  xmin: -124.8485 ymin: 45.54364 xmax: -116.9161 ymax: 49.00244</span></span>
-<span id="cb19-6"><a></a><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
-<span id="cb19-7"><a></a><span class="co">#&gt;         name                       geometry</span></span>
-<span id="cb19-8"><a></a><span class="co">#&gt; 1 Washington MULTIPOLYGON (((-121.5237 4...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Simple feature collection with 1 feature and 1 field
+#&gt; Geometry type: MULTIPOLYGON
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -124.8485 ymin: 45.54364 xmax: -116.9161 ymax: 49.00244
+#&gt; Geodetic CRS:  WGS 84
+#&gt;         name                       geometry
+#&gt; 1 Washington MULTIPOLYGON (((-121.5237 4...</code></pre>
 </div>
-</div>
-</div>
+</div></div>
 </section>
 <section id="spatial-filtering" class="slide level2">
 <h2>Spatial Filtering</h2>
@@ -794,64 +728,52 @@
 <div class="{columns}">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="fu">mutate</span>(states, <span class="at">touch =</span> <span class="fu">st_touches</span>(states, wa, <span class="at">sparse =</span> <span class="cn">FALSE</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb20-2"><a></a>  <span class="fu">filter</span>(touch)</span>
-<span id="cb20-3"><a></a><span class="co">#&gt; Simple feature collection with 2 features and 2 fields</span></span>
-<span id="cb20-4"><a></a><span class="co">#&gt; Geometry type: MULTIPOLYGON</span></span>
-<span id="cb20-5"><a></a><span class="co">#&gt; Dimension:     XY</span></span>
-<span id="cb20-6"><a></a><span class="co">#&gt; Bounding box:  xmin: -124.7035 ymin: 41.98818 xmax: -111.0435 ymax: 49.00085</span></span>
-<span id="cb20-7"><a></a><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
-<span id="cb20-8"><a></a><span class="co">#&gt;     name                       geometry touch</span></span>
-<span id="cb20-9"><a></a><span class="co">#&gt; 1  Idaho MULTIPOLYGON (((-111.0455 4...  TRUE</span></span>
-<span id="cb20-10"><a></a><span class="co">#&gt; 2 Oregon MULTIPOLYGON (((-117.22 44....  TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Simple feature collection with 2 features and 2 fields
+#&gt; Geometry type: MULTIPOLYGON
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -124.7035 ymin: 41.98818 xmax: -111.0435 ymax: 49.00085
+#&gt; Geodetic CRS:  WGS 84
+#&gt;     name                       geometry touch
+#&gt; 1  Idaho MULTIPOLYGON (((-111.0455 4...  TRUE
+#&gt; 2 Oregon MULTIPOLYGON (((-117.22 44....  TRUE</code></pre>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="fu">st_filter</span>(states, wa, <span class="at">.predicate =</span> st_touches) </span>
-<span id="cb21-2"><a></a><span class="co">#&gt; Simple feature collection with 2 features and 1 field</span></span>
-<span id="cb21-3"><a></a><span class="co">#&gt; Geometry type: MULTIPOLYGON</span></span>
-<span id="cb21-4"><a></a><span class="co">#&gt; Dimension:     XY</span></span>
-<span id="cb21-5"><a></a><span class="co">#&gt; Bounding box:  xmin: -124.7035 ymin: 41.98818 xmax: -111.0435 ymax: 49.00085</span></span>
-<span id="cb21-6"><a></a><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
-<span id="cb21-7"><a></a><span class="co">#&gt;     name                       geometry</span></span>
-<span id="cb21-8"><a></a><span class="co">#&gt; 1  Idaho MULTIPOLYGON (((-111.0455 4...</span></span>
-<span id="cb21-9"><a></a><span class="co">#&gt; 2 Oregon MULTIPOLYGON (((-117.22 44....</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Simple feature collection with 2 features and 1 field
+#&gt; Geometry type: MULTIPOLYGON
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -124.7035 ymin: 41.98818 xmax: -111.0435 ymax: 49.00085
+#&gt; Geodetic CRS:  WGS 84
+#&gt;     name                       geometry
+#&gt; 1  Idaho MULTIPOLYGON (((-111.0455 4...
+#&gt; 2 Oregon MULTIPOLYGON (((-117.22 44....</code></pre>
 </div>
 </div></div>
 </section>
 <section id="result" class="slide level2">
 <h2>Result</h2>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="fu">ggplot</span>(states) <span class="sc">+</span> </span>
-<span id="cb22-2"><a></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span> </span>
-<span id="cb22-3"><a></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> wa, <span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb22-4"><a></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_filter</span>(states, wa, <span class="at">.predicate =</span> st_touches), <span class="at">fill =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span> </span>
-<span id="cb22-5"><a></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">ggplot</span>(states) <span class="sc">+</span> </span>
+<span id="cb18-2"><a></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span> </span>
+<span id="cb18-3"><a></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> wa, <span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">alpha =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb18-4"><a></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_filter</span>(states, wa, <span class="at">.predicate =</span> st_touches), <span class="at">fill =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb18-5"><a></a>  <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-41-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"></section>
 <section id="distance-example-additional-parameter" class="slide level2">
 <h2>Distance Example (additional parameter)</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a>cities <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">"data/uscities.csv"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb23-2"><a></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"lng"</span>, <span class="st">"lat"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb23-3"><a></a>  <span class="fu">select</span>(city, population, state_name) <span class="sc">|&gt;</span> </span>
-<span id="cb23-4"><a></a>  <span class="fu">st_transform</span>(<span class="dv">5070</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="fu">st_filter</span>(cities, </span>
-<span id="cb24-2"><a></a>          <span class="fu">filter</span>(cities, city <span class="sc">==</span> <span class="st">"Fort Collins"</span>), </span>
-<span id="cb24-3"><a></a>          <span class="at">.predicate =</span> st_is_within_distance, <span class="dv">10000</span>) </span>
-<span id="cb24-4"><a></a><span class="co">#&gt; Simple feature collection with 2 features and 3 fields</span></span>
-<span id="cb24-5"><a></a><span class="co">#&gt; Geometry type: POINT</span></span>
-<span id="cb24-6"><a></a><span class="co">#&gt; Dimension:     XY</span></span>
-<span id="cb24-7"><a></a><span class="co">#&gt; Bounding box:  xmin: -760147.5 ymin: 1982249 xmax: -751658.3 ymax: 1984620</span></span>
-<span id="cb24-8"><a></a><span class="co">#&gt; Projected CRS: NAD83 / Conus Albers</span></span>
-<span id="cb24-9"><a></a><span class="co">#&gt; # A tibble: 2 × 4</span></span>
-<span id="cb24-10"><a></a><span class="co">#&gt;   city         population state_name            geometry</span></span>
-<span id="cb24-11"><a></a><span class="co">#&gt; * &lt;chr&gt;             &lt;dbl&gt; &lt;chr&gt;              &lt;POINT [m]&gt;</span></span>
-<span id="cb24-12"><a></a><span class="co">#&gt; 1 Fort Collins     339256 Colorado   (-760147.5 1984620)</span></span>
-<span id="cb24-13"><a></a><span class="co">#&gt; 2 Timnath            8007 Colorado   (-751658.3 1982249)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Simple feature collection with 2 features and 3 fields
+#&gt; Geometry type: POINT
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -760147.5 ymin: 1982249 xmax: -751658.3 ymax: 1984620
+#&gt; Projected CRS: NAD83 / Conus Albers
+#&gt; # A tibble: 2 × 4
+#&gt;   city         population state_name            geometry
+#&gt; * &lt;chr&gt;             &lt;dbl&gt; &lt;chr&gt;              &lt;POINT [m]&gt;
+#&gt; 1 Fort Collins     339256 Colorado   (-760147.5 1984620)
+#&gt; 2 Timnath            8007 Colorado   (-751658.3 1982249)</code></pre>
 </div>
 </section></section>
 <section id="spatial-data-science" class="title-slide slide level1 center">
@@ -917,48 +839,31 @@
 <h1>Every Starbucks in the World</h1>
 <p>What county has the most Starbucks in each state?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a>(<span class="at">starbucks =</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">'data/directory.csv'</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb25-2"><a></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Latitude), Country <span class="sc">==</span> <span class="st">"US"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb25-3"><a></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Longitude"</span>, <span class="st">"Latitude"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb25-4"><a></a>  <span class="fu">st_transform</span>(<span class="dv">5070</span>))</span>
-<span id="cb25-5"><a></a><span class="co">#&gt; Simple feature collection with 13608 features and 11 fields</span></span>
-<span id="cb25-6"><a></a><span class="co">#&gt; Geometry type: POINT</span></span>
-<span id="cb25-7"><a></a><span class="co">#&gt; Dimension:     XY</span></span>
-<span id="cb25-8"><a></a><span class="co">#&gt; Bounding box:  xmin: -6223543 ymin: 278591.2 xmax: 2122577 ymax: 5307178</span></span>
-<span id="cb25-9"><a></a><span class="co">#&gt; Projected CRS: NAD83 / Conus Albers</span></span>
-<span id="cb25-10"><a></a><span class="co">#&gt; # A tibble: 13,608 × 12</span></span>
-<span id="cb25-11"><a></a><span class="co">#&gt;    Brand     `Store Number` `Store Name` `Ownership Type` `Street Address` City </span></span>
-<span id="cb25-12"><a></a><span class="co">#&gt;  * &lt;chr&gt;     &lt;chr&gt;          &lt;chr&gt;        &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;</span></span>
-<span id="cb25-13"><a></a><span class="co">#&gt;  1 Starbucks 3513-125945    Safeway-Anc… Licensed         5600 Debarr Rd … Anch…</span></span>
-<span id="cb25-14"><a></a><span class="co">#&gt;  2 Starbucks 74352-84449    Safeway-Anc… Licensed         1725 Abbott Rd   Anch…</span></span>
-<span id="cb25-15"><a></a><span class="co">#&gt;  3 Starbucks 12449-152385   Safeway - A… Licensed         1501 Huffman Rd  Anch…</span></span>
-<span id="cb25-16"><a></a><span class="co">#&gt;  4 Starbucks 24936-233524   100th &amp; C S… Company Owned    320 W. 100th Av… Anch…</span></span>
-<span id="cb25-17"><a></a><span class="co">#&gt;  5 Starbucks 8973-85630     Old Seward … Company Owned    1005 E Dimond B… Anch…</span></span>
-<span id="cb25-18"><a></a><span class="co">#&gt;  6 Starbucks 72788-84447    Fred Meyer … Licensed         1000 E Northern… Anch…</span></span>
-<span id="cb25-19"><a></a><span class="co">#&gt;  7 Starbucks 79549-106150   Safeway - A… Licensed         3101 PENLAND PK… Anch…</span></span>
-<span id="cb25-20"><a></a><span class="co">#&gt;  8 Starbucks 75988-107245   ANC Main Te… Licensed         HMSHost, 500 We… Anch…</span></span>
-<span id="cb25-21"><a></a><span class="co">#&gt;  9 Starbucks 11426-99254    Tudor Rd an… Company Owned    110 W. Tudor Rd… Anch…</span></span>
-<span id="cb25-22"><a></a><span class="co">#&gt; 10 Starbucks 20349-108249   Fred Meyer-… Licensed         7701 Debarr Road Anch…</span></span>
-<span id="cb25-23"><a></a><span class="co">#&gt; # ℹ 13,598 more rows</span></span>
-<span id="cb25-24"><a></a><span class="co">#&gt; # ℹ 6 more variables: `State/Province` &lt;chr&gt;, Country &lt;chr&gt;, Postcode &lt;chr&gt;,</span></span>
-<span id="cb25-25"><a></a><span class="co">#&gt; #   `Phone Number` &lt;chr&gt;, Timezone &lt;chr&gt;, geometry &lt;POINT [m]&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a>counties <span class="ot">=</span> <span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"conus"</span>, <span class="at">county =</span> <span class="st">"all"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb26-2"><a></a>  <span class="fu">st_transform</span>(<span class="dv">5070</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb26-3"><a></a>  <span class="fu">select</span>(name, state_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Simple feature collection with 13608 features and 11 fields
+#&gt; Geometry type: POINT
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -6223543 ymin: 278591.2 xmax: 2122577 ymax: 5307178
+#&gt; Projected CRS: NAD83 / Conus Albers
+#&gt; # A tibble: 13,608 × 12
+#&gt;    Brand     `Store Number` `Store Name` `Ownership Type` `Street Address` City 
+#&gt;  * &lt;chr&gt;     &lt;chr&gt;          &lt;chr&gt;        &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;
+#&gt;  1 Starbucks 3513-125945    Safeway-Anc… Licensed         5600 Debarr Rd … Anch…
+#&gt;  2 Starbucks 74352-84449    Safeway-Anc… Licensed         1725 Abbott Rd   Anch…
+#&gt;  3 Starbucks 12449-152385   Safeway - A… Licensed         1501 Huffman Rd  Anch…
+#&gt;  4 Starbucks 24936-233524   100th &amp; C S… Company Owned    320 W. 100th Av… Anch…
+#&gt;  5 Starbucks 8973-85630     Old Seward … Company Owned    1005 E Dimond B… Anch…
+#&gt;  6 Starbucks 72788-84447    Fred Meyer … Licensed         1000 E Northern… Anch…
+#&gt;  7 Starbucks 79549-106150   Safeway - A… Licensed         3101 PENLAND PK… Anch…
+#&gt;  8 Starbucks 75988-107245   ANC Main Te… Licensed         HMSHost, 500 We… Anch…
+#&gt;  9 Starbucks 11426-99254    Tudor Rd an… Company Owned    110 W. Tudor Rd… Anch…
+#&gt; 10 Starbucks 20349-108249   Fred Meyer-… Licensed         7701 Debarr Road Anch…
+#&gt; # ℹ 13,598 more rows
+#&gt; # ℹ 6 more variables: `State/Province` &lt;chr&gt;, Country &lt;chr&gt;, Postcode &lt;chr&gt;,
+#&gt; #   `Phone Number` &lt;chr&gt;, Timezone &lt;chr&gt;, geometry &lt;POINT [m]&gt;</code></pre>
 </div>
 </section>
 <section id="section-1" class="slide level2">
 <h2></h2>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a>topSB <span class="ot">&lt;-</span> <span class="fu">st_join</span>(counties, starbucks) <span class="sc">|&gt;</span> </span>
-<span id="cb27-2"><a></a>  <span class="fu">group_by</span>(name, state_name) <span class="sc">|&gt;</span> </span>
-<span id="cb27-3"><a></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
-<span id="cb27-4"><a></a>  <span class="fu">group_by</span>(state_name) <span class="sc">|&gt;</span> </span>
-<span id="cb27-5"><a></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb27-6"><a></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-50-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"></section>
 <section id="tessellation-and-aggregation-sneek-peak" class="slide level2">
@@ -967,26 +872,6 @@
 <li>The same Starbucks data can be aggregated into different tessellation schemes</li>
 <li>This demonstrates how the choice of geographic units affects analysis results:</li>
 </ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a><span class="co"># Create a simple grid for CONUS</span></span>
-<span id="cb28-2"><a></a>conus <span class="ot">=</span> <span class="fu">st_union</span>(counties)</span>
-<span id="cb28-3"><a></a>grid_1 <span class="ot">=</span> <span class="fu">st_make_grid</span>(conus, <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">15</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb28-4"><a></a>  <span class="fu">st_as_sf</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb28-5"><a></a>  <span class="fu">mutate</span>(<span class="at">cell_id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span>
-<span id="cb28-6"><a></a></span>
-<span id="cb28-7"><a></a>grid_2 <span class="ot">=</span> <span class="fu">st_make_grid</span>(conus, <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">200</span>, <span class="dv">150</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb28-8"><a></a>  <span class="fu">st_as_sf</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb28-9"><a></a>  <span class="fu">mutate</span>(<span class="at">cell_id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span>
-<span id="cb28-10"><a></a></span>
-<span id="cb28-11"><a></a><span class="co"># Aggregate Starbucks by grid cell</span></span>
-<span id="cb28-12"><a></a>sbck_grid_1 <span class="ot">&lt;-</span> <span class="fu">st_join</span>(grid_1, starbucks) <span class="sc">|&gt;</span> </span>
-<span id="cb28-13"><a></a>  <span class="fu">group_by</span>(cell_id) <span class="sc">|&gt;</span> </span>
-<span id="cb28-14"><a></a>  <span class="fu">summarise</span>(<span class="at">n_stores =</span> <span class="fu">n</span>())</span>
-<span id="cb28-15"><a></a></span>
-<span id="cb28-16"><a></a>sbck_grid_2 <span class="ot">&lt;-</span> <span class="fu">st_join</span>(grid_2, starbucks) <span class="sc">|&gt;</span> </span>
-<span id="cb28-17"><a></a>  <span class="fu">group_by</span>(cell_id) <span class="sc">|&gt;</span> </span>
-<span id="cb28-18"><a></a>  <span class="fu">summarise</span>(<span class="at">n_stores =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-52-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"></section>
 <section id="critical-note" class="slide level2">
@@ -1009,13 +894,7 @@
 <ul>
 <li>By default the data.frame subsetting methods we’ve seen (e.g <code>[,]</code>) implements <code>st_intersection</code></li>
 </ul>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a>wa <span class="ot">=</span> <span class="fu">st_transform</span>(wa, <span class="dv">5070</span>)</span>
-<span id="cb29-2"><a></a>wa_starbucks <span class="ot">=</span> starbucks[wa,] <span class="co">#&lt;&lt;</span></span>
-<span id="cb29-3"><a></a></span>
-<span id="cb29-4"><a></a><span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">geom_sf</span>(<span class="at">data =</span> wa) <span class="sc">+</span> <span class="fu">geom_sf</span>(<span class="at">data =</span> wa_starbucks) <span class="sc">+</span> <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
-</div>
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-54-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"></section></section>
 <section id="buffering" class="title-slide slide level1 center">
 <h1>Buffering</h1>
@@ -1024,17 +903,7 @@
 <li><code>st_buffer()</code> expands or contracts geometries by a given distance</li>
 <li>Useful for proximity analysis and creating zones of influence</li>
 </ul>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="co"># Buffer the Washington state boundary by 50 km</span></span>
-<span id="cb30-2"><a></a>wa_buffer <span class="ot">=</span> <span class="fu">st_buffer</span>(wa, <span class="at">dist =</span> <span class="dv">50000</span>) <span class="co"># distance in map units (meters for EPSG:5070)</span></span>
-<span id="cb30-3"><a></a></span>
-<span id="cb30-4"><a></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb30-5"><a></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> wa_buffer, <span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span> </span>
-<span id="cb30-6"><a></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> wa, <span class="at">fill =</span> <span class="st">"navy"</span>) <span class="sc">+</span> </span>
-<span id="cb30-7"><a></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
-<span id="cb30-8"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Buffer around Washington state (50 km)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
-</div>
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-55-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"><ul>
 <li>Buffers are often combined with predicates for analysis like <em>“find all cities within 100 km of a river”</em></li>
 </ul>
@@ -1091,23 +960,10 @@
 <li>Simplification dramatically reduces computational complexity for subsequent operations</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a>usa <span class="ot">=</span> <span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"conus"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb31-2"><a></a>  <span class="fu">st_union</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb31-3"><a></a>  <span class="fu">st_transform</span>(<span class="dv">5070</span>)</span>
-<span id="cb31-4"><a></a></span>
-<span id="cb31-5"><a></a>usa1000   <span class="ot">=</span> <span class="fu">st_simplify</span>(usa, <span class="at">dTolerance =</span> <span class="dv">10000</span>)</span>
-<span id="cb31-6"><a></a>usa10000  <span class="ot">=</span> <span class="fu">st_simplify</span>(usa, <span class="at">dTolerance =</span> <span class="dv">100000</span>)</span>
-<span id="cb31-7"><a></a>usa100000 <span class="ot">=</span> <span class="fu">st_simplify</span>(usa, <span class="at">dTolerance =</span> <span class="dv">1000000</span>)</span>
-<span id="cb31-8"><a></a></span>
-<span id="cb31-9"><a></a><span class="co"># Compare point counts</span></span>
-<span id="cb31-10"><a></a><span class="fu">cat</span>(<span class="st">"Original points:"</span>, mapview<span class="sc">::</span><span class="fu">npts</span>(usa), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb31-11"><a></a><span class="co">#&gt; Original points: 11292</span></span>
-<span id="cb31-12"><a></a><span class="fu">cat</span>(<span class="st">"After 10 km tolerance:"</span>, mapview<span class="sc">::</span><span class="fu">npts</span>(usa1000), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb31-13"><a></a><span class="co">#&gt; After 10 km tolerance: 220</span></span>
-<span id="cb31-14"><a></a><span class="fu">cat</span>(<span class="st">"After 100 km tolerance:"</span>, mapview<span class="sc">::</span><span class="fu">npts</span>(usa10000), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb31-15"><a></a><span class="co">#&gt; After 100 km tolerance: 27</span></span>
-<span id="cb31-16"><a></a><span class="fu">cat</span>(<span class="st">"After 1000 km tolerance:"</span>, mapview<span class="sc">::</span><span class="fu">npts</span>(usa100000), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb31-17"><a></a><span class="co">#&gt; After 1000 km tolerance: 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Original points: 11292
+#&gt; After 10 km tolerance: 220
+#&gt; After 100 km tolerance: 27
+#&gt; After 1000 km tolerance: 4</code></pre>
 </div>
 
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-60-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"></section>
@@ -1117,12 +973,7 @@
 <li><p>A limitation with Douglas-Peucker (therefore st_simplify) is that it simplifies objects on a per-geometry basis.</p></li>
 <li><p>This means the ‘topology’ is lost, resulting in overlapping and disconnected geometries.</p></li>
 </ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a>states <span class="ot">=</span> <span class="fu">st_transform</span>(states, <span class="dv">5070</span>)</span>
-<span id="cb32-2"><a></a>simp_states   <span class="ot">=</span> <span class="fu">st_simplify</span>(states, <span class="at">dTolerance =</span> <span class="dv">20000</span>)</span>
-<span id="cb32-3"><a></a><span class="fu">plot</span>(simp_states<span class="sc">$</span>geometry)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
-</div>
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-61-1.png" style="width:100.0%" class="r-stretch"></section>
 <section id="visvalingam" class="slide level2">
 <h2>Visvalingam</h2>
@@ -1139,38 +990,19 @@
 <ul>
 <li>The <code>ms_simplify</code> function is a wrapper around the <code>mapshaper</code> JavaScript library (created by lead viz experts at the NYT)</li>
 </ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a><span class="fu">library</span>(rmapshaper)</span>
-<span id="cb33-2"><a></a></span>
-<span id="cb33-3"><a></a>usa10 <span class="ot">=</span> <span class="fu">ms_simplify</span>(usa, <span class="at">keep =</span> .<span class="dv">1</span>)</span>
-<span id="cb33-4"><a></a>usa5  <span class="ot">=</span> <span class="fu">ms_simplify</span>(usa, <span class="at">keep =</span> .<span class="dv">05</span>)</span>
-<span id="cb33-5"><a></a>usa1  <span class="ot">=</span> <span class="fu">ms_simplify</span>(usa, <span class="at">keep =</span> .<span class="dv">01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-64-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"></section>
 <section id="section-4" class="slide level2">
 <h2></h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a>states <span class="ot">=</span> <span class="fu">st_transform</span>(states, <span class="dv">5070</span>)</span>
-<span id="cb34-2"><a></a>simp_states   <span class="ot">=</span> <span class="fu">ms_simplify</span>(states, <span class="at">keep =</span> .<span class="dv">05</span>)</span>
-<span id="cb34-3"><a></a><span class="fu">plot</span>(simp_states<span class="sc">$</span>geometry)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
-</div>
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-65-1.png" style="width:100.0%" class="r-stretch"></section>
 <section id="section-5" class="slide level2">
 <h2></h2>
 <p>In all cases, the number of points in a geometry can be calculated with <code>mapview::npts()</code></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>states <span class="ot">=</span> <span class="fu">st_transform</span>(states, <span class="dv">5070</span>)</span>
-<span id="cb35-2"><a></a>simp_states_st   <span class="ot">=</span> <span class="fu">st_simplify</span>(states, <span class="at">dTolerance =</span> <span class="dv">20000</span>)</span>
-<span id="cb35-3"><a></a>simp_states_ms   <span class="ot">=</span> <span class="fu">ms_simplify</span>(states, <span class="at">keep =</span> .<span class="dv">05</span>)</span>
-<span id="cb35-4"><a></a></span>
-<span id="cb35-5"><a></a>mapview<span class="sc">::</span><span class="fu">npts</span>(states)</span>
-<span id="cb35-6"><a></a><span class="co">#&gt; [1] 5930</span></span>
-<span id="cb35-7"><a></a>mapview<span class="sc">::</span><span class="fu">npts</span>(simp_states_st)</span>
-<span id="cb35-8"><a></a><span class="co">#&gt; [1] 50</span></span>
-<span id="cb35-9"><a></a>mapview<span class="sc">::</span><span class="fu">npts</span>(simp_states_ms)</span>
-<span id="cb35-10"><a></a><span class="co">#&gt; [1] 292</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; [1] 5930
+#&gt; [1] 50
+#&gt; [1] 292</code></pre>
 </div>
 </section></section>
 <section id="tesselation" class="title-slide slide level1 center">
@@ -1250,22 +1082,10 @@
 <section id="our-data-for-today" class="slide level2">
 <h2>Our Data for today …</h2>
 <h4 id="southern-counties">Southern Counties</h4>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a>south_counties <span class="ot">=</span> <span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"south"</span>, <span class="at">county =</span> <span class="st">"all"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb36-2"><a></a>  <span class="fu">st_transform</span>(<span class="fu">st_crs</span>(cities))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <p><br></p>
 <h4 id="unioned-to-states-using-dplyr">Unioned to States using <code>dplyr</code></h4>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a>south_states <span class="ot">=</span> south_counties <span class="sc">|&gt;</span> </span>
-<span id="cb37-2"><a></a>  <span class="fu">group_by</span>(state_name) <span class="sc">|&gt;</span> </span>
-<span id="cb37-3"><a></a>  <span class="fu">summarise</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <p><br></p>
 <h4 id="south-county-centroids">South County Centroids</h4>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a>south_cent <span class="ot">=</span> <span class="fu">st_centroid</span>(south_counties)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-76-1.png" style="width:100.0%" class="r-stretch"></section>
 <section id="southern-coverage-county" class="slide level2">
@@ -1281,12 +1101,6 @@
 <li><p>The return object of <code>st_make_grid</code> is a new <code>sfc</code> object</p></li>
 <li><p>Grids can be specified by <em>cellsize</em> or number of grid cells (<em>n</em>) in the X and Y direction</p></li>
 </ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a><span class="co"># Create a grid over the south with 70 rows and 50 columns</span></span>
-<span id="cb39-2"><a></a>sq_grid <span class="ot">=</span> <span class="fu">st_make_grid</span>(south_counties, <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">70</span>, <span class="dv">50</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb39-3"><a></a>  <span class="fu">st_as_sf</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb39-4"><a></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
 <section id="southern-coverage-square" class="slide level2">
 <h2>Southern Coverage: Square</h2>
@@ -1298,11 +1112,6 @@
 <li><p>Hexagonal tessellations (honey combs) offer an alternative to square grids</p></li>
 <li><p>They are created in the same way but by setting <code>square = FALSE</code></p></li>
 </ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a>hex_grid <span class="ot">=</span> <span class="fu">st_make_grid</span>(south_counties, <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">70</span>, <span class="dv">50</span>), <span class="at">square =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb40-2"><a></a>  <span class="fu">st_as_sf</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb40-3"><a></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
 <section id="southern-coverage-hexagon" class="slide level2">
 <h2>Southern Coverage: Hexagon</h2>
@@ -1435,14 +1244,6 @@
 <li><p>Should always be simplified after creation (st_cast())</p></li>
 <li><p>If to be treated as an object for analysis, should be id’d</p></li>
 </ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a>south_cent_u <span class="ot">=</span> <span class="fu">st_union</span>(south_cent)</span>
-<span id="cb41-2"><a></a></span>
-<span id="cb41-3"><a></a>v_grid <span class="ot">=</span> <span class="fu">st_voronoi</span>(south_cent_u) <span class="sc">|&gt;</span> </span>
-<span id="cb41-4"><a></a>  <span class="fu">st_cast</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb41-5"><a></a>  <span class="fu">st_as_sf</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb41-6"><a></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
 <section id="southern-coverage-voronoi" class="slide level2">
 <h2>Southern Coverage: Voronoi</h2>
@@ -1500,12 +1301,6 @@
 <li><p>Should always be simplified after creation (<code>st_cast()</code>)</p></li>
 <li><p>If to be treated as an object for analysis, should be id’d</p></li>
 </ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a>t_grid <span class="ot">=</span> <span class="fu">st_triangulate</span>(south_cent_u) <span class="sc">|&gt;</span> </span>
-<span id="cb42-2"><a></a>  <span class="fu">st_cast</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb42-3"><a></a>  <span class="fu">st_as_sf</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb42-4"><a></a>  <span class="fu">mutate</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
 <section id="southern-coverage-triangles" class="slide level2">
 <h2>Southern Coverage: Triangles</h2>
@@ -1513,9 +1308,6 @@
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-98-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"></section>
 <section id="southern-coverage-triangles-1" class="slide level2">
 <h2>Southern Coverage: Triangles</h2>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a>t_grid <span class="ot">=</span> <span class="fu">st_intersection</span>(t_grid, <span class="fu">st_union</span>(south_states))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 
 <img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-100-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"></section>
 <section id="difference-in-object-coverages" class="slide level2">
@@ -1591,23 +1383,9 @@
 <li>Using the same Starbucks data, aggregating into different grid sizes produces different statistical patterns:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="co"># Aggregate into 3 different grid resolutions</span></span>
-<span id="cb44-2"><a></a>conus <span class="ot">=</span> <span class="fu">st_union</span>(counties)</span>
-<span id="cb44-3"><a></a>fine_grid <span class="ot">=</span> <span class="fu">st_make_grid</span>(conus, <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">40</span>, <span class="dv">30</span>)) <span class="sc">|&gt;</span> <span class="fu">st_as_sf</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span>
-<span id="cb44-4"><a></a>medium_grid <span class="ot">=</span> <span class="fu">st_make_grid</span>(conus, <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">15</span>)) <span class="sc">|&gt;</span> <span class="fu">st_as_sf</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span>
-<span id="cb44-5"><a></a>coarse_grid <span class="ot">=</span> <span class="fu">st_make_grid</span>(conus, <span class="at">n =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">8</span>)) <span class="sc">|&gt;</span> <span class="fu">st_as_sf</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span>
-<span id="cb44-6"><a></a></span>
-<span id="cb44-7"><a></a>fine_agg <span class="ot">=</span> <span class="fu">st_join</span>(fine_grid, starbucks) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>())</span>
-<span id="cb44-8"><a></a>medium_agg <span class="ot">=</span> <span class="fu">st_join</span>(medium_grid, starbucks) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>())</span>
-<span id="cb44-9"><a></a>coarse_agg <span class="ot">=</span> <span class="fu">st_join</span>(coarse_grid, starbucks) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>())</span>
-<span id="cb44-10"><a></a></span>
-<span id="cb44-11"><a></a><span class="co"># Statistics differ by aggregation scheme</span></span>
-<span id="cb44-12"><a></a><span class="fu">cat</span>(<span class="st">"Fine grid - Mean:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(fine_agg<span class="sc">$</span>n), <span class="dv">2</span>), <span class="st">"SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(fine_agg<span class="sc">$</span>n), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb44-13"><a></a><span class="co">#&gt; Fine grid - Mean: 11.81 SD: 44.57</span></span>
-<span id="cb44-14"><a></a><span class="fu">cat</span>(<span class="st">"Medium grid - Mean:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(medium_agg<span class="sc">$</span>n), <span class="dv">2</span>), <span class="st">"SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(medium_agg<span class="sc">$</span>n), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb44-15"><a></a><span class="co">#&gt; Medium grid - Mean: 45.24 SD: 113.85</span></span>
-<span id="cb44-16"><a></a><span class="fu">cat</span>(<span class="st">"Coarse grid - Mean:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(coarse_agg<span class="sc">$</span>n), <span class="dv">2</span>), <span class="st">"SD:"</span>, <span class="fu">round</span>(<span class="fu">sd</span>(coarse_agg<span class="sc">$</span>n), <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb44-17"><a></a><span class="co">#&gt; Coarse grid - Mean: 168.49 SD: 271.16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; Fine grid - Mean: 11.81 SD: 44.57
+#&gt; Medium grid - Mean: 45.24 SD: 113.85
+#&gt; Coarse grid - Mean: 168.49 SD: 271.16</code></pre>
 </div>
 <ul>
 <li>The spatial patterns and statistical properties differ significantly based on aggregation choice—this is the MAUP!</li>
@@ -1634,38 +1412,86 @@
 <h1>Spatial Statistics Foundation</h1>
 
 </section>
-<section id="from-neighbors-to-inference-why-we-need-spatial-statistics" class="slide level2">
-<h2>From Neighbors to Inference: Why We Need Spatial Statistics</h2>
-<p><strong>The central question:</strong> Do neighboring observations have similar values?</p>
-<p>If YES: - Standard regression breaks (independence assumption violated) - We need <strong>spatial statistics</strong> to test for clustering and model dependence - The spatial <strong>weights matrix W</strong> captures neighbor relationships</p>
-<div class="fragment">
-<p><strong>Why W matters:</strong> - Built from geometric relationships: <code>st_touches()</code>, <code>st_intersects()</code>, <code>st_is_within_distance()</code> - Scale depends on tessellation choice (hexagon vs square vs Voronoi) → <strong>MAUP</strong> - Directly inputs to: Moran’s I, spatial regression (SAR/SEM), LISA, kriging</p>
-</div>
-<div class="fragment">
-<p><strong>Section Arc:</strong></p>
+<section id="bridge-from-geometry-to-inference" class="slide level2">
+<h2>Bridge from geometry to inference</h2>
+<p>So far, we have learned that geometric choices change analysis:</p>
 <ul>
-<li>Build the neighbor matrix <code>W</code> from geometry (predicates &amp; tessellations)</li>
-<li>Test for global clustering with Moran’s I</li>
-<li>Visualize local patterns with LISA and spatial-lag plots</li>
-<li>Diagnose how spatial dependence breaks OLS and motivates spatial regression</li>
+<li>predicates define relationships</li>
+<li>tessellations define units</li>
+<li>simplification changes representation</li>
+</ul>
+<div class="fragment">
+<p><strong>Spatial statistics adds one new question:</strong></p>
+<blockquote>
+<p>Do nearby observations tend to have similar values?</p>
+</blockquote>
+<p>If the answer is yes, then geometry is not just changing the map — it is changing the <strong>inference</strong>.</p>
+<p><strong>Story of this section:</strong></p>
+<ul>
+<li>define what “near” means</li>
+<li>encode that definition in <code>W</code></li>
+<li>use <code>W</code> to test for clustering</li>
+<li>see why changing spatial units can change the answer</li>
 </ul>
 </div>
 </section>
-<section id="from-predicates-to-neighbor-matrices" class="slide level2">
-<h2>From Predicates to Neighbor Matrices</h2>
-<p><strong>The spatial weights matrix W</strong> is the bridge from geometry to statistics</p>
+<section id="why-spatial-statistics" class="slide level2">
+<h2>Why spatial statistics?</h2>
+<p><strong>Core idea:</strong> spatial data are rarely independent.</p>
+<ul>
+<li>Nearby places often share similar conditions</li>
+<li>Aggregation choices can create or hide pattern</li>
+<li>A standard iid mental model can be misleading</li>
+</ul>
+<div class="fragment">
+<p>So before modeling, we need a formal way to say <strong>who is near whom</strong>.</p>
+<p><strong>This is why spatial statistics exists:</strong> not because maps are fancy, but because location changes the assumptions behind inference.</p>
+<p><strong>So what for water resources?</strong></p>
+<ul>
+<li>neighboring catchments often share climate, geology, and land use</li>
+<li>nearby gages are rarely independent replicates</li>
+<li>flood, drought, and water-quality patterns often organize regionally</li>
+</ul>
+</div>
+</section>
+<section id="from-predicates-to-neighbors" class="slide level2">
+<h2>From predicates to neighbors</h2>
+<p>This is where prior content matters.</p>
+<p>We already know how to encode spatial relationships with predicates:</p>
+<ul>
+<li><code>st_touches()</code> → shared borders</li>
+<li><code>st_intersects()</code> → overlap</li>
+<li><code>st_is_within_distance()</code> → distance-based neighbors</li>
+</ul>
+<div class="fragment">
+<p>These are not just GIS operations.</p>
+<p>They are how we turn geometry into a statistical definition of <strong>neighborhood</strong>.</p>
+<p><strong>Key point:</strong> the choice of predicate is already a modeling choice.</p>
+<p><strong>Water-resources implication:</strong> a watershed adjacency rule, stream-network rule, or Euclidean distance rule may imply very different hydrologic processes.</p>
+</div>
+</section>
+<section id="spatial-weights-matrix-w" class="slide level2">
+<h2>Spatial weights matrix <code>W</code></h2>
+<p><strong><code>W</code> is a formal encoding of who counts as near whom.</strong></p>
+<ul>
+<li>rows = focal locations</li>
+<li>columns = possible neighbors</li>
+<li><code>w_ij &gt; 0</code> means location <em>j</em> contributes to location <em>i</em></li>
+<li><code>w_ij = 0</code> means they are not neighbors</li>
+</ul>
+<div class="fragment">
+<p>This is the bridge from geometry to spatial inference.</p>
+<p><strong>So what?</strong> If you care about regionalization, transfer learning, model validation, gage networks, or hotspot detection, you are already making choices that belong in <code>W</code>.</p>
+</div>
+</section>
+<section id="building-w-in-3-steps" class="slide level2">
+<h2>Building <code>W</code> in 3 steps</h2>
 <div class="columns">
 <div class="column" style="width:33%;">
-<p><strong>Step 1: Binary Predicate</strong></p>
+<p><strong>1. Define neighbors</strong></p>
+<p>1 = neighbors, 0 = not neighbors</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a>(W_binary <span class="ot">&lt;-</span> <span class="fu">st_touches</span>(</span>
-<span id="cb45-2"><a></a>  hexagon_grid, </span>
-<span id="cb45-3"><a></a>  <span class="at">sparse =</span> <span class="cn">FALSE</span></span>
-<span id="cb45-4"><a></a>) <span class="sc">*</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Result: 1 if neighbors, 0 if not</p>
-<div class="cell">
-<pre><code>#&gt; Neighbor counts (min, mean, median, max): 3 4.44 5 8
+<pre><code>#&gt; Neighbor counts (min / mean / max): 3 4.44 8
 #&gt;      [,1] [,2] [,3] [,4] [,5] [,6]
 #&gt; [1,]    0    1    0    1    1    0
 #&gt; [2,]    1    0    1    1    1    1
@@ -1675,25 +1501,16 @@
 #&gt; [6,]    0    1    1    0    1    0</code></pre>
 </div>
 </div><div class="column" style="width:33%;">
-<p><strong>Step 2: Remove Self</strong></p>
+<p><strong>2. Remove self-links</strong></p>
+<p>A region is not its own neighbor</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a></a>(<span class="fu">diag</span>(W_binary) <span class="ot">&lt;-</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>A tile is not its own neighbor</p>
-<div class="cell">
-<pre><code>#&gt; Diagonal entries (first 6):
-#&gt; [1] 0 0 0 0 0 0</code></pre>
+<pre><code>#&gt; [1] 0 0 0 0 0 0</code></pre>
 </div>
 </div><div class="column" style="width:33%;">
-<p><strong>Step 3: Row-Standardize</strong></p>
+<p><strong>3. Row-standardize</strong></p>
+<p>Each row sums to 1, so the lag is a neighbor average</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a></a>(W <span class="ot">&lt;-</span> W_binary <span class="sc">/</span> </span>
-<span id="cb49-2"><a></a>  <span class="fu">rowSums</span>(W_binary))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Each row sums to 1</p>
-<div class="cell">
-<pre><code>#&gt; Sample row-standardized W (first 6 rows x cols):
-#&gt;      [,1] [,2] [,3] [,4] [,5] [,6]
+<pre><code>#&gt;      [,1] [,2] [,3] [,4] [,5] [,6]
 #&gt; [1,] 0.00 0.33 0.00 0.33 0.33 0.00
 #&gt; [2,] 0.20 0.00 0.20 0.20 0.20 0.20
 #&gt; [3,] 0.00 0.33 0.00 0.00 0.33 0.33
@@ -1702,192 +1519,319 @@
 #&gt; [6,] 0.00 0.20 0.20 0.00 0.20 0.00</code></pre>
 </div>
 </div></div>
+</section>
+<section id="what-row-standardizing-does" class="slide level2">
+<h2>What row-standardizing does</h2>
+<p>Row-standardizing makes the spatial lag easier to interpret.</p>
+<p>Without it:</p>
+<ul>
+<li>locations with many neighbors can dominate</li>
+<li>raw adjacency counts are harder to compare across space</li>
+</ul>
+<p>With it:</p>
+<ul>
+<li>each row sums to 1</li>
+<li>the lag becomes a weighted average of neighboring values</li>
+<li>“my neighborhood signal” becomes directly interpretable</li>
+</ul>
+<p><strong>It does not remove the modeling choice — it just makes the choice easier to work with.</strong></p>
+</section>
+<section id="what-w-lets-us-do" class="slide level2">
+<h2>What <code>W</code> lets us do</h2>
+<p>Once we have <code>W</code>, we can ask statistical questions about pattern.</p>
+<p><strong>Most important first question:</strong></p>
+<blockquote>
+<p>Are nearby values more similar than we would expect by chance?</p>
+</blockquote>
+<p>That is the core idea behind <strong>spatial autocorrelation</strong>.</p>
 <div class="fragment">
-<p><strong>This neighbor matrix W</strong> becomes the input to every spatial statistic: - Moran’s I (spatial autocorrelation) - Spatial regression (SAR, SEM models) - LISA (local clustering) - Kriging (spatial interpolation)</p>
+<p>For a first pass, the main tool is <strong>Moran’s I</strong>.</p>
 </div>
 </section>
-<section id="example-starbucks-clustering-by-state" class="slide level2">
-<h2>Example: Starbucks Clustering by State</h2>
-<p><strong>Question:</strong> Do states with many Starbucks neighbors have many Starbucks? (Are Starbucks geographically clustered?)</p>
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
-<div style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-size: 0.8em;">
-<p><strong>Code:</strong></p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a></a><span class="co"># 1. Aggregate</span></span>
-<span id="cb51-2"><a></a>state_counts <span class="ot">&lt;-</span> <span class="fu">st_join</span>(</span>
-<span id="cb51-3"><a></a>  states, starbucks) <span class="sc">%&gt;%</span></span>
-<span id="cb51-4"><a></a>  <span class="fu">group_by</span>(state) <span class="sc">%&gt;%</span></span>
-<span id="cb51-5"><a></a>  <span class="fu">summarise</span>(<span class="at">n_stores =</span> <span class="fu">n</span>())</span>
-<span id="cb51-6"><a></a></span>
-<span id="cb51-7"><a></a><span class="co"># 2. Build neighbor matrix</span></span>
-<span id="cb51-8"><a></a>W <span class="ot">&lt;-</span> <span class="fu">st_touches</span>(state_counts,</span>
-<span id="cb51-9"><a></a>  <span class="at">sparse =</span> <span class="cn">FALSE</span>) <span class="sc">*</span> <span class="dv">1</span></span>
-<span id="cb51-10"><a></a><span class="fu">diag</span>(W) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb51-11"><a></a>W <span class="ot">&lt;-</span> W <span class="sc">/</span> <span class="fu">rowSums</span>(W)</span>
-<span id="cb51-12"><a></a></span>
-<span id="cb51-13"><a></a><span class="co"># 3. Compute Moran's I</span></span>
-<span id="cb51-14"><a></a>I <span class="ot">&lt;-</span> ape<span class="sc">::</span><span class="fu">Moran.I</span>(</span>
-<span id="cb51-15"><a></a>  state_counts<span class="sc">$</span>n_stores, </span>
-<span id="cb51-16"><a></a>  <span class="at">weight =</span> W)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div style="background: #E8F5E9; padding: 15px; border-radius: 5px; border-left: 4px solid #2E7D32;">
-<p><strong>Output:</strong></p>
-<pre><code>Moran's I = 0.58
-p-value &lt; 0.001</code></pre>
-<p><strong>🔴 Strong positive autocorrelation</strong> - <strong>CA</strong> (high) ← Oregon, Nevada (high) - <strong>MT</strong> (low) ← Idaho, Wyoming (low)</p>
-<p><strong>Conclusion:</strong> Starbucks cluster by region, not random</p>
-</div>
+<section id="morans-i-the-first-global-test" class="slide level2">
+<h2>Moran’s I: the first global test</h2>
+<p><strong>Moran’s I</strong> summarizes whether similar values cluster in space.</p>
+<p>Interpretation:</p>
+<ul>
+<li><strong>positive</strong> Moran’s I → similar neighbors cluster together</li>
+<li><strong>near 0</strong> → no strong spatial pattern beyond randomness</li>
+<li><strong>negative</strong> Moran’s I → neighbors tend to be dissimilar</li>
+</ul>
+<div class="fragment">
+<p>It is a <strong>global</strong> summary: one value for the whole study area.</p>
+<p><strong>Mental model:</strong> Moran’s I is asking whether values line up with their neighborhood averages more than a random rearrangement would.</p>
+<p><strong>Water-resources implication:</strong> if streamflow error, nutrient concentration, or flood exposure has strong positive spatial autocorrelation, then nearby units are carrying shared information — and naive independence assumptions can mislead you.</p>
 </div>
 </section>
-<section id="tessellation-choice-affects-neighbor-structure-and-statistics" class="slide level2">
-<h2>Tessellation Choice Affects Neighbor Structure (and Statistics)</h2>
-<p>Different tessellations change neighbor structure and therefore statistical estimates (MAUP).</p>
-<p><strong>Critical insight:</strong> Same point data, different tessellations, different statistical results</p>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>Example: Hexagon Grid</strong></p>
+<section id="how-to-read-morans-i-in-practice" class="slide level2">
+<h2>How to read Moran’s I in practice</h2>
+<p>When you see a Moran’s I result, ask three questions:</p>
+<ol type="1">
+<li><strong>Sign</strong> — is the pattern clustered or contrasting?</li>
+<li><strong>Magnitude</strong> — how strong is the pattern?</li>
+<li><strong>Context</strong> — what definition of neighborhood produced it?</li>
+</ol>
+<div class="fragment">
+<p>A Moran’s I value is never just “about the data.” It is always about the data <strong>plus the chosen <code>W</code></strong>.</p>
+</div>
+</section>
+<section id="example-starbucks-counts-in-hexagons" class="slide level2">
+<h2>Example: Starbucks counts in hexagons</h2>
+<p>We will use a simple areal example:</p>
+<ul>
+<li>build a hexagon tessellation over CONUS</li>
+<li>count Starbucks per hexagon</li>
+<li>define neighbors with <code>st_touches()</code></li>
+<li>compute Moran’s I on those counts</li>
+</ul>
+<p><strong>This example is simplified, not definitive.</strong> Its purpose is to make the statistical logic visible before moving to real research settings.</p>
+</section>
+<section id="morans-i-example-map-takeaway" class="slide level2">
+<h2>Moran’s I example: map + takeaway</h2>
+
+<img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-113-1.png" style="width:100.0%" class="r-stretch"><p><strong>Teaching takeaway:</strong> similar values are clustering in space, so this pattern is not well described as iid randomness.</p>
+<p><strong>Interpretation in plain English:</strong> places with lots of Starbucks tend to be near places with lots of Starbucks; places with few tend to be near places with few.</p>
+<p><strong>So what for water resources research?</strong></p>
+<ul>
+<li>if flood losses cluster, response planning should be regional, not purely local</li>
+<li>if model residuals cluster, validation should account for spatial dependence</li>
+<li>if hydrologic signatures cluster, regionalization may be defensible — but only at the right scale</li>
+</ul>
+</section>
+<section id="from-global-pattern-to-local-pattern" class="slide level2">
+<h2>From global pattern to local pattern</h2>
+<p>Moran’s I gives us one number for the whole map.</p>
+<p>That is useful, but it hides <em>where</em> the pattern is happening.</p>
+<p>To get local intuition, we introduce two related ideas:</p>
+<ul>
+<li>the <strong>spatial lag</strong>: the weighted average of neighboring values</li>
+<li><strong>LISA</strong>: Local Indicators of Spatial Association</li>
+</ul>
+<div class="fragment">
+<p><strong>Why this matters:</strong></p>
+<ul>
+<li>Moran’s I asks whether clustering exists overall</li>
+<li>the spatial lag helps show how each place relates to its neighborhood</li>
+<li>LISA asks where local similarity or local contrast is strongest</li>
+</ul>
+</div>
+</section>
+<section id="spatial-lag-and-lisa-what-they-are" class="slide level2">
+<h2>Spatial lag and LISA: what they are</h2>
+<p><strong>Spatial lag</strong></p>
+<ul>
+<li>for each location, compute a neighborhood summary using <code>W</code></li>
+<li>most often, this is a weighted average of neighboring values</li>
+<li>it answers: <em>what do my neighbors look like?</em></li>
+</ul>
+<p><strong>Formula:</strong></p>
+<p><span class="math display">\[  ext{lag}(x)_i = \sum_j w_{ij} x_j\]</span></p>
+<div class="fragment">
+<p><strong>LISA</strong></p>
+<ul>
+<li>stands for <strong>Local Indicators of Spatial Association</strong></li>
+<li>uses each location’s value together with its neighborhood context</li>
+<li>helps identify places that are:
+<ul>
+<li>high surrounded by high</li>
+<li>low surrounded by low</li>
+<li>high surrounded by low</li>
+<li>low surrounded by high</li>
+</ul></li>
+</ul>
+<p>For now, think of LISA as the <strong>local companion</strong> to Moran’s I.</p>
+</div>
+</section>
+<section id="how-the-spatial-lag-is-calculated" class="slide level2">
+<h2>How the spatial lag is calculated</h2>
+<p>The calculation follows directly from <code>W</code>:</p>
+<ol type="1">
+<li>choose a neighborhood definition</li>
+<li>build <code>W</code></li>
+<li>take a weighted average of neighbor values for each location</li>
+</ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a></a><span class="co"># Create regular hexagon tessellation</span></span>
-<span id="cb53-2"><a></a>hex_grid <span class="ot">&lt;-</span> <span class="fu">st_make_grid</span>(</span>
-<span id="cb53-3"><a></a>  conus_bbox, </span>
-<span id="cb53-4"><a></a>  <span class="at">n =</span> <span class="dv">70</span>, </span>
-<span id="cb53-5"><a></a>  <span class="at">square =</span> <span class="cn">FALSE</span></span>
-<span id="cb53-6"><a></a>)</span>
-<span id="cb53-7"><a></a></span>
-<span id="cb53-8"><a></a><span class="co"># Count Starbucks in each hexagon</span></span>
-<span id="cb53-9"><a></a>hex_counts <span class="ot">&lt;-</span> <span class="fu">st_join</span>(</span>
-<span id="cb53-10"><a></a>  hex_grid, starbucks</span>
-<span id="cb53-11"><a></a>) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
-<span id="cb53-12"><a></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>())</span>
-<span id="cb53-13"><a></a></span>
-<span id="cb53-14"><a></a><span class="co"># Build neighbor weight matrix</span></span>
-<span id="cb53-15"><a></a>W <span class="ot">&lt;-</span> <span class="fu">st_touches</span>(hex_grid) <span class="sc">%&gt;%</span> </span>
-<span id="cb53-16"><a></a>  <span class="fu">as.matrix</span>()</span>
-<span id="cb53-17"><a></a>W <span class="ot">&lt;-</span> W <span class="sc">/</span> <span class="fu">rowSums</span>(W)  <span class="co"># Standardize</span></span>
-<span id="cb53-18"><a></a></span>
-<span id="cb53-19"><a></a><span class="co"># Compute Moran's I</span></span>
-<span id="cb53-20"><a></a>ape<span class="sc">::</span><span class="fu">Moran.I</span>(hex_counts<span class="sc">$</span>n, W)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>#&gt; counts: 1, 2, 3, 4, 5, 6, 7, 8, 9
+#&gt; lag values: 3.67, 3.8, 4.33, 4.6, 5, 5.4, 5.67, 6.2, 6.33</code></pre>
 </div>
-<p><strong>Result:</strong> I = 0.253</p>
-</div><div class="column" style="width:50%;">
-<p><strong>Comparison: Tessellation summary &amp; results</strong></p>
+<div class="fragment">
+<p><strong>Interpretation:</strong></p>
+<ul>
+<li>a high lag means your neighbors tend to have high values</li>
+<li>a low lag means your neighbors tend to have low values</li>
+<li>comparing your value to your lag helps reveal local agreement or mismatch</li>
+</ul>
+<p><strong>Water-resources implication:</strong> this is the local logic behind identifying coherent flood-prone regions, drought clusters, unusually impaired reaches, or stations behaving unlike their surroundings.</p>
+</div>
+</section>
+<section id="spatial-lag-what-your-neighbors-look-like" class="slide level2">
+<h2>Spatial lag: what your neighbors look like</h2>
+<p>The spatial lag is the weighted neighborhood average:</p>
+<p><span class="math display">\[  ext{lag}(x) = W x\]</span></p>
+
+<img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-115-1.png" style="width:100.0%" class="r-stretch"><p>This gives local intuition:</p>
+<ul>
+<li>upper-right = high values near high values</li>
+<li>lower-left = low values near low values</li>
+<li>off-diagonal = local mismatch or transition</li>
+</ul>
+</section>
+<section id="why-the-lag-plot-matters" class="slide level2">
+<h2>Why the lag plot matters</h2>
+<p>The lag plot helps make visible what Moran’s I compresses into one number.</p>
+<ul>
+<li>points near the upper-right and lower-left support positive autocorrelation</li>
+<li>a diffuse cloud around the center suggests weak structure</li>
+<li>strong off-diagonal structure would imply contrast rather than clustering</li>
+</ul>
+<p><strong>Start with the global pattern, then look for local structure.</strong> That progression makes the map easier to interpret.</p>
+</section>
+<section id="local-clustering-intuition" class="slide level2">
+<h2>Local clustering intuition</h2>
+<p>A global Moran’s I gives one number for the whole map.</p>
+<p>A local view asks:</p>
+<blockquote>
+<p>Where are the high-high and low-low areas?</p>
+</blockquote>
+
+<img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-116-1.png" style="width:100.0%" class="r-stretch"><p>This is a useful bridge to LISA without overloading the first lesson with full local significance testing.</p>
+<p><strong>So what?</strong> Local patterns are often what matter operationally: where should we investigate, intervene, monitor, or transfer information with caution?</p>
+</section>
+<section id="maup-returns-tessellation-changes-inference" class="slide level2">
+<h2>MAUP returns: tessellation changes inference</h2>
+<p>This is the key bridge back to prior content.</p>
+<p>The same point data can produce different statistical results when we change the spatial units.</p>
+<div class="cell">
+<div class="cell-output-display">
 <table class="caption-top">
+<caption>Same points, different tessellations, different neighbor structures</caption>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Tessellation</th>
-<th style="text-align: right;">Tiles</th>
-<th style="text-align: right;">Avg Neighbors</th>
-<th style="text-align: right;">Range</th>
-<th style="text-align: right;">Moran’s I</th>
-<th style="text-align: left;">Pattern</th>
+<th style="text-align: left;">tessellation</th>
+<th style="text-align: right;">tiles</th>
+<th style="text-align: right;">avg_neighbors</th>
+<th style="text-align: right;">moran_I</th>
+<th style="text-align: right;">p_value</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Hexagon</td>
-<td style="text-align: right;">~300</td>
-<td style="text-align: right;">~6</td>
-<td style="text-align: right;">6 (uniform)</td>
+<td style="text-align: right;">2310</td>
+<td style="text-align: right;">5.77</td>
 <td style="text-align: right;">0.253</td>
-<td style="text-align: left;">Uniform</td>
+<td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Square</td>
-<td style="text-align: right;">~300</td>
-<td style="text-align: right;">~4</td>
-<td style="text-align: right;">4 (orthogonal)</td>
+<td style="text-align: right;">3131</td>
+<td style="text-align: right;">7.70</td>
 <td style="text-align: right;">0.246</td>
-<td style="text-align: left;">Orthogonal</td>
+<td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Voronoi</td>
-<td style="text-align: right;">Variable</td>
-<td style="text-align: right;">~6</td>
-<td style="text-align: right;">1–15</td>
+<td style="text-align: right;">2500</td>
+<td style="text-align: right;">5.98</td>
 <td style="text-align: right;">0.279</td>
-<td style="text-align: left;">Variable</td>
-</tr>
-</tbody>
-</table>
-<p><strong>MAUP:</strong> Same data, different tessellations → different point estimates; choose neighborhoods using domain knowledge.</p>
-</div></div>
-</section>
-<section id="morans-i-does-your-variable-cluster" class="slide level2">
-<h2>Moran’s I: Does Your Variable Cluster?</h2>
-<p><strong>The question:</strong> If two hexagons are neighbors, do they have similar Starbucks counts?</p>
-<p><strong>Moran’s I is the answer—a test for spatial autocorrelation</strong></p>
-<div class="fragment">
-<p><strong>Formula</strong> (don’t memorize, conceptually: “weighted correlation of X with its spatial lag”):</p>
-<p><span class="math display">\[I = \frac{\sum_i \sum_j w_{ij}(x_i - \bar{x})(x_j - \bar{x})}{σ^2 \sum_i \sum_j w_{ij}}\]</span></p>
-</div>
-<div class="fragment">
-<p><strong>Interpretation:</strong></p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>I value</th>
-<th>Meaning</th>
-<th>Starbucks</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>I &gt; 0, p &lt; 0.05</strong></td>
-<td>🟢 Positive clustering</td>
-<td>CA hexagons HIGH-HIGH, MT LOW-LOW</td>
-</tr>
-<tr class="even">
-<td><strong>I ≈ 0, p &gt; 0.05</strong></td>
-<td>🟡 No clustering</td>
-<td>Uniform distribution</td>
-</tr>
-<tr class="odd">
-<td><strong>I &lt; 0, p &lt; 0.05</strong></td>
-<td>🔴 Regular pattern</td>
-<td>High surrounded by low (rare)</td>
+<td style="text-align: right;">0</td>
 </tr>
 </tbody>
 </table>
 </div>
+</div>
+<p><strong>Interpretation:</strong> <code>W</code> is not a fact of nature. It depends on the geometry we choose.</p>
+<p><strong>Water-resources implication:</strong> conclusions about “regional pattern” can change when you move from HUCs to grid cells, from catchments to counties, or from areal neighbors to stream-network neighbors.</p>
+</section>
+<section id="what-this-means-substantively" class="slide level2">
+<h2>What this means substantively</h2>
+<p>When tessellation changes, three things can change together:</p>
+<ul>
+<li>the number of units</li>
+<li>the number of neighbors each unit has</li>
+<li>the value of Moran’s I</li>
+</ul>
 <div class="fragment">
-<p><strong>Our result:</strong> I = 0.253, p &lt; 0.001 ✓ <strong>Significant positive clustering</strong></p>
-<p><strong>What this means:</strong> Starbucks are geographically concentrated. Coastal and urban hexagons cluster together; rural hexagons cluster together. This is <strong>not a random distribution</strong>.</p>
+<p>So a spatial statistic is not just a property of the phenomenon. It is also a property of the <strong>representation</strong>.</p>
+<p>This is why MAUP is not a side note — it is a warning label.</p>
+<p><strong>Research takeaway:</strong> when your paper makes a spatial claim, you should be ready to explain why your spatial units and neighborhood rule are substantively defensible.</p>
 </div>
 </section>
-<section id="row-standardize-spatial-lag-teacher-friendly" class="slide level2">
-<h2>Row-Standardize &amp; Spatial Lag — (Teacher-friendly)</h2>
-<div class="columns">
-<div class="column" style="width:48%;">
-<p><strong>What we do (3 quick steps)</strong></p>
+<section id="common-beginner-mistakes" class="slide level2">
+<h2>Common beginner mistakes</h2>
 <ol type="1">
-<li>Build binary adjacency: <code>W_binary &lt;- st_touches(grid, sparse = FALSE) * 1</code></li>
-<li>Remove self-links: <code>diag(W_binary) &lt;- 0</code></li>
-<li>Row-standardize so rows sum to 1: <code>W &lt;- W_binary / rowSums(W_binary)</code></li>
+<li>Treating <code>W</code> as obvious or neutral</li>
+<li>Reporting Moran’s I without explaining the neighborhood rule</li>
+<li>Moving from one global statistic straight to causal claims</li>
+<li>Forgetting that aggregation choice can change the result</li>
 </ol>
-<div class="cell">
-<pre><code>#&gt; Raw (region A): [1,1,1,1]  -&gt; Row-standardized: [0.25,0.25,0.25,0.25]
-#&gt; Raw (region B): [1 x8]     -&gt; Row-standardized: [0.125 x8]</code></pre>
+<p><strong>Safer habit:</strong> always describe how neighbors were defined and why that definition is substantively reasonable.</p>
+<p><strong>In water resources research, this means:</strong> tie your spatial definition back to process — flow connectivity, basin similarity, meteorology, infrastructure, administration, or management scale.</p>
+</section>
+<section id="key-takeaways" class="slide level2">
+<h2>Key takeaways</h2>
+<ol type="1">
+<li>Spatial statistics begin by defining <strong>near</strong></li>
+<li>Predicates and tessellations create neighbor relationships</li>
+<li>Neighbor relationships become the weights matrix <code>W</code></li>
+<li>Moran’s I tests whether similar values cluster globally</li>
+<li>Results depend on scale, zoning, and neighborhood definition</li>
+</ol>
+<div class="fragment">
+<p>That is why geometry matters statistically, not just visually.</p>
+<p><strong>Bottom line for water resources:</strong> spatial statistics helps you decide whether apparent regional pattern is signal, artifact, or some mixture of both.</p>
 </div>
-</div><div class="column" style="width:52%;">
-<p><strong>What the spatial lag tells us</strong></p>
-<p>Formula (compact):</p>
-<p><span class="math display">\[\text{lag} = W x\]</span></p>
-<p>Short numeric example (class demo):</p>
-<div class="cell">
-<pre><code>#&gt; counts: 1,2,3,4,5,6,7,8,9
-#&gt; lag (first 6): 3.67,3.8,4.33,4.6,5,5.4</code></pre>
+</section>
+<section id="preview-not-mastery" class="slide level2">
+<h2>Preview, not mastery</h2>
+<p>Today’s core lesson is:</p>
+<ul>
+<li><strong>global autocorrelation</strong>: Moran’s I</li>
+<li><strong>local clustering intuition</strong>: lag quadrants / LISA preview</li>
+<li><strong>sensitivity to spatial representation</strong>: MAUP</li>
+</ul>
+<p>What comes next in a fuller course:</p>
+<ul>
+<li>spatial regression</li>
+<li>distance-threshold sensitivity</li>
+<li>Geary’s C</li>
+<li>variograms</li>
+<li>kriging</li>
+</ul>
+<p>We will treat those as extensions, not the main story of this first introduction.</p>
+</section>
+<section id="two-defensible-ways-to-define-near" class="slide level2">
+<h2>Two defensible ways to define “near”</h2>
+<p>A shared-border rule is not the only option.</p>
+<ul>
+<li><strong>contiguity neighbors</strong>: units touch along an edge or boundary</li>
+<li><strong>distance neighbors</strong>: units are within some threshold distance</li>
+</ul>
+<div class="fragment">
+<p>Both are reasonable in different settings. Changing this choice changes <code>W</code>, and that can change Moran’s I.</p>
 </div>
-</div></div>
+</section>
+<section id="appendix-preview-geostatistics-is-a-different-family" class="slide level2">
+<h2>Appendix / preview: geostatistics is a different family</h2>
+<p>Areal autocorrelation asks whether nearby units have similar values.</p>
+<p>Geostatistics asks how similarity changes with distance in continuous space.</p>
+<ul>
+<li>empirical variogram = summarize semivariance by distance</li>
+<li>kriging = use that structure for prediction</li>
+</ul>
+<p>For this first lesson, the main point is just that these are related, but not identical, branches of spatial statistics.</p>
 </section>
 <section id="standard-regression-fails-with-spatial-data" class="slide level2">
 <h2>Standard Regression Fails with Spatial Data</h2>
 <p><strong>OLS Assumption:</strong> Observations are independent (residuals are uncorrelated)</p>
 <div class="fragment">
-<p><strong>Spatial Data Reality:</strong> Nearby regions often have correlated attributes - Starbucks density clusters (coastal cities have high density) - Similar urban development patterns - Regional consumer preferences &amp; market saturation - → <strong>Residuals are correlated, not independent</strong></p>
+<p><strong>Spatial Data Reality:</strong> Nearby regions often have correlated attributes</p>
+<ul>
+<li>Starbucks density clusters (coastal cities have high density)</li>
+<li>Similar urban development patterns</li>
+<li>Regional consumer preferences &amp; market saturation</li>
+<li>→ <strong>Residuals are correlated, not independent</strong></li>
+</ul>
 </div>
 <div class="fragment">
 <p><strong>Consequences of violating independence:</strong></p>
@@ -1919,7 +1863,12 @@ p-value &lt; 0.001</code></pre>
 </table>
 </div>
 <div class="fragment">
-<p><strong>Solution: Use spatial statistics that explicitly model dependence</strong> - <strong>Testing</strong>: Moran’s I (test for spatial clustering) - <strong>Modeling</strong>: Spatial Autoregressive (SAR) or Spatial Error (SEM) models - <strong>Interpretation</strong>: Spatial lag models, Conditional AutoRegressive (CAR) models</p>
+<p><strong>Solution: Use spatial statistics that explicitly model dependence</strong></p>
+<ul>
+<li><strong>Testing</strong>: Moran’s I (test for spatial clustering)</li>
+<li><strong>Modeling</strong>: Spatial Autoregressive (SAR) or Spatial Error (SEM) models</li>
+<li><strong>Interpretation</strong>: Spatial lag models, Conditional AutoRegressive (CAR) models</li>
+</ul>
 </div>
 </section>
 <section id="lisa-which-neighborhoods-are-clusters-vs.-outliers" class="slide level2">
@@ -1930,25 +1879,43 @@ p-value &lt; 0.001</code></pre>
 <p><strong>LISA Quadrants</strong> (from Moran scatterplot):</p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p>🔴 <strong>High-High</strong> (red) - High value + high neighbors - Cluster of high values - Example: California coast (high Starbucks, neighbors are high)</p>
-<p>🔵 <strong>Low-Low</strong> (blue) - Low value + low neighbors - Cluster of low values - Example: Rural interior states (low Starbucks, neighbors are low)</p>
+<p>🔴 <strong>High-High</strong> (red)</p>
+<ul>
+<li>High value + high neighbors</li>
+<li>Cluster of high values</li>
+<li>Example: California coast (high Starbucks, neighbors are high)</li>
+</ul>
+<p>🔵 <strong>Low-Low</strong> (blue)</p>
+<ul>
+<li>Low value + low neighbors</li>
+<li>Cluster of low values</li>
+<li>Example: Rural interior states (low Starbucks, neighbors are low)</li>
+</ul>
 </div><div class="column" style="width:50%;">
-<p>🟠 <strong>High-Low</strong> (orange) - High value + low neighbors - Isolated hotspot (outlier) - Example: Denver metro (high Starbucks surrounded by sparse rural states)</p>
-<p>🟢 <strong>Low-High</strong> (green) - Low value + high neighbors - Rare anomaly - Example: Small town on coast (low local Starbucks but high neighbors)</p>
+<p>🟠 <strong>High-Low</strong> (orange)</p>
+<ul>
+<li>High value + low neighbors</li>
+<li>Isolated hotspot (outlier)</li>
+<li>Example: Denver metro (high Starbucks surrounded by sparse rural states)</li>
+</ul>
+<p>🟢 <strong>Low-High</strong> (green)</p>
+<ul>
+<li>Low value + high neighbors</li>
+<li>Rare anomaly</li>
+<li>Example: Small town on coast (low local Starbucks but high neighbors)</li>
+</ul>
 </div></div>
 </div>
-<div class="fragment">
-<p><strong>In practice</strong>: LISA identifies which specific neighborhoods drive the global Moran’s I signal - Are Starbucks clusters concentrated on coasts? Or distributed nationwide? - Are high-density outliers major metros or measurement errors?</p>
+</section>
+<section id="section-7" class="slide level2">
+<h2></h2>
+<p><strong>In practice</strong>: LISA identifies which specific neighborhoods drive the global Moran’s I signal</p>
+<ul>
+<li>Are Starbucks clusters concentrated on coasts? Or distributed nationwide?</li>
+<li>Are high-density outliers major metros or measurement errors?</li>
+</ul>
 <div class="cell">
-<pre><code>#&gt; `geom_smooth()` using formula = 'y ~ x'</code></pre>
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="week-3-1_files/figure-revealjs/unnamed-chunk-116-1.png" style="width:100.0%"></p>
-</figure>
-</div>
-</div>
-</div>
+<pre><code>#&gt; LISA plots unavailable: tessellation computation not run.</code></pre>
 </div>
 </section>
 <section id="the-road-ahead-spatial-regression" class="slide level2">

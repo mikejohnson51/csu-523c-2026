@@ -18,14 +18,17 @@ format:
       data-background-color: "#1E4D2B"
 knitr:
   opts_chunk: 
-    echo: true
-    message: true
+    echo: false
+    message: false
+    warning: false
     collapse: true
     comment: "#>"
     out.width: "100%"
+    fig.width: 7
+    fig.height: 4
 ---
 
-```{r, include = F}
+```{r, include = TRUE}
 library(sf)
 library(tidyverse)
 library(knitr)
@@ -697,6 +700,7 @@ Where `II` would state: "Does the Interior of "a" overlaps with the Interior of 
 Where `IB` would state: "Does the Interior of "a" overlap with the Boundary of "b" in a way that produces a point (0), line (1), or polygon (2)"
 
 Both matrix forms:
+
   - dimensional {0,1,2,F}
   - Boolean {T,F}
   
@@ -720,7 +724,7 @@ Reading from left-to-right and top-to-bottom, the DE-9IM(a,b) string code is '21
 - Geometry Y is a 4 feature polygon colored in blue
 
 ::: columns
-::: {.column-width = "50%"}
+::: {.column width="50%"}
 ```{r, echo = FALSE}
 #| out.width: '50%'
 b0 = st_polygon(list(rbind(c(-1,-1), c(1,-1), c(1,1), c(-1,1), c(-1,-1))))
@@ -735,7 +739,7 @@ y = st_sfc(a0,a1,a2,a3)
 plot(x, border = 'red')
 plot(y, border = 'blue', add = TRUE)
 ```
-::: {.column-width = "50%"}
+::: {.column width="50%"}
 :::
 ```{r}
 st_relate(x,y)
@@ -806,13 +810,13 @@ wa = filter(states, name == "Washington")
 ```
 
 ::: columns
-::: {column.wdith = "50%"}
+::: {.column width="50%"}
 ```{r}
 #| out.width: '50%'
 plot(states$geometry)
 ```
 :::
-::: {column.wdith = "50%"}
+::: {.column width="50%"}
 ```{r, message = F, warning = F}
 (mutate(states, 
         deim9 = st_relate(states, wa),
@@ -844,13 +848,13 @@ fruits %in% c("apple", "lemon")
 - We have used `dplyr::filter` to  subset a data frame, retaining all rows that satisfy a `boolean` condition. 
 
 ::: columns
-::: {column.wdith = "50%"}
+::: {.column width="50%"}
 ```{r}
 mutate(states, equalsWA = (name == "Washington")) |> 
   st_drop_geometry()
 ```
 :::
-::: {column.wdith = "50%"}
+::: {.column width="50%"}
 ```{r}
 filter(states, name == "Washington")
 ```
@@ -1750,184 +1754,259 @@ knitr::include_graphics('img/15-gm-maup.png')
 
 # Spatial Statistics Foundation
 
-## From Neighbors to Inference: Why We Need Spatial Statistics
+## Bridge from geometry to inference
 
-**The central question:** Do neighboring observations have similar values?
+So far, we have learned that geometric choices change analysis:
 
-If YES:
-  - Standard regression breaks (independence assumption violated)
-  - We need **spatial statistics** to test for clustering and model dependence
-  - The spatial **weights matrix W** captures neighbor relationships
-
-. . .
-
-**Why W matters:**
-  - Built from geometric relationships: `st_touches()`, `st_intersects()`, `st_is_within_distance()`
-  - Scale depends on tessellation choice (hexagon vs square vs Voronoi) → **MAUP**
-  - Directly inputs to: Moran's I, spatial regression (SAR/SEM), LISA, kriging
+- predicates define relationships
+- tessellations define units
+- simplification changes representation
 
 . . .
 
-**Section Arc:**
+**Spatial statistics adds one new question:**
 
-- Build the neighbor matrix `W` from geometry (predicates & tessellations)
-- Test for global clustering with Moran's I
-- Visualize local patterns with LISA and spatial-lag plots
-- Diagnose how spatial dependence breaks OLS and motivates spatial regression
+> Do nearby observations tend to have similar values?
 
-## From Predicates to Neighbor Matrices
+If the answer is yes, then geometry is not just changing the map — it is changing the **inference**.
 
-**The spatial weights matrix W** is the bridge from geometry to statistics
+**Story of this section:**
+
+- define what “near” means
+- encode that definition in `W`
+- use `W` to test for clustering
+- see why changing spatial units can change the answer
+
+---
+
+## Why spatial statistics?
+
+**Core idea:** spatial data are rarely independent.
+
+- Nearby places often share similar conditions
+- Aggregation choices can create or hide pattern
+- A standard iid mental model can be misleading
+
+. . .
+
+So before modeling, we need a formal way to say **who is near whom**.
+
+**This is why spatial statistics exists:** not because maps are fancy, but because location changes the assumptions behind inference.
+
+**So what for water resources?**
+
+- neighboring catchments often share climate, geology, and land use
+- nearby gages are rarely independent replicates
+- flood, drought, and water-quality patterns often organize regionally
+
+---
+
+## From predicates to neighbors
+
+This is where prior content matters.
+
+We already know how to encode spatial relationships with predicates:
+
+- `st_touches()` → shared borders
+- `st_intersects()` → overlap
+- `st_is_within_distance()` → distance-based neighbors
+
+. . .
+
+These are not just GIS operations.
+
+They are how we turn geometry into a statistical definition of **neighborhood**.
+
+**Key point:** the choice of predicate is already a modeling choice.
+
+**Water-resources implication:** a watershed adjacency rule, stream-network rule, or Euclidean distance rule may imply very different hydrologic processes.
+
+---
+
+## Spatial weights matrix `W`
+
+**`W` is a formal encoding of who counts as near whom.**
+
+- rows = focal locations
+- columns = possible neighbors
+- `w_ij > 0` means location *j* contributes to location *i*
+- `w_ij = 0` means they are not neighbors
+
+. . .
+
+This is the bridge from geometry to spatial inference.
+
+**So what?** If you care about regionalization, transfer learning, model validation, gage networks, or hotspot detection, you are already making choices that belong in `W`.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# Prepare a tiny example grid (hidden) so we can print concrete outputs in the step boxes
+# Prepare a tiny example grid so we can print concrete outputs in the step boxes
 sf_use_s2(FALSE)
 small_bbox <- st_bbox(c(xmin = 0, ymin = 0, xmax = 3, ymax = 3))
 small_grid <- st_make_grid(small_bbox, n = c(3,3)) %>% st_as_sf() %>% mutate(id = row_number())
 
-# Binary neighbor matrix
 W_binary_small <- st_touches(small_grid, sparse = FALSE) * 1
 diag(W_binary_small) <- 0
-
-# Row-standardized weights
 W_small <- W_binary_small / rowSums(W_binary_small)
 W_small[!is.finite(W_small)] <- 0
-
-# Neighbor counts (degree)
 deg <- rowSums(W_binary_small)
 ```
 
+---
+
+## Building `W` in 3 steps
+
 ::: columns
 ::: {.column width="33%"}
-**Step 1: Binary Predicate**
+**1. Define neighbors**
 ```{r, eval=FALSE}
-(W_binary <- st_touches(
-  hexagon_grid, 
-  sparse = FALSE
-) * 1)
+W_binary <- st_touches(grid, sparse = FALSE) * 1
 ```
-Result: 1 if neighbors, 0 if not
+1 = neighbors, 0 = not neighbors
+
 ```{r, echo=FALSE}
-cat("Neighbor counts (min, mean, median, max):", min(deg), round(mean(deg),2), median(deg), max(deg), "\n")
-print(W_binary_small[1:min(6,nrow(W_binary_small)), 1:min(6,ncol(W_binary_small))])
+cat("Neighbor counts (min / mean / max):", min(deg), round(mean(deg),2), max(deg), "
+")
+print(W_binary_small[1:6, 1:6])
 ```
 :::
 
 ::: {.column width="33%"}
-**Step 2: Remove Self**
+**2. Remove self-links**
 ```{r, eval=FALSE}
-(diag(W_binary) <- 0)
+diag(W_binary) <- 0
 ```
-A tile is not its own neighbor
+A region is not its own neighbor
+
 ```{r, echo=FALSE}
-cat("Diagonal entries (first 6):\n")
-print(diag(W_binary_small)[1:min(6,length(diag(W_binary_small)))])
+print(diag(W_binary_small)[1:6])
 ```
 :::
 
 ::: {.column width="33%"}
-**Step 3: Row-Standardize**
+**3. Row-standardize**
 ```{r, eval=FALSE}
-(W <- W_binary / 
-  rowSums(W_binary))
+W <- W_binary / rowSums(W_binary)
 ```
-Each row sums to 1
+Each row sums to 1, so the lag is a neighbor average
+
 ```{r, echo=FALSE}
-cat("Sample row-standardized W (first 6 rows x cols):\n")
-print(round(W_small[1:min(6,nrow(W_small)), 1:min(6,ncol(W_small))], 2))
+print(round(W_small[1:6, 1:6], 2))
 ```
 :::
 :::
+
+---
+
+## What row-standardizing does
+
+Row-standardizing makes the spatial lag easier to interpret.
+
+Without it:
+
+- locations with many neighbors can dominate
+- raw adjacency counts are harder to compare across space
+
+With it:
+
+- each row sums to 1
+- the lag becomes a weighted average of neighboring values
+- “my neighborhood signal” becomes directly interpretable
+
+**It does not remove the modeling choice — it just makes the choice easier to work with.**
+
+---
+
+## What `W` lets us do
+
+Once we have `W`, we can ask statistical questions about pattern.
+
+**Most important first question:**
+
+> Are nearby values more similar than we would expect by chance?
+
+That is the core idea behind **spatial autocorrelation**.
 
 . . .
 
-**This neighbor matrix W** becomes the input to every spatial statistic:
-  - Moran's I (spatial autocorrelation)
-  - Spatial regression (SAR, SEM models)
-  - LISA (local clustering)
-  - Kriging (spatial interpolation)
+For a first pass, the main tool is **Moran’s I**.
 
-## Example: Starbucks Clustering by State
+---
 
-**Question:** Do states with many Starbucks neighbors have many Starbucks? (Are Starbucks geographically clustered?)
+## Moran’s I: the first global test
 
-::: {style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;"}
+**Moran’s I** summarizes whether similar values cluster in space.
 
-::: {style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-size: 0.8em;"}
-**Code:**
-```r
-# 1. Aggregate
-state_counts <- st_join(
-  states, starbucks) %>%
-  group_by(state) %>%
-  summarise(n_stores = n())
+Interpretation:
 
-# 2. Build neighbor matrix
-W <- st_touches(state_counts,
-  sparse = FALSE) * 1
-diag(W) <- 0
-W <- W / rowSums(W)
+- **positive** Moran’s I → similar neighbors cluster together
+- **near 0** → no strong spatial pattern beyond randomness
+- **negative** Moran’s I → neighbors tend to be dissimilar
 
-# 3. Compute Moran's I
-I <- ape::Moran.I(
-  state_counts$n_stores, 
-  weight = W)
-```
-:::
+. . .
 
-::: {style="background: #E8F5E9; padding: 15px; border-radius: 5px; border-left: 4px solid #2E7D32;"}
-**Output:**
-```
-Moran's I = 0.58
-p-value < 0.001
-```
+It is a **global** summary: one value for the whole study area.
 
-**🔴 Strong positive autocorrelation**
-- **CA** (high) ← Oregon, Nevada (high)
-- **MT** (low) ← Idaho, Wyoming (low)
+**Mental model:** Moran’s I is asking whether values line up with their neighborhood averages more than a random rearrangement would.
 
-**Conclusion:** Starbucks cluster by region, not random
-:::
+**Water-resources implication:** if streamflow error, nutrient concentration, or flood exposure has strong positive spatial autocorrelation, then nearby units are carrying shared information — and naive independence assumptions can mislead you.
 
-:::
+---
 
+## How to read Moran’s I in practice
 
-## Tessellation Choice Affects Neighbor Structure (and Statistics)
+When you see a Moran’s I result, ask three questions:
 
-Different tessellations change neighbor structure and therefore statistical estimates (MAUP).
+1. **Sign** — is the pattern clustered or contrasting?
+2. **Magnitude** — how strong is the pattern?
+3. **Context** — what definition of neighborhood produced it?
 
-**Critical insight:** Same point data, different tessellations, different statistical results
+. . .
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# Compute all three tessellations (hidden computation)
+A Moran’s I value is never just “about the data.”
+It is always about the data **plus the chosen `W`**.
+
+---
+
+## Example: Starbucks counts in hexagons
+
+We will use a simple areal example:
+
+- build a hexagon tessellation over CONUS
+- count Starbucks per hexagon
+- define neighbors with `st_touches()`
+- compute Moran’s I on those counts
+
+**This example is simplified, not definitive.**
+Its purpose is to make the statistical logic visible before moving to real research settings.
+
+```{r, include=TRUE, cache=TRUE, message=FALSE, warning=FALSE}
+# Hidden prep for the main spatial statistics examples
 if (!require(ape, quietly = TRUE)) install.packages("ape")
 if (!require(ggplot2, quietly = TRUE)) install.packages("ggplot2")
 sf_use_s2(FALSE)
 
-# Get CONUS bounds and repair geometry
-states_valid <- AOI::aoi_get(state = "conus") |> 
+states_valid <- AOI::aoi_get(state = "conus") |>
   st_transform(5070) |>
-  st_make_valid() 
+  st_make_valid()
 
 conus_bbox <- st_bbox(states_valid)
 conus_union <- st_union(states_valid)
 
-# Create three tessellations with matching CRS
 hex_grid <- st_make_grid(conus_bbox, n = 70, square = FALSE) %>%
-  st_as_sf() %>% 
+  st_as_sf() %>%
   st_set_crs(st_crs(starbucks)) %>%
   st_filter(conus_union) %>%
   mutate(id = row_number())
 
 sq_grid <- st_make_grid(conus_bbox, n = 70, square = TRUE) %>%
-  st_as_sf() %>% 
+  st_as_sf() %>%
   st_set_crs(st_crs(starbucks)) %>%
   st_filter(conus_union) %>%
   mutate(id = row_number())
 
 set.seed(523)
 centroids <- st_sample(conus_union, 2500) %>%
-  st_as_sf() %>% 
+  st_as_sf() %>%
   st_set_crs(st_crs(starbucks)) %>%
   mutate(id = row_number())
 
@@ -1937,189 +2016,381 @@ voronoi_grid <- st_voronoi(st_union(st_geometry(centroids))) %>%
   st_filter(conus_union) %>%
   mutate(id = row_number())
 
-# Count Starbucks in each tessellation
 count_starbucks <- function(grid) {
-  st_join(grid, starbucks) %>% st_drop_geometry() %>%
-  group_by(id) %>% summarise(n = n(), .groups = "drop") %>%
-  pull(n)
+  out <- st_join(grid, starbucks) %>%
+    st_drop_geometry() %>%
+    count(id, name = "n")
+  grid %>%
+    st_drop_geometry() %>%
+    select(id) %>%
+    left_join(out, by = "id") %>%
+    mutate(n = replace_na(n, 0)) %>%
+    pull(n)
 }
 
-# Compute Moran's I
-compute_morans <- function(grid, counts) {
-  W <- st_touches(grid, sparse = FALSE) * 1; diag(W) <- 0
-  W <- W / rowSums(W); W[!is.finite(W)] <- 0
-  moran_i <- ape::Moran.I(as.numeric(counts), W)
-  c(I = moran_i$observed, p = moran_i$p.value)
+build_W <- function(grid) {
+  W <- st_touches(grid, sparse = FALSE) * 1
+  diag(W) <- 0
+  rs <- rowSums(W)
+  W <- W / ifelse(rs == 0, 1, rs)
+  W[!is.finite(W)] <- 0
+  W
+}
+
+compute_moran <- function(x, W) {
+  out <- ape::Moran.I(as.numeric(x), W)
+  tibble(I = out$observed, p = out$p.value)
 }
 
 hex_sb <- count_starbucks(hex_grid)
-sq_sb <- count_starbucks(sq_grid)
+sq_sb  <- count_starbucks(sq_grid)
 vor_sb <- count_starbucks(voronoi_grid)
 
-hex_m <- compute_morans(hex_grid, hex_sb)
-sq_m <- compute_morans(sq_grid, sq_sb)
-vor_m <- compute_morans(voronoi_grid, vor_sb)
+W_hex <- build_W(hex_grid)
+W_sq  <- build_W(sq_grid)
+W_vor <- build_W(voronoi_grid)
 
-# Create LISA and lag plots for hexagon grid (example)
-W_hex <- st_touches(hex_grid, sparse = FALSE) * 1; diag(W_hex) <- 0
-W_hex <- W_hex / rowSums(W_hex); W_hex[!is.finite(W_hex)] <- 0
+hex_m <- compute_moran(hex_sb, W_hex)
+sq_m  <- compute_moran(sq_sb, W_sq)
+vor_m <- compute_moran(vor_sb, W_vor)
 
-hex_lag <- W_hex %*% hex_sb
-hex_z <- scale(hex_sb)
-hex_lag_z <- scale(hex_lag)
+hex_lag <- as.numeric(W_hex %*% hex_sb)
+hex_z <- as.numeric(scale(hex_sb))
+hex_lag_z <- as.numeric(scale(hex_lag))
 
-# LISA quadrant assignment
-hex_lisa <- data.frame(
-  x = hex_z[,1],
-  lag_x = hex_lag_z[,1],
+hex_lisa <- tibble(
+  x = hex_z,
+  lag_x = hex_lag_z,
   quadrant = case_when(
-    hex_z[,1] > 0 & hex_lag_z[,1] > 0 ~ "High-High",
-    hex_z[,1] < 0 & hex_lag_z[,1] < 0 ~ "Low-Low",
-    hex_z[,1] > 0 & hex_lag_z[,1] < 0 ~ "High-Low",
-    hex_z[,1] < 0 & hex_lag_z[,1] > 0 ~ "Low-High",
+    x > 0 & lag_x > 0 ~ "High-High",
+    x < 0 & lag_x < 0 ~ "Low-Low",
+    x > 0 & lag_x < 0 ~ "High-Low",
+    x < 0 & lag_x > 0 ~ "Low-High",
     TRUE ~ "Other"
   )
 )
 
-# Create LISA plot
-p_lisa <- ggplot(hex_lisa, aes(x, lag_x, color = quadrant)) +
-  geom_point(size = 3, alpha = 0.7) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
-  scale_color_manual(values = c("High-High" = "#d73027", "Low-Low" = "#4575b4", 
-                                 "High-Low" = "#fee090", "Low-High" = "#91bfdb", 
-                                 "Other" = "gray80")) +
-  labs(title = "LISA Quadrants", x = "Starbucks Density", y = "Spatial Lag") +
-  theme_minimal() +
-  theme(legend.position = "bottom", legend.title = element_blank())
+hex_map <- hex_grid
+hex_map$count <- as.numeric(hex_sb)
+hex_map$quadrant <- hex_lisa$quadrant
 
-# Create lag plot
-p_lag <- ggplot(hex_lisa, aes(x, lag_x, color = quadrant)) +
-  geom_point(size = 3, alpha = 0.7) +
-  geom_smooth(method = "lm", se = FALSE, color = "black", alpha = 0.3) +
-  scale_color_manual(values = c("High-High" = "#d73027", "Low-Low" = "#4575b4", 
-                                 "High-Low" = "#fee090", "Low-High" = "#91bfdb", 
-                                 "Other" = "gray80")) +
-  labs(title = "Spatial Lag Relationship", x = "Starbucks Density", y = "Average Neighbor Density") +
-  theme_minimal() +
-  theme(legend.position = "none")
-```
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-**Example: Hexagon Grid**
-
-```{r, echo=TRUE, eval=FALSE}
-# Create regular hexagon tessellation
-hex_grid <- st_make_grid(
-  conus_bbox, 
-  n = 70, 
-  square = FALSE
+compare_tbl <- tibble(
+  tessellation = c("Hexagon", "Square", "Voronoi"),
+  tiles = c(nrow(hex_grid), nrow(sq_grid), nrow(voronoi_grid)),
+  avg_neighbors = c(mean(rowSums(W_hex > 0)), mean(rowSums(W_sq > 0)), mean(rowSums(W_vor > 0))),
+  moran_I = c(hex_m$I, sq_m$I, vor_m$I),
+  p_value = c(hex_m$p, sq_m$p, vor_m$p)
 )
-
-# Count Starbucks in each hexagon
-hex_counts <- st_join(
-  hex_grid, starbucks
-) %>% group_by(id) %>%
-  summarise(n = n())
-
-# Build neighbor weight matrix
-W <- st_touches(hex_grid) %>% 
-  as.matrix()
-W <- W / rowSums(W)  # Standardize
-
-# Compute Moran's I
-ape::Moran.I(hex_counts$n, W)
 ```
 
-**Result:** I = `r round(hex_m[1], 3)`
+---
 
-:::
+## Moran’s I example: map + takeaway
 
-::: {.column width="50%"}
+```{r, echo=FALSE, fig.width=8, fig.height=4}
+ggplot() +
+  geom_sf(data = hex_map, aes(fill = count), color = NA) +
+  scale_fill_viridis_c(option = "magma") +
+  labs(
+    title = paste0("Hexagon Starbucks counts: Moran's I = ", round(hex_m$I, 3)),
+    subtitle = paste0("Analytical p-value ≈ ", signif(hex_m$p, 3)),
+    fill = "count"
+  ) +
+  theme_minimal()
+```
 
-**Comparison: Tessellation summary & results**
+**Teaching takeaway:** similar values are clustering in space, so this pattern is not well described as iid randomness.
 
-| Tessellation | Tiles | Avg Neighbors | Range | Moran's I | Pattern |
-|:---|---:|---:|---:|---:|:---|
-| Hexagon | ~300 | ~6 | 6 (uniform) | `r round(hex_m[1], 3)` | Uniform |
-| Square | ~300 | ~4 | 4 (orthogonal) | `r round(sq_m[1], 3)` | Orthogonal |
-| Voronoi | Variable | ~6 | 1–15 | `r round(vor_m[1], 3)` | Variable |
+**Interpretation in plain English:** places with lots of Starbucks tend to be near places with lots of Starbucks; places with few tend to be near places with few.
 
-**MAUP:** Same data, different tessellations → different point estimates; choose neighborhoods using domain knowledge.
+**So what for water resources research?**
 
-:::
+- if flood losses cluster, response planning should be regional, not purely local
+- if model residuals cluster, validation should account for spatial dependence
+- if hydrologic signatures cluster, regionalization may be defensible — but only at the right scale
 
-::::
+---
 
-## Moran's I: Does Your Variable Cluster?
+## From global pattern to local pattern
 
-**The question:** If two hexagons are neighbors, do they have similar Starbucks counts?
+Moran’s I gives us one number for the whole map.
 
-**Moran's I is the answer—a test for spatial autocorrelation**
+That is useful, but it hides *where* the pattern is happening.
+
+To get local intuition, we introduce two related ideas:
+
+- the **spatial lag**: the weighted average of neighboring values
+- **LISA**: Local Indicators of Spatial Association
 
 . . .
 
-**Formula** (don't memorize, conceptually: "weighted correlation of X with its spatial lag"):
+**Why this matters:**
 
-$$I = \frac{\sum_i \sum_j w_{ij}(x_i - \bar{x})(x_j - \bar{x})}{σ^2 \sum_i \sum_j w_{ij}}$$
+- Moran’s I asks whether clustering exists overall
+- the spatial lag helps show how each place relates to its neighborhood
+- LISA asks where local similarity or local contrast is strongest
+
+---
+
+## Spatial lag and LISA: what they are
+
+**Spatial lag**
+
+- for each location, compute a neighborhood summary using `W`
+- most often, this is a weighted average of neighboring values
+- it answers: *what do my neighbors look like?*
+
+**Formula:**
+
+$$	ext{lag}(x)_i = \sum_j w_{ij} x_j$$
+
+. . .
+
+**LISA**
+
+- stands for **Local Indicators of Spatial Association**
+- uses each location’s value together with its neighborhood context
+- helps identify places that are:
+  - high surrounded by high
+  - low surrounded by low
+  - high surrounded by low
+  - low surrounded by high
+
+For now, think of LISA as the **local companion** to Moran’s I.
+
+---
+
+## How the spatial lag is calculated
+
+The calculation follows directly from `W`:
+
+1. choose a neighborhood definition
+2. build `W`
+3. take a weighted average of neighbor values for each location
+
+```{r, echo=FALSE}
+demo_counts <- 1:9
+demo_lag <- as.numeric(W_small %*% demo_counts)
+cat("counts:", paste(demo_counts, collapse=", "), "
+")
+cat("lag values:", paste(round(demo_lag,2), collapse=", "), "
+")
+```
 
 . . .
 
 **Interpretation:**
 
-| I value | Meaning | Starbucks |
-|---|---|---|
-| **I > 0, p < 0.05** | 🟢 Positive clustering | CA hexagons HIGH-HIGH, MT LOW-LOW |
-| **I ≈ 0, p > 0.05** | 🟡 No clustering | Uniform distribution |
-| **I < 0, p < 0.05** | 🔴 Regular pattern | High surrounded by low (rare) |
+- a high lag means your neighbors tend to have high values
+- a low lag means your neighbors tend to have low values
+- comparing your value to your lag helps reveal local agreement or mismatch
+
+**Water-resources implication:** this is the local logic behind identifying coherent flood-prone regions, drought clusters, unusually impaired reaches, or stations behaving unlike their surroundings.
+
+---
+
+## Spatial lag: what your neighbors look like
+
+The spatial lag is the weighted neighborhood average:
+
+$$	ext{lag}(x) = W x$$
+
+```{r, echo=FALSE, fig.width=6, fig.height=4}
+ggplot(hex_lisa, aes(x = x, y = lag_x, color = quadrant)) +
+  geom_point(alpha = 0.7, size = 2.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  scale_color_manual(values = c(
+    "High-High" = "#d73027",
+    "Low-Low" = "#4575b4",
+    "High-Low" = "#fee090",
+    "Low-High" = "#91bfdb",
+    "Other" = "gray80"
+  )) +
+  labs(
+    title = "Spatial lag plot",
+    x = "Standardized value",
+    y = "Standardized neighbor average",
+    color = "pattern"
+  ) +
+  theme_minimal()
+```
+
+This gives local intuition:
+
+- upper-right = high values near high values
+- lower-left = low values near low values
+- off-diagonal = local mismatch or transition
+
+---
+
+## Why the lag plot matters
+
+The lag plot helps make visible what Moran’s I compresses into one number.
+
+- points near the upper-right and lower-left support positive autocorrelation
+- a diffuse cloud around the center suggests weak structure
+- strong off-diagonal structure would imply contrast rather than clustering
+
+**Start with the global pattern, then look for local structure.**
+That progression makes the map easier to interpret.
+
+---
+
+## Local clustering intuition
+
+A global Moran’s I gives one number for the whole map.
+
+A local view asks:
+
+> Where are the high-high and low-low areas?
+
+```{r, echo=FALSE, fig.width=8, fig.height=4}
+ggplot() +
+  geom_sf(data = hex_map, aes(fill = quadrant), color = NA) +
+  scale_fill_manual(values = c(
+    "High-High" = "#d73027",
+    "Low-Low" = "#4575b4",
+    "High-Low" = "#fee090",
+    "Low-High" = "#91bfdb",
+    "Other" = "gray90"
+  )) +
+  labs(title = "Local clustering intuition from lag quadrants", fill = "quadrant") +
+  theme_minimal()
+```
+
+This is a useful bridge to LISA without overloading the first lesson with full local significance testing.
+
+**So what?** Local patterns are often what matter operationally: where should we investigate, intervene, monitor, or transfer information with caution?
+
+---
+
+## MAUP returns: tessellation changes inference
+
+This is the key bridge back to prior content.
+
+The same point data can produce different statistical results when we change the spatial units.
+
+```{r, echo=FALSE}
+knitr::kable(
+  compare_tbl %>%
+    mutate(
+      avg_neighbors = round(avg_neighbors, 2),
+      moran_I = round(moran_I, 3),
+      p_value = signif(p_value, 3)
+    ),
+  caption = "Same points, different tessellations, different neighbor structures"
+)
+```
+
+**Interpretation:** `W` is not a fact of nature. It depends on the geometry we choose.
+
+**Water-resources implication:** conclusions about “regional pattern” can change when you move from HUCs to grid cells, from catchments to counties, or from areal neighbors to stream-network neighbors.
+
+---
+
+## What this means substantively
+
+When tessellation changes, three things can change together:
+
+- the number of units
+- the number of neighbors each unit has
+- the value of Moran’s I
 
 . . .
 
-**Our result:** I = 0.253, p < 0.001 ✓ **Significant positive clustering**
+So a spatial statistic is not just a property of the phenomenon.
+It is also a property of the **representation**.
 
-**What this means:** Starbucks are geographically concentrated. Coastal and urban hexagons cluster together; rural hexagons cluster together. This is **not a random distribution**.
+This is why MAUP is not a side note — it is a warning label.
 
-## Row-Standardize & Spatial Lag — (Teacher-friendly)
+**Research takeaway:** when your paper makes a spatial claim, you should be ready to explain why your spatial units and neighborhood rule are substantively defensible.
 
-::: columns
+---
 
-::: {.column width="48%"}
-**What we do (3 quick steps)**
+## Common beginner mistakes
 
-1. Build binary adjacency: `W_binary <- st_touches(grid, sparse = FALSE) * 1`
-2. Remove self-links: `diag(W_binary) <- 0`
-3. Row-standardize so rows sum to 1: `W <- W_binary / rowSums(W_binary)`
+1. Treating `W` as obvious or neutral
+2. Reporting Moran’s I without explaining the neighborhood rule
+3. Moving from one global statistic straight to causal claims
+4. Forgetting that aggregation choice can change the result
 
-```{r, echo=FALSE}
-# tiny illustrative arrays (printed for clarity)
-cat("Raw (region A): [1,1,1,1]  -> Row-standardized: [0.25,0.25,0.25,0.25]\n")
-cat("Raw (region B): [1 x8]     -> Row-standardized: [0.125 x8]\n")
+**Safer habit:** always describe how neighbors were defined and why that definition is substantively reasonable.
+
+**In water resources research, this means:** tie your spatial definition back to process — flow connectivity, basin similarity, meteorology, infrastructure, administration, or management scale.
+
+---
+
+## Key takeaways
+
+1. Spatial statistics begin by defining **near**
+2. Predicates and tessellations create neighbor relationships
+3. Neighbor relationships become the weights matrix `W`
+4. Moran’s I tests whether similar values cluster globally
+5. Results depend on scale, zoning, and neighborhood definition
+
+. . .
+
+That is why geometry matters statistically, not just visually.
+
+**Bottom line for water resources:** spatial statistics helps you decide whether apparent regional pattern is signal, artifact, or some mixture of both.
+
+---
+
+## Preview, not mastery
+
+Today’s core lesson is:
+
+- **global autocorrelation**: Moran’s I
+- **local clustering intuition**: lag quadrants / LISA preview
+- **sensitivity to spatial representation**: MAUP
+
+What comes next in a fuller course:
+
+- spatial regression
+- distance-threshold sensitivity
+- Geary’s C
+- variograms
+- kriging
+
+We will treat those as extensions, not the main story of this first introduction.
+
+---
+
+## Two defensible ways to define “near”
+
+A shared-border rule is not the only option.
+
+- **contiguity neighbors**: units touch along an edge or boundary
+- **distance neighbors**: units are within some threshold distance
+
+```{r, eval=FALSE}
+# contiguity
+W_contig <- st_touches(polygons, sparse = FALSE) * 1
+
+# distance
+W_dist <- st_is_within_distance(points, dist = 50000)
 ```
-:::
 
-::: {.column width="52%"}
-**What the spatial lag tells us**
+. . .
 
-Formula (compact):
+Both are reasonable in different settings.
+Changing this choice changes `W`, and that can change Moran’s I.
 
-$$\text{lag} = W x$$
+---
 
-Short numeric example (class demo):
+## Appendix / preview: geostatistics is a different family
 
-```{r, echo=FALSE}
-# demo using the small grid prepared earlier
-demo_counts <- 1:9
-demo_lag <- as.numeric(W_small %*% demo_counts)
-cat("counts:", paste(demo_counts, collapse=","), "\n")
-cat("lag (first 6):", paste(round(demo_lag[1:6],2), collapse=","), "\n")
-```
+Areal autocorrelation asks whether nearby units have similar values.
 
-:::
+Geostatistics asks how similarity changes with distance in continuous space.
 
-:::
+- empirical variogram = summarize semivariance by distance
+- kriging = use that structure for prediction
+
+For this first lesson, the main point is just that these are related, but not identical, branches of spatial statistics.
+
+---
 
 ## Standard Regression Fails with Spatial Data
 
@@ -2130,6 +2401,7 @@ Observations are independent (residuals are uncorrelated)
 
 **Spatial Data Reality:**
 Nearby regions often have correlated attributes
+
   - Starbucks density clusters (coastal cities have high density)
   - Similar urban development patterns
   - Regional consumer preferences & market saturation
@@ -2149,6 +2421,7 @@ Nearby regions often have correlated attributes
 . . .
 
 **Solution: Use spatial statistics that explicitly model dependence**
+
   - **Testing**: Moran's I (test for spatial clustering)
   - **Modeling**: Spatial Autoregressive (SAR) or Spatial Error (SEM) models
   - **Interpretation**: Spatial lag models, Conditional AutoRegressive (CAR) models
@@ -2166,11 +2439,13 @@ Nearby regions often have correlated attributes
 ::: columns
 ::: {.column width="50%"}
 🔴 **High-High** (red)
+
 - High value + high neighbors
 - Cluster of high values
 - Example: California coast (high Starbucks, neighbors are high)
 
 🔵 **Low-Low** (blue)
+
 - Low value + low neighbors
 - Cluster of low values
 - Example: Rural interior states (low Starbucks, neighbors are low)
@@ -2178,27 +2453,35 @@ Nearby regions often have correlated attributes
 
 ::: {.column width="50%"}
 🟠 **High-Low** (orange)
+
 - High value + low neighbors
 - Isolated hotspot (outlier)
 - Example: Denver metro (high Starbucks surrounded by sparse rural states)
 
 🟢 **Low-High** (green)
+
 - Low value + high neighbors
 - Rare anomaly
 - Example: Small town on coast (low local Starbucks but high neighbors)
 :::
 :::
 
-. . .
+## 
 
 **In practice**: LISA identifies which specific neighborhoods drive the global Moran's I signal
+
   - Are Starbucks clusters concentrated on coasts? Or distributed nationwide?
   - Are high-density outliers major metros or measurement errors?
 
-```{r, echo=FALSE, fig.width=8, fig.height=5}
-if (exists("p_lisa") && exists("p_lag")) {
+```{r, echo=FALSE, fig.width=10, fig.height=5}
+if (exists("p_lisa") && exists("p_quad")) {
   library(patchwork)
-  p_lisa / p_lag
+  # Show LISA scatter (left) and hexagon LISA map (right) side-by-side
+  p_lisa | p_quad
+} else if (exists("p_lisa") && exists("p_lag")) {
+  # fallback if older name exists
+  library(patchwork)
+  p_lisa | p_lag
 } else {
   cat("LISA plots unavailable: tessellation computation not run.\n")
 }

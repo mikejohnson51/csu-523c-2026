@@ -800,3 +800,303 @@ point_in_polygon3(quakes, countries, var = "ADMIN") |>
   gghighlight::gghighlight(n > (mean(n) + sd(n)))
 ```
 
+---
+
+# Defensive Programming with Functions
+
+## Why Be Defensive?
+
+- You are unlikely to remember every edge case when you wrote your function
+
+- Other people (or future you!) will use your functions in ways you didn't anticipate
+
+- Data can change, be corrupt, or have unexpected structure
+
+- Functions used in production need to **fail gracefully** and provide useful error messages
+
+- Good defensive programming prevents silent failures that corrupt your analysis
+
+## Defensive Programming Principles
+
+Key strategies:
+
+ - **Validate inputs** - check that arguments are the correct type/structure
+ - **Handle errors** - use `tryCatch()` to manage exceptions
+ - **Provide feedback** - use informative messages and logging
+ - **Fail fast** - stop at the first problem rather than continuing with bad data
+ - **Document expectations** - be clear about what your function requires
+
+## Example: The Risky Function
+
+```{r}
+# This function is risky!
+fast_distance = function(x, y) {
+  sqrt((x$geometry[[1]]$x - y$geometry[[1]]$x)^2 + 
+       (x$geometry[[1]]$y - y$geometry[[1]]$y)^2)
+}
+```
+
+Problems:
+ - Assumes x and y have geometry columns
+ - Assumes geometry is simple point data
+ - No error handling if data is missing or malformed
+ - Cryptic error messages if something goes wrong
+
+## tryCatch: Error Handling in R
+
+`tryCatch()` allows you to handle errors and other conditions gracefully:
+
+```{r, eval = FALSE}
+tryCatch(
+  {
+    # Code to try
+    result = risky_operation()
+  },
+  error = function(e) {
+    # Handle errors
+    print(paste("Error occurred:", e$message))
+  },
+  warning = function(w) {
+    # Handle warnings
+    print(paste("Warning:", w$message))
+  },
+  finally = {
+    # Always runs, regardless of success/error
+    print("Operation completed")
+  }
+)
+```
+
+## Defensive Distance Function
+
+```{r}
+# Better version with defensive programming
+defensible_distance = function(x, y) {
+  
+  # Check inputs are sf objects
+  if (!inherits(x, "sf") || !inherits(y, "sf")) {
+    stop("Both x and y must be sf objects")
+  }
+  
+  # Check geometry column exists
+  if (!"geometry" %in% names(x) || !"geometry" %in% names(y)) {
+    stop("sfObjects must have geometry column")
+  }
+  
+  # Use tryCatch for computation
+  tryCatch(
+    {
+      dist = sf::st_distance(x, y)
+      dist
+    },
+    error = function(e) {
+      stop(paste("Distance calculation failed:", e$message))
+    }
+  )
+}
+```
+
+## The Logger Package
+
+The `logger` package provides a standardized way to record function activity:
+
+```{r, eval = FALSE}
+library(logger)
+
+# Basic logging
+log_info("Function started with parameters: x = {x}, y = {y}")
+log_debug("Internal state: data shape is {nrow(data)} rows")
+log_warn("Missing data found in column {col}")
+log_error("Critical error: unable to read file {filename}")
+```
+
+Benefits:
+ - **Structured output** - timestamps, log levels, consistent format
+ - **Easy filtering** - can set thresholds for verbosity
+ - **Production-ready** - can write to files or streaming services
+ - **Namespace-aware** - tracks which function is logging
+
+## Setting Log Thresholds
+
+```{r, eval = FALSE}
+# Show only warnings and errors (less verbose)
+log_threshold(WARN)
+
+# Show all debug info (very verbose)
+log_threshold(DEBUG)
+
+# Production setting - only errors and above
+log_threshold(ERROR)
+```
+
+## Combining tryCatch and Logger
+
+```{r, eval = FALSE}
+smart_point_in_polygon = function(points, polygon, var) {
+  
+  log_info("Starting point_in_polygon: {nrow(points)} points, {nrow(polygon)} polygons")
+  
+  # Input validation
+  tryCatch(
+    {
+      if (!inherits(points, "sf")) {
+        log_error("Points input is not an sf object")
+        stop("Points must be an sf object")
+      }
+      
+      if (!inherits(polygon, "sf")) {
+        log_error("Polygon input is not an sf object")
+        stop("Polygon must be an sf object")
+      }
+      
+      if (!var %in% names(polygon)) {
+        log_error("Variable '{var}' not found in polygon data")
+        stop(paste("Variable", var, "not found"))
+      }
+      
+      log_debug("Inputs validated successfully")
+    },
+    error = function(e) {
+      log_error("Input validation failed: {e$message}")
+      stop(e)
+    }
+  )
+  
+  # Main computation with error handling
+  tryCatch(
+    {
+      log_debug("Performing spatial join...")
+      result = st_join(polygon, points) |>
+        st_drop_geometry() |>
+        count(get(var)) |>
+        setNames(c(var, "n")) |>
+        left_join(polygon, by = var) |>
+        st_as_sf()
+      
+      log_info("Success: {nrow(result)} polygons returned with point counts")
+      result
+    },
+    error = function(e) {
+      log_error("Spatial join failed: {e$message}")
+      stop(e)
+    }
+  )
+}
+```
+
+## Verbose Function Example: Defensive PIP
+
+```{r}
+library(logger)
+
+point_in_polygon_safe = function(points, polygon, var) {
+  
+  log_info("="*50)
+  log_info("Starting point_in_polygon_safe()")
+  log_info("Input: {nrow(points)} points")
+  log_info("Input: {nrow(polygon)} polygons")
+  log_info("Variable: {var}")
+  
+  # Validate and report on inputs
+  tryCatch(
+    {
+      log_debug("Checking point geometry type...")
+      if (!all(st_geometry_type(points) %in% c("POINT", "MULTIPOINT"))) {
+        log_warn("Some point geometries are not simple points")
+      } else {
+        log_debug("All points are valid POINT geometries")
+      }
+      
+      log_debug("Checking polygon geometry type...")
+      if (!all(st_geometry_type(polygon) %in% c("POLYGON", "MULTIPOLYGON"))) {
+        log_error("Not all geometries are polygons!")
+        stop("Polygon input must contain polygon geometries")
+      }
+      log_debug("All polygons are valid POLYGON geometries")
+      
+      # Check CRS match
+      if (st_crs(points) != st_crs(polygon)) {
+        log_warn("CRS mismatch detected")
+        log_info("Transforming points to polygon CRS")
+        points = st_transform(points, st_crs(polygon))
+      } else {
+        log_debug("CRS match confirmed: {st_crs(polygon)$epsg}")
+      }
+      
+    },
+    error = function(e) {
+      log_error("Validation failed: {e$message}")
+      stop(e)
+    }
+  )
+  
+  # Perform computation
+  tryCatch(
+    {
+      log_info("Beginning spatial join...")
+      start_time = Sys.time()
+      
+      result = st_join(polygon, points) |>
+        st_drop_geometry() |>
+        count(get(var)) |>
+        setNames(c(var, "n")) |>
+        left_join(polygon, by = var) |>
+        st_as_sf()
+      
+      elapsed = as.numeric(Sys.time() - start_time)
+      log_info("Spatial join completed in {round(elapsed, 2)} seconds")
+      log_info("Results: {nrow(result)} features with point counts")
+      log_info("Range of points per feature: {min(result$n, na.rm=T)} to {max(result$n, na.rm=T)}")
+      
+      result
+      
+    },
+    warning = function(w) {
+      log_warn("Warning during computation: {w$message}")
+    },
+    error = function(e) {
+      log_error("Computation failed: {e$message}")
+      stop(e)
+    },
+    finally = {
+      log_info("point_in_polygon_safe() completed")
+      log_info("="*50)
+    }
+  )
+}
+```
+
+## Using the Safe Version
+
+```{r, eval = FALSE}
+# Set verbosity level
+log_threshold(DEBUG)
+
+# Run with full diagnostic output
+result = point_in_polygon_safe(starbucks, filter(counties, state_name == "Colorado"), "geoid")
+
+plot_pip(result)
+```
+
+## Key Takeaways
+
+✅ **Write defensive functions:**
+  - Validate all inputs
+  - Check data structure and types
+  - Handle edge cases
+
+✅ **Use tryCatch for robustness:**
+  - Catch errors before they crash
+  - Provide meaningful error messages
+  - Clean up resources in `finally` block
+
+✅ **Use logger for transparency:**
+  - Record function progress
+  - Help users understand what's happening
+  - Make debugging easier
+
+✅ **Combine them all:**
+  - Defensive programming + logging = production-ready functions
+  - Users (and you!) will understand what went wrong
+  - Easier to maintain and debug over time
+

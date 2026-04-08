@@ -174,11 +174,11 @@ Last, we want to ensure that our surfaces are topologically valid/simple.
 
 ### Step 1.4
 
-If you plot the above tessellations you'll see the triangulated surfaces produce regions far beyond the boundaries of CONUS.
+If you plot the above tessellations you'll see that the **Voronoi**, **Delaunay triangulation**, **hexagon**, and **square grids** all produce regions far beyond the boundaries of CONUS.
 
-We need to cut these boundaries to CONUS border. 
+We need to cut these boundaries to CONUS borders. 
 
-To do this, we will call on `st_intersection`, but will first need a geometry of CONUS to serve as our differencing feature. We can get this by unioning our existing county boundaries.
+To do this, we will call on `st_intersection`, but will first need a geometry of CONUS to serve as our clipping feature. We can get this by unioning our existing county boundaries.
 
 ```{r, eval = TRUE}
 
@@ -199,6 +199,31 @@ To achieve this:
 
 ```
 
+::: callout-important
+## Validation Checkpoint (Optional)
+
+After simplification, verify the boundary is still valid and covers all dams:
+
+```{r}
+#| eval: false
+# Check: Is the simplified boundary valid?
+st_is_valid(boundary_simplified)
+
+# Check: Does it still contain all of CONUS?
+st_bbox(boundary_simplified)  # Should cover roughly [-125, 24] to [-66, 49]
+
+# Check: Visual comparison
+plot(boundary_original, main = "Original")
+plot(boundary_simplified, main = "Simplified")
+```
+:::
+
+::: callout-note
+## Simplification: Boundary Only, Not Tessellation
+
+**Important distinction**: This step simplifies the **CONUS boundary container** we use for clipping the tessellated surfaces. Simplification affects *only* the geometry of the clipping operation — it speeds up the intersection computation by reducing boundary vertices. Your tessellation tiles themselves remain **high-resolution** and unchanged. You are not simplifying the tessellation itself, only the container we clip with.
+:::
+
 - Once you are happy with your simplification, use the `mapview::npts` function to report the number of points in your original object, and the number of points in your simplified object. 
 
 - How many points were you able to remove? What are the consequences of doing this computationally?
@@ -206,7 +231,7 @@ To achieve this:
 ```{r}
 ```
 
-- Finally, use your simplified object to crop the two triangulated tessellations with `st_intersection`:
+- Finally, use your simplified object to crop **all four grids** (Voronoi, Delaunay triangulation, hexagons, and squares) to the CONUS boundary with `st_intersection`:
 
 ```{r}
 
@@ -268,7 +293,7 @@ Use your new function to plot each of your tessellated surfaces and the original
 
 # Question 2:
 
-In this question, we will write out a function to summarize our tessellated surfaces. Most of this should have been done in your daily assignments.
+In this question, we will write out a function to summarize our tessellated surfaces.
 
 ### Step 2.1
 
@@ -308,13 +333,16 @@ Multiple `data.frame` objects can bound row-wise with `bind_rows` into a single 
 
 For example, if your function is called `sum_tess`, the following would bind your summaries of the triangulation and voroni object.
 
-```{r}
-
+```{r, eval = FALSE}
+bind_rows(
+  sum_tess(triangulate_grid, "triangulation"),
+  sum_tess(voronoi_grid, "voronoi")
+)
 ```
 
 ### Step 2.4
 
-Once your 5 summaries are bound (2 tessellations, 2 coverage's, and the raw counties) print the `data.frame` as a nice table using `knitr`/`kableExtra.`
+Once your 5 summaries are bound (2 tessellations, 2 coverage's, and the raw counties) print the `data.frame` as a nice table using `knitr`/`kableExtra`/`flextable` or your preferred table formatting package.
 
 ```{r, echo = FALSE}
 
@@ -340,12 +368,12 @@ For the remainder of this lab we will analyze the distributions of these dams us
 
 ### Step 3.1
 
-In the tradition of this class - and true to data science/GIS work - you need to find, download, and manage raw data. While the raw NID data is no longer easy to get with the transition of the USACE services to ESRI Features Services, I staged the data in the resources directory of this class. To get it, navigate to that location and download the raw file into you lab data directory.
+In the tradition of this class - and true to data science/GIS work - you need to find, download, and manage raw data. THe NID dataset is available as a CSV download from the USACE website [here](https://nid.sec.usace.army.mil/nid/#/downloads). Grab the CSV.
 
 - Return to your RStudio Project and read the data in using the `readr::read_csv`
   - Use `janitor::clean_names()` to standardize column names to snake_case (tidy data convention)
   - After reading the data in, be sure to remove rows that don't have location values (`!is.na()`)
-  - Convert the data.frame to a sf object by defining the coordinates and CRS
+  - Convert the `data.frame` to a `sf` object by defining the coordinates and CRS
   - Transform the data to a CONUS AEA (EPSG:5070) projection - matching your tessellation
   - Filter to include only those within your CONUS boundary
 
@@ -397,6 +425,16 @@ Following the in-class examples develop an efficient point-in-polygon function t
   - The name of the id column as `arg3`
   
 The function should make use of spatial and non-spatial joins, sf coercion and `dplyr::count`. The returned object should be input `sf` object with a column - `n` -  counting the number of points in each tile.
+
+::: callout-important
+## Point-in-Polygon Function Design Notes
+
+1. **CRS Matching**: Ensure `points` and `polygons` are in the same CRS before calling `st_join()`. If they differ, use `st_transform()` to align them first.
+
+2. **Empty Polygons**: `st_join(...) %>% count(id)` creates one row per intersection found. Polygons with *zero* intersections will appear in the result with `n = 0` **only if** you use a *left join* (default for `st_join()`). If a polygon has no points, make sure your result still includes it; if not, use `st_join(...) %>% right_join(...)` or initialize counts explicitly.
+
+3. **Sparse vs. Dense Matrices**: In this step you're not creating matrices. However, in Q6.1 you'll use `st_touches(..., sparse = FALSE)` to build neighbor matrices explicitly. Here in Q3, `st_join()` handles the spatial predicate internally (`st_intersects` by default), so you won't set sparsity—just know that `st_join()` scales well to large datasets. For troubleshooting performance: if your function runs slowly with 91,000 dams, check whether your tessellation polygons are topologically simple (use `st_is_valid()`).
+:::
   
 ```{r}
 
@@ -469,39 +507,113 @@ Your answer should be **3–4 paragraphs** and grounded in the actual visualizat
 
 ---
 
-# Question 4: Spatial Predicates and Dam-Boundary Relationships
 
-County, state, and river basin boundaries play a central role in dam management—dams near boundaries may be governed differently, funded differently, or managed by different agencies. This question uses **spatial predicates** (from week 3 lectures) to identify and characterize these boundary relationships.
+# Question 4
 
-::: callout-note
-## Spatial Predicates Review (Week 3 Lecture Content)
+The NID provides a comprehensive data dictionary [here](https://files.hawaii.gov/dbedt/op/gis/data/nid_dams_data_dictionary.htm#Purposes). In it we find that dam purposes are designated by a character [code](https://files.hawaii.gov/dbedt/op/gis/data/nid_dams_data_dictionary.htm#Purposes).
 
-Spatial predicates test the **topological relationship** between two geometries using the Dimensionally Extended 9-Intersection Model (DE-9IM). Common ones include:
+These are shown below for convenience (built using knitr on a data.frame called `nid_classifier`):
 
-- `st_intersects(x, y)`: do x and y share any space? (Interior, boundary, or both)
-- `st_touches(x, y)`: do x and y touch at boundaries *only*, with no interior overlap?
-- `st_contains(x, y)`: does x completely contain y in its interior?
-- `st_within(x, y)`: is x completely contained within y?
+```{r}
+#| echo: false
+#| eval: true
 
-These return logical vectors (`TRUE`/`FALSE`) and are the foundation of spatial filtering with `st_filter()`. See week 3 slides for detailed DE-9IM definitions and illustrations.
-:::
+nid_classifier = data.frame(matrix(c('I' , 'Irrigation',
+'H' , 'Hydroelectric',
+'C' , 'Flood Control',
+'N' , 'Navigation',
+'S' , 'Water Supply',
+'R' , 'Recreation',
+'P' , 'Fire Protection',
+'F' , 'Fish and Wildlife',
+'D' , 'Debris Control',
+'T' , 'Tailings',
+'G' , 'Grade Stabilization',
+'O' , 'Other'), ncol = 2, byrow = T)) %>% 
+  setNames(c("abbr", "purpose"))
+```
+
+```{r}
+#| echo: false
+#| eval: true
+
+knitr::kable(nid_classifier,              
+        caption = "NID 2019: Dam Purposes",
+        format.args = list(big.mark = ",")) %>% 
+    kableExtra::kable_styling("striped", full_width = TRUE, font_size = 14)
+```
+
+- In the data dictionary, we see a dam can have _multiple_ purposes.
+
+- In these cases, the purpose codes are concatenated in order of decreasing importance. For example, `SCR` would indicate the primary purposes are _Water Supply_, then _Flood Control_, then _Recreation._
+
+- A standard summary indicates there are over 400 unique combinations of dam purposes:
+
+```{r, echo = TRUE, eval = TRUE}
+unique(dams2$PURPOSES) %>% length()
+```
+
+- By storing dam codes as a concatenated string, there is no easy way to identify how many dams serve any one purpose... for example where are the hydro electric dams?
+
+**** 
+
+To overcome this data structure limitation, we can identify how many dams serve each purpose by splitting the PURPOSES values (`strsplit`) and tabulating the unlisted results as a data.frame. Effectively this is double/triple/quadruple counting dams bases on how many purposes they serve:
+
+```{r}
+#| echo: false
+#| eval: false
+# create a vector of all characters in your purpose and unlist 
+dam_freq <- strsplit(dams2$PURPOSES, split = "") %>%
+  unlist() %>% 
+  table() %>% 
+  as.data.frame() %>% 
+  setNames(c("abbr", "count")) %>% 
+  left_join(nid_classifier) %>% 
+  mutate(lab = paste0(purpose, "\n(", abbr, ")"))
+```
+
+The result of this would indicate:
+
+```{r}
+#| echo: false
+#| eval: false
+
+ggplot() + 
+  geom_col(data = dam_freq, aes(x = reorder(lab, -count), y = count, fill = purpose), alpha = .8) + 
+  labs(x = "", y = "# Dams", title = "Number of Dams serving each purpose")  +
+  scale_fill_viridis_d()+ 
+  theme_linedraw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = .9, hjust = 1)) + 
+  theme(legend.position = 'none')
+```
 
 ### Step 4.1
 
-Use `st_filter()` with different spatial predicates to classify dams relative to your chosen tessellation from Q3.
+ - Your task is to create point-in-polygon counts for at _least_ 4 of the above dam purposes:
 
-**a.** Create a subset of dams that `st_touches` the tessellation tile boundaries (dams exactly on borders—their point geometry touches the boundary line).
+ - You will use `grepl` to filter the complete dataset to those with your chosen purpose
+  
+ - Remember that `grepl` returns a boolean if a given pattern is matched in a string
+ 
+ - `grepl` is vectorized so can be used in `dplyr::filter`
+ 
+*****
 
-**b.** Create a subset of dams completely `st_within` tiles (dams in the interior, not touching boundaries).
+For example:
+    
+```{r}
+#| echo: true
+#| eval: true
+# Find flood control dams in the first 5 records:
+dams2$PURPOSES[1:5]
+grepl("F", dams2$PURPOSES[1:5])
+```
 
-**c.** Use `st_join()` to identify dams at multi-tile corners: join dams to the tessellation and count how many tiles each dam intersects. Filter for dams with `n_tiles > 1`.
+****
 
-::: callout-tip
-**Implementation hints:**
-- `st_filter(dams, tessellation, .predicate = st_touches)` returns dams touching tile boundaries
--  `st_filter(dams, tessellation, .predicate = st_within)` returns dams fully contained within tiles
-- For corner dams: `st_join(tessellation, dams) %>% count(dam_id_or_index)` then `filter(n > 1)`
-:::
+For your analysis, choose _at least_ four of the above codes, and describe why you chose them. Then for each of them, create a subset of dams that serve that purpose using `dplyr::filter` and `grepl`
+
+Finally, use your `point-in-polygon` function to count each subset across your **cropped tessellation from Q1.4** (e.g., `hexagon_clipped` or `square_clipped`).
 
 ```{r}
 
@@ -509,21 +621,13 @@ Use `st_filter()` with different spatial predicates to classify dams relative to
 
 ### Step 4.2
 
-Produce summary statistics for each predicate class:
+- Now use your plotting function from Q3 to map these counts on the **cropped tessellation**.
 
-**a.** How many dams fall into each category (touching, within, at multi-tile corners)? Create a summary table.
+- *But!* you will use `gghighlight` to **only** color those tiles where the count (*n*) is greater then the (`mean + 1 standard deviation`) of the set
 
-**b.** Are dams at boundaries (touching/corner dams) systematically different from interior dams? If the NID dataset includes:
-   - **Purpose codes**: Do boundary vs. interior dams serve different functions?
-   - **Dam type or construction material**: Are they built differently?
-   - **Construction date**: Do boundary dams differ in age?
-   
-   Produce a brief summary (table or text) of any differences you find.
+- Since your plotting function returns a `ggplot` object already, the `gghighlight` call can be added "`+`" directly to the function.
 
-**c.** Create a map showing your tessellation with dams colored by predicate class: 
-   - Interior dams = one color (e.g., blue)
-   - Boundary dams = another color (e.g., orange)  
-   - Multi-tile corner dams = third color (e.g., red)
+- The result of this exploration is to highlight the areas of the country with the most 
 
 ```{r}
 
@@ -531,530 +635,11 @@ Produce summary statistics for each predicate class:
 
 ### Step 4.3
 
-Write 2–3 sentences addressing:
-   - What fraction of dams fall at boundaries (touching) or multi-tile corners vs. in the interior?
-   - Do dams cluster at boundaries preferentially, or are they randomly distributed?
-   - What governance or management challenges might arise from dams at multi-agency (multi-tile) boundaries?
+Comment on the geographic distribution of dams you found. Does it make sense? How might the tessellation you chose impact your findings? How does the distribution of dams coincide with other geographic factors such as river systems, climate, ect?
 
-```{r}
+**Optional: Connect to Q6** — For purposes you chose in Q4, hypothesize in 1–2 sentences: *"Will [irrigation/hydroelectric] dams show the same LISA hotspots as all dams in Q6, or different patterns? Why?"* After completing Q6, revisit this hypothesis.
 
-```
-
----
-
-# Question 5: Simplification Impact — Computational Cost vs. Accuracy Trade-off
-
-In Step 1.5, you simplified your CONUS boundary using the Visvalingam algorithm. That simplification was necessary for computational speed—but at what cost? This question quantifies the trade-off between **computation time** and **geometric accuracy** by comparing point-in-polygon results using original vs. simplified boundaries.
-
-::: callout-note
-## Why Simplification Matters (Week 3 Content)
-
-Spatial intersections (like `st_intersection()`) are expensive: they test every pair of vertices between two polygons. A boundary with 100,000 vertices costs far more to intersect than one with 1,000 vertices. Your Week 3 lecture on simplification algorithms (Douglas-Peucker vs. Visvalingam) found that you can eliminate 95% of vertices while retaining visual shape. But **do your analysis results change?**
-:::
-
-### Step 5.1
-
-**Measure Computation Time**: Re-run your tessellation clipping operation **twice**, measuring elapsed time with both original and simplified boundaries.
-
-**a.** Retrieve or recreate your unsimplified CONUS boundary and your simplified version from Step 1.5:
-
-```{r}
-usa_unsimplified <- AOI::aoi_get(state = "conus") %>% 
-  st_union() %>% 
-  st_transform(5070)
-
-# If you completed Step 1.5, usa_simplified should already exist
-# If not, create it here with your chosen keep percentage:
-if (!exists("usa_simplified")) {
-  usa_simplified <- rmapshaper::ms_simplify(usa_unsimplified, keep = 0.10)
-}
-
-# Count original vertices
-original_vertices <- mapview::npts(usa_unsimplified)
-simplified_vertices <- mapview::npts(usa_simplified)
-
-cat("Original boundary vertices:", original_vertices, "\n")
-cat("Simplified boundary vertices:", simplified_vertices, "\n")
-cat("Vertices retained:", 100 * simplified_vertices / original_vertices, "%\n")
-```
-
-**b.** Wrap your tessellation clipping in `system.time()` for both boundaries. Time the clipping of your Voronoi and triangulated tessellations:
-
-```{r}
-#| eval: false
-# Clipping with UNSIMPLIFIED boundary
-time_unsimplified <- system.time({
-  voronoi_unsimplified <- st_intersection(voronoi_grid, usa_unsimplified)
-  triangles_unsimplified <- st_intersection(triangulate_grid, usa_unsimplified)
-})
-
-# Clipping with SIMPLIFIED boundary (from Step 1.5)
-time_simplified <- system.time({
-  voronoi_simplified <- st_intersection(voronoi_grid, usa_simplified)
-  triangles_simplified <- st_intersection(triangulate_grid, usa_simplified)
-})
-
-cat("Unsimplified elapsed time:", time_unsimplified["elapsed"], "seconds\n")
-cat("Simplified elapsed time:", time_simplified["elapsed"], "seconds\n")
-cat("Speed-up factor:", time_unsimplified["elapsed"] / time_simplified["elapsed"], "x\n")
-```
-
-```{r}
-
-```
-
-### Step 5.2
-
-**Compare Geometric Accuracy**: For both the Voronoi and triangulated tessellations, do the simplified and unsimplified results have meaningful differences?
-
-**a.** Create a comparison table showing:
-   - Number of tiles in each result
-   - Total area clipped with unsimplified boundary (km²)
-   - Total area clipped with simplified boundary (km²)
-   - Percent difference in area
-
-```{r}
-#| eval: false
-compare_accuracy <- function(simplified_result, unsimplified_result, method_name) {
-  unsimplified_area <- sum(st_area(unsimplified_result)) %>% 
-    units::set_units("km2") %>% as.numeric()
-  simplified_area <- sum(st_area(simplified_result)) %>% 
-    units::set_units("km2") %>% as.numeric()
-  area_diff_pct <- 100 * (simplified_area - unsimplified_area) / unsimplified_area
-  
-  data.frame(
-    method = method_name,
-    n_tiles_unsimplified = nrow(unsimplified_result),
-    n_tiles_simplified = nrow(simplified_result),
-    area_unsimplified_km2 = round(unsimplified_area, 0),
-    area_simplified_km2 = round(simplified_area, 0),
-    area_diff_pct = round(area_diff_pct, 2)
-  )
-}
-
-voronoi_compare <- compare_accuracy(voronoi_simplified, voronoi_unsimplified, "Voronoi")
-triangles_compare <- compare_accuracy(triangles_simplified, triangles_unsimplified, "Triangles")
-
-bind_rows(voronoi_compare, triangles_compare) %>% 
-  knitr::kable(caption = "Simplification Impact on Geometry")
-```
-
-**b.** Check for **missing regions**: Did the simplified boundary omit important coastal or border areas? Visual check: overlay the clipped results and note any missing tiles around CONUS edges.
-
-```{r}
-
-```
-
-### Step 5.3
-
-**Decision and Recommendation**
-
-Write 3–4 paragraphs addressing:
-
-**a.** **Speed-up assessment**: How much faster was the simplified version? Was the speedup worth the simplification effort, or would unsimplified be more appropriate? (A 10x speedup is significant; a 1.2x speedup may not justify added complexity.)
-
-**b.** **Accuracy assessment**: How much geometric accuracy was lost? 
-   - If area difference < 1%, simplification was appropriate.
-   - If 1–3%, simplification was reasonable with minor artifacts.  
-   - If > 3%, simplification was too aggressive.
-   
-   Did the simplified boundary miss important regions? How does the percent difference relate to the Visvalingam `keep` percentage you chose?
-
-**c.** **Parameter sensitivity**: How sensitive are the results to your `keep` choice? Would `keep = 0.05` (coarser) or `keep = 0.20` (finer) have been better? Justify based on your speed/accuracy trade-off.
-
-**d.** **Guidance for others**: Would you recommend simplification to other students working with US boundary data? If yes, what would you advise about the `keep` threshold? If no, why not?
-
-```{r}
-
-```
-
----
-
-# Question 6: Spatial Autocorrelation and Scale-Dependent Inference
-
-One of the key insights from Week 3-1 is that **spatial predicates and tessellation choices directly drive spatial statistical inference**. In this question, you'll compute a foundational spatial statistic—**Moran's I** (spatial autocorrelation)—across your different tessellations to understand how geographic scale affects conclusions about dam clustering.
-
-::: callout-note
-## Spatial Autocorrelation Foundation (Week 3-1 Concept)
-
-**Spatial autocorrelation** tests whether nearby regions have similar values (positive autocorrelation), dissimilar values (negative), or independent values. Moran's I is the most common test:
-
-- **I > 0**: Positive autocorrelation — neighboring tiles tend to have similar dam counts (clustering suggests natural/hydrologic patterns)
-- **I ≈ 0**: No spatial autocorrelation — dam distribution is random
-- **I < 0**: Negative autocorrelation — neighboring tiles have dissimilar values (dams push away from each other)
-
-Moran's I depends critically on the **neighborhood matrix** (which tiles are neighbors), which you create using spatial predicates (`st_touches`, `st_intersects`). Different tessellations produce different neighborhood structures, leading to **different I values from the same underlying dam data**—this is the spatial statistics manifestation of MAUP.
-:::
-
-### Step 6.1
-
-**Create Neighbor Matrices** for your tessellations (use your chosen tessellation from Q3 and 1–2 others for comparison).
-
-For each tessellation, create a **binary neighbor matrix** where entry (i,j) = 1 if tiles i and j share a boundary (`st_touches`), and 0 otherwise:
-
-::: callout-tip
-## Key Implementation Details
-
-1. **`st_touches(..., sparse = FALSE)`** returns a dense matrix (all 0s and 1s); **`sparse = TRUE`** returns a sparse object (memory-efficient for large datasets). Use `sparse = FALSE` for clarity.
-
-2. **`diag(...) <- 0`** removes self-neighbors (tiles are not their own neighbors). This is critical to avoid inflating the neighborhood count.
-
-3. **Row-standardization**: Dividing each row by its sum scales the weights so each tile has equal influence regardless of how many neighbors it has. Always use row-standardized weights for Moran's I.
-
-4. **Isolated tiles**: If a tile has 0 neighbors (island geometry), `rowSums()` = 0, causing division-by-zero → `Inf`. The line `neighbor_weights[!is.finite(...)] <- 0` replaces these with 0.
-
-5. **Quick check**: `rowSums(neighbor_weights)` should be 1 (or 0 for isolated tiles).
-:::
-
-```{r}
-#| eval: false
-# STEP A: Create for your chosen tessellation (e.g., hex_grid_dams)
-# Assumes your aggregated tessellation has an ID column (e.g., tile_id) 
-# and dam count column (e.g., n)
-
-neighbor_matrix_hex <- st_touches(hex_grid_dams, sparse = FALSE) * 1
-diag(neighbor_matrix_hex) <- 0  # Exclude self-neighbors
-
-# Row-standardized weights (each row sums to 1)
-neighbor_weights_hex <- neighbor_matrix_hex / rowSums(neighbor_matrix_hex)
-neighbor_weights_hex[!is.finite(neighbor_weights_hex)] <- 0
-
-# Quick diagnostics
-cat("HEXAGON GRID:\n")
-cat("Number of tiles:", nrow(neighbor_matrix_hex), "\n")
-cat("Total edges (neighbor pairs):", sum(neighbor_matrix_hex) / 2, "\n")
-cat("Average neighbors per tile:", round(mean(rowSums(neighbor_matrix_hex)), 2), "\n")
-cat("Min/Max neighbors:", min(rowSums(neighbor_matrix_hex)), "/", max(rowSums(neighbor_matrix_hex)), "\n\n")
-
-# STEP B: Repeat for square grid
-neighbor_matrix_square <- st_touches(square_grid_dams, sparse = FALSE) * 1
-diag(neighbor_matrix_square) <- 0
-neighbor_weights_square <- neighbor_matrix_square / rowSums(neighbor_matrix_square)
-neighbor_weights_square[!is.finite(neighbor_weights_square)] <- 0
-
-cat("SQUARE GRID:\n")
-cat("Number of tiles:", nrow(neighbor_matrix_square), "\n")
-cat("Average neighbors per tile:", round(mean(rowSums(neighbor_matrix_square)), 2), "\n")
-cat("Min/Max neighbors:", min(rowSums(neighbor_matrix_square)), "/", max(rowSums(neighbor_matrix_square)), "\n\n")
-
-# STEP C: Repeat for Voronoi
-neighbor_matrix_vor <- st_touches(voronoi_dams, sparse = FALSE) * 1
-diag(neighbor_matrix_vor) <- 0
-neighbor_weights_vor <- neighbor_matrix_vor / rowSums(neighbor_matrix_vor)
-neighbor_weights_vor[!is.finite(neighbor_weights_vor)] <- 0
-
-cat("VORONOI:\n")
-cat("Number of tiles:", nrow(neighbor_matrix_vor), "\n")
-cat("Average neighbors per tile:", round(mean(rowSums(neighbor_matrix_vor)), 2), "\n")
-cat("Min/Max neighbors:", min(rowSums(neighbor_matrix_vor)), "/", max(rowSums(neighbor_matrix_vor)), "\n")
-```
-
-**Expected Observation**: Regular tessellations (hexagon, square) have _uniform_ neighbor counts (~6 for hex, ~4 for square, boundary tiles have fewer). Voronoi has _variable_ neighbor counts (often 3–8, rarely 1–15 for edge cases). **Why does this matter?** Neighbor structure directly affects Moran's I stability—uniform neighborhoods lead to more stable autocorrelation estimates.
-
-```{r}
-
-```
-
-### Step 6.2
-
-**Compute Moran's I** for dam density (counts per tile) under different tessellations.
-
-Moran's I is calculated as:
-
-$$I = \frac{n}{\sum_i \sum_j w_{ij}} \frac{\sum_i \sum_j w_{ij} (x_i - \bar{x})(x_j - \bar{x})}{\sum_i (x_i - \bar{x})^2}$$
-
-Where:
-- $x_i$ = dam count in tile i
-- $\bar{x}$ = mean dam count across all tiles
-- $w_{ij}$ = neighborhood weight (1 if neighbors, 0 otherwise, then row-standardized)
-- $n$ = number of tiles
-
-The `ape` package provides `Moran.I()` for this calculation:
-
-::: callout-important
-## Install ape first
-```{r}
-#| eval: false
-install.packages("ape")
-```
-:::
-
-::: callout-tip
-## Moran.I() Function Signature
-
-```
-ape::Moran.I(x = vector, weight = weight_matrix)
-```
-
-**Arguments:**
-- `x`: Vector of values (dam counts per tile). Must be same length as `nrow(weight)`. Any NAs will cause the function to fail—handle these BEFORE calling Moran.I().
-- `weight`: Row-standardized neighbor weight matrix (from Step 6.1).
-
-**Returns:**
-- `observed`: The calculated Moran's I value
-- `expected`: Expected I value if data were random (~0 for most datasets)
-- `sd`: Standard deviation (not always provided; use p.value instead)
-- `p.value`: Two-tailed p-value testing $H_0: I = 0$ (no autocorrelation)
-
-**Interpretation:**
-- `observed > expected` and `p.value < 0.05`: **Significant positive autocorrelation** — nearby tiles have similar values (clustering)
-- `observed ≈ expected` and `p.value > 0.05`: **No significant pattern** — random distribution  
-- `observed < expected` and `p.value < 0.05`: **Negative autocorrelation** — neighbors differ (rare for dam data; would suggest dams push away from each other)
-:::
-
-```{r}
-#| eval: false
-library(ape)
-
-# STEP A: HEX GRID - Extract dam counts
-dam_counts_hex <- hex_grid_dams$n  # Ensure column name matches your data
-
-# Compute Moran's I
-morans_hex <- ape::Moran.I(x = dam_counts_hex, weight = neighbor_weights_hex)
-
-cat("HEXAGON GRID RESULTS:\n")
-cat("Moran's I observed:", round(morans_hex$observed, 4), "\n")
-cat("Expected (random):", round(morans_hex$expected, 4), "\n")
-cat("P-value:", round(morans_hex$p.value, 4), "\n")
-if (morans_hex$p.value < 0.05) {
-  cat("✓ SIGNIFICANT positive autocorrelation (p < 0.05)\n")
-} else {
-  cat("✗ No significant autocorrelation\n")
-}
-cat("\n")
-
-# STEP B: SQUARE GRID
-dam_counts_sq <- square_grid_dams$n
-morans_sq <- ape::Moran.I(x = dam_counts_sq, weight = neighbor_weights_square)
-
-cat("SQUARE GRID RESULTS:\n")
-cat("Moran's I observed:", round(morans_sq$observed, 4), "\n")
-cat("P-value:", round(morans_sq$p.value, 4), "\n")
-cat("\n")
-
-# STEP C: VORONOI
-dam_counts_vor <- voronoi_dams$n
-morans_vor <- ape::Moran.I(x = dam_counts_vor, weight = neighbor_weights_vor)
-
-cat("VORONOI RESULTS:\n")
-cat("Moran's I observed:", round(morans_vor$observed, 4), "\n")
-cat("P-value:", round(morans_vor$p.value, 4), "\n")
-```
-
-**Assemble Summary Table** (use these results):
-
-```{r}
-#| eval: false
-morans_summary <- data.frame(
-  tessellation = c("Hexagon", "Square", "Voronoi"),
-  tiles_n = c(nrow(hex_grid_dams), nrow(square_grid_dams), nrow(voronoi_dams)),
-  morans_i = c(
-    round(morans_hex$observed, 4),
-    round(morans_sq$observed, 4),
-    round(morans_vor$observed, 4)
-  ),
-  p_value = c(
-    round(morans_hex$p.value, 4),
-    round(morans_sq$p.value, 4),
-    round(morans_vor$p.value, 4)
-  ),
-  avg_neighbors = c(
-    round(mean(rowSums(neighbor_matrix_hex)), 2),
-    round(mean(rowSums(neighbor_matrix_square)), 2),
-    round(mean(rowSums(neighbor_matrix_vor)), 2)
-  ),
-  significant = c(
-    ifelse(morans_hex$p.value < 0.05, "Yes", "No"),
-    ifelse(morans_sq$p.value < 0.05, "Yes", "No"),
-    ifelse(morans_vor$p.value < 0.05, "Yes", "No")
-  )
-)
-
-knitr::kable(morans_summary, 
-             caption = "Moran's I: Spatial Autocorrelation across Tessellations",
-             digits = 4)
-```
-
-```{r}
-
-```
-
-### Step 6.3
-
-**Interpret Scale-Dependent Results**
-
-::: callout-tip
-## Interpretation Checklist
-
-Before writing your response, verify you can answer:
-- [ ] What is the range of Moran's I values across your 3 tessellations? (e.g., 0.32–0.41)
-- [ ] Are all results significant at p < 0.05? If not, which tessellation(s) show random distribution?
-- [ ] Which tessellation has the highest Moran's I? (This shows the strongest clustering signal.)
-- [ ] How many neighbors does each tessellation average? (From Step 6.1 diagnostics.)
-- [ ] Can you explain _why_ regular tessellations (hex/square) might differ from Voronoi in I values?
-:::
-
-Write 2–3 paragraphs (aim for ~400 words) addressing the following explicitly:
-
-**a. Tessellation Differences in Moran's I**
-- Do the three tessellations show noticeably different I values? (Typically they're similar, ±0.03 of each other.)
-- Which tessellation has the strongest positive autocorrelation? Is it a surprise?
-- Are all results significant at p < 0.05, or do some show random distribution?
-
-**b. Why Tessellation Choice Drives Differences**
-- Regular tessellations (hex/square): predictable neighbor counts → stable I estimates
-- Voronoi: variable neighbor counts → potentially different I because neighborhood structure is irregular
-- Finer tessellations (more tiles): smaller areas per tile → may capture local clustering better or create artificial boundaries
-- Use your Step 6.1 diagnostics (number of tiles, average neighbors) to ground this explanation
-
-**c. What Moran's I Tells Us About Dams**
-- Positive I > 0.3 (significant): Genuine clustering — dams preferentially locate in high-density zones (e.g., Tennessee Valley, California, Pacific Northwest)
-- Positive I < 0.1 or non-significant: Random or weakly structured — dam distribution doesn't follow strong geographic neighborhoods
-- Your results likely show 0.3–0.4 range and significance, meaning dam clustering is real and not random
-
-**d. MAUP in Practice — The Policy Implication (Most Important)**
-- **The problem**: A policy maker receives two reports using the same dam data but different tessellations. Report 1 claims "I=0.41, dams highly clustered." Report 2 claims "I=0.35, clustering weaker." Both are true depending on tessellation choice.
-- **Your explanation**: The tessellation defines what "neighbors" means. Regular grids produce consistent neighborhoods; Voronoi produces irregular ones. Different neighborhoods → different statistical results → potentially different policy conclusions.
-- **Defensibility**: Which scale is best for policy?
-  - If policy cares about state-level coordination: use counties or larger grid cells
-  - If policy cares about local projects: use smaller tessellations (hexagons, squares)
-  - Your answer should identify which tessellation you'd recommend from Q3 and _why its scale aligns with decision-making units_
-
-```{r}
-
-```
-
-### Step 6.4 *(Graduate-Level Extension)*
-
-**Sensitivity Analysis: How does Moran's I change with distance-based neighborhoods?**
-
-The touching-predicate (`st_touches`) captures **immediate geographic neighbors** (tiles that share boundaries). But spatial clustering can occur at *multiple scales*. A dam built in 2020 in Colorado might correlate with others built in 2020 in neighboring Arizona (immediate scale) *and* with others across the Mountain West (regional scale, 200+ km away). This extension tests: **At what spatial scale does dam age (or count) clustering become apparent?**
-
-::: callout-tip
-## Extension Design
-
-Instead of touching boundaries, compute Moran's I using **distance-based neighborhoods**: two tile centroids are considered neighbors if they're within X km of each other.
-
-Test three distance thresholds:
-- **25 km**: Local neighborhood (1–2 tile widths apart; captures immediate clustering)
-- **50 km**: Regional neighborhood (3–5 tile widths; captures sub-regional patterns)
-- **100 km**: Macro neighborhood (10+ tile widths; captures large-scale structure)
-
-Compare Moran's I across thresholds. If dam clustering is strongest at 25 km, it's **locally driven** (adjacency matters). If strongest at 100 km, clustering is **regional** (state/basin-level hydrology). If similar across all scales, clustering is **robust** at multiple scales.
-
-**Estimate time: 15 minutes**
-:::
-
-::: callout-warning
-## Distance Computation Note
-
-`st_distance()` returns a dense matrix where `[i, j]` = distance from tile i to tile j. For 300+ tiles, this creates a ~300×300 matrix (~90K entries). This is fine in memory but noticeably slower to compute than sparse boolean matrices. For real projects with 10,000+ tiles, sparse distance matrices or geohash-based indices are preferred.
-:::
-
-```{r}
-#| eval: false
-# STEP A: Compute distance matrix between tile centroids (hexagon grid)
-# Use the centroids of your hexagon tiles
-
-hex_centroids <- st_centroid(hex_grid_dams)
-distance_matrix <- st_distance(hex_centroids)  # Returns units::units object in meters
-
-# Convert to km
-distance_matrix_km <- as.numeric(distance_matrix) / 1000
-dim(distance_matrix_km) <- dim(distance_matrix)  # Restore matrix structure
-
-# STEP B: Create neighbor matrices for three distance thresholds
-# A tile is its own neighbor at distance 0; exclude self with diag() <- 0
-
-create_distance_neighbors <- function(dist_matrix_km, threshold_km) {
-  neighbor_matrix <- (dist_matrix_km <= threshold_km) * 1
-  diag(neighbor_matrix) <- 0  # Exclude self-neighbors
-  
-  # Row-standardize
-  neighbor_weights <- neighbor_matrix / rowSums(neighbor_matrix)
-  neighbor_weights[!is.finite(neighbor_weights)] <- 0
-  
-  return(neighbor_weights)
-}
-
-weights_25km <- create_distance_neighbors(distance_matrix_km, threshold_km = 25)
-weights_50km <- create_distance_neighbors(distance_matrix_km, threshold_km = 50)
-weights_100km <- create_distance_neighbors(distance_matrix_km, threshold_km = 100)
-
-# Verify neighbor counts change as expected
-cat("Neighbors within 25 km:\n")
-cat("Average neighbors per tile:", round(mean(rowSums(weights_25km > 0)), 2), "\n")
-cat("Range:", min(rowSums(weights_25km > 0)), "to", max(rowSums(weights_25km > 0)), "\n\n")
-
-cat("Neighbors within 50 km:\n")
-cat("Average neighbors per tile:", round(mean(rowSums(weights_50km > 0)), 2), "\n")
-cat("Range:", min(rowSums(weights_50km > 0)), "to", max(rowSums(weights_50km > 0)), "\n\n")
-
-cat("Neighbors within 100 km:\n")
-cat("Average neighbors per tile:", round(mean(rowSums(weights_100km > 0)), 2), "\n")
-cat("Range:", min(rowSums(weights_100km > 0)), "to", max(rowSums(weights_100km > 0)), "\n")
-
-# STEP C: Recompute Moran's I for each distance threshold
-dam_counts_hex <- hex_grid_dams$n
-
-morans_25 <- ape::Moran.I(x = dam_counts_hex, weight = weights_25km)
-morans_50 <- ape::Moran.I(x = dam_counts_hex, weight = weights_50km)
-morans_100 <- ape::Moran.I(x = dam_counts_hex, weight = weights_100km)
-
-# STEP D: Compare results in a summary table
-distance_sensitivity <- data.frame(
-  distance_threshold_km = c(25, 50, 100),
-  morans_i = c(
-    round(morans_25$observed, 4),
-    round(morans_50$observed, 4),
-    round(morans_100$observed, 4)
-  ),
-  p_value = c(
-    round(morans_25$p.value, 4),
-    round(morans_50$p.value, 4),
-    round(morans_100$p.value, 4)
-  ),
-  avg_neighbors = c(
-    round(mean(rowSums(weights_25km > 0)), 2),
-    round(mean(rowSums(weights_50km > 0)), 2),
-    round(mean(rowSums(weights_100km > 0)), 2)
-  ),
-  significant = c(
-    ifelse(morans_25$p.value < 0.05, "Yes***", "No"),
-    ifelse(morans_50$p.value < 0.05, "Yes***", "No"),
-    ifelse(morans_100$p.value < 0.05, "Yes***", "No")
-  )
-)
-
-knitr::kable(
-  distance_sensitivity,
-  caption = "Moran's I Sensitivity to Spatial Scale: Distance-Based Neighborhoods",
-  digits = 4
-)
-
-cat("\n### Interpretation Guide:\n")
-cat("- If Moran's I **decreases** as distance increases (e.g., 0.40 → 0.25 → 0.10):\n")
-cat("  Dam clustering is **LOCAL** (immediate neighbors matter most). Dams tend to cluster\n")
-cat("  in small regions; distant dams don't share the clustering pattern.\n\n")
-
-cat("- If Moran's I **stays similar** across all distances (e.g., 0.35 → 0.34 → 0.36):\n")
-cat("  Clustering is **ROBUST** (operates at multiple scales). Dam patterns persist whether\n")
-cat("  you look at immediate or regional neighborhoods. Suggests water strategy is coherent\n")
-cat("  across large geographic extents (e.g., nationwide infrastructure policy).\n\n")
-
-cat("- If Moran's I **stays low/insignificant** across all distances:\n")
-cat("  Dam distribution is **RANDOM** (not spatially structured). No clustering at any scale.\n")
-```
-
-**Write 2–3 sentences summarizing your findings:**
-
-```{r}
-
-```
-
----
-
-# Question 7: Spatial Correlation of Dam Attributes — Introduction to Spatial Regression
+# Question 5: Spatial Correlation of Dam Attributes — Introduction to Spatial Regression
 
 Dam characteristics—such as **age, surface area, storage capacity, and purpose**—vary geographically. Understanding the spatial structure of these relationships is foundational to spatial regression modeling (upcoming topics). In this question, you'll examine whether dam attributes exhibit **spatial dependence** and assess whether neighboring tiles have correlated characteristics.
 
@@ -1064,13 +649,15 @@ Dam characteristics—such as **age, surface area, storage capacity, and purpose
 Standard regression assumes observations are **independent**. But spatial data often violates this: dams in the Pacific Northwest likely share design and management practices, leading to **spatially correlated residuals**. This spatial dependence can bias confidence intervals and inflate significance tests in standard OLS regression.
 
 The solution involves **spatial lag models** (Spatial Autoregressive, SAR) or **spatial error models** (SEM) that explicitly model dependence via neighbor relationships. This lab asks: *Do your tessellation neighborhoods reveal spatial structure in dam attributes?*
+
+**For this question, use your cropped tessellation from Q1.4** (your recommended tessellation from Q3, clipped to the CONUS boundary). You'll examine whether dam attributes (age, size, count) are spatially autocorrelated—evidence that neighboring tiles have similar values, violating independence assumptions.
 :::
 
-### Step 7.1
+### Step 5.1
 
 **Aggregate Dam Attributes by Tile**
 
-Using your chosen tessellation from Q3, compute **mean and variance** of key dam attributes within each tile. The NID dataset typically includes:
+Using your **cropped tessellation from Q1.4** (your recommended grid from Q3, clipped to CONUS boundary), compute **mean and variance** of key dam attributes within each tile. The NID dataset typically includes:
 
 - **Age**: `year_completed` or similar (compute mean age per tile)
 - **Size**: `surface_area_acres` or `normal_pool_elevation` (compute mean per tile)
@@ -1113,7 +700,7 @@ Do you see geographic clustering of old vs. new dams? Large vs. small dams?
 
 ```
 
-### Step 7.2
+### Step 5.2
 
 **Neighbor Correlation: Local Spatial Variation**
 
@@ -1224,7 +811,7 @@ cat("  This violates OLS independence assumption → spatial regression needed.\
 
 ```
 
-### Step 7.3
+### Step 5.3
 
 **Visualize Spatial Autocorrelation: Scatterplot of Attribute vs. Spatial Lag**
 
@@ -1357,7 +944,7 @@ ggplot(hex_grid_dams_for_map) +
 
 ```
 
-### Step 7.4
+### Step 5.4
 
 **Interpretation and Implication for Spatial Regression**
 
@@ -1412,6 +999,180 @@ This is the crux: **If dam attributes are spatially autocorrelated, OLS regressi
 - **Which tessellation for spatial models?** The tessellation from Q3 with **regular neighborhoods** (hexagons or squares) and **moderate tile counts** (e.g., 100–500 tiles) provides stable neighbors. Too fine → too many neighbors; too coarse → not enough detail.
 
 **Closing sentence**: "Given evidence of spatial autocorrelation in dam attributes (r = X–Y), a spatial regression model is warranted for any subsequent analysis of dam characteristics. Standard OLS would underestimate uncertainty and potentially mislead policy decisions."
+
+```{r}
+
+```
+
+### Step 5.5 (Optional) — Hypothesis Checkpoint
+
+Before moving to Q6, answer this question to verify your understanding:
+
+**Given your correlation results from Step 5.2, what do you expect to see in a Moran scatterplot (Q6)?** 
+
+- If all correlations are > 0.5: Do you expect most points to cluster in the upper-right (HH) and lower-left (LL) quadrants, or scattered across all four?
+- If correlations are weak (< 0.3): Would you expect many High-Low or Low-High outliers?
+- Based on dam geography (e.g., TVA region, Colorado River Basin), where do you predict hotspots (HH) and coldspots (LL) will concentrate?
+
+Write 2–3 sentences predicting Q6 outcomes before you compute LISA. After Q6, revisit this prediction to see if reality matched your expectation.
+
+---
+
+# Question 6: Local Spatial Autocorrelation (LISA) — Mapping Hotspots and Coldspots
+
+**In this question, you'll analyze LISA using your recommended tessellation from Q3 AND a second tessellation (e.g., square grid if you chose hexagon, or vice versa).** This tessellation comparison will reveal how MAUP affects local clustering patterns.
+
+While global statistics like Moran's I (Q5) test for clustering "on average," spatial patterns are **rarely uniform**. Some regions have dense hotspots (e.g., TVA region with concentrated dam infrastructure), while others are sparse coldspots (remote areas, deserts). **Local Indicator of Spatial Autocorrelation (LISA)** decomposes global clustering into local patterns, revealing **where** hotspots and coldspots occur—critical for targeted management interventions.
+
+In this question, you'll compute LISA using **cropped tessellations** (your recommended one from Q3, plus comparison grids) to identify geographic clustering patterns. You'll work with both your chosen tessellation AND at least one alternative (e.g., hexagon and square grids), both clipped to ensure proper boundary handling.
+
+::: callout-note
+## LISA Concept (Week 3-1 Lectures)
+
+LISA compares each tile's **standardized dam count** ($z_i$) to the **standardized spatial lag** ($\text{lag}_z$):
+
+$$\text{lag}_z = \frac{1}{w_i} \sum_{j \in N(i)} w_{ij} z_j$$
+
+where neighbors $j \in N(i)$ are adjacent tiles, and $w_{ij}$ = row-standardized adjacency weight (1 if touching, 0 otherwise).
+
+The resulting **LISA quadrants** reveal:
+- **High-High (HH)**: High dam count, high-count neighbors → hotspot
+- **Low-Low (LL)**: Low dam count, low-count neighbors → coldspot  
+- **High-Low (HL)**: High count, low neighbors → potentially isolated cluster edge
+- **Low-High (LH)**: Low count, high neighbors → potential anomaly or outlier
+:::
+
+### Step 6.1
+
+Crop your tessellations to ensure consistent boundaries:
+
+**a.** Use your recommended tessellation from Q3 (e.g., hexagon grid). Clip it to the CONUS boundary with `st_intersection(tessellation, boundary)`.
+
+**b.** Also clip **at least one alternative** tessellation (e.g., square grid) using the same boundary clipping.
+
+**c.** For each clipped tessellation, recompute dam counts using point-in-polygon joining to ensure correct aggregation within the cropped geometry.
+
+::: callout-tip
+## Cropping Tessellations Correctly
+
+```
+# Recommended tessellation (e.g., hexagon_grid)
+hex_cropped <- st_intersection(hexagon_grid, usa_boundary)
+
+# Alternative for comparison (e.g., square_grid)
+square_cropped <- st_intersection(square_grid, usa_boundary)
+
+# Recompute dam counts on cropped grids
+# (Use your point_in_polygon function or st_join + count pattern)
+hex_dams <- st_join(hex_cropped, dams_sf) %>%
+  group_by(id) %>%
+  summarise(n = n(), .groups = "drop")
+
+square_dams <- st_join(square_cropped, dams_sf) %>%
+  group_by(id) %>%
+  summarise(n = n(), .groups = "drop")
+```
+
+**Important**: Cropping changes tile counts and boundary geometries. Re-aggregate dam counts *after* cropping to match the new tile geometry.
+:::
+
+```{r}
+
+```
+
+### Step 6.2
+
+Compute neighbors and spatial lag for your **recommended tessellation**:
+
+**a.** Create the binary neighbor adjacency matrix using `st_touches(..., sparse = FALSE)`. Include only tiles within the cropped boundary.
+
+**b.** Remove self-neighbors: `diag(W) <- 0`
+
+**c.** Row-standardize weights: divide each row by its sum, handling isolated tiles.
+
+**d.** Compute spatial lag: $\text{lag} = W_{\text{std}} \times \text{dam\_counts}$
+
+**e.** Standardize both dam counts and spatial lag (z-score normalization).
+
+::: callout-important
+## Validation Checkpoint (Optional but Recommended)
+
+After computing the neighbor matrix, verify it's valid:
+
+```{r}
+#| eval: false
+# Check 1: Is the matrix symmetric? (for undirected adjacency)
+all(neighbor_matrix == t(neighbor_matrix))
+
+# Check 2: Are all rows row-standardized (divide by row sum)?
+rowSums(neighbor_weights)  # Should all be 1 (or 0 for isolated tiles)
+
+# Check 3: Are there isolated tiles (no neighbors)?
+sum(rowSums(neighbor_weights) == 0)
+
+# If any isolated tiles, document how you'll handle them in spatial lag calculation
+```
+:::
+
+```{r}
+
+```
+
+### Step 6.3
+
+Assign **LISA quadrants** and create visualizations:
+
+**a.** Assign each tile to a quadrant (HH, LL, HL, LH) based on the signs of $z$ and $\text{lag}_z$.
+
+**b.** Create a **Moran scatter plot**: Plot $z$ (x-axis) vs. $\text{lag}_z$ (y-axis), with points colored by quadrant. Add dashed reference lines at (0, 0). Interpretation: do points cluster on the axes (strong local dependence) or scatter widely?
+
+**c.** Create a **LISA map**: Choropleth of your cropped tessellation colored by LISA quadrant (HH=red, LL=blue, HL=yellow, LH=cyan). Overlay state or county boundaries for geographic reference. Interpretation: where are hotspots concentrated? Are coldspots in deserts/mountains as expected?
+
+```{r}
+
+```
+
+### Step 6.4
+
+**Comparison with alternative tessellation** (e.g., square grid):
+
+**a.** Repeat Steps 6.2–6.3 for your alternative tessellation.
+
+**b.** Create side-by-side maps (recommended vs. alternative) showing LISA quadrant distributions. Do they tell the same story, or does tessellation geometry affect local clustering patterns?
+
+**c.** **Quantitative comparison**: For both tessellations, count the number of tiles in each quadrant. Example output:
+   - Hexagon: HH=15 tiles, LL=23 tiles, HL=5 tiles, LH=2 tiles
+   - Square: HH=18 tiles, LL=20 tiles, HL=8 tiles, LH=3 tiles
+   - **Interpretation**: Are quadrant distributions similar (robust LISA pattern) or different (MAUP sensitive at local scale)?
+
+**d.** Interpret: Which tessellation reveals clustering more clearly? Do LISA patterns align between methods, or does MAUP (modifiable areal unit problem) create divergent local structure?
+
+```{r}
+
+```
+
+### Step 6.5
+
+**Geographic Interpretation and Management Implications**
+
+Write a 3–4 paragraph synthesis addressing:
+
+**a.** **Geographic hotspots and coldspots**: Identify major clustering regions:
+   - Which dams are in HH hotspots? (E.g., TVA dams, Colorado River dams, others?)
+   - Which regions are LL coldspots? (Mountains, deserts, sparse-development areas?)
+   - What management or hydrologic factors explain these patterns?
+
+**Specific region example:** Choose one HH hotspot (e.g., Tennessee Valley Authority region, Colorado River Basin, California Central Valley) and describe three factors that explain why TVA dams or Colorado River dams cluster. Use geographic knowledge or brief web research if needed.
+
+**b.** **Outliers and anomalies**: Are there notable HL or LH tiles? What might explain them?
+
+**c.** **Tessellation comparison**: Does tessellation choice (hexagon vs. square vs. other) affect LISA conclusions? How does MAUP operate at the local scale?
+
+**d.** **Implications for management**: How does LISA output inform dam operations, reporting, or policy?
+   - Where should multi-state coordination efforts focus? (HH hotspots)
+   - Which regions have simple management structures? (LL coldspots)
+   - How do your LISA findings from Q6 compare to the dam purpose patterns you identified in Q4? (E.g., do irrigation dams cluster the same way as all dams?)
+   - Where do policies need special attention to local anomalies? (HL/LH outliers)
 
 ```{r}
 
