@@ -181,7 +181,7 @@ mapview::npts(grid1km) * 2 # how many X and Y?
 . . . 
 
 ```{r}
-mapview::npts(grid1km) / length(grid) # how many points per tile?
+mapview::npts(grid1km) / length(grid1km) # how many points per tile?
 ```
 
 . . . 
