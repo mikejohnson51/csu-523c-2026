@@ -1,0 +1,1453 @@
+---
+title: "Week 4"
+subtitle: "Raster Data"
+format:
+  revealjs: 
+    smaller: true
+    incremental: false
+    logo: ../csu-rams-logo.png
+    slide-number: c/t
+    footer: "[ESS 523c: Environmental Data Science Applications: Water Resources](https://github.com/mikejohnson51/csu-ess-523c/)"
+    include-before-body: header.html
+    include-after-body: footer-annotations.html
+    theme: [default, csu-css.scss]
+    width: 1600
+    height: 1000
+    countIncrementalSlides: false
+    title-slide-attributes:
+      data-background-color: "#1E4D2B"
+knitr:
+  opts_chunk: 
+    echo: true
+    message: false
+    collapse: true
+    comment: "#>"
+    out.width: "100%"
+---
+
+```{r, include = F}
+library(tidyverse)
+library(AOI)
+library(sf)
+library(terra)
+```
+
+## Learning Objectives
+
+- **Understand**: difference between vector (objects) and raster (fields)
+- **Describe**: raster structure (extent, resolution, CRS, layers)
+- **Demonstrate**: basic `terra` workflows (read, crop, mask, aggregate)
+- **Apply**: simple raster algebra and zonal/focal/global operations
+- **Interpret**: examples of raster analyses (elevation, clustering)
+
+## Recap: sf and spatial concepts
+
+- Spatial phenomena can be thought of as discrete **objects** with clear boundaries or as **continuous phenomena** that can be observed everywhere, with _no_ natural boundaries.
+
+- We have described these as **objects** and **fields** (Kuhn, 2012)
+
+- Objects are usually represented by vector data consisting of:
+  - a geometry (simple features (`sfc`, `sfg`))
+  - some attribute information (`data.frame`)
+
+- In R these are unified as a `sf` object
+
+- Field data is typically represented by raster data
+
+- For this, we will begin our discussions using the `terra` package
+
+## `terra` 
+
+- Like `sf`, `terra` is an implementation of [the standard raster data model](https://gistbok.ucgis.org/bok-topics/raster-data-model)
+
+- The model is used by all GIS platforms
+
+- Continuous data can be represented either as continuous or categorical values on a regular grid of cells (a matrix).
+
+- Cells have: (1) a resolution, (2) an inferred coordinate, typically referenced by centroid, and (3) a value that applies to the entire cell area.
+
+## Recap: R data structures
+
+- Vector:
+  - A vector can have dimensions
+    - A 1D vector is a collection of values
+    - A 2D vector is a matrix
+    - A 3D vector is an array
+
+- List: a collection of objects
+
+- data.frame: a list with requirement of equal length column (vectors)
+
+- data.frames and lists (sfc) defined our vector model
+
+- Arrays will define our raster model
+
+## Spatial Extent
+
+One last topic with respect to vector data (that will carry us into raster) is the idea of an extent:
+
+```{r}
+(ny <- AOI::aoi_get(state = "NY") |> 
+   st_transform(5070) |> 
+   dplyr::select(name))
+```
+
+In geometry, the minimum bounding box for a point set (stored as `POINT`, `POLYLINE`, `POLYGON`) in N dimensions is "...the box with the smallest measure within which all the points lie." 
+
+## We can extract bounding box coordinates with `st_bbox`
+
+- returns: an object of class `bbox` of length 4.
+
+```{r}
+(bb = st_bbox(ny))
+
+class(bb)
+
+typeof(bb)
+```
+
+## There is a method for creating an sfc from a `bbox` object
+
+```{r}
+(bb = st_as_sfc(bb))
+
+class(bb)
+
+typeof(bb)
+```
+
+## Result: 
+
+```{r}
+plot(bb, border = rgb(0,0,1))
+plot(ny, add = TRUE, col = rgb(1,0,0, .5))
+```
+
+## Extents can be discretized in a number of ways:
+
+::: columns
+::: {.column width=50%}
+```{r}
+grid = st_make_grid(bb)
+plot(ny$geometry)
+plot(grid, add = TRUE)
+```
+:::
+::: {.column width=50%}
+```{r}
+grid1km = st_make_grid(bb, cellsize = 10000)
+plot(ny$geometry)
+plot(grid1km, add = TRUE)
+```
+:::
+:::
+
+## What makes a regular tessellation
+
+A regular tessellation has three key properties:
+
+- all cells have the same size and shape
+- there are no gaps or overlaps
+- the full extent is covered
+
+```{r}
+length(grid1km) # how many grid cells?
+```
+
+. . . 
+
+```{r}
+sqrt(st_area(grid1km)[1]) # side length of each cell
+```
+
+. . . 
+
+```{r}
+st_bbox(grid1km) # extent of the grid
+```
+
+. . . 
+
+```{r}
+mapview::npts(grid1km) # how many points?
+```
+
+. . . 
+
+```{r}
+mapview::npts(grid1km) * 2 # how many X and Y?
+```
+
+. . . 
+
+```{r}
+mapview::npts(grid1km) / length(grid) # how many points per tile?
+```
+
+. . . 
+
+```{r}
+sqrt(st_area(grid1km)[1]) # length of each tile?
+```
+
+```{r}
+st_bbox(grid1km) # extent of grid
+```
+
+## Alternative representation 
+
+Regular grids can also be indexed by their centroids
+
+```{r}
+cent <- st_centroid(grid1km)
+
+plot(ny$geometry)
+plot(cent, add = TRUE, pch = 16, cex = .25)
+```
+
+```{r}
+length(cent) # how many grid tiles
+
+mapview::npts(grid1km) # how many points?
+
+mapview::npts(grid1km) * 2 # how many X and Y?
+```
+
+
+## Equal area from centroid
+
+We can use our voronoi diagram to show that the area closest to a cell centroid is the cell itself.
+
+```{r}
+vor = st_union(cent) |> 
+  st_voronoi() |> 
+  st_cast() |> 
+  st_intersection(bb)
+
+plot(ny$geometry); plot(vor, add = TRUE)
+```
+
+## Raster Model
+
+- The raster model is one of the earliest and most widely used data models within geographic information systems (Tomlin, 1990; Goodchild, 1992, Maguire, 1992). 
+
+- Typically used to record, analyze and visualize data with a continuous nature such as elevation, temperature ("GIS"), or reflected or emitted electromagnetic radiation ("Remote Sensing")
+
+- Quotes are used because you'll find from a data perspective these differences are artificial and a product of the ESRI/ENVI/ERDAS divide
+
+. . . 
+
+- The term `raster` originated from the German word for screen, implying a series of orthogonality oriented parallel lines.  
+
+- Digital raster objects most often take the form of a _regularly spaced_, _grid-like_ pattern of rows and columns
+
+- Each element referred to as a cell, pixel, or grid point.
+
+## Many terms mean the same thing ...
+
+ - The entire raster is sometimes referred to as an "image", "array", "surface", "matrix", or "lattice" (Wise, 2000).  
+
+- They all mean the same thing.
+
+ - Cells of the raster are most often square, but may be rectangular (with differing resolutions in x and y directions) or other shapes that can be tessellated such as triangles and hexagons (Figure below from Peuquet, 1984).
+
+```{r, fig.align='center', fig.width = 10, echo = FALSE}
+knitr::include_graphics('img/17-raster-tess.png')
+```
+
+## Photos and Computers ...
+
+::: columns
+::: {.column width="50%"}
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-pixel-resolution.png')
+```
+:::
+::: {.column width="50%"}
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-what-is-a-pixel.jpg')
+```
+:::
+:::
+
+## Aerial Imagery (really just a photo `r emo::ji("smile")`)
+
+::: columns
+::: {.column width="50%"}
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-boat-res1.jpg')
+```
+:::
+::: {.column width="50%"}
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-boat-res2.jpg')
+```
+:::
+:::
+
+## What is stored in these cells?
+
+::: columns
+::: {.column width="50%"}
+
+### Categorical Values (integer/factor)
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-lc-pixels.png')
+```
+::: 
+::: {.column width="50%"}
+### Continuous Values (numeric)
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-raster-elev.png')
+```
+:::
+:::
+
+## Spectral Values 
+
+ - Either Color, or sensor
+ 
+```{r, fig.align='center',  echo = FALSE}
+knitr::include_graphics('img/17-rgb.png')
+```
+
+## Any digital image contains an RGB channel for color:
+
+- Red, green, and blue are the three additive colors (primary colors of light)
+
+- In R, colors can be defined using the RGB channels
+
+```{r, fig.width=10, fig.align='center'}
+(rgb(1,0,0)) # red
+(rgb(0,.54,.96)) # UCSB navy
+(rgb(254,188,17, maxColorValue = 255)) # UCSB navy
+```
+
+## Pure RGB
+
+```{r}
+par(mfrow = c(1,3), mar = c(0,0,0,0))
+plot(ny$geometry,   col = rgb(1,0,0)) # red
+plot(ny$geometry,   col = rgb(0,1,0)) # green
+plot(ny$geometry,   col = rgb(0,0,1)) # blue
+```
+
+
+## RGB and bytes/bits
+
+- The **red**, **green** and **blue** use 8 bits each (1 byte), which each have integer values from 0 to 255. 
+
+- This makes 256^3 = 16,777,216 possible colors.
+
+- See more [here](https://www.rapidtables.com/web/color/RGB_Color.html)
+
+- How does this relate to the selection of 256x256 pixel tiles in web maps?
+
+##
+
+RGB values are what matter most for raster imagery in this course.
+
+- Digital images store color with red, green, and blue channels.
+- Printers use a different system (CMYK), but the core idea is the same: color is encoded numerically.
+- For us, the important takeaway is that image rasters store values by channel.
+
+```{r, fig.width=10, fig.align='center'}
+par(mfrow = c(1,4), mar = c(0,0,0,0))
+plot(ny$geometry, col = rgb(0,1,1))  # cyan
+plot(ny$geometry, col = rgb(1,0,1)) # Magenta
+plot(ny$geometry, col = rgb(1,1,0)) # Yellow
+plot(ny$geometry, col = rgb(0,0,0)) # black
+```
+
+# Why do we care?
+
+- Pixels are the base unit of raster data and have a resolution
+
+- This is the X and the Y dimension of each cell in the units of the CRS
+
+```{r, fig.align='center',  echo = FALSE}
+knitr::include_graphics('img/17-raster.png')
+```
+
+## Resolution drives image clarity (granularity)
+
+- Higher resolution (smaller cells) = more detail, but bigger data!
+
+::: columns
+::: {.column width="50%"}
+```{r, fig.align='center',  echo = FALSE}
+knitr::include_graphics('img/17-raster-res.png')
+```
+:::
+::: {.column width="50%"}
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-raster-res.gif')
+```
+:::
+:::
+
+## Raster images seek to discretize the real world into cell-based values
+
+- Again either integer (categorical), continuous, or signal
+
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-rasterize-world.png')
+```
+
+## All rasters have an extent!
+
+- This is the same extent as a bounding box
+- Can be described as 4 values (xmin,ymin,xmax,ymax)
+
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-raster-extent.png')
+```
+
+## Implicit Coordinates
+
+- Unlike vector data, the raster data model stores cell coordinates indirectly.
+
+- Coordinates are derived from the raster origin, the resolution, and the cell index (for example, row 100 and column 150).
+
+- In practice, the **column position** determines movement in the x-direction and the **row position** determines movement in the y-direction. Cell-center coordinates are inferred from that structure rather than stored one by one.
+
+```{r, fig.align='center', echo = FALSE}
+knitr::include_graphics('img/17-raster-extent.png')
+```
+
+## 
+
+- So, any image (.png, .tif, .gif) can be read as a raster...
+
+- The raster is defined by the extent and resolution of the cells
+
+- To be spatial, the extent (and thus the coordinates) must be grounded in a CRS
+
+::: columns
+::: {.column width=50%}
+
+```{r}
+(img = terra::rast('img/17-raster-extent.png'))
+```
+
+:::
+::: {.column width=50%}
+
+```{r}
+terra::plotRGB(img, r = 1, g = 2, b = 3)
+```
+
+:::
+:::
+
+## Raster Data in R
+
+A `SpatRast` represents single-layer (variable) raster data. 
+
+A `SpatRast` always stores the fundamental parameters that describe it. 
+  - The number of columns and rows, 
+  - The spatial extent
+  - The Coordinate Reference System. 
+
+In addition, a `SpatRast` can store information about the file where raster values are stored (if there is such a file). 
+
+Here we construct an empty raster:
+
+```{r}
+(r <- rast(ncol=20, nrow=20, xmax=-80, xmin=-120, ymin=20, ymax=60))
+```
+
+#### Extract Dimensionality ...
+
+```{r}
+nrow(r)
+ncol(r)
+ncell(r)
+nlyr(r)
+```
+
+## Raster Values
+
+values can be extracted with `values()`
+
+```{r}
+head(values(r))
+```
+
+## Assigning values as a vector
+
+```{r}
+values(r) <- 1:ncell(r)
+
+r
+
+head(values(r))
+```
+
+
+```{r}
+plot(r)
+```
+
+## Raster is S4
+
+- Compared to S3, the S4 object system is stricter and closer to other object-oriented systems.
+
+- What does this mean for us?
+
+- A `SpatRaster` is a formal object with a defined representation.
+
+- In practice, that means it has structured components and methods for things like extent, CRS, dimensions, and values. Slots can be accessed with `@`, even though we will usually prefer accessor functions.
+
+```{r}
+str(r, max.level = 2)
+r@pntr
+r@pntr$ncol
+```
+
+## Access via Function
+
+```{r}
+ext(r)
+crs(r)
+nrow(r)
+ncol(r)
+head(values(r))
+```
+
+## Multi-layers
+
+```{r, figalign='center', fig.width = 18, echo = FALSE}
+knitr::include_graphics('img/17_multi-band.png')
+```
+
+In many cases, multi-variable raster datasets are used. Variables can be related to time or measurement.
+
+A `SpatRaster` is a collection of objects with the same spatial `extent` and `resolution.` 
+
+In essence it is a list of  objects, or a 3D array. 
+
+## Remember our Array data?
+
+```{r}
+(v = 1:27)
+(arr = array(v, dim = c(3,3,3)))
+```
+
+## An array is a single file so it can be "rasterized"
+
+```{r}
+b = rast(arr)
+plot(b)
+```
+
+# Core Raster Principles
+
+## 1. Bounding Box / Extents
+
+**Geometries** have extents that define the maximum and minimum coverage of the shape in a coordinate reference system
+
+```{r, fig.cap = "Image Source: National Ecological Observatory Network (NEON)", fig.align='center', fig.width = 18, echo = FALSE}
+knitr::include_graphics('img/18-geom-extent.png')
+```
+
+## 2. Extent
+
+- When dealing with objects, the extent (or bbox) is derived from the coordinate set
+
+- When dealing with raster data, the extent is a foundational component of the raster data structure
+
+  - That is, we need to know the area the raster is covering!
+
+```{r, fig.cap = "Image Source: National Ecological Observatory Network (NEON)", fig.align='center', fig.width = 18, echo = FALSE}
+knitr::include_graphics('img/17-raster-extent.png')
+```
+
+## 3. Discretization
+
+Once we know the **extent**, we need to know _how_ that space is split up
+
+Two complementary pieces of information tell us this:
+
+   - Resolution (res)
+   - Number of row and number of columns (nrow/ncol)
+  
+```{r, fig.cap = "Image Source: National Ecological Observatory Network (NEON)", fig.align='center', fig.width = 18, echo = FALSE}
+knitr::include_graphics('img/17-raster-res.png')
+```
+
+## So, 
+
+A raster is made of an **extent** and a **resolution** / row-column structure
+
+- A vector of values fills that structure (the same way a vector in R can have dimensions)
+
+  - These values are often scaled to integers to reduce file size
+
+- Values are referenced in Cartesian space based on cell index
+
+- A CRS, together with the extent, provides spatial reference / coordinates
+
+## General Process 
+
+Almost all remote sensing / image analysis begins with the same basic steps:
+
+  1. Identifying an area of interest (AOI)
+  
+  2. Identifying and downloading the relevant images or products
+  
+  3. Analyzing the raster products
+
+
+The definition of an AOI is critical because raster data are continuous, so we define the bounds of the study rather than the bounds of objects.
+
+- **But**, objects often (even typically) define our bounds
+
+
+## Find elevation data for Fort Collins:
+
+1.  Define the AOI
+
+```{r, eval = FALSE}
+bb = read_csv("../labs/data/uscities.csv") |>
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) |> 
+  filter(city == "Fort Collins") |> 
+  st_transform(5070) |> 
+  st_buffer(50000) |> 
+  st_bbox() |> 
+  st_as_sfc() |> 
+  st_as_sf()
+```
+- Read data from elevation map tiles, for a specific zoom, and crop to the AOI
+
+```{r}
+#| eval: false
+elev = elevatr::get_elev_raster(bb, z = 11) |> crop(bb)
+writeRaster(elev, filename = "data/foco-elev.tif", overwrite = TRUE)
+```
+
+- The resulting raster ...
+
+```{r,fig.height=5}
+(elev = rast("data/foco-elev.tif"))
+```
+
+
+```{r,fig.height=5, echo = FALSE, fig.align='center'}
+plot(elev)
+```
+
+## Raster Values Continuity
+
+```{r}
+v = values(elev)
+class(v)
+length(v)
+```
+
+
+```{r}
+elev
+```
+
+## Raster Values 
+
+```{r}
+# The length of the vector is equal to the rows * columns
+length(v) == nrow(elev) * ncol(elev)
+# The span of the x extent divided by the resolution equals the raster rows
+((xmax(elev) - xmin(elev)) / res(elev)[1]) == ncol(elev) 
+# The span of the x extent divided by the number of rows equals the raster resolution
+((xmax(elev) - xmin(elev)) / ncol(elev)) == res(elev)[1] 
+```
+
+## All image files are the same!
+
+```{r}
+download.file(url = "https://a.tile.openstreetmap.org/18/43803/104352.png",
+              destfile = "data/104352.png")
+img = png::readPNG("data/104352.png")
+class(img)
+typeof(img)
+dim(img)
+```
+
+## 
+
+```{r}
+img[1,1,1:3]
+rgb(1.0000000, 0.9607843, 0.8980392)
+```
+
+```{r, fig.cap = "Google Color Picker", fig.align='center', out.width="50%", echo = FALSE}
+knitr::include_graphics('img/18-color-picker.png')
+```
+
+##
+
+::: columns
+::: {.column width=50%}
+
+![](data/104352.png)
+
+:::
+::: {.column width=50%}
+
+![](img/18-color-picker.png)
+
+:::
+:::
+
+## Raster Algebra
+
+- So our raster **data** is stored as a large numeric array/vector
+
+- Many generic functions allow for simple algebra on Raster objects, 
+
+- These include:
+
+  - normal algebraic operators such as `+`, `-`, `*`, `/`
+
+  - logical operators such as `>`, `>=`, `<`,` ==`, `!` 
+
+  - functions like `abs`, `round`, `ceiling`, `floor`, `trunc`, `sqrt`, `log`, `log10`, `exp`, `cos`, `sin`, `atan`, `tan`, `max`, `min`, `range`, `prod`, `sum`, `any`, `all` 
+
+
+## Raster Algebra
+
+- Raster algebra works **cell by cell**, while preserving the raster's extent, resolution, and CRS.
+
+- You can combine raster objects with constants, logical comparisons, and many mathematical functions.
+
+### For example:
+```{r}
+elev + 100
+log10(elev)
+elev > 2000
+```
+
+## Replacement
+
+- Raster values can be replaced using conditional statements
+- Doing this changes the underlying data!
+- If you want to retain the original data, you must make a copy of the base layer
+
+::: columns
+::: {.column width=50%}
+```{r, fig.height=5}
+plot(elev)
+```
+:::
+::: {.column width=50%}
+
+```{r, fig.height=5}
+elev2 = elev #<<
+elev2[elev2 <= 1500] = NA #<<
+plot(elev2)
+```
+:::
+:::
+
+## Modifying a raster
+
+When we want to modify the **extent** of a raster we can _clip_ it to a new bounds
+
+`crop`: lets you reduce the extent of a raster to the extent of another, overlapping object:
+
+::: columns
+::: {.column width=50%}
+```{r, fig.height=5}
+#remotes::install_github("mikejohnson51/AOI")
+fc = AOI::geocode("Fort Collins", bbox = TRUE) |> 
+  st_transform(crs(elev))
+
+plot(elev)
+plot(fc, add = TRUE, col = NA)
+```
+::: 
+::: {.column width=50%}
+```{r, fig.height=5}
+fc_elev = crop(elev, fc) #<<
+plot(fc_elev)
+```
+:::
+:::
+
+## Modifying the underlying data:
+
+`mask`: mask takes an input object (sf, sp, or raster) and sets anything not underlying the input to a new value (default = NA)
+
+```{r}
+library(osmdata)
+
+osm = osmdata::opq(st_bbox(st_transform(fc,4326))) |> 
+  add_osm_feature("water") |> 
+  osmdata_sf()
+
+(poly = osm$osm_polygons |> 
+  st_transform(crs(elev)))
+```
+
+##
+
+::: columns
+::: {.column width=50%}
+```{r}
+plot(fc_elev)
+plot(poly, col = "blue", add  = TRUE)
+```
+
+::: 
+::: {.column width=50%}
+```{r}
+ma =  mask(fc_elev, poly)
+ma2 = mask(fc_elev, poly, inverse = TRUE)
+plot(c(fc_elev, ma, ma2))
+```
+:::
+:::
+
+## What is `mask` doing?
+
+```{r}
+NA * 7
+```
+
+. . . 
+
+```{r, fig.height=5}
+mask_r = rasterize(poly, fc_elev, background = NA)
+plot(mask_r)
+```
+
+##
+
+```{r, fig.height=5}
+base_mask = mask_r * fc_elev
+plot(base_mask)
+```
+
+
+## Crop or/and mask
+
+- Crop is more efficient then mask
+- Often you will want to mask and crop a raster
+- The correct way to do this is crop _then_ mask
+
+```{r, fig.height=5}
+cm = crop(fc_elev, poly) |>  
+  mask(poly)
+
+plot(cm)
+```
+
+
+## Aggregate and disaggregate
+
+- `aggregate` and `disaggregate` allow for changing the _resolution_  of a Raster object. 
+
+- This is similar to the zoom scaling on a web map except the scale factor is not set to 2
+
+- For aggregate, you need to specify a function determining what to do with the grouped cell values (default = mean).
+
+```{r,echo = FALSE}
+rpoly = as.polygons(aggregate(fc_elev, 10, fun = max))
+```
+
+::: columns
+::: {.column width=50%}
+```{r, fig.height=5}
+plot(fc_elev)
+plot(rpoly, add = T)
+```
+:::
+::: {.column width=50%}
+```{r, fig.height=5}
+agg = aggregate(fc_elev, 10, fun = max) #<<
+plot(agg)
+plot(rpoly, add = T)
+```
+:::
+:::
+
+## `app`
+
+Just like a vector, we can apply functions over a raster with `app`
+
+These types of formulas are very useful for thresholding analysis
+
+*Question: separate Fort Collins into the higher and lower elevations*
+
+```{r}
+FUN = function(x){ ifelse(x < mean(x), 1, 2) }
+```
+
+
+```{r, fig.height=5, fig.align='center'}
+elev3 = app(elev, FUN) #<<
+plot(elev3, col = c("red", "blue"))
+```
+
+## Read in the saved raster file
+
+```{r, fig.height=5}
+(r = rast("data/foco-elev.tif"))
+```
+
+## Create a conditional (threshold) mask
+
+```{r, fig.height=5}
+threshold = function(x) {ifelse(x <= 1520 , NA, 1)}
+```
+
+```{r, fig.height=5}
+threshold(1600)
+threshold(-100)
+```
+
+```{r, fig.height=5}
+(m = app(r, threshold))
+```
+
+
+## Results
+
+::: columns
+::: {.column width=50%}
+
+```{r, fig.height=5}
+plot(r)
+```
+:::
+::: {.column width=50%}
+```{r, fig.height=5}
+plot(m)
+```
+:::
+:::
+
+## Multiply cell-wise
+
+- algebraic, logical, and functional operations act on a raster cell-wise
+
+```{r, fig.align='center', fig.height=5}
+elev_cut = m * r
+plot(elev_cut, col = viridis::viridis(256))
+```
+
+## Reclassify
+
+- Reclassify is a function that allows you to change the values of a raster based on a set of rules
+- The rules are defined in a data frame with three columns:
+
+  - `min` = the minimum value of the range
+  - `max` = the maximum value of the range
+  - `lab` = the new value to assign to that range
+
+```{r}
+(rcl = data.frame(min = seq(1500,1590,10), max =  seq(1510,1600,10), lab = c(0:9)))
+```
+
+```{r}
+(rc = classify(elev_cut, rcl, include.lowest = TRUE))
+```
+
+##
+
+```{r}
+(s = c(r, m, elev_cut, rc) |> 
+  setNames(c("elevation", "elev-mask", "terrain", "topography")))
+```
+
+##
+
+```{r, fig.height=8, fig.align='center'}
+plot(s, col = viridis::viridis(256))
+```
+
+## Real Example: Classify Rainfall Regions of Colorado
+
+```{r}
+#remotes::install_github("mikejohnson51/climateR")
+library(climateR)
+
+AOI = AOI::aoi_get(state = 'CO') 
+
+system.time({ prcp = climateR::getTerraClim(AOI, "ppt", 
+                                            startDate = "2000-01-01", endDate = '2005-12-31') })
+```
+
+
+```{r}
+# More on global below ...
+quarts = global(prcp$ppt, fivenum)
+
+(quarts = colMeans(quarts))
+
+(rcl = data.frame(quarts[1:4], quarts[2:5], 1:4))
+```
+
+## 
+
+```{r}
+terra::classify(mean(prcp$ppt), rcl, include.lowest=TRUE) |> 
+   plot(col = blues9)
+```
+
+## Object/Field Interaction
+
+For this example, we used OSM to extract the river data for the area of interest. We will talk more about OSM next week: 
+
+```{r}
+foco_rivers <- read_sf("data/foco-rivers-osm.gpkg")
+```
+
+## Lets find the longest river segment *IN* our extent
+
+```{r, fig.height=5}
+river = foco_rivers |> 
+  st_transform(crs(r)) |> 
+  st_intersection(st_as_sfc(st_bbox(r))) %>% 
+  mutate(length = st_length(.)) |> 
+  slice_max(length, n = 1)
+```
+
+
+```{r, fig.height=5}
+plot(r)
+plot(river, add = TRUE, col = "blue", lwd = 2)
+```
+
+## Value Extraction
+
+- Often, we want to know the profile and sinousity of a river
+
+- To do this, we need to know the inlet and outlet as well as the straight line connector
+
+```{r, fig.height=5}
+inlet  = head(st_cast(river, "POINT"), 1)
+outlet = tail(st_cast(river, "POINT"), 1) 
+pts    = bind_rows(inlet, outlet) 
+
+line = st_cast(st_union(pts), "LINESTRING")
+```
+
+##
+
+```{r}
+plot(r)
+plot(river, add = TRUE, col = "blue", lwd = 2)
+plot(line, add = TRUE, col = "black", lwd = 2)
+plot(outlet$geom, add = TRUE, pch = 16, col = "red")
+plot(inlet$geom,  add = TRUE, pch = 16, col = "green")
+```
+
+## Sinuosity
+
+Channel **sinuosity** is calculated by dividing the length of the stream channel by the straight line distance between the end points of the selected channel reach.
+
+```{r}
+(sin = st_length(river) / st_length(line))
+```
+
+```{r, fig.align='center', fig.height = 3, echo = FALSE}
+knitr::include_graphics('img/19-sinuosity.png')
+```
+
+## River Slope:
+
+The change in elevation between the inlet/outlet divided by the length (rise/run) give us the slope of the river:
+
+To calculate this, we must extract elevation values at the inlet and outlet:
+
+
+```{r}
+(elev = extract(r, pts))
+```
+
+
+```{r}
+100 * (elev$`foco-elev`[1] - elev$`foco-elev`[2]) / units::drop_units(st_length(river))
+```
+
+## River profile
+
+What does the elevation profile of the river look like?
+
+```{r}
+profile = extract(r, river)$`foco-elev`
+```
+
+```{r, fig.align='center', fig.height=5}
+plot(profile, type = "l")
+lines(zoo::rollmean(profile,k = 10), 
+      col = "darkred", lwd = 3)
+```
+
+## Map Algebra
+
+- Dana Tomlin (Tomlin 1990) defined a framework for the analyizing field data stored as grided values.
+
+- He called this framework map algebra. 
+
+- Map algebra operations and functions are broken down into four types: 
+
+  - local
+
+  - focal
+
+  - zonal
+
+  - global
+
+
+## Local
+
+- Local operations and functions are applied to **each** individual cell and only involve those cells sharing the same location.
+
+- More than one raster can be involved in a local operation. 
+
+- For example, rasters can be **summed** ( each overlapping pixels is added) 
+
+- Local operations also include **reclassification** of values. 
+
+```{r}
+s = c(mean(prcp$ppt), app(prcp$ppt, sd), min(prcp$ppt), max(prcp$ppt)) |> 
+  setNames(c("Mean", "StDev", "Min", "Max"))
+
+rasterVis::levelplot(s)
+```
+
+## Focal
+
+- Also referred to as "neighborhood" operations.
+
+- Assigns summary values to the output cells based on the neighboring cells in the input raster. 
+
+- For example, a cell output value can be the average of 9 neighboring input cells (including the center cell) - this acts as a smoothing function.
+
+## Focal
+
+- Focal operations require a window (also known as a kernel) to work over
+
+- Additionally a kernel also defines the weight each neighboring cell contributes to the summary statistic. 
+
+- For example, all cells in a 3x3 neighbor could each contribute 1/9th of their value to the summarized value (i.e. equal weight). 
+
+- The weight can take on a more complex form defined by a function; such weights are defined by a kernel function. 
+
+- One popular function is a Gaussian weighted function which assigns greater weight to nearby cells than those further away ([Toblers first law](https://en.wikipedia.org/wiki/Tobler%27s_first_law_of_geography))
+
+## Example: Focal
+
+Lets apply a smoothing kernel to our Fort Collins elevation data over an 25x25 window, using the mean operator
+  
+```{r}
+foco = AOI::geocode("Fort Collins", bbox = TRUE) |> st_transform(crs(r))
+
+foco_elev = crop(r, foco)
+f1 <- focal(foco_elev, w= matrix(1,nrow=25,ncol=25), fun=mean)
+```
+
+## Results 
+
+::: columns
+::: {.column width=50%}
+
+```{r}
+plot(foco_elev)
+```
+::: 
+::: {.column width=50%}
+```{r}
+plot(f1)
+```
+:::
+:::
+
+
+## What did we do?
+
+::: columns
+::: {.column width=50%}
+```{r}
+matrix(1,nrow=25,ncol=25)
+```
+:::
+::: {.column width=50%}
+```{r}
+mean(foco_elev[1:25, 1:25][,1])
+
+na.omit(values(f1))[1]
+```
+:::
+:::
+
+## Zonal 
+
+- Zonal operations compute a summary values (such as the mean) from cells aggregated to some zonal unit. 
+
+- Like focal operations, a zone and a summary function must be defined
+
+- The most basis example of a zonal function is aggregation!
+
+
+```{r, fig.align='center', fig.height=5}
+aggregate(foco_elev, 10) |> plot()
+```
+
+
+## Zonal Statisics (More advanced)
+
+- For more complicated object zones, [exactextractr](https://github.com/isciences/exactextractr) is a fast and efficient R utility that binds the C++ `exactextract` tool. 
+
+- What is the county level mean January rainfall in California?
+
+```{r, fig.height=5}
+AOI = AOI::aoi_get(state = "CO", county = "all")
+AOI$janPTT = exactextractr::exact_extract(prcp$ppt$`ppt_2000-01-01_total`, AOI, "mean", progress = FALSE)
+plot(AOI['janPTT'])
+```
+
+## What about the US?
+
+```{r}
+counties <-  AOI::aoi_get(state = "conus", county = "all")
+  
+jan <- climateR::getTerraClim(counties, "ppt", startDate = "2000-01-01") 
+  
+counties$janPTT <-  exactextractr::exact_extract(jan$ppt, counties, "mean", progress = FALSE)
+```
+
+
+```{r, fig.align="center", fig.height=5}
+plot(counties['janPTT'], border = NA, key.pos = 4)
+```
+
+## Global
+
+- Global operations make use of _some_ or _all_ input cells when computing an output cell value. 
+
+- They are a special case of zonal operations with the _entire_ raster represents a single zone. 
+
+- Examples include generating descriptive statistics for the entire raster dataset
+
+
+## Summary Values
+
+`global`: computes statistics for the values of each layer in a Raster* object. 
+
+```{r}
+elev <- rast('data/foco-elev.tif')
+global(elev, mean)
+mean(values(elev), na.rm = TRUE)
+```
+
+# Why not just `mean()`
+
+In the terra package, functions like `max`, `min`, and `mean`, return a new SpatRast* object (with a value computed for each cell). 
+
+In contrast, `global` returns a single value, computed from the all the values of a layer.
+
+::: columns
+::: {.column width=50%}
+
+```{r, fig.height=5}
+s = c(elev, elev^2, elev*.5)
+mean(s) |> plot()
+```
+:::
+::: {.column width=50%}
+```{r}
+global(s, mean)
+```
+:::
+:::
+
+## Mean Monthly Rainfall for Colorado
+
+::: columns
+::: {.column width=50%}
+### global
+```{r, fig.height=5}
+plot(global(prcp$ppt, max)$max, type = "l", 
+     ylab = "rainfall", xlab = "month since 2000-01")
+lines(global(prcp$ppt, min)$min, type = "l", col = "blue")
+lines(global(prcp$ppt, mean)$mean, type = "l", col = "darkred", lwd = 2)
+```
+::: 
+::: {.column width=50%}
+### mean()
+```{r, fig.height=5}
+plot(mean(prcp$ppt), col = blues9)
+plot(AOI, add =TRUE, col = NA, lwd = 2)
+```
+:::
+:::
+
+
+
+# Kmeans over to Raster Data!
+
+- each layer of a SpatRaster is a layer
+- each layer is a vector of values
+
+```{r}
+library(climateR)
+params <-  c("ppt", "tmax", "tmin", "srad", "q")
+AOI   <-  AOI::aoi_get(state = "CO")
+
+co <-  climateR::getTerraClim(AOI, params, startDate = "2018-10-01")  %>% 
+  unlist() %>% 
+  rast() |> 
+  setNames(params)
+```
+
+## Colorado October 2018 climate
+
+```{r}
+plot(co)
+```
+
+## Raster layers are vectors!
+
+```{r}
+values = values(co)
+head(values)
+```
+
+## Data Prep
+
+- Identify NA indices for latter reference
+- Remove NA values 
+- Scale
+
+```{r}
+idx <- which(!apply(is.na(values), 1, any))
+v   <- na.omit(values)
+vs  <- scale(v)
+```
+
+##
+
+```{r}
+(E <- kmeans(vs, 5, iter.max = 100))
+```
+
+## Copying a raster structure
+
+```{R}
+clus_raster <- co$tmax
+values(clus_raster) <- NA
+```
+
+## Assign values
+
+```{r}
+clus_raster[idx] <- E$cluster
+plot(clus_raster, col = RColorBrewer::brewer.pal(5, "Spectral"))
+```
+
+## Merging across data sources
+
+```{r}
+# Get elevations data
+elev = elevatr::get_elev_raster(AOI, z = 5) %>% 
+  crop(AOI) |> 
+  rast()
+
+# Align Raster extents and resolutions
+elev = project(elev, co$ppt)
+
+# Extract Values
+values = c(co$ppt, elev) %>% values()
+
+# Prep data
+idx = which(!apply(is.na(values), 1, any))
+v = na.omit(values)
+vs = scale(v)
+
+# Cluster
+E = kmeans(vs, 5, iter.max = 100)
+
+clus_raster = elev
+values(clus_raster) = NA
+clus_raster[idx] <- E$cluster
+```
+
+## 
+
+::: columns
+::: {.column width=50%}
+
+```{r, fig.height=5}
+par(mfrow = c(2,1))
+plot(elev)
+plot(co$ppt)
+```
+:::
+::: {.column width=50%}
+
+```{r}
+plot(clus_raster, col = RColorBrewer::brewer.pal(5, "Spectral"))
+```
+:::
+:::
+
+## Clustering at larger scales
+
+```{r}
+counties =  AOI::aoi_get(state = "conus", county = "all")
+params = c("tmax", "tmin", "ppt", "srad")
+
+dat = climateR::getTerraClim(counties, params, startDate = "2018-06-01") %>% 
+  unlist() |> 
+  rast() %>% 
+  setNames(params) |> 
+  exactextractr::exact_extract(counties, "mean", progress = FALSE)
+```
+
+```{r}
+dat = scale(dat)
+
+counties$clust8 = kmeans(dat, 8)$cluster
+
+plot(st_transform(counties["clust8"], 5070), border = NA)
+```
+
+## Extra! Animating Rasters...
+
+Install and load the `gifski` package
+
+- **save_gif**: combines many individual plots
+
+- A **for loop** build the plots
+
+- The **plot** is what we have been doing all along (if you want a `ggplot` you must print the object!)
+
+- **gif_file**: the path to save the image
+
+- **width/height**: the image dimensions
+
+- **delay**: the pause between frames
+
+- **loop**: should the gif play over and over?
+
+```{r, eval = FALSE}
+library(gifski)
+
+save_gif(
+  {for(i in 1:nlyr(prcp$ppt)) {
+      plot(prcp$ppt[[i]], col = blues9, 
+           legend = FALSE, 
+           main = names(prcp$ppt)[i])}
+  }, 
+  gif_file = "img/ppt.gif", 
+  width = 800, height = 600, delay = .33, loop = TRUE)
+```
+
+## Result
+
+![](img/ppt.gif)
+
+

@@ -709,7 +709,7 @@ Do you see geographic clustering of old vs. new dams? Large vs. small dams?
 
 **Neighbor Correlation: Local Spatial Variation**
 
-For your tessellation's neighbor matrix (from Q6), compute the **spatial lag** of dam attributes: the average value of an attribute in a tile's neighbors. This reveals whether _spatial neighbors have similar dam attributes_—a key signal that observations are **not independent** (violating OLS assumptions).
+For your tessellation's neighbor matrix, compute the **spatial lag** of dam attributes: the average value of an attribute in a tile's neighbors. This reveals whether _spatial neighbors have similar dam attributes_—a key signal that observations are **not independent** (violating OLS assumptions).
 
 ::: callout-warning
 ## Critical: NA Handling in Spatial Lag Calculations

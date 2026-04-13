@@ -1,0 +1,5 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='800' height='300'>
+  <rect width='100%' height='100%' fill='#ffffff' />
+  <text x='20' y='40' font-size='28' fill='#1E4D2B' font-family='Arial'>JSON Schema (Example)</text>
+  <text x='20' y='80' font-size='16' fill='#333'>{"type": "object", "properties": {"name": {"type":"string"}}}</text>
+</svg>
