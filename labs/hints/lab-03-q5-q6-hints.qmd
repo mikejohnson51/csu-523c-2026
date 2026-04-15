@@ -1,0 +1,589 @@
+---
+title: "Lab 3: Q5–Q6 Hints & Tricks"
+subtitle: "Spatial Correlation and LISA — Reducing Repetitive Code"
+author: "ESS 523c: Water Resource Data Science"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+    highlight-style: github
+---
+
+```{r}
+#| include: false
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+```
+
+# Lab 3: Q5–Q6 Hints & Tricks
+
+This document provides guidance for **Question 5 (Spatial Correlation)** and **Question 6 (LISA: Local Hotspots/Coldspots)**. These questions are challenging because they blend **numerical/matrix operations** with **geographic interpretation**.
+
+---
+
+# Overview: Why Q5 & Q6 Are Hard
+
+**Q5 (Spatial Correlation):**
+
+- Requires converting spatial neighbors into **matrix form** and computing matrix multiplication
+
+- NA handling in spatial lag calculations will break your `cor()` call if not done carefully
+
+- Interpretation requires connecting statistics (r = 0.62) to dam geography 
+
+**Q6 (LISA Local Autocorrelation):**
+
+- Extends Q5 matrices to produce **4 quadrant categories** (HH, LL, HL, LH)
+
+- Requires a **required side-by-side comparison** with counties
+
+- MAUP interpretation demands explaining *why* two different units reveal different patterns
+
+- Geographic synthesis is deep: identifying specific hotspots (TVA), coldspots (deserts), and anomalies
+
+
+# Helper Functions: Reduce Repetitive Code
+
+**Reuse the classroom function:** You already learned `point_in_polygon()` in week-3-2 lectures! This section shows how to use it for dam counting, plus 4 additional helpers for spatial lag and LISA analysis.
+
+## Function 1: Reuse point_in_polygon() from Week-3-2 Lectures
+
+The week-3-2 slides introduced an efficient point-in-polygon function. **Copy it directly from the slides - this is the basic version:**
+
+```{r}
+#| eval: false
+point_in_polygon = function(points, polygon, var){
+  st_join(polygon, points) |> 
+    st_drop_geometry() |> 
+    count(get(var)) |> 
+    setNames(c(var, "n")) |>
+    left_join(polygon, by = var) |> 
+    st_as_sf() 
+}
+
+# Usage:
+tess_counts <- point_in_polygon(dams_sf, my_tessellation, "tile_id") 
+county_counts <- point_in_polygon(dams_sf, counties, "GEOID") 
+```
+
+**Why reuse?** This function is tested in class, handles the spatial join correctly, and avoids reinventing the wheel.
+
+## Function 2: Build and Standardize Neighbor Matrix (New helper)
+
+Combines neighbor matrix creation, self-removal, validation, and standardization:
+
+```{r}
+#| eval: false
+
+# Create, clean, and row-standardize neighbor adjacency matrix.
+# Handles isolated polygons gracefully.
+# Args:
+#   geometry_sf: sf object with valid geometries
+# Returns:
+#   row-standardized weight matrix (sparse handling included)
+
+standardize_weights <- function(geometry_sf) {
+
+  # Check validity
+  if (any(!st_is_valid(geometry_sf))) {
+    geometry_sf <- st_make_valid(geometry_sf)
+  }
+  
+  # Binary neighbor matrix
+  W <- st_touches(geometry_sf, sparse = FALSE)
+  diag(W) <- 0  # Remove self-neighbors
+  
+  # Row-standardize (handles isolated tiles)
+  W_std <- W / rowSums(W)
+  W_std[rowSums(W) == 0, ] <- 0  # Replace NaN (no neighbors) with 0
+  
+  return(W_std)
+}
+
+# Usage:
+W_std_tess   <- standardize_weights(tess_counts)
+W_std_county <- standardize_weights(county_counts)
+```
+
+## Function 3: Compute Spatial Lag with Safe Imputation (New helper)
+
+Automates NA imputation and lag calculation:
+
+```{r}
+#| eval: false
+
+# Compute spatial lag of an attribute via matrix multiplication.
+# Imputes NAs to global mean before lag calculation.
+# Args:
+#   attribute_vector: numeric vector (may contain NAs)
+#   weight_matrix: row-standardized weight matrix
+#   original_na_mask: logical vector marking which values were originally NA
+#                     (optional; used later for selective correlation)
+# Returns:
+#   List with $lag (spatial lag), $imputed (imputed attribute), 
+#   $na_mask (original NAs)
+
+compute_spatial_lag <- function(attribute_vector, weight_matrix, 
+                                original_na_mask = NULL) {
+  # Record which values were originally NA
+  if (is.null(original_na_mask)) {
+    original_na_mask <- is.na(attribute_vector)
+  }
+  
+  # Impute NAs to global mean
+  global_mean <- mean(attribute_vector, na.rm = TRUE)
+  attribute_imputed <- ifelse(is.na(attribute_vector), 
+                              global_mean, 
+                              attribute_vector)
+  
+  # Compute spatial lag
+  spatial_lag <- weight_matrix %*% attribute_imputed
+  spatial_lag <- as.vector(spatial_lag)
+  
+  return(list(
+    lag = spatial_lag,
+    imputed = attribute_imputed,
+    na_mask = original_na_mask
+  ))
+}
+
+# Usage:
+lag_result_tess <- compute_spatial_lag(tess_counts$n, W_std_tess)
+lag_tess        <- lag_result_tess$lag
+n_imputed_tess  <- lag_result_tess$imputed
+na_mask_tess    <- lag_result_tess$na_mask
+```
+
+## Function 4: Standardize and Assign LISA Quadrants (New helper)
+
+Combines z-score normalization and quadrant logic:
+
+```{r}
+#| eval: false
+
+# Standardize attribute and lag, then assign LISA quadrants.
+# Args:
+#   attribute_vector: numeric vector
+#   spatial_lag_vector: numeric vector (spatial lag of attribute)
+# Returns:
+#   List with $z_attr, $z_lag, $quadrant
+
+assign_lisa_quadrants <- function(attribute_vector, spatial_lag_vector) {
+  # Standardize both
+  z_attr <- as.vector(scale(attribute_vector))
+  z_lag  <- as.vector(scale(spatial_lag_vector))
+  
+  # Assign quadrants
+  quadrant <- case_when(
+    z_attr > 0 & z_lag > 0 ~ "HH",
+    z_attr < 0 & z_lag < 0 ~ "LL",
+    z_attr > 0 & z_lag < 0 ~ "HL",
+    z_attr < 0 & z_lag > 0 ~ "LH",
+    TRUE ~ NA_character_
+  )
+  
+  return(list( z_attr = z_attr, z_lag = z_lag, quadrant = quadrant))
+}
+
+# Usage:
+lisa_result_tess <- assign_lisa_quadrants(tess_counts$n, lag_tess)
+tess_counts$lisa <- lisa_result_tess$quadrant
+
+lisa_result_county <- assign_lisa_quadrants(county_counts$n, lag_county)
+county_counts$lisa <- lisa_result_county$quadrant
+```
+
+## Function 5: Plot LISA Map with Consistent Styling
+
+Single function for all LISA choropleth maps:
+
+```{r}
+#| eval: false
+
+# Create a consistent LISA choropleth map.
+# Args:
+#   geometry_sf: sf object with 'lisa' column (HH, LL, HL, LH, NA)
+#   title: character, plot title
+# Returns:
+#   ggplot object
+
+plot_lisa_map <- function(geometry_sf, title = "LISA Map") {
+
+  lisa_colors <- c("HH" = "red", "LL" = "blue",  "HL" = "yellow", "LH" = "cyan", NA = "gray90")
+  
+  ggplot(geometry_sf) +
+    geom_sf(aes(fill = lisa), color = NA) +
+    scale_fill_manual(values = lisa_colors, na.value = "gray90") +
+    labs(title = title) +
+    theme_void() +
+    theme(legend.position = "bottom")
+}
+```
+
+
+# Question 5: Spatial Correlation & Lag
+
+## Step 5.1: Aggregating Dam Attributes by Tile (The Foundation)
+
+**Goal:** Each tessellation tile should have **mean aggregates** of dam characteristics.
+
+**Reuse `point_in_polygon()` from week-3-2 slides:** This handles spatial joins cleanly and preserves zero-dam tiles automatically.
+
+```{r}
+#| eval: false
+# SIMPLEST APPROACH: Use point_in_polygon() from Function 1 (week-3-2 classroom code)
+tess_counts <- point_in_polygon(dams_sf, your_cropped_tessellation, "tile_id")
+
+# To add mean attributes, join dams back and aggregate.
+# Column names match the NID dataset (check names(dams_sf) if unsure).
+tess_counts <- tess_counts %>%
+  st_join(dams_sf) %>%
+  group_by(tile_id) %>%
+  mutate(
+    mean_year_completed = mean(year_completed, na.rm = TRUE),
+    mean_surface_area   = mean(surface_area_acres, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  distinct(tile_id, .keep_all = TRUE)
+```
+
+**Troubleshooting:**
+- **Extra rows?** `st_join()` creates one row per dam-tile intersection. If a dam touches multiple tiles (on boundary), it gets counted multiple times. Use `st_join(..., largest = TRUE)` to assign each dam to its largest overlapping tile.
+- **Missing tiles?** If a tile has *zero* dams, `st_join()` may drop it. Use `right_join()` or `complete()` to restore all tiles with NA propagation, then impute NAs in the next step.
+- **Weird summary values?** Double-check your column names. NID column names are notoriously inconsistent (check `names(dams_sf)`).
+
+
+## Step 5.2: Neighbor Matrices & Spatial Lag (Watch for NAs!)
+
+**Goal:** Compute the average attribute of each tile's neighbors, revealing whether spatial neighbors are similar.
+
+### Building & Standardizing the Neighbor Matrix
+
+```{r}
+#| eval: false
+# Build standardized neighbor weights using the helper function.
+# This handles geometry validity, self-removal, and row-standardization.
+W_std <- standardize_weights(your_cropped_tessellation)
+
+# Quick validation checks
+stopifnot(is.matrix(W_std))
+stopifnot(all(rowSums(W_std) >= 0))
+```
+
+**Why row-standardization?** Without it, tiles with 8 neighbors overshadow those with 2 neighbors. Standardization puts all tiles on equal footing: each neighbor contributes equally (weight = 1/n_neighbors).
+
+**Common mistake:** Forgetting `diag(W) <- 0` means each tile counts itself as its own neighbor, biasing the lag calculation. The helper function does this automatically.
+
+### Computing Spatial Lag (Matrix multiplication)
+
+The lab asks you to compute lag and correlation for **all three attributes** (`n`, `mean_year_completed`, `mean_surface_area`) and summarise in a table. Apply the same pattern for each:
+
+```{r}
+#| eval: false
+# Repeat this pattern for each attribute.
+# The helper handles NA imputation to global mean automatically.
+
+# Dam count (n has no NAs — zeros for empty tiles, not NA)
+lag_result_n    <- compute_spatial_lag(tess_counts$n, W_std)
+
+# Mean year completed (NA where tile has no dams)
+lag_result_year <- compute_spatial_lag(tess_counts$mean_year_completed, W_std)
+
+# Mean surface area (NA where tile has no dams)
+lag_result_area <- compute_spatial_lag(tess_counts$mean_surface_area, W_std)
+
+# Correlation for each (use na_mask to exclude imputed values)
+cor_n    <- cor(lag_result_n$imputed,    lag_result_n$lag,    use = "complete.obs")
+cor_year <- cor(lag_result_year$imputed[!lag_result_year$na_mask],
+                lag_result_year$lag[!lag_result_year$na_mask], use = "complete.obs")
+cor_area <- cor(lag_result_area$imputed[!lag_result_area$na_mask],
+                lag_result_area$lag[!lag_result_area$na_mask], use = "complete.obs")
+
+# Validation:
+sum(is.na(lag_result_n$lag))  # Should be 0 (imputation worked)
+```
+
+**Why impute NAs?** Zero-dam tiles have `NA` mean_year (can't average). If you skip this:
+- Matrix multiplication produces `NaN` (0 * NA = NaN)
+- `cor()` fails: "no complete element pairs"
+- Your correlation analysis crashes
+
+**Why impute to global mean, not delete?** Deleting zero-dam tiles loses spatial structure—their *absence* of dams is information too. Imputation preserves the neighbor structure while computing lag.
+
+### Computing Correlations
+
+```{r}
+#| eval: false
+# Compute correlation using helper's NA mask so we only correlate
+# on originally-observed values (not those imputed to the global mean).
+# Assumes `lag_result` (from `compute_spatial_lag()`) is available.
+
+na_mask <- lag_result$na_mask
+cor_value <- cor(attribute_imputed[!na_mask], spatial_lag[!na_mask], use = "complete.obs")
+```
+
+### Interpreting Correlation Values
+
+| r value | Interpretation | Implication |
+|---------|---|---|
+| > 0.6 | Strong autocorrelation | Neighbors very similar; OLS regression will have spatially correlated errors |
+| 0.3–0.6 | Moderate autocorrelation | Neighbors somewhat similar; spatial effects present but not dominant |
+| < 0.3 | Weak autocorrelation | Neighbors dissimilar; spatial dependence minimal |
+| Negative | Anticorrelation | High-count tiles surrounded by low-count neighbors (rare; check data) |
+
+**Dam-specific insights:**
+- **n** (count) often shows strong correlation (r > 0.5) because dense regions naturally have dense neighbors
+- **mean_year** (age) moderate-to-strong if dams built in coherent eras (TVA 1930s–50s, Western dams 1960s–80s)
+- **mean_area** (size) weak-to-moderate; geology drives size, but geology varies regionally
+
+---
+
+## Step 5.3: Moran's I Scatterplot (Visual diagnosis)
+
+**Goal:** Plot **standardized** attribute (z-score) vs. its **standardized spatial lag** to visually assess global autocorrelation, with points colored by HH/LL/HL/LH quadrant.
+
+```{r}
+#| eval: false
+# Pick one attribute from Step 5.2 (lab asks for count or year_completed).
+# `assign_lisa_quadrants()` returns z_attr, z_lag, and quadrant — use those directly.
+lag_result  <- lag_result_n   # or lag_result_year / lag_result_area
+lisa_result <- assign_lisa_quadrants(lag_result$imputed, lag_result$lag)
+
+moran_data <- data.frame(
+  z     = lisa_result$z_attr,
+  lag_z = lisa_result$z_lag,
+  quad  = lisa_result$quadrant
+)
+
+ggplot(moran_data, aes(x = z, y = lag_z, color = quad)) +
+  geom_point(size = 2, alpha = 0.6) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
+  scale_color_manual(values = c("HH" = "#d73027", "LL" = "#4575b4",
+                                "HL" = "#fee090", "LH" = "#91bfdb"),
+                     na.value = "gray80") +
+  labs(title = "Moran Scatterplot",
+       x = "Standardized attribute", y = "Standardized spatial lag",
+       color = "Quadrant") +
+  theme_minimal()
+```
+
+**What to look for:**
+- **Points concentrated in upper-right (HH) and lower-left (LL):** strong positive autocorrelation
+- **Scattered / off-diagonal points:** weak autocorrelation or local anomalies
+- **HL / LH points:** outliers — a high tile surrounded by low neighbors (or vice versa)
+
+**Note:** Do **not** create a geographic map here — save local hotspot mapping for Q6.
+
+---
+
+# Question 6: LISA—Local Hotspots & Coldspots
+
+**In this question, you'll analyze LISA using your recommended tessellation from Q3 AND counties as a required comparison unit.**
+
+## Step 6.1: Cropping & Recomputing Counts (Easy to mess up!)
+
+**CRITICAL:** After you crop your tessellation in Q1.5, your tile counts change. You must **recompute dam counts** here because the geometry has shifted.
+
+```{r}
+#| eval: false
+# Use point_in_polygon() from week-3-2 to recompute counts cleanly
+tess_counts <- point_in_polygon(dams_sf, my_tessellation, "tile_id")
+
+county_counts <- point_in_polygon(dams_sf, counties, "GEOID")
+```
+
+**Common mistakes:**
+- Using old (uncropped) tessellation counts from Q3 → wrong boundaries
+- Forgetting that `st_join()` drops zero-dam features → restoring with `right_join()`
+- Mismatched ID columns → later joins fail
+
+---
+
+## Step 6.2: Neighbor Matrices (Reusable code)
+
+```{r}
+#| eval: false
+# Use the helper function to build and standardize neighbors
+W_std_tess <- standardize_weights(tess_counts)
+W_std_county <- standardize_weights(county_counts)
+```
+
+**Why counties are required:** Comparing regular grids (hexagons, squares) vs. administrative units (counties) is the **definition of MAUP**. They often reveal different local patterns—that's the point! Don't skip counties.
+
+---
+
+## Step 6.3: LISA Quadrants + Visualizations (Tessellation)
+
+Lab Step 6.3 requires **two plots for your tessellation**: (a) a Moran scatterplot and (b) a LISA geographic choropleth map.
+
+```{r}
+#| eval: false
+# --- Compute lag and quadrants for tessellation ---
+lag_result_tess  <- compute_spatial_lag(tess_counts$n, W_std_tess)
+lisa_result_tess <- assign_lisa_quadrants(lag_result_tess$imputed, lag_result_tess$lag)
+
+tess_counts$z      <- lisa_result_tess$z_attr
+tess_counts$lag_z  <- lisa_result_tess$z_lag
+tess_counts$lisa   <- lisa_result_tess$quadrant
+
+# (a) Moran scatterplot
+p_scatter_tess <- ggplot(tess_counts, aes(x = z, y = lag_z, color = lisa)) +
+  geom_point(size = 2, alpha = 0.6) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
+  scale_color_manual(values = c("HH" = "#d73027", "LL" = "#4575b4",
+                                "HL" = "#fee090", "LH" = "#91bfdb"),
+                     na.value = "gray80") +
+  labs(title = "LISA Scatter (Tessellation)",
+       x = "Standardized count", y = "Standardized lag", color = "Quadrant") +
+  theme_minimal()
+
+# (b) LISA geographic map
+p_map_tess <- plot_lisa_map(tess_counts, "LISA Map (Tessellation)")
+
+p_scatter_tess + p_map_tess
+```
+
+**Quadrant counts:**
+```{r}
+#| eval: false
+tess_counts %>% st_drop_geometry() %>% count(lisa)
+```
+
+---
+
+## Step 6.4: County Comparison (Required)
+
+Lab Step 6.4 requires repeating Steps 6.2–6.3 for counties and producing side-by-side LISA maps.
+
+```{r}
+#| eval: false
+# --- Repeat for counties ---
+lag_result_county  <- compute_spatial_lag(county_counts$n, W_std_county)
+lisa_result_county <- assign_lisa_quadrants(lag_result_county$imputed, lag_result_county$lag)
+
+county_counts$z     <- lisa_result_county$z_attr
+county_counts$lag_z <- lisa_result_county$z_lag
+county_counts$lisa  <- lisa_result_county$quadrant
+
+# Side-by-side LISA maps (required deliverable)
+p_tess   <- plot_lisa_map(tess_counts,   "LISA Map (Your Tessellation)")
+p_county <- plot_lisa_map(county_counts, "LISA Map (Counties)")
+
+p_tess + p_county
+```
+
+**Quantitative comparison:**
+```{r}
+#| eval: false
+list(
+  tessellation = tess_counts   %>% st_drop_geometry() %>% count(lisa),
+  counties     = county_counts %>% st_drop_geometry() %>% count(lisa)
+)
+```
+
+**Why this matters:** Identical colors in both panels mean visual differences reflect *unit choice*, not styling. When quadrant distributions differ (e.g., tessellation shows more HH, counties show more LL), that's MAUP operating at the local scale.
+
+---
+
+# Summary: Why Reusing Classroom Functions Matters
+
+Using the classroom `point_in_polygon()` function (week-3-2) plus 4 new helpers transforms Q5–Q6 from ~150 lines of repetitive code to ~40 focused lines:
+
+| Without Functions | With Functions | Benefit |
+|---|---|---|
+| 20 lines to count dams twice (tess + county) | 2 lines: `point_in_polygon(dams_sf, tess, id)` + `point_in_polygon(dams_sf, county, id)` | Reuse battle-tested classroom code; reduces copy-paste errors |
+| 15 lines to build/standardize neighbors twice | 2 lines: `standardize_weights(tess)` + `standardize_weights(county)` | Validation and edge-case handling encapsulated |
+| 25 lines to compute lag, impute, standardize twice | 4 lines: `compute_spatial_lag()` + `assign_lisa_quadrants()` | Complex logic tested once, reused twice |
+| 30+ lines to plot LISA maps with consistent styling | 2 lines: `plot_lisa_map(tess)` + `plot_lisa_map(county)` | Guarantees identical colors/aesthetics; easier to modify later |
+
+**Total reduction:** From ~150 lines → ~40 lines, **with fewer bugs and clearer intent.**
+
+**Key insight:** Spatial analysis is fundamentally repetitive—you compute the same statistics on different units (tessellation vs. counties). Functions let you encapsulate the logic once and apply it everywhere. This is not just about code length; it's about *cognitive load*. When you read `W_std_tess <- standardize_weights(tess_counts)`, you immediately understand: "Build and standardize neighbor weights for tessellation." No need to parse 15 lines and mentally check for division-by-zero bugs.
+
+---
+
+# Final Tips
+
+1. **Start by copying `point_in_polygon()` from week-3-2 slides.** This classroom function is your foundation for dam counting. Then add the 4 new helpers for spatial lag and LISA. This demonstrates that lecture material directly applies to labs!
+
+2. **Validate early**: Check dimensions, NAs, and summary stats after each major step. Use the helper functions' built-in validation (e.g., `st_make_valid()` in `standardize_weights()`).
+
+3. **Geographic knowledge matters**: If you don't know where the TVA is, look it up. Your interpretation will be richer. Use the helper functions to focus on *what* the data says, not *how* to manipulate it.
+
+4. **MAUP is the point**: Don't dismiss differences between tessellation and counties as "noise." They're illustrating the modifiable areal unit problem in action. The helper functions make comparison effortless—use that to explore robustness.
+
+5. **Tell a story**: Your findings should flow: Q5 (global correlation) → Q6a/b (geographic hotspots/coldspots) → Q6c (MAUP) → Q6d (management implications). Clean code from helper functions lets you focus on narrative.
+
+---
+
+# Quick Reference: Complete Q6 Workflow
+
+Here's what a clean Q6 script looks like using the classroom `point_in_polygon()` plus helper functions:
+
+```{r}
+#| eval: false
+# 1. Copy helper functions from this guide
+point_in_polygon <- function(points, polygon, var) { ... }  # From week-3-2 slides
+standardize_weights <- function(geometry_sf) { ... }
+compute_spatial_lag <- function(attribute_vector, weight_matrix, ...) { ... }
+assign_lisa_quadrants <- function(attribute_vector, spatial_lag_vector) { ... }
+plot_lisa_map <- function(geometry_sf, title = "LISA Map") { ... }
+
+# 2. Crop tessellation and counties (from Q1.4)
+my_tess <- hexagon_clipped  # Already cropped in Q1.5
+counties <- aoi_get(state = "conus", county = "all") %>% st_transform(5070)
+
+# 3. Count dams using point_in_polygon() from week-3-2
+tess_counts   <- point_in_polygon(dams_sf, my_tess,  "tile_id")  # counts stored in `n`
+county_counts <- point_in_polygon(dams_sf, counties, "GEOID")   # counts stored in `n`
+
+# 4. Build neighbor weights
+W_std_tess <- standardize_weights(tess_counts)
+W_std_county <- standardize_weights(county_counts)
+
+# 5. Compute spatial lag and LISA
+lag_tess  <- compute_spatial_lag(tess_counts$n, W_std_tess)
+lisa_tess <- assign_lisa_quadrants(lag_tess$imputed, lag_tess$lag)
+tess_counts$lisa <- lisa_tess$quadrant
+
+lag_county  <- compute_spatial_lag(county_counts$n, W_std_county)
+lisa_county <- assign_lisa_quadrants(lag_county$imputed, lag_county$lag)
+county_counts$lisa <- lisa_county$quadrant
+
+# 6. Plot side-by-side
+p_tess <- plot_lisa_map(tess_counts, "LISA: Hexagon Grid")
+p_county <- plot_lisa_map(county_counts, "LISA: Counties")
+patchwork::p_tess + p_county
+
+# 7. Summarize quadrants
+list(
+  tess = tess_counts %>% st_drop_geometry() %>% count(lisa),
+  county = county_counts %>% st_drop_geometry() %>% count(lisa)
+)
+
+# 8. Now write your geographic interpretation (Q6.5)
+# - Identify major HH hotspots (TVA, Colorado River, etc.)
+# - Identify LL coldspots (deserts, mountains)
+# - Compare tessellation vs. county patterns → MAUP discussion
+```
+
+**Total lines of logic: ~40 lines, all testable and reusable.**
+
+---
+
+## Debugging Checklist
+
+| Problem | Likely Cause | Solution |
+|---|---|---|
+| `cor()` returns NA | NAs in spatial lag | Impute using `ifelse(is.na(x), global_mean, x)` |
+| `W_std` has NaN | Isolated tiles (no neighbors) → division by 0 | Set `W_std[rowSums(W)==0,] <- 0` after standardization |
+| Quadrant map is all gray | All `lisa` values are NA | Check: Are `z_attribute` and `z_lag` computed? Are they not all HH? |
+| County map looks weird | Counties missing or in wrong CRS | Check `st_crs()` and ensure all counties are present |
+| Moran scatterplot is flat | Weak autocorrelation (expected!) | This is not an error; weak r indicates spatial independence |
+| Too many HH tiles | Used raw counts instead of standardized | LISA requires standardized z-scores, not raw `n` |

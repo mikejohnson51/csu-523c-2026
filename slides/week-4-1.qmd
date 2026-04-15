@@ -780,12 +780,26 @@ plot(fc_elev)
 ```{r}
 library(osmdata)
 
-osm = osmdata::opq(st_bbox(st_transform(fc,4326))) |> 
-  add_osm_feature("water") |> 
-  osmdata_sf()
+# Note: Wrapped in try() because Overpass API may timeout
+osm <- try({
+  osmdata::opq(st_bbox(st_transform(fc, 4326))) |> 
+    add_osm_feature("water") |> 
+    osmdata_sf()
+}, silent = FALSE)
 
-(poly = osm$osm_polygons |> 
-  st_transform(crs(elev)))
+# If successful, extract polygons
+if (!inherits(osm, "try-error") && !is.null(osm$osm_polygons)) {
+  poly <- osm$osm_polygons |> st_transform(crs(elev))
+  cat("Water features loaded from OpenStreetMap\n")
+} else {
+  cat("Note: Overpass API unavailable; using demo water feature instead\n")
+  # Fallback: create a simple water feature within the Fort Collins extent
+  fc_center <- st_centroid(fc)
+  poly <- st_buffer(fc_center, 500) |>  # 500m buffer around city center
+    st_as_sf()
+}
+
+poly
 ```
 
 ##
@@ -973,16 +987,27 @@ library(climateR)
 
 AOI = AOI::aoi_get(state = 'CO') 
 
-system.time({ prcp = climateR::getTerraClim(AOI, "ppt", 
-                                            startDate = "2000-01-01", endDate = '2005-12-31') })
+# Wrapped in try() to handle potential API timeouts
+prcp <- try({
+  climateR::getTerraClim(AOI, "ppt", 
+                        startDate = "2000-01-01", endDate = '2005-12-31')
+}, silent = FALSE)
+
+# Check if successful
+if (inherits(prcp, "try-error")) {
+  cat("Note: Climate data API unavailable; skipping prcp analysis\n")
+} else {
+  system.time(print(prcp))
+}
 ```
 
 
 ```{r}
 # More on global below ...
-quarts = global(prcp$ppt, fivenum)
-
-(quarts = colMeans(quarts))
+if (!inherits(prcp, "try-error")) {
+  quarts = global(prcp$ppt, fivenum)
+  (quarts = colMeans(quarts))
+}
 
 (rcl = data.frame(quarts[1:4], quarts[2:5], 1:4))
 ```
@@ -1084,6 +1109,8 @@ lines(zoo::rollmean(profile,k = 10),
       col = "darkred", lwd = 3)
 ```
 
+# Map Algebra vs Matrix Algebra
+
 ## Map Algebra
 
 - Dana Tomlin (Tomlin 1990) defined a framework for the analyizing field data stored as grided values.
@@ -1171,12 +1198,12 @@ plot(f1)
 ::: columns
 ::: {.column width=50%}
 ```{r}
-matrix(1,nrow=25,ncol=25)
+matrix(1,nrow=5,ncol=5)
 ```
 :::
 ::: {.column width=50%}
 ```{r}
-mean(foco_elev[1:25, 1:25][,1])
+mean(foco_elev[1:5, 1:5][,1])
 
 na.omit(values(f1))[1]
 ```
@@ -1201,7 +1228,7 @@ aggregate(foco_elev, 10) |> plot()
 
 - For more complicated object zones, [exactextractr](https://github.com/isciences/exactextractr) is a fast and efficient R utility that binds the C++ `exactextract` tool. 
 
-- What is the county level mean January rainfall in California?
+- What is the county level mean January rainfall in Colorado?
 
 ```{r, fig.height=5}
 AOI = AOI::aoi_get(state = "CO", county = "all")
@@ -1211,7 +1238,7 @@ plot(AOI['janPTT'])
 
 ## What about the US?
 
-```{r}
+```{r, eval=FALSE}
 counties <-  AOI::aoi_get(state = "conus", county = "all")
   
 jan <- climateR::getTerraClim(counties, "ppt", startDate = "2000-01-01") 
@@ -1220,7 +1247,7 @@ counties$janPTT <-  exactextractr::exact_extract(jan$ppt, counties, "mean", prog
 ```
 
 
-```{r, fig.align="center", fig.height=5}
+```{r, fig.align="center", fig.height=5, eval=FALSE}
 plot(counties['janPTT'], border = NA, key.pos = 4)
 ```
 
@@ -1297,10 +1324,17 @@ library(climateR)
 params <-  c("ppt", "tmax", "tmin", "srad", "q")
 AOI   <-  AOI::aoi_get(state = "CO")
 
-co <-  climateR::getTerraClim(AOI, params, startDate = "2018-10-01")  %>% 
-  unlist() %>% 
-  rast() |> 
-  setNames(params)
+co <- try({
+  climateR::getTerraClim(AOI, params, startDate = "2018-10-01")  %>% 
+    unlist() %>% 
+    rast() |> 
+    setNames(params)
+}, silent = FALSE)
+
+if (!inherits(co, "try-error")) {
+  cat("Climate data loaded successfully\n")
+  print(co)
+}
 ```
 
 ## Colorado October 2018 climate
@@ -1396,7 +1430,7 @@ plot(clus_raster, col = RColorBrewer::brewer.pal(5, "Spectral"))
 
 ## Clustering at larger scales
 
-```{r}
+```{r, eval=FALSE}
 counties =  AOI::aoi_get(state = "conus", county = "all")
 params = c("tmax", "tmin", "ppt", "srad")
 
@@ -1407,7 +1441,7 @@ dat = climateR::getTerraClim(counties, params, startDate = "2018-06-01") %>%
   exactextractr::exact_extract(counties, "mean", progress = FALSE)
 ```
 
-```{r}
+```{r, eval=FALSE}
 dat = scale(dat)
 
 counties$clust8 = kmeans(dat, 8)$cluster
@@ -1449,5 +1483,74 @@ save_gif(
 ## Result
 
 ![](img/ppt.gif)
+
+---
+
+## Advanced Topic: Raster Reprojection
+
+Rasters often need to be transformed from one **Coordinate Reference System (CRS)** to another to match vector data, other rasters, or regional standards.
+
+**Example**: Landsat data (UTM) needs reprojection to match state plane or your analysis CRS.
+
+```{r}
+# Original raster: UTM zone 12N
+original_crs <- crs(elev)
+str(original_crs)
+res(elev)[1]
+
+# Reproject to geographic (WGS84)
+elev_wgs84 <- project(elev, "EPSG:4326")
+str(crs(elev_wgs84))
+res(elev_wgs84)[1]
+```
+
+**Risk**: Reprojection changes infered pixel coordinates AND resolution—always inspect results!
+
+
+## Resampling Methods: The Hidden Cost
+
+When reprojecting (or changing resolution), `terra` must **resample** pixels to fit the new grid that have been sheered, or changed in size:
+
+```{r}
+g = st_make_grid(ext(elev), n = 100) |> 
+  st_as_sf(crs = crs(elev))
+
+g2 = st_make_grid(ext(elev), n = 10) |> 
+  st_as_sf(crs = crs(elev)) |> 
+  st_transform(4326)
+```
+
+::: columns
+::: {.column width=50%}
+```{r}
+plot(g)
+```
+:::
+::: {.column width=50%}
+```{r}
+plot(g2)
+```
+:::
+:::
+
+## Different methods produce very different results.
+
+- Fall back to [GDAL](https://gdal.org/en/stable/programs/gdalwarp.html)
+
+- Main question: "how do you select and/or reduce value to a new grid value knowing each grid has 0:n contributors, and each contributor has a different weight (distance, area, etc)
+
+**Rule of Thumb**: Use `nearest` for categories, `bilienar/cubic` for continuous data. But, projection is always "lossy" and is slow.
+
+## Summary: Raster Reprojection & Resampling
+
+| Task | Method | Key Consideration |
+|------|--------|-------------------|
+| **Reproject to new CRS** | `project(rast, crs)` | Choose method: `nearest` (categorical) or `cubic` (continuous) |
+| **Change resolution** | `aggregate()` or `resample()` | Coarse = fast but lose detail; fine = slow |
+| **Inspect quality** | `plot()` side-by-side | Always visually verify reprojected/resampled output |
+| **Convert vector → raster** | `rasterize()` | Only when needed; many operations are faster in raster |
+| **Many analyses benefit from raster** | Map algebra, zonal stats, focal ops | But some tasks require vector topology |
+
+**Best practice**: Start with the appropriate format (vector or raster) for your analysis—don't convert back and forth.
 
 

@@ -443,7 +443,13 @@ Labs - with the exception of Lab 0 - are assigned on Wednesdays and due the foll
       <div class="item-icon icon-lab">🔬</div>
       <div class="item-type">Lab</div>
       <div class="item-link"><a href="labs/lab-03.html">Lab 3: MAUP in Practice</a></div>
-      <span class="badge-new">Due 4/15/26</span>
+      <span class="badge-new">Due 4/19/26</span>
+    </div>
+    <div class="week-item">
+      <div class="item-icon icon-lab">🔬</div>
+      <div class="item-type">Lab Hints</div>
+      <div class="item-link"><a href="labs/hints/lab-03-q5-q6-hints.html">Lab 3: Q5 and Q6 hints</a></div>
+      <span class="badge-new">new</span>
     </div>
   </div>
 </div>

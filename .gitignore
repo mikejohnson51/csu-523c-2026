@@ -4,6 +4,7 @@
 .Ruserdata
 slides/data
 labs/keys/*
+labs/data/*
 docs/labs/keys/*
 /.quarto/
 .DS_Store

@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="ESS 523c: Water Resource Data Science">
+<meta name="dcterms.date" content="2026-04-15">
+
+<title>Lab 3: Q5–Q6 Hints &amp; Tricks – ESS 523c</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-86daaaaad7353f9cc0c554efc1dd6d94.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-91f08874e50da1a069230c5ed37e6299.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../csu-rams-logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">ESS 523c</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/mikejohnson51/csu-523c-2026/"> <i class="bi bi-github" role="img" aria-label="ESS 523c">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#lab-3-q5q6-hints-tricks" id="toc-lab-3-q5q6-hints-tricks" class="nav-link active" data-scroll-target="#lab-3-q5q6-hints-tricks">Lab 3: Q5–Q6 Hints &amp; Tricks</a></li>
+  <li><a href="#overview-why-q5-q6-are-hard" id="toc-overview-why-q5-q6-are-hard" class="nav-link" data-scroll-target="#overview-why-q5-q6-are-hard">Overview: Why Q5 &amp; Q6 Are Hard</a></li>
+  <li><a href="#helper-functions-reduce-repetitive-code" id="toc-helper-functions-reduce-repetitive-code" class="nav-link" data-scroll-target="#helper-functions-reduce-repetitive-code">Helper Functions: Reduce Repetitive Code</a>
+  <ul class="collapse">
+  <li><a href="#function-1-reuse-point_in_polygon-from-week-3-2-lectures" id="toc-function-1-reuse-point_in_polygon-from-week-3-2-lectures" class="nav-link" data-scroll-target="#function-1-reuse-point_in_polygon-from-week-3-2-lectures">Function 1: Reuse point_in_polygon() from Week-3-2 Lectures</a></li>
+  <li><a href="#function-2-build-and-standardize-neighbor-matrix-new-helper" id="toc-function-2-build-and-standardize-neighbor-matrix-new-helper" class="nav-link" data-scroll-target="#function-2-build-and-standardize-neighbor-matrix-new-helper">Function 2: Build and Standardize Neighbor Matrix (New helper)</a></li>
+  <li><a href="#function-3-compute-spatial-lag-with-safe-imputation-new-helper" id="toc-function-3-compute-spatial-lag-with-safe-imputation-new-helper" class="nav-link" data-scroll-target="#function-3-compute-spatial-lag-with-safe-imputation-new-helper">Function 3: Compute Spatial Lag with Safe Imputation (New helper)</a></li>
+  <li><a href="#function-4-standardize-and-assign-lisa-quadrants-new-helper" id="toc-function-4-standardize-and-assign-lisa-quadrants-new-helper" class="nav-link" data-scroll-target="#function-4-standardize-and-assign-lisa-quadrants-new-helper">Function 4: Standardize and Assign LISA Quadrants (New helper)</a></li>
+  <li><a href="#function-5-plot-lisa-map-with-consistent-styling" id="toc-function-5-plot-lisa-map-with-consistent-styling" class="nav-link" data-scroll-target="#function-5-plot-lisa-map-with-consistent-styling">Function 5: Plot LISA Map with Consistent Styling</a></li>
+  </ul></li>
+  <li><a href="#question-5-spatial-correlation-lag" id="toc-question-5-spatial-correlation-lag" class="nav-link" data-scroll-target="#question-5-spatial-correlation-lag">Question 5: Spatial Correlation &amp; Lag</a>
+  <ul class="collapse">
+  <li><a href="#step-5.1-aggregating-dam-attributes-by-tile-the-foundation" id="toc-step-5.1-aggregating-dam-attributes-by-tile-the-foundation" class="nav-link" data-scroll-target="#step-5.1-aggregating-dam-attributes-by-tile-the-foundation">Step 5.1: Aggregating Dam Attributes by Tile (The Foundation)</a></li>
+  <li><a href="#step-5.2-neighbor-matrices-spatial-lag-watch-for-nas" id="toc-step-5.2-neighbor-matrices-spatial-lag-watch-for-nas" class="nav-link" data-scroll-target="#step-5.2-neighbor-matrices-spatial-lag-watch-for-nas">Step 5.2: Neighbor Matrices &amp; Spatial Lag (Watch for NAs!)</a>
+  <ul class="collapse">
+  <li><a href="#building-standardizing-the-neighbor-matrix" id="toc-building-standardizing-the-neighbor-matrix" class="nav-link" data-scroll-target="#building-standardizing-the-neighbor-matrix">Building &amp; Standardizing the Neighbor Matrix</a></li>
+  <li><a href="#computing-spatial-lag-matrix-multiplication" id="toc-computing-spatial-lag-matrix-multiplication" class="nav-link" data-scroll-target="#computing-spatial-lag-matrix-multiplication">Computing Spatial Lag (Matrix multiplication)</a></li>
+  <li><a href="#computing-correlations" id="toc-computing-correlations" class="nav-link" data-scroll-target="#computing-correlations">Computing Correlations</a></li>
+  <li><a href="#interpreting-correlation-values" id="toc-interpreting-correlation-values" class="nav-link" data-scroll-target="#interpreting-correlation-values">Interpreting Correlation Values</a></li>
+  </ul></li>
+  <li><a href="#step-5.3-morans-i-scatterplot-visual-diagnosis" id="toc-step-5.3-morans-i-scatterplot-visual-diagnosis" class="nav-link" data-scroll-target="#step-5.3-morans-i-scatterplot-visual-diagnosis">Step 5.3: Moran’s I Scatterplot (Visual diagnosis)</a></li>
+  </ul></li>
+  <li><a href="#question-6-lisalocal-hotspots-coldspots" id="toc-question-6-lisalocal-hotspots-coldspots" class="nav-link" data-scroll-target="#question-6-lisalocal-hotspots-coldspots">Question 6: LISA—Local Hotspots &amp; Coldspots</a>
+  <ul class="collapse">
+  <li><a href="#step-6.1-cropping-recomputing-counts-easy-to-mess-up" id="toc-step-6.1-cropping-recomputing-counts-easy-to-mess-up" class="nav-link" data-scroll-target="#step-6.1-cropping-recomputing-counts-easy-to-mess-up">Step 6.1: Cropping &amp; Recomputing Counts (Easy to mess up!)</a></li>
+  <li><a href="#step-6.2-neighbor-matrices-reusable-code" id="toc-step-6.2-neighbor-matrices-reusable-code" class="nav-link" data-scroll-target="#step-6.2-neighbor-matrices-reusable-code">Step 6.2: Neighbor Matrices (Reusable code)</a></li>
+  <li><a href="#step-6.3-lisa-quadrants-visualizations-tessellation" id="toc-step-6.3-lisa-quadrants-visualizations-tessellation" class="nav-link" data-scroll-target="#step-6.3-lisa-quadrants-visualizations-tessellation">Step 6.3: LISA Quadrants + Visualizations (Tessellation)</a></li>
+  <li><a href="#step-6.4-county-comparison-required" id="toc-step-6.4-county-comparison-required" class="nav-link" data-scroll-target="#step-6.4-county-comparison-required">Step 6.4: County Comparison (Required)</a></li>
+  </ul></li>
+  <li><a href="#summary-why-reusing-classroom-functions-matters" id="toc-summary-why-reusing-classroom-functions-matters" class="nav-link" data-scroll-target="#summary-why-reusing-classroom-functions-matters">Summary: Why Reusing Classroom Functions Matters</a></li>
+  <li><a href="#final-tips" id="toc-final-tips" class="nav-link" data-scroll-target="#final-tips">Final Tips</a></li>
+  <li><a href="#quick-reference-complete-q6-workflow" id="toc-quick-reference-complete-q6-workflow" class="nav-link" data-scroll-target="#quick-reference-complete-q6-workflow">Quick Reference: Complete Q6 Workflow</a>
+  <ul class="collapse">
+  <li><a href="#debugging-checklist" id="toc-debugging-checklist" class="nav-link" data-scroll-target="#debugging-checklist">Debugging Checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 3: Q5–Q6 Hints &amp; Tricks</h1>
+<p class="subtitle lead">Spatial Correlation and LISA — Reducing Repetitive Code</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>ESS 523c: Water Resource Data Science </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 15, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="lab-3-q5q6-hints-tricks" class="level1">
+<h1>Lab 3: Q5–Q6 Hints &amp; Tricks</h1>
+<p>This document provides guidance for <strong>Question 5 (Spatial Correlation)</strong> and <strong>Question 6 (LISA: Local Hotspots/Coldspots)</strong>. These questions are challenging because they blend <strong>numerical/matrix operations</strong> with <strong>geographic interpretation</strong>.</p>
+<hr>
+</section>
+<section id="overview-why-q5-q6-are-hard" class="level1">
+<h1>Overview: Why Q5 &amp; Q6 Are Hard</h1>
+<p><strong>Q5 (Spatial Correlation):</strong></p>
+<ul>
+<li><p>Requires converting spatial neighbors into <strong>matrix form</strong> and computing matrix multiplication</p></li>
+<li><p>NA handling in spatial lag calculations will break your <code>cor()</code> call if not done carefully</p></li>
+<li><p>Interpretation requires connecting statistics (r = 0.62) to dam geography</p></li>
+</ul>
+<p><strong>Q6 (LISA Local Autocorrelation):</strong></p>
+<ul>
+<li><p>Extends Q5 matrices to produce <strong>4 quadrant categories</strong> (HH, LL, HL, LH)</p></li>
+<li><p>Requires a <strong>required side-by-side comparison</strong> with counties</p></li>
+<li><p>MAUP interpretation demands explaining <em>why</em> two different units reveal different patterns</p></li>
+<li><p>Geographic synthesis is deep: identifying specific hotspots (TVA), coldspots (deserts), and anomalies</p></li>
+</ul>
+</section>
+<section id="helper-functions-reduce-repetitive-code" class="level1">
+<h1>Helper Functions: Reduce Repetitive Code</h1>
+<p><strong>Reuse the classroom function:</strong> You already learned <code>point_in_polygon()</code> in week-3-2 lectures! This section shows how to use it for dam counting, plus 4 additional helpers for spatial lag and LISA analysis.</p>
+<section id="function-1-reuse-point_in_polygon-from-week-3-2-lectures" class="level2">
+<h2 class="anchored" data-anchor-id="function-1-reuse-point_in_polygon-from-week-3-2-lectures">Function 1: Reuse point_in_polygon() from Week-3-2 Lectures</h2>
+<p>The week-3-2 slides introduced an efficient point-in-polygon function. <strong>Copy it directly from the slides - this is the basic version:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>point_in_polygon <span class="ot">=</span> <span class="cf">function</span>(points, polygon, var){</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_join</span>(polygon, points) <span class="sc">|&gt;</span> </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_drop_geometry</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="fu">get</span>(var)) <span class="sc">|&gt;</span> </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(<span class="fu">c</span>(var, <span class="st">"n"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(polygon, <span class="at">by =</span> var) <span class="sc">|&gt;</span> </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_as_sf</span>() </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>tess_counts <span class="ot">&lt;-</span> <span class="fu">point_in_polygon</span>(dams_sf, my_tessellation, <span class="st">"tile_id"</span>) </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>county_counts <span class="ot">&lt;-</span> <span class="fu">point_in_polygon</span>(dams_sf, counties, <span class="st">"GEOID"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Why reuse?</strong> This function is tested in class, handles the spatial join correctly, and avoids reinventing the wheel.</p>
+</section>
+<section id="function-2-build-and-standardize-neighbor-matrix-new-helper" class="level2">
+<h2 class="anchored" data-anchor-id="function-2-build-and-standardize-neighbor-matrix-new-helper">Function 2: Build and Standardize Neighbor Matrix (New helper)</h2>
+<p>Combines neighbor matrix creation, self-removal, validation, and standardization:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create, clean, and row-standardize neighbor adjacency matrix.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Handles isolated polygons gracefully.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Args:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   geometry_sf: sf object with valid geometries</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   row-standardized weight matrix (sparse handling included)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>standardize_weights <span class="ot">&lt;-</span> <span class="cf">function</span>(geometry_sf) {</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check validity</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">any</span>(<span class="sc">!</span><span class="fu">st_is_valid</span>(geometry_sf))) {</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    geometry_sf <span class="ot">&lt;-</span> <span class="fu">st_make_valid</span>(geometry_sf)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Binary neighbor matrix</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  W <span class="ot">&lt;-</span> <span class="fu">st_touches</span>(geometry_sf, <span class="at">sparse =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">diag</span>(W) <span class="ot">&lt;-</span> <span class="dv">0</span>  <span class="co"># Remove self-neighbors</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Row-standardize (handles isolated tiles)</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  W_std <span class="ot">&lt;-</span> W <span class="sc">/</span> <span class="fu">rowSums</span>(W)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  W_std[<span class="fu">rowSums</span>(W) <span class="sc">==</span> <span class="dv">0</span>, ] <span class="ot">&lt;-</span> <span class="dv">0</span>  <span class="co"># Replace NaN (no neighbors) with 0</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(W_std)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage:</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>W_std_tess   <span class="ot">&lt;-</span> <span class="fu">standardize_weights</span>(tess_counts)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>W_std_county <span class="ot">&lt;-</span> <span class="fu">standardize_weights</span>(county_counts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="function-3-compute-spatial-lag-with-safe-imputation-new-helper" class="level2">
+<h2 class="anchored" data-anchor-id="function-3-compute-spatial-lag-with-safe-imputation-new-helper">Function 3: Compute Spatial Lag with Safe Imputation (New helper)</h2>
+<p>Automates NA imputation and lag calculation:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute spatial lag of an attribute via matrix multiplication.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Imputes NAs to global mean before lag calculation.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Args:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   attribute_vector: numeric vector (may contain NAs)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   weight_matrix: row-standardized weight matrix</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   original_na_mask: logical vector marking which values were originally NA</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#                     (optional; used later for selective correlation)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   List with $lag (spatial lag), $imputed (imputed attribute), </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   $na_mask (original NAs)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>compute_spatial_lag <span class="ot">&lt;-</span> <span class="cf">function</span>(attribute_vector, weight_matrix, </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                                <span class="at">original_na_mask =</span> <span class="cn">NULL</span>) {</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Record which values were originally NA</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(original_na_mask)) {</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    original_na_mask <span class="ot">&lt;-</span> <span class="fu">is.na</span>(attribute_vector)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Impute NAs to global mean</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  global_mean <span class="ot">&lt;-</span> <span class="fu">mean</span>(attribute_vector, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  attribute_imputed <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(attribute_vector), </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                              global_mean, </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>                              attribute_vector)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute spatial lag</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  spatial_lag <span class="ot">&lt;-</span> weight_matrix <span class="sc">%*%</span> attribute_imputed</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  spatial_lag <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(spatial_lag)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">lag =</span> spatial_lag,</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">imputed =</span> attribute_imputed,</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">na_mask =</span> original_na_mask</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage:</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>lag_result_tess <span class="ot">&lt;-</span> <span class="fu">compute_spatial_lag</span>(tess_counts<span class="sc">$</span>n, W_std_tess)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>lag_tess        <span class="ot">&lt;-</span> lag_result_tess<span class="sc">$</span>lag</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>n_imputed_tess  <span class="ot">&lt;-</span> lag_result_tess<span class="sc">$</span>imputed</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>na_mask_tess    <span class="ot">&lt;-</span> lag_result_tess<span class="sc">$</span>na_mask</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="function-4-standardize-and-assign-lisa-quadrants-new-helper" class="level2">
+<h2 class="anchored" data-anchor-id="function-4-standardize-and-assign-lisa-quadrants-new-helper">Function 4: Standardize and Assign LISA Quadrants (New helper)</h2>
+<p>Combines z-score normalization and quadrant logic:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize attribute and lag, then assign LISA quadrants.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Args:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   attribute_vector: numeric vector</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   spatial_lag_vector: numeric vector (spatial lag of attribute)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns:</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   List with $z_attr, $z_lag, $quadrant</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>assign_lisa_quadrants <span class="ot">&lt;-</span> <span class="cf">function</span>(attribute_vector, spatial_lag_vector) {</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Standardize both</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  z_attr <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">scale</span>(attribute_vector))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  z_lag  <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">scale</span>(spatial_lag_vector))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Assign quadrants</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  quadrant <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    z_attr <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> z_lag <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"HH"</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    z_attr <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> z_lag <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"LL"</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    z_attr <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> z_lag <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"HL"</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    z_attr <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> z_lag <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"LH"</span>,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>( <span class="at">z_attr =</span> z_attr, <span class="at">z_lag =</span> z_lag, <span class="at">quadrant =</span> quadrant))</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage:</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>lisa_result_tess <span class="ot">&lt;-</span> <span class="fu">assign_lisa_quadrants</span>(tess_counts<span class="sc">$</span>n, lag_tess)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>tess_counts<span class="sc">$</span>lisa <span class="ot">&lt;-</span> lisa_result_tess<span class="sc">$</span>quadrant</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>lisa_result_county <span class="ot">&lt;-</span> <span class="fu">assign_lisa_quadrants</span>(county_counts<span class="sc">$</span>n, lag_county)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>county_counts<span class="sc">$</span>lisa <span class="ot">&lt;-</span> lisa_result_county<span class="sc">$</span>quadrant</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="function-5-plot-lisa-map-with-consistent-styling" class="level2">
+<h2 class="anchored" data-anchor-id="function-5-plot-lisa-map-with-consistent-styling">Function 5: Plot LISA Map with Consistent Styling</h2>
+<p>Single function for all LISA choropleth maps:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a consistent LISA choropleth map.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Args:</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   geometry_sf: sf object with 'lisa' column (HH, LL, HL, LH, NA)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   title: character, plot title</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot object</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plot_lisa_map <span class="ot">&lt;-</span> <span class="cf">function</span>(geometry_sf, <span class="at">title =</span> <span class="st">"LISA Map"</span>) {</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  lisa_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"HH"</span> <span class="ot">=</span> <span class="st">"red"</span>, <span class="st">"LL"</span> <span class="ot">=</span> <span class="st">"blue"</span>,  <span class="st">"HL"</span> <span class="ot">=</span> <span class="st">"yellow"</span>, <span class="st">"LH"</span> <span class="ot">=</span> <span class="st">"cyan"</span>, <span class="at">NA =</span> <span class="st">"gray90"</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(geometry_sf) <span class="sc">+</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> lisa), <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> lisa_colors, <span class="at">na.value =</span> <span class="st">"gray90"</span>) <span class="sc">+</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> title) <span class="sc">+</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="question-5-spatial-correlation-lag" class="level1">
+<h1>Question 5: Spatial Correlation &amp; Lag</h1>
+<section id="step-5.1-aggregating-dam-attributes-by-tile-the-foundation" class="level2">
+<h2 class="anchored" data-anchor-id="step-5.1-aggregating-dam-attributes-by-tile-the-foundation">Step 5.1: Aggregating Dam Attributes by Tile (The Foundation)</h2>
+<p><strong>Goal:</strong> Each tessellation tile should have <strong>mean aggregates</strong> of dam characteristics.</p>
+<p><strong>Reuse <code>point_in_polygon()</code> from week-3-2 slides:</strong> This handles spatial joins cleanly and preserves zero-dam tiles automatically.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SIMPLEST APPROACH: Use point_in_polygon() from Function 1 (week-3-2 classroom code)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>tess_counts <span class="ot">&lt;-</span> <span class="fu">point_in_polygon</span>(dams_sf, your_cropped_tessellation, <span class="st">"tile_id"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To add mean attributes, join dams back and aggregate.</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Column names match the NID dataset (check names(dams_sf) if unsure).</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>tess_counts <span class="ot">&lt;-</span> tess_counts <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_join</span>(dams_sf) <span class="sc">%&gt;%</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tile_id) <span class="sc">%&gt;%</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_year_completed =</span> <span class="fu">mean</span>(year_completed, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_surface_area   =</span> <span class="fu">mean</span>(surface_area_acres, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(tile_id, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Troubleshooting:</strong> - <strong>Extra rows?</strong> <code>st_join()</code> creates one row per dam-tile intersection. If a dam touches multiple tiles (on boundary), it gets counted multiple times. Use <code>st_join(..., largest = TRUE)</code> to assign each dam to its largest overlapping tile. - <strong>Missing tiles?</strong> If a tile has <em>zero</em> dams, <code>st_join()</code> may drop it. Use <code>right_join()</code> or <code>complete()</code> to restore all tiles with NA propagation, then impute NAs in the next step. - <strong>Weird summary values?</strong> Double-check your column names. NID column names are notoriously inconsistent (check <code>names(dams_sf)</code>).</p>
+</section>
+<section id="step-5.2-neighbor-matrices-spatial-lag-watch-for-nas" class="level2">
+<h2 class="anchored" data-anchor-id="step-5.2-neighbor-matrices-spatial-lag-watch-for-nas">Step 5.2: Neighbor Matrices &amp; Spatial Lag (Watch for NAs!)</h2>
+<p><strong>Goal:</strong> Compute the average attribute of each tile’s neighbors, revealing whether spatial neighbors are similar.</p>
+<section id="building-standardizing-the-neighbor-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="building-standardizing-the-neighbor-matrix">Building &amp; Standardizing the Neighbor Matrix</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build standardized neighbor weights using the helper function.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># This handles geometry validity, self-removal, and row-standardization.</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>W_std <span class="ot">&lt;-</span> <span class="fu">standardize_weights</span>(your_cropped_tessellation)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick validation checks</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">is.matrix</span>(W_std))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">rowSums</span>(W_std) <span class="sc">&gt;=</span> <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Why row-standardization?</strong> Without it, tiles with 8 neighbors overshadow those with 2 neighbors. Standardization puts all tiles on equal footing: each neighbor contributes equally (weight = 1/n_neighbors).</p>
+<p><strong>Common mistake:</strong> Forgetting <code>diag(W) &lt;- 0</code> means each tile counts itself as its own neighbor, biasing the lag calculation. The helper function does this automatically.</p>
+</section>
+<section id="computing-spatial-lag-matrix-multiplication" class="level3">
+<h3 class="anchored" data-anchor-id="computing-spatial-lag-matrix-multiplication">Computing Spatial Lag (Matrix multiplication)</h3>
+<p>The lab asks you to compute lag and correlation for <strong>all three attributes</strong> (<code>n</code>, <code>mean_year_completed</code>, <code>mean_surface_area</code>) and summarise in a table. Apply the same pattern for each:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Repeat this pattern for each attribute.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The helper handles NA imputation to global mean automatically.</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Dam count (n has no NAs — zeros for empty tiles, not NA)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>lag_result_n    <span class="ot">&lt;-</span> <span class="fu">compute_spatial_lag</span>(tess_counts<span class="sc">$</span>n, W_std)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean year completed (NA where tile has no dams)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>lag_result_year <span class="ot">&lt;-</span> <span class="fu">compute_spatial_lag</span>(tess_counts<span class="sc">$</span>mean_year_completed, W_std)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean surface area (NA where tile has no dams)</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>lag_result_area <span class="ot">&lt;-</span> <span class="fu">compute_spatial_lag</span>(tess_counts<span class="sc">$</span>mean_surface_area, W_std)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Correlation for each (use na_mask to exclude imputed values)</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>cor_n    <span class="ot">&lt;-</span> <span class="fu">cor</span>(lag_result_n<span class="sc">$</span>imputed,    lag_result_n<span class="sc">$</span>lag,    <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>cor_year <span class="ot">&lt;-</span> <span class="fu">cor</span>(lag_result_year<span class="sc">$</span>imputed[<span class="sc">!</span>lag_result_year<span class="sc">$</span>na_mask],</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                lag_result_year<span class="sc">$</span>lag[<span class="sc">!</span>lag_result_year<span class="sc">$</span>na_mask], <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>cor_area <span class="ot">&lt;-</span> <span class="fu">cor</span>(lag_result_area<span class="sc">$</span>imputed[<span class="sc">!</span>lag_result_area<span class="sc">$</span>na_mask],</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>                lag_result_area<span class="sc">$</span>lag[<span class="sc">!</span>lag_result_area<span class="sc">$</span>na_mask], <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Validation:</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(lag_result_n<span class="sc">$</span>lag))  <span class="co"># Should be 0 (imputation worked)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Why impute NAs?</strong> Zero-dam tiles have <code>NA</code> mean_year (can’t average). If you skip this: - Matrix multiplication produces <code>NaN</code> (0 * NA = NaN) - <code>cor()</code> fails: “no complete element pairs” - Your correlation analysis crashes</p>
+<p><strong>Why impute to global mean, not delete?</strong> Deleting zero-dam tiles loses spatial structure—their <em>absence</em> of dams is information too. Imputation preserves the neighbor structure while computing lag.</p>
+</section>
+<section id="computing-correlations" class="level3">
+<h3 class="anchored" data-anchor-id="computing-correlations">Computing Correlations</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute correlation using helper's NA mask so we only correlate</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># on originally-observed values (not those imputed to the global mean).</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Assumes `lag_result` (from `compute_spatial_lag()`) is available.</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>na_mask <span class="ot">&lt;-</span> lag_result<span class="sc">$</span>na_mask</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>cor_value <span class="ot">&lt;-</span> <span class="fu">cor</span>(attribute_imputed[<span class="sc">!</span>na_mask], spatial_lag[<span class="sc">!</span>na_mask], <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="interpreting-correlation-values" class="level3">
+<h3 class="anchored" data-anchor-id="interpreting-correlation-values">Interpreting Correlation Values</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 60%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>r value</th>
+<th>Interpretation</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>&gt; 0.6</td>
+<td>Strong autocorrelation</td>
+<td>Neighbors very similar; OLS regression will have spatially correlated errors</td>
+</tr>
+<tr class="even">
+<td>0.3–0.6</td>
+<td>Moderate autocorrelation</td>
+<td>Neighbors somewhat similar; spatial effects present but not dominant</td>
+</tr>
+<tr class="odd">
+<td>&lt; 0.3</td>
+<td>Weak autocorrelation</td>
+<td>Neighbors dissimilar; spatial dependence minimal</td>
+</tr>
+<tr class="even">
+<td>Negative</td>
+<td>Anticorrelation</td>
+<td>High-count tiles surrounded by low-count neighbors (rare; check data)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Dam-specific insights:</strong> - <strong>n</strong> (count) often shows strong correlation (r &gt; 0.5) because dense regions naturally have dense neighbors - <strong>mean_year</strong> (age) moderate-to-strong if dams built in coherent eras (TVA 1930s–50s, Western dams 1960s–80s) - <strong>mean_area</strong> (size) weak-to-moderate; geology drives size, but geology varies regionally</p>
+<hr>
+</section>
+</section>
+<section id="step-5.3-morans-i-scatterplot-visual-diagnosis" class="level2">
+<h2 class="anchored" data-anchor-id="step-5.3-morans-i-scatterplot-visual-diagnosis">Step 5.3: Moran’s I Scatterplot (Visual diagnosis)</h2>
+<p><strong>Goal:</strong> Plot <strong>standardized</strong> attribute (z-score) vs.&nbsp;its <strong>standardized spatial lag</strong> to visually assess global autocorrelation, with points colored by HH/LL/HL/LH quadrant.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pick one attribute from Step 5.2 (lab asks for count or year_completed).</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># `assign_lisa_quadrants()` returns z_attr, z_lag, and quadrant — use those directly.</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>lag_result  <span class="ot">&lt;-</span> lag_result_n   <span class="co"># or lag_result_year / lag_result_area</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>lisa_result <span class="ot">&lt;-</span> <span class="fu">assign_lisa_quadrants</span>(lag_result<span class="sc">$</span>imputed, lag_result<span class="sc">$</span>lag)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>moran_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">z     =</span> lisa_result<span class="sc">$</span>z_attr,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag_z =</span> lisa_result<span class="sc">$</span>z_lag,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">quad  =</span> lisa_result<span class="sc">$</span>quadrant</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(moran_data, <span class="fu">aes</span>(<span class="at">x =</span> z, <span class="at">y =</span> lag_z, <span class="at">color =</span> quad)) <span class="sc">+</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray"</span>) <span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray"</span>) <span class="sc">+</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"HH"</span> <span class="ot">=</span> <span class="st">"#d73027"</span>, <span class="st">"LL"</span> <span class="ot">=</span> <span class="st">"#4575b4"</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"HL"</span> <span class="ot">=</span> <span class="st">"#fee090"</span>, <span class="st">"LH"</span> <span class="ot">=</span> <span class="st">"#91bfdb"</span>),</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                     <span class="at">na.value =</span> <span class="st">"gray80"</span>) <span class="sc">+</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Moran Scatterplot"</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Standardized attribute"</span>, <span class="at">y =</span> <span class="st">"Standardized spatial lag"</span>,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Quadrant"</span>) <span class="sc">+</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>What to look for:</strong> - <strong>Points concentrated in upper-right (HH) and lower-left (LL):</strong> strong positive autocorrelation - <strong>Scattered / off-diagonal points:</strong> weak autocorrelation or local anomalies - <strong>HL / LH points:</strong> outliers — a high tile surrounded by low neighbors (or vice versa)</p>
+<p><strong>Note:</strong> Do <strong>not</strong> create a geographic map here — save local hotspot mapping for Q6.</p>
+<hr>
+</section>
+</section>
+<section id="question-6-lisalocal-hotspots-coldspots" class="level1">
+<h1>Question 6: LISA—Local Hotspots &amp; Coldspots</h1>
+<p><strong>In this question, you’ll analyze LISA using your recommended tessellation from Q3 AND counties as a required comparison unit.</strong></p>
+<section id="step-6.1-cropping-recomputing-counts-easy-to-mess-up" class="level2">
+<h2 class="anchored" data-anchor-id="step-6.1-cropping-recomputing-counts-easy-to-mess-up">Step 6.1: Cropping &amp; Recomputing Counts (Easy to mess up!)</h2>
+<p><strong>CRITICAL:</strong> After you crop your tessellation in Q1.5, your tile counts change. You must <strong>recompute dam counts</strong> here because the geometry has shifted.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use point_in_polygon() from week-3-2 to recompute counts cleanly</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>tess_counts <span class="ot">&lt;-</span> <span class="fu">point_in_polygon</span>(dams_sf, my_tessellation, <span class="st">"tile_id"</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>county_counts <span class="ot">&lt;-</span> <span class="fu">point_in_polygon</span>(dams_sf, counties, <span class="st">"GEOID"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Common mistakes:</strong> - Using old (uncropped) tessellation counts from Q3 → wrong boundaries - Forgetting that <code>st_join()</code> drops zero-dam features → restoring with <code>right_join()</code> - Mismatched ID columns → later joins fail</p>
+<hr>
+</section>
+<section id="step-6.2-neighbor-matrices-reusable-code" class="level2">
+<h2 class="anchored" data-anchor-id="step-6.2-neighbor-matrices-reusable-code">Step 6.2: Neighbor Matrices (Reusable code)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the helper function to build and standardize neighbors</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>W_std_tess <span class="ot">&lt;-</span> <span class="fu">standardize_weights</span>(tess_counts)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>W_std_county <span class="ot">&lt;-</span> <span class="fu">standardize_weights</span>(county_counts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Why counties are required:</strong> Comparing regular grids (hexagons, squares) vs.&nbsp;administrative units (counties) is the <strong>definition of MAUP</strong>. They often reveal different local patterns—that’s the point! Don’t skip counties.</p>
+<hr>
+</section>
+<section id="step-6.3-lisa-quadrants-visualizations-tessellation" class="level2">
+<h2 class="anchored" data-anchor-id="step-6.3-lisa-quadrants-visualizations-tessellation">Step 6.3: LISA Quadrants + Visualizations (Tessellation)</h2>
+<p>Lab Step 6.3 requires <strong>two plots for your tessellation</strong>: (a) a Moran scatterplot and (b) a LISA geographic choropleth map.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Compute lag and quadrants for tessellation ---</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>lag_result_tess  <span class="ot">&lt;-</span> <span class="fu">compute_spatial_lag</span>(tess_counts<span class="sc">$</span>n, W_std_tess)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>lisa_result_tess <span class="ot">&lt;-</span> <span class="fu">assign_lisa_quadrants</span>(lag_result_tess<span class="sc">$</span>imputed, lag_result_tess<span class="sc">$</span>lag)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>tess_counts<span class="sc">$</span>z      <span class="ot">&lt;-</span> lisa_result_tess<span class="sc">$</span>z_attr</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>tess_counts<span class="sc">$</span>lag_z  <span class="ot">&lt;-</span> lisa_result_tess<span class="sc">$</span>z_lag</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>tess_counts<span class="sc">$</span>lisa   <span class="ot">&lt;-</span> lisa_result_tess<span class="sc">$</span>quadrant</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Moran scatterplot</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>p_scatter_tess <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(tess_counts, <span class="fu">aes</span>(<span class="at">x =</span> z, <span class="at">y =</span> lag_z, <span class="at">color =</span> lisa)) <span class="sc">+</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray"</span>) <span class="sc">+</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray"</span>) <span class="sc">+</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"HH"</span> <span class="ot">=</span> <span class="st">"#d73027"</span>, <span class="st">"LL"</span> <span class="ot">=</span> <span class="st">"#4575b4"</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"HL"</span> <span class="ot">=</span> <span class="st">"#fee090"</span>, <span class="st">"LH"</span> <span class="ot">=</span> <span class="st">"#91bfdb"</span>),</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>                     <span class="at">na.value =</span> <span class="st">"gray80"</span>) <span class="sc">+</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"LISA Scatter (Tessellation)"</span>,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Standardized count"</span>, <span class="at">y =</span> <span class="st">"Standardized lag"</span>, <span class="at">color =</span> <span class="st">"Quadrant"</span>) <span class="sc">+</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) LISA geographic map</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>p_map_tess <span class="ot">&lt;-</span> <span class="fu">plot_lisa_map</span>(tess_counts, <span class="st">"LISA Map (Tessellation)"</span>)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>p_scatter_tess <span class="sc">+</span> p_map_tess</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Quadrant counts:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tess_counts <span class="sc">%&gt;%</span> <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span> <span class="fu">count</span>(lisa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+</section>
+<section id="step-6.4-county-comparison-required" class="level2">
+<h2 class="anchored" data-anchor-id="step-6.4-county-comparison-required">Step 6.4: County Comparison (Required)</h2>
+<p>Lab Step 6.4 requires repeating Steps 6.2–6.3 for counties and producing side-by-side LISA maps.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Repeat for counties ---</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>lag_result_county  <span class="ot">&lt;-</span> <span class="fu">compute_spatial_lag</span>(county_counts<span class="sc">$</span>n, W_std_county)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>lisa_result_county <span class="ot">&lt;-</span> <span class="fu">assign_lisa_quadrants</span>(lag_result_county<span class="sc">$</span>imputed, lag_result_county<span class="sc">$</span>lag)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>county_counts<span class="sc">$</span>z     <span class="ot">&lt;-</span> lisa_result_county<span class="sc">$</span>z_attr</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>county_counts<span class="sc">$</span>lag_z <span class="ot">&lt;-</span> lisa_result_county<span class="sc">$</span>z_lag</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>county_counts<span class="sc">$</span>lisa  <span class="ot">&lt;-</span> lisa_result_county<span class="sc">$</span>quadrant</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Side-by-side LISA maps (required deliverable)</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>p_tess   <span class="ot">&lt;-</span> <span class="fu">plot_lisa_map</span>(tess_counts,   <span class="st">"LISA Map (Your Tessellation)"</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>p_county <span class="ot">&lt;-</span> <span class="fu">plot_lisa_map</span>(county_counts, <span class="st">"LISA Map (Counties)"</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>p_tess <span class="sc">+</span> p_county</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Quantitative comparison:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">tessellation =</span> tess_counts   <span class="sc">%&gt;%</span> <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span> <span class="fu">count</span>(lisa),</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">counties     =</span> county_counts <span class="sc">%&gt;%</span> <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span> <span class="fu">count</span>(lisa)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Why this matters:</strong> Identical colors in both panels mean visual differences reflect <em>unit choice</em>, not styling. When quadrant distributions differ (e.g., tessellation shows more HH, counties show more LL), that’s MAUP operating at the local scale.</p>
+<hr>
+</section>
+</section>
+<section id="summary-why-reusing-classroom-functions-matters" class="level1">
+<h1>Summary: Why Reusing Classroom Functions Matters</h1>
+<p>Using the classroom <code>point_in_polygon()</code> function (week-3-2) plus 4 new helpers transforms Q5–Q6 from ~150 lines of repetitive code to ~40 focused lines:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Without Functions</th>
+<th>With Functions</th>
+<th>Benefit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>20 lines to count dams twice (tess + county)</td>
+<td>2 lines: <code>point_in_polygon(dams_sf, tess, id)</code> + <code>point_in_polygon(dams_sf, county, id)</code></td>
+<td>Reuse battle-tested classroom code; reduces copy-paste errors</td>
+</tr>
+<tr class="even">
+<td>15 lines to build/standardize neighbors twice</td>
+<td>2 lines: <code>standardize_weights(tess)</code> + <code>standardize_weights(county)</code></td>
+<td>Validation and edge-case handling encapsulated</td>
+</tr>
+<tr class="odd">
+<td>25 lines to compute lag, impute, standardize twice</td>
+<td>4 lines: <code>compute_spatial_lag()</code> + <code>assign_lisa_quadrants()</code></td>
+<td>Complex logic tested once, reused twice</td>
+</tr>
+<tr class="even">
+<td>30+ lines to plot LISA maps with consistent styling</td>
+<td>2 lines: <code>plot_lisa_map(tess)</code> + <code>plot_lisa_map(county)</code></td>
+<td>Guarantees identical colors/aesthetics; easier to modify later</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total reduction:</strong> From ~150 lines → ~40 lines, <strong>with fewer bugs and clearer intent.</strong></p>
+<p><strong>Key insight:</strong> Spatial analysis is fundamentally repetitive—you compute the same statistics on different units (tessellation vs.&nbsp;counties). Functions let you encapsulate the logic once and apply it everywhere. This is not just about code length; it’s about <em>cognitive load</em>. When you read <code>W_std_tess &lt;- standardize_weights(tess_counts)</code>, you immediately understand: “Build and standardize neighbor weights for tessellation.” No need to parse 15 lines and mentally check for division-by-zero bugs.</p>
+<hr>
+</section>
+<section id="final-tips" class="level1">
+<h1>Final Tips</h1>
+<ol type="1">
+<li><p><strong>Start by copying <code>point_in_polygon()</code> from week-3-2 slides.</strong> This classroom function is your foundation for dam counting. Then add the 4 new helpers for spatial lag and LISA. This demonstrates that lecture material directly applies to labs!</p></li>
+<li><p><strong>Validate early</strong>: Check dimensions, NAs, and summary stats after each major step. Use the helper functions’ built-in validation (e.g., <code>st_make_valid()</code> in <code>standardize_weights()</code>).</p></li>
+<li><p><strong>Geographic knowledge matters</strong>: If you don’t know where the TVA is, look it up. Your interpretation will be richer. Use the helper functions to focus on <em>what</em> the data says, not <em>how</em> to manipulate it.</p></li>
+<li><p><strong>MAUP is the point</strong>: Don’t dismiss differences between tessellation and counties as “noise.” They’re illustrating the modifiable areal unit problem in action. The helper functions make comparison effortless—use that to explore robustness.</p></li>
+<li><p><strong>Tell a story</strong>: Your findings should flow: Q5 (global correlation) → Q6a/b (geographic hotspots/coldspots) → Q6c (MAUP) → Q6d (management implications). Clean code from helper functions lets you focus on narrative.</p></li>
+</ol>
+<hr>
+</section>
+<section id="quick-reference-complete-q6-workflow" class="level1">
+<h1>Quick Reference: Complete Q6 Workflow</h1>
+<p>Here’s what a clean Q6 script looks like using the classroom <code>point_in_polygon()</code> plus helper functions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Copy helper functions from this guide</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>point_in_polygon <span class="ot">&lt;-</span> <span class="cf">function</span>(points, polygon, var) { ... }  <span class="co"># From week-3-2 slides</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>standardize_weights <span class="ot">&lt;-</span> <span class="cf">function</span>(geometry_sf) { ... }</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>compute_spatial_lag <span class="ot">&lt;-</span> <span class="cf">function</span>(attribute_vector, weight_matrix, ...) { ... }</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>assign_lisa_quadrants <span class="ot">&lt;-</span> <span class="cf">function</span>(attribute_vector, spatial_lag_vector) { ... }</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>plot_lisa_map <span class="ot">&lt;-</span> <span class="cf">function</span>(geometry_sf, <span class="at">title =</span> <span class="st">"LISA Map"</span>) { ... }</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Crop tessellation and counties (from Q1.4)</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>my_tess <span class="ot">&lt;-</span> hexagon_clipped  <span class="co"># Already cropped in Q1.5</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>counties <span class="ot">&lt;-</span> <span class="fu">aoi_get</span>(<span class="at">state =</span> <span class="st">"conus"</span>, <span class="at">county =</span> <span class="st">"all"</span>) <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(<span class="dv">5070</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Count dams using point_in_polygon() from week-3-2</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>tess_counts   <span class="ot">&lt;-</span> <span class="fu">point_in_polygon</span>(dams_sf, my_tess,  <span class="st">"tile_id"</span>)  <span class="co"># counts stored in `n`</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>county_counts <span class="ot">&lt;-</span> <span class="fu">point_in_polygon</span>(dams_sf, counties, <span class="st">"GEOID"</span>)   <span class="co"># counts stored in `n`</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Build neighbor weights</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>W_std_tess <span class="ot">&lt;-</span> <span class="fu">standardize_weights</span>(tess_counts)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>W_std_county <span class="ot">&lt;-</span> <span class="fu">standardize_weights</span>(county_counts)</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Compute spatial lag and LISA</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>lag_tess  <span class="ot">&lt;-</span> <span class="fu">compute_spatial_lag</span>(tess_counts<span class="sc">$</span>n, W_std_tess)</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>lisa_tess <span class="ot">&lt;-</span> <span class="fu">assign_lisa_quadrants</span>(lag_tess<span class="sc">$</span>imputed, lag_tess<span class="sc">$</span>lag)</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>tess_counts<span class="sc">$</span>lisa <span class="ot">&lt;-</span> lisa_tess<span class="sc">$</span>quadrant</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>lag_county  <span class="ot">&lt;-</span> <span class="fu">compute_spatial_lag</span>(county_counts<span class="sc">$</span>n, W_std_county)</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>lisa_county <span class="ot">&lt;-</span> <span class="fu">assign_lisa_quadrants</span>(lag_county<span class="sc">$</span>imputed, lag_county<span class="sc">$</span>lag)</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>county_counts<span class="sc">$</span>lisa <span class="ot">&lt;-</span> lisa_county<span class="sc">$</span>quadrant</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Plot side-by-side</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>p_tess <span class="ot">&lt;-</span> <span class="fu">plot_lisa_map</span>(tess_counts, <span class="st">"LISA: Hexagon Grid"</span>)</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>p_county <span class="ot">&lt;-</span> <span class="fu">plot_lisa_map</span>(county_counts, <span class="st">"LISA: Counties"</span>)</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>patchwork<span class="sc">::</span>p_tess <span class="sc">+</span> p_county</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Summarize quadrants</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(</span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">tess =</span> tess_counts <span class="sc">%&gt;%</span> <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span> <span class="fu">count</span>(lisa),</span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">county =</span> county_counts <span class="sc">%&gt;%</span> <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span> <span class="fu">count</span>(lisa)</span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a><span class="co"># 8. Now write your geographic interpretation (Q6.5)</span></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a><span class="co"># - Identify major HH hotspots (TVA, Colorado River, etc.)</span></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a><span class="co"># - Identify LL coldspots (deserts, mountains)</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a><span class="co"># - Compare tessellation vs. county patterns → MAUP discussion</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Total lines of logic: ~40 lines, all testable and reusable.</strong></p>
+<hr>
+<section id="debugging-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="debugging-checklist">Debugging Checklist</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>cor()</code> returns NA</td>
+<td>NAs in spatial lag</td>
+<td>Impute using <code>ifelse(is.na(x), global_mean, x)</code></td>
+</tr>
+<tr class="even">
+<td><code>W_std</code> has NaN</td>
+<td>Isolated tiles (no neighbors) → division by 0</td>
+<td>Set <code>W_std[rowSums(W)==0,] &lt;- 0</code> after standardization</td>
+</tr>
+<tr class="odd">
+<td>Quadrant map is all gray</td>
+<td>All <code>lisa</code> values are NA</td>
+<td>Check: Are <code>z_attribute</code> and <code>z_lag</code> computed? Are they not all HH?</td>
+</tr>
+<tr class="even">
+<td>County map looks weird</td>
+<td>Counties missing or in wrong CRS</td>
+<td>Check <code>st_crs()</code> and ensure all counties are present</td>
+</tr>
+<tr class="odd">
+<td>Moran scatterplot is flat</td>
+<td>Weak autocorrelation (expected!)</td>
+<td>This is not an error; weak r indicates spatial independence</td>
+</tr>
+<tr class="even">
+<td>Too many HH tiles</td>
+<td>Used raw counts instead of standardized</td>
+<td>LISA requires standardized z-scores, not raw <code>n</code></td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
