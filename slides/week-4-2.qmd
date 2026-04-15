@@ -410,14 +410,11 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 
 **Lab 4 & this walkthrough execute all five steps for Palo 2016 flood.**
 
-::: columns
-::: {.column width="60%"}
 1. **Query STAC** → find scenes matching criteria (date, location, cloud cover)
 2. **Inspect metadata** → confirm cloud cover, available bands, data quality
 3. **Sign URLs** → authenticate access to cloud-hosted files
 4. **Download selectively** → you often need only 1–2 bands, not entire scenes
 5. **Load into `terra`** → treat as raster for analysis (NDVI, flood mapping, etc.)
-
 
 ## Why This Matters for Water Science
 
@@ -443,8 +440,6 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 
 ## Real-World STAC Catalogs for Water
 
-::: columns
-::: {.column width="50%"}
 - **Microsoft Planetary Computer**: 50+ datasets (Landsat, Sentinel-1/2, MODIS, ASTER, Climate models)
 - **AWS Registry of Open Data**: Open-access Landsat, Sentinel, NOAA, others
 - **Google Earth Engine**: Similar concept (not STAC-native, but queryable)
