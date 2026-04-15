@@ -19,8 +19,6 @@ library(ggplot2)
 library(patchwork)
 ```
 
-# Lab 3: Q5–Q6 Hints & Tricks
-
 This document provides guidance for **Question 5 (Spatial Correlation)** and **Question 6 (LISA: Local Hotspots/Coldspots)**. These questions are challenging because they blend **numerical/matrix operations** with **geographic interpretation**.
 
 ---

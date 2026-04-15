@@ -186,6 +186,29 @@
       margin-right: 0; 
     }
   </style>
+  <link href="../site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+  <script src="../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+  <script src="../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+  <link href="../site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+  <script src="../site_libs/leaflet-1.3.1/leaflet.js"></script>
+  <link href="../site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+  <script src="../site_libs/proj4-2.6.2/proj4.min.js"></script>
+  <script src="../site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+  <link href="../site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+  <script src="../site_libs/leaflet-binding-2.2.3/leaflet.js"></script>
+  <script src="../site_libs/leaflet-providers-2.0.0/leaflet-providers_2.0.0.js"></script>
+  <script src="../site_libs/leaflet-providers-plugin-2.2.3/leaflet-providers-plugin.js"></script>
+  <script src="../site_libs/HomeButton-0.0.1/home-button.js"></script>
+  <script src="../site_libs/HomeButton-0.0.1/easy-button-src.min.js"></script>
+  <link href="../site_libs/palo-CSS-0.0.1/palo_home-button.css" rel="stylesheet">
+  <script src="../site_libs/clipboard-0.0.1/setClipboardText.js"></script>
+  <link href="../site_libs/mapviewCSS-0.0.1/mapview-popup.css" rel="stylesheet">
+  <link href="../site_libs/mapviewCSS-0.0.1/mapview.css" rel="stylesheet">
+  <script src="../site_libs/carto - 1_93db42-1/data_stars_carto1e58c16.txt"></script>
+  <script src="../site_libs/joda-0.0.1/joda.js"></script>
+  <script src="../site_libs/joda-0.0.1/addImageQuery-bindings.js"></script>
+  <link href="../site_libs/carto___1-CSS-0.0.1/carto___1_home-button.css" rel="stylesheet">
+  <link href="../site_libs/filter_buildings__impact_-CSS-0.0.1/filter_buildings__impact__home-button.css" rel="stylesheet">
 </head>
 <body class="quarto-light">
 <script src="https://use.fontawesome.com/5235085b15.js"></script>
@@ -537,11 +560,11 @@
 <p>Microsoft Planetary Computer hosts large datasets (Landsat, Sentinel, Copernicus, MODIS, etc.) and requires <strong>signed URLs</strong> for access. The <code>rstac</code> package handles this automatically:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="co"># Sign all asset URLs for the first item</span></span>
-<span id="cb17-2"><a></a>item_signed <span class="ot">&lt;-</span> search<span class="sc">$</span>features <span class="sc">%&gt;%</span></span>
-<span id="cb17-3"><a></a>  rstac<span class="sc">::</span><span class="fu">items_sign</span>(rstac<span class="sc">::</span><span class="fu">sign_planetary_computer</span>())</span>
+<span id="cb17-2"><a></a>item_signed <span class="ot">&lt;-</span> search  <span class="sc">|&gt;</span> </span>
+<span id="cb17-3"><a></a>  <span class="fu">items_sign</span>(rstac<span class="sc">::</span><span class="fu">sign_planetary_computer</span>())</span>
 <span id="cb17-4"><a></a></span>
-<span id="cb17-5"><a></a>item_signed[[<span class="dv">1</span>]]<span class="sc">$</span>assets<span class="sc">$</span>green<span class="sc">$</span>href  <span class="co"># Now this URL is signed and ready for download</span></span>
-<span id="cb17-6"><a></a><span class="co">#&gt; [1] "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2016/025/031/LC08_L2SP_025031_20160926_20200906_02_T1/LC08_L2SP_025031_20160926_20200906_02_T1_SR_B3.TIF"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-5"><a></a>item_signed<span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>assets<span class="sc">$</span>green<span class="sc">$</span>href <span class="co"># Now this URL is signed and ready for download</span></span>
+<span id="cb17-6"><a></a><span class="co">#&gt; [1] "https://landsateuwest.blob.core.windows.net/landsat-c2/level-2/standard/oli-tirs/2016/025/031/LC08_L2SP_025031_20160926_20200906_02_T1/LC08_L2SP_025031_20160926_20200906_02_T1_SR_B3.TIF?st=2026-04-14T21%3A04%3A37Z&amp;se=2026-04-15T21%3A49%3A37Z&amp;sp=rl&amp;sv=2025-07-05&amp;sr=c&amp;skoid=9c8ff44a-6a2c-4dfb-b298-1c9212f64d9a&amp;sktid=72f988bf-86f1-41af-91ab-2d7cd011db47&amp;skt=2026-04-14T22%3A54%3A33Z&amp;ske=2026-04-21T22%3A54%3A33Z&amp;sks=b&amp;skv=2025-07-05&amp;sig=BFG%2FQ9BblNEiIcHeNmkY5WT56BKjn1sAYMafPYOgHHs%3D"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This avoids keeping credentials in your code—much more secure!</p>
 </section>
@@ -568,25 +591,43 @@
 <span id="cb18-17"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="asset-download" class="slide level2">
-<h2>Asset Download</h2>
+<section id="direct-read" class="slide level2">
+<h2>Direct read</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>stac_query <span class="ot">&lt;-</span> <span class="fu">stac</span>(<span class="st">"https://planetarycomputer.microsoft.com/api/stac/v1"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb19-2"><a></a>  <span class="fu">stac_search</span>(</span>
-<span id="cb19-3"><a></a>    <span class="at">collections =</span> <span class="st">"landsat-c2-l2"</span>,</span>
-<span id="cb19-4"><a></a>    <span class="at">datetime    =</span> <span class="st">"2016-09-24/2016-09-29"</span>,</span>
-<span id="cb19-5"><a></a>    <span class="at">bbox        =</span> <span class="fu">st_bbox</span>(palo),</span>
-<span id="cb19-6"><a></a>    <span class="at">limit       =</span> <span class="dv">1</span></span>
-<span id="cb19-7"><a></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb19-8"><a></a>  <span class="fu">get_request</span>() <span class="sc">|&gt;</span></span>
-<span id="cb19-9"><a></a>  <span class="fu">items_sign</span>(<span class="fu">sign_planetary_computer</span>())</span>
-<span id="cb19-10"><a></a></span>
-<span id="cb19-11"><a></a><span class="fu">assets_download</span>(</span>
-<span id="cb19-12"><a></a>  <span class="at">items      =</span> stac_query,</span>
-<span id="cb19-13"><a></a>  <span class="at">asset_names =</span>  <span class="fu">c</span>(<span class="st">'blue'</span>, <span class="st">'green'</span>, <span class="st">'red'</span>),</span>
-<span id="cb19-14"><a></a>  <span class="at">output_dir =</span> <span class="st">'labs/data'</span>,</span>
-<span id="cb19-15"><a></a>  <span class="at">overwrite  =</span> <span class="cn">FALSE</span></span>
-<span id="cb19-16"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>vsi <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(item_signed<span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>assets<span class="sc">$</span>green<span class="sc">$</span>href)</span>
+<span id="cb19-2"><a></a>vsi</span>
+<span id="cb19-3"><a></a><span class="co">#&gt; class       : SpatRaster </span></span>
+<span id="cb19-4"><a></a><span class="co">#&gt; size        : 7801, 7681, 1  (nrow, ncol, nlyr)</span></span>
+<span id="cb19-5"><a></a><span class="co">#&gt; resolution  : 30, 30  (x, y)</span></span>
+<span id="cb19-6"><a></a><span class="co">#&gt; extent      : 518085, 748515, 4506885, 4740915  (xmin, xmax, ymin, ymax)</span></span>
+<span id="cb19-7"><a></a><span class="co">#&gt; coord. ref. : WGS 84 / UTM zone 15N (EPSG:32615) </span></span>
+<span id="cb19-8"><a></a><span class="co">#&gt; source      : LC08_L2SP_025031_20160926_20200906_02_T1_SR_B3.TIF </span></span>
+<span id="cb19-9"><a></a><span class="co">#&gt; name        : LC08_L2SP_025031_20160926_20200906_02_T1_SR_B3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="assisted-asset-download" class="slide level2">
+<h2>Assisted Asset Download</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="fu">assets_download</span>(</span>
+<span id="cb20-2"><a></a>  <span class="at">items      =</span> item_signed,</span>
+<span id="cb20-3"><a></a>  <span class="at">asset_names =</span>  <span class="fu">c</span>(<span class="st">'blue'</span>, <span class="st">'green'</span>, <span class="st">'red'</span>),</span>
+<span id="cb20-4"><a></a>  <span class="at">output_dir =</span> <span class="st">'../labs/data'</span>,</span>
+<span id="cb20-5"><a></a>  <span class="at">overwrite  =</span> <span class="cn">FALSE</span></span>
+<span id="cb20-6"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="fu">list.files</span>( <span class="at">path =</span> <span class="st">"../labs/data"</span>,</span>
+<span id="cb21-2"><a></a>  <span class="at">pattern =</span> <span class="st">"*.TIF$"</span>,</span>
+<span id="cb21-3"><a></a>  <span class="at">recursive =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb21-4"><a></a>  <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb21-5"><a></a><span class="co">#&gt; [1] "../labs/data/landsat-c2/level-2/standard/oli-tirs/2016/025/031/LC08_L2SP_025031_20160926_20200906_02_T1/LC08_L2SP_025031_20160926_20200906_02_T1_SR_B1.TIF"</span></span>
+<span id="cb21-6"><a></a><span class="co">#&gt; [2] "../labs/data/landsat-c2/level-2/standard/oli-tirs/2016/025/031/LC08_L2SP_025031_20160926_20200906_02_T1/LC08_L2SP_025031_20160926_20200906_02_T1_SR_B2.TIF"</span></span>
+<span id="cb21-7"><a></a><span class="co">#&gt; [3] "../labs/data/landsat-c2/level-2/standard/oli-tirs/2016/025/031/LC08_L2SP_025031_20160926_20200906_02_T1/LC08_L2SP_025031_20160926_20200906_02_T1_SR_B3.TIF"</span></span>
+<span id="cb21-8"><a></a><span class="co">#&gt; [4] "../labs/data/landsat-c2/level-2/standard/oli-tirs/2016/025/031/LC08_L2SP_025031_20160926_20200906_02_T1/LC08_L2SP_025031_20160926_20200906_02_T1_SR_B4.TIF"</span></span>
+<span id="cb21-9"><a></a><span class="co">#&gt; [5] "../labs/data/landsat-c2/level-2/standard/oli-tirs/2016/025/031/LC08_L2SP_025031_20160926_20200906_02_T1/LC08_L2SP_025031_20160926_20200906_02_T1_SR_B5.TIF"</span></span>
+<span id="cb21-10"><a></a><span class="co">#&gt; [6] "../labs/data/landsat-c2/level-2/standard/oli-tirs/2016/025/031/LC08_L2SP_025031_20160926_20200906_02_T1/LC08_L2SP_025031_20160926_20200906_02_T1_SR_B6.TIF"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </div>
 </section>
 <section id="from-stac-to-analysis-the-full-workflow" class="slide level2">
@@ -607,19 +648,22 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 <li><strong>Download selectively</strong> → you often need only 1–2 bands, not entire scenes</li>
 <li><strong>Load into <code>terra</code></strong> → treat as raster for analysis (NDVI, flood mapping, etc.)</li>
 </ol>
-</div><div class="column" style="width:40%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="https://www.usgs.gov/media/images/landsat-data-flow.png" style="width:100.0%"></p>
-<figcaption>Cloud-to-analysis pipeline: no manual downloads needed</figcaption>
-</figure>
-</div>
-</div></div>
-</section>
 <section id="why-this-matters-for-water-science" class="slide level2">
 <h2>Why This Matters for Water Science</h2>
-<p><strong>Pre-STAC workflow</strong> (still common): - Click directories on EarthExplorer - Download entire scenes (10+ GB each) - Manual metadata tracking - Months to assemble regional datasets</p>
-<p><strong>With STAC + rstac</strong>: - Query programmatically in seconds - Download only what you need (individual bands, 50–100 MB) - Metadata is structured, version-controlled - Automated multi-year, multi-sensor analyses feasible</p>
+<p><strong>Pre-STAC workflow</strong> (still common):</p>
+<ul>
+<li><p>Click directories on EarthExplorer</p></li>
+<li><p>Download entire scenes (10+ GB each)</p></li>
+<li><p>Manual metadata tracking</p></li>
+<li><p>Months to assemble regional datasets</p></li>
+</ul>
+<p><strong>With STAC + rstac</strong>:</p>
+<ul>
+<li><p>Query programmatically in seconds</p></li>
+<li><p>Download only what you need (individual bands, 50–100 MB)</p></li>
+<li><p>Metadata is structured, version-controlled</p></li>
+<li><p>Automated multi-year, multi-sensor analyses feasible</p></li>
+</ul>
 </section>
 <section id="real-world-stac-catalogs-for-water" class="slide level2">
 <h2>Real-World STAC Catalogs for Water</h2>
@@ -633,29 +677,6 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 <li><strong>CBERS/INPE (Brazil)</strong>: Open satellite data via STAC</li>
 </ul>
 <p>All queryable programmatically from R with <code>rstac</code>.</p>
-</div><div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="https://stacspec.org/en/about/stac-spec/.png" style="width:100.0%"></p>
-<figcaption>STAC-compliant data archives provide global coverage</figcaption>
-</figure>
-</div>
-<p><strong>Example</strong>: A single STAC query can simultaneously search Landsat, Sentinel, and MODIS for the same AOI/date.</p>
-</div></div>
-</section>
-<section id="geojson-validation-tools" class="slide level2">
-<h2>GeoJSON Validation &amp; Tools</h2>
-<p><strong>Validate before sharing:</strong> - <strong>Online</strong>: https://geojson.io, https://geojsonlint.com - <strong>In R</strong>: <code>sf::st_is_valid()</code> checks geometry</p>
-<p><strong>Common issues</strong>: - Unclosed rings (last coordinate ≠ first) - Wrong coordinate order (lat,lon instead of lon,lat) - Invalid nested structures</p>
-</section>
-<section id="discussion-reflection" class="slide level2">
-<h2>Discussion &amp; Reflection</h2>
-<ul>
-<li><strong>How would you use STAC to study a recent flood or drought in your region?</strong></li>
-<li><strong>What tradeoffs exist between downloading all data vs.&nbsp;querying on-the-fly?</strong></li>
-<li><strong>How does cloud interoperability improve reproducibility in water research?</strong></li>
-</ul>
-</section>
 <section id="key-takeaways" class="slide level2">
 <h2>Key Takeaways</h2>
 <ol type="1">
@@ -665,106 +686,131 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 <li>Together, these <strong>unlock automated multi-year, multi-region analyses</strong></li>
 <li>For water science: <strong>combine satellite data with ground-truth</strong> (gauges, models) to answer critical operational questions</li>
 </ol>
+<hr>
 </section>
-<section id="complete-walkthrough-palo-2016-flood-analysis" class="slide level2">
-<h2>Complete Walkthrough: Palo 2016 Flood Analysis</h2>
-<h3 id="step-1-define-aoi-and-temporal-window">Step 1: Define AOI and Temporal Window</h3>
+<section id="complete-walkthrough" class="slide level2">
+<h2>Complete Walkthrough:</h2>
+<h3 id="palo-2016-flood-analysis">Palo 2016 Flood Analysis</h3>
+<h4 id="step-1-define-aoi-and-temporal-window">Step 1: Define AOI and Temporal Window</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="fu">library</span>(rstac)</span>
-<span id="cb21-2"><a></a><span class="fu">library</span>(terra)</span>
-<span id="cb21-3"><a></a><span class="fu">library</span>(sf)</span>
-<span id="cb21-4"><a></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb21-5"><a></a></span>
-<span id="cb21-6"><a></a><span class="co"># AOI: Palo, Iowa</span></span>
-<span id="cb21-7"><a></a>palo <span class="ot">&lt;-</span> AOI<span class="sc">::</span><span class="fu">geocode</span>(<span class="st">"Palo, Iowa"</span>, <span class="at">bbox =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb21-8"><a></a></span>
-<span id="cb21-9"><a></a><span class="co"># Flood occurred Sept 26, 2016; search Sept 24–29 for cloud-free imagery</span></span>
-<span id="cb21-10"><a></a>temporal_range <span class="ot">&lt;-</span> <span class="st">"2016-09-24/2016-09-29"</span></span>
-<span id="cb21-11"><a></a><span class="fu">cat</span>(<span class="st">"Searching for Landsat 8 L2 data...</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb21-12"><a></a><span class="co">#&gt; Searching for Landsat 8 L2 data...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="fu">library</span>(rstac)</span>
+<span id="cb23-2"><a></a><span class="fu">library</span>(terra)</span>
+<span id="cb23-3"><a></a><span class="fu">library</span>(sf)</span>
+<span id="cb23-4"><a></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb23-5"><a></a></span>
+<span id="cb23-6"><a></a><span class="co"># AOI: Palo, Iowa</span></span>
+<span id="cb23-7"><a></a>palo <span class="ot">&lt;-</span> AOI<span class="sc">::</span><span class="fu">geocode</span>(<span class="st">"Palo, Iowa"</span>, <span class="at">bbox =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-8"><a></a></span>
+<span id="cb23-9"><a></a><span class="co"># Flood occurred Sept 26, 2016; search Sept 24–29 for cloud-free imagery</span></span>
+<span id="cb23-10"><a></a>temporal_range <span class="ot">&lt;-</span> <span class="st">"2016-09-24/2016-09-29"</span></span>
+<span id="cb23-11"><a></a></span>
+<span id="cb23-12"><a></a>mapview<span class="sc">::</span><span class="fu">mapview</span>(palo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-7c2e9f01b9298ea214db" style="width:100%;height:384px;"></div>
+<script type="application/json" data-for="htmlwidget-7c2e9f01b9298ea214db">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"createMapPane","args":["polygon",420]},{"method":"addPolygons","args":[[[[{"lng":[-91.81281300000001,-91.778813,-91.778813,-91.81281300000001,-91.81281300000001],"lat":[42.048236,42.048236,42.082236,42.082236,42.048236]}]]],null,"palo",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"polygon","stroke":true,"color":"#333333","weight":0.5,"opacity":0.9,"fill":true,"fillColor":"#6666FF","fillOpacity":0.6,"smoothFactor":1,"noClip":false},"<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>request&emsp;<\/th><td>Palo, Iowa&emsp;<\/td><\/tr><tr><td>2<\/td><th>score&emsp;<\/th><td>100&emsp;<\/td><\/tr><tr><td>3<\/td><th>arcgis_address&emsp;<\/th><td>Palo, Iowa&emsp;<\/td><\/tr><tr><td>4<\/td><th>x&emsp;<\/th><td>-91.79581&emsp;<\/td><\/tr><tr><td>5<\/td><th>y&emsp;<\/th><td>42.06524&emsp;<\/td><\/tr><tr><td>6<\/td><th>geometry&emsp;<\/th><td>sfc_POLYGON&emsp;<\/td><\/tr><\/table><\/div>",{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},"1",{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},{"stroke":true,"weight":1,"opacity":0.9,"fillOpacity":0.84,"bringToFront":false,"sendToBack":false}]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-91.81281300000001,42.048236,-91.778813,42.082236,true,"palo","Zoom to palo","<strong> palo <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],"palo",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#6666FF"],"labels":["palo"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"","extra":null,"layerId":null,"className":"info legend","group":"palo"}]}],"limits":{"lat":[42.048236,42.082236],"lng":[-91.81281300000001,-91.778813]},"fitBounds":[42.048236,-91.81281300000001,42.082236,-91.778813,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\"position\":\"relative\",\"bottomleft\":\"0px\",\"background-color\":\"rgba(255, 255, 255, 0.7)\",\"box-shadow\":\"0 0 2px #bbb\",\"background-clip\":\"padding-box\",\"margin\":\"0\",\"padding-left\":\"5px\",\"padding-right\":\"5px\",\"color\":\"#333\",\"font-size\":\"9px\",\"font-family\":\"\\\"Helvetica Neue\\\", Arial, Helvetica, sans-serif\",\"text-align\":\"left\",\"z-index\":\"700\"});\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+</div>
 </div>
 </section>
 <section id="complete-walkthrough-stac-query-with-signing" class="slide level2">
 <h2>Complete Walkthrough: STAC Query (with signing)</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="co"># Connect to Microsoft Planetary Computer</span></span>
-<span id="cb22-2"><a></a>stac_query <span class="ot">&lt;-</span> <span class="fu">stac</span>(<span class="st">"https://planetarycomputer.microsoft.com/api/stac/v1"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb22-3"><a></a>  <span class="fu">stac_search</span>(</span>
-<span id="cb22-4"><a></a>    <span class="at">collections =</span> <span class="st">"landsat-c2-l2"</span>,</span>
-<span id="cb22-5"><a></a>    <span class="at">datetime    =</span> temporal_range,</span>
-<span id="cb22-6"><a></a>    <span class="at">bbox        =</span> <span class="fu">st_bbox</span>(palo),</span>
-<span id="cb22-7"><a></a>    <span class="at">limit       =</span> <span class="dv">1</span></span>
-<span id="cb22-8"><a></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb22-9"><a></a>  <span class="fu">get_request</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb22-10"><a></a>  <span class="fu">items_sign</span>(<span class="fu">sign_planetary_computer</span>())</span>
-<span id="cb22-11"><a></a></span>
-<span id="cb22-12"><a></a><span class="co"># Inspect the result</span></span>
-<span id="cb22-13"><a></a><span class="fu">cat</span>(<span class="st">"Item ID:"</span>, stac_query<span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>id, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb22-14"><a></a><span class="co">#&gt; Item ID: LC08_L2SP_025031_20160926_02_T1</span></span>
-<span id="cb22-15"><a></a><span class="fu">cat</span>(<span class="st">"Date:"</span>, stac_query<span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>properties<span class="sc">$</span>datetime, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb22-16"><a></a><span class="co">#&gt; Date: 2016-09-26T16:47:41.390781Z</span></span>
-<span id="cb22-17"><a></a><span class="fu">cat</span>(<span class="st">"Cloud cover:"</span>, stac_query<span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>properties<span class="sc">$</span><span class="st">`</span><span class="at">eo:cloud_cover</span><span class="st">`</span>, <span class="st">"%</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb22-18"><a></a><span class="co">#&gt; Cloud cover: 0.01 %</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="co"># Connect to Microsoft Planetary Computer</span></span>
+<span id="cb24-2"><a></a>stac_query <span class="ot">&lt;-</span> <span class="fu">stac</span>(<span class="st">"https://planetarycomputer.microsoft.com/api/stac/v1"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a></a>  <span class="fu">stac_search</span>(</span>
+<span id="cb24-4"><a></a>    <span class="at">collections =</span> <span class="st">"landsat-c2-l2"</span>,</span>
+<span id="cb24-5"><a></a>    <span class="at">datetime    =</span> temporal_range,</span>
+<span id="cb24-6"><a></a>    <span class="at">bbox        =</span> <span class="fu">st_bbox</span>(palo),</span>
+<span id="cb24-7"><a></a>    <span class="at">limit       =</span> <span class="dv">1</span></span>
+<span id="cb24-8"><a></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb24-9"><a></a>  <span class="fu">get_request</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb24-10"><a></a>  <span class="fu">items_sign</span>(<span class="fu">sign_planetary_computer</span>())</span>
+<span id="cb24-11"><a></a></span>
+<span id="cb24-12"><a></a>stac_query</span>
+<span id="cb24-13"><a></a><span class="co">#&gt; ###Items</span></span>
+<span id="cb24-14"><a></a><span class="co">#&gt; - features (1 item(s)):</span></span>
+<span id="cb24-15"><a></a><span class="co">#&gt;   - LC08_L2SP_025031_20160926_02_T1</span></span>
+<span id="cb24-16"><a></a><span class="co">#&gt; - assets: </span></span>
+<span id="cb24-17"><a></a><span class="co">#&gt; ang, atran, blue, cdist, coastal, drad, emis, emsd, green, lwir11, mtl.json, mtl.txt, mtl.xml, nir08, qa, qa_aerosol, qa_pixel, qa_radsat, red, rendered_preview, swir16, swir22, tilejson, trad, urad</span></span>
+<span id="cb24-18"><a></a><span class="co">#&gt; - item's fields: </span></span>
+<span id="cb24-19"><a></a><span class="co">#&gt; assets, bbox, collection, geometry, id, links, properties, stac_extensions, stac_version, type</span></span>
+<span id="cb24-20"><a></a><span class="co"># Inspect the result</span></span>
+<span id="cb24-21"><a></a><span class="fu">cat</span>(<span class="st">"Item ID:"</span>, stac_query<span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>id, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb24-22"><a></a><span class="co">#&gt; Item ID: LC08_L2SP_025031_20160926_02_T1</span></span>
+<span id="cb24-23"><a></a></span>
+<span id="cb24-24"><a></a><span class="fu">cat</span>(<span class="st">"Date:"</span>, stac_query<span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>properties<span class="sc">$</span>datetime, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb24-25"><a></a><span class="co">#&gt; Date: 2016-09-26T16:47:41.390781Z</span></span>
+<span id="cb24-26"><a></a></span>
+<span id="cb24-27"><a></a><span class="fu">cat</span>(<span class="st">"Cloud cover:"</span>, stac_query<span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>properties<span class="sc">$</span><span class="st">`</span><span class="at">eo:cloud_cover</span><span class="st">`</span>, <span class="st">"%</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb24-28"><a></a><span class="co">#&gt; Cloud cover: 0.01 %</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">assets_download</span>(</span>
+<span id="cb25-2"><a></a>  <span class="at">items      =</span> stac_query,</span>
+<span id="cb25-3"><a></a>  <span class="at">asset_names =</span> <span class="fu">c</span>(<span class="st">'coastal'</span>, <span class="st">'blue'</span>, <span class="st">'green'</span>, <span class="st">'red'</span>, <span class="st">'nir08'</span>, <span class="st">'swir16'</span>),</span>
+<span id="cb25-4"><a></a>  <span class="at">output_dir =</span> <span class="st">'../labs/data'</span>,</span>
+<span id="cb25-5"><a></a>  <span class="at">overwrite  =</span> <span class="cn">FALSE</span></span>
+<span id="cb25-6"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="complete-walkthrough-load-pre-downloaded-data" class="slide level2">
 <h2>Complete Walkthrough: Load Pre-Downloaded Data</h2>
 <p>Since data is already in <code>labs/data</code>, load directly from the local directory:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="co"># List downloaded Landsat band files (TIF format)</span></span>
-<span id="cb23-2"><a></a>raster_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(</span>
-<span id="cb23-3"><a></a>  <span class="at">path =</span> <span class="st">"../labs/data"</span>,</span>
-<span id="cb23-4"><a></a>  <span class="at">pattern =</span> <span class="st">"*.TIF$"</span>,</span>
-<span id="cb23-5"><a></a>  <span class="at">full.names =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb23-6"><a></a>  <span class="at">recursive =</span> <span class="cn">TRUE</span></span>
-<span id="cb23-7"><a></a>)</span>
-<span id="cb23-8"><a></a></span>
-<span id="cb23-9"><a></a><span class="co"># Sort to ensure consistent band order</span></span>
-<span id="cb23-10"><a></a>raster_files <span class="ot">&lt;-</span> <span class="fu">sort</span>(raster_files)[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span>
-<span id="cb23-11"><a></a></span>
-<span id="cb23-12"><a></a><span class="co"># Stack into a single SpatRaster object</span></span>
-<span id="cb23-13"><a></a>landsat_stack <span class="ot">&lt;-</span> <span class="fu">rast</span>(raster_files)</span>
-<span id="cb23-14"><a></a>band_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'coastal'</span>, <span class="st">'blue'</span>, <span class="st">'green'</span>, <span class="st">'red'</span>, <span class="st">'nir08'</span>, <span class="st">'swir16'</span>)</span>
-<span id="cb23-15"><a></a>landsat_stack <span class="ot">&lt;-</span> <span class="fu">setNames</span>(landsat_stack, band_names)</span>
-<span id="cb23-16"><a></a></span>
-<span id="cb23-17"><a></a>landsat_stack</span>
-<span id="cb23-18"><a></a><span class="co">#&gt; class       : SpatRaster </span></span>
-<span id="cb23-19"><a></a><span class="co">#&gt; size        : 7801, 7681, 6  (nrow, ncol, nlyr)</span></span>
-<span id="cb23-20"><a></a><span class="co">#&gt; resolution  : 30, 30  (x, y)</span></span>
-<span id="cb23-21"><a></a><span class="co">#&gt; extent      : 518085, 748515, 4506885, 4740915  (xmin, xmax, ymin, ymax)</span></span>
-<span id="cb23-22"><a></a><span class="co">#&gt; coord. ref. : WGS 84 / UTM zone 15N (EPSG:32615) </span></span>
-<span id="cb23-23"><a></a><span class="co">#&gt; sources     : LC08_L2SP_025031_20160926_20200906_02_T1_SR_B1.TIF  </span></span>
-<span id="cb23-24"><a></a><span class="co">#&gt;               LC08_L2SP_025031_20160926_20200906_02_T1_SR_B2.TIF  </span></span>
-<span id="cb23-25"><a></a><span class="co">#&gt;               LC08_L2SP_025031_20160926_20200906_02_T1_SR_B3.TIF  </span></span>
-<span id="cb23-26"><a></a><span class="co">#&gt;               ... and 3 more sources</span></span>
-<span id="cb23-27"><a></a><span class="co">#&gt; names       : coastal, blue, green, red, nir08, swir16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a><span class="co"># List downloaded Landsat band files (TIF format)</span></span>
+<span id="cb26-2"><a></a>raster_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(</span>
+<span id="cb26-3"><a></a>  <span class="at">path =</span> <span class="st">"../labs/data"</span>,</span>
+<span id="cb26-4"><a></a>  <span class="at">pattern =</span> <span class="st">"*.TIF$"</span>,</span>
+<span id="cb26-5"><a></a>  <span class="at">full.names =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb26-6"><a></a>  <span class="at">recursive =</span> <span class="cn">TRUE</span></span>
+<span id="cb26-7"><a></a>)</span>
+<span id="cb26-8"><a></a></span>
+<span id="cb26-9"><a></a><span class="co"># Sort to ensure consistent band order</span></span>
+<span id="cb26-10"><a></a>raster_files <span class="ot">&lt;-</span> <span class="fu">sort</span>(raster_files)[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb26-11"><a></a></span>
+<span id="cb26-12"><a></a><span class="co"># Stack into a single SpatRaster object</span></span>
+<span id="cb26-13"><a></a>landsat_stack <span class="ot">&lt;-</span> <span class="fu">rast</span>(raster_files)</span>
+<span id="cb26-14"><a></a>band_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'coastal'</span>, <span class="st">'blue'</span>, <span class="st">'green'</span>, <span class="st">'red'</span>, <span class="st">'nir08'</span>, <span class="st">'swir16'</span>)</span>
+<span id="cb26-15"><a></a>landsat_stack <span class="ot">&lt;-</span> <span class="fu">setNames</span>(landsat_stack, band_names)</span>
+<span id="cb26-16"><a></a></span>
+<span id="cb26-17"><a></a>landsat_stack</span>
+<span id="cb26-18"><a></a><span class="co">#&gt; class       : SpatRaster </span></span>
+<span id="cb26-19"><a></a><span class="co">#&gt; size        : 7801, 7681, 6  (nrow, ncol, nlyr)</span></span>
+<span id="cb26-20"><a></a><span class="co">#&gt; resolution  : 30, 30  (x, y)</span></span>
+<span id="cb26-21"><a></a><span class="co">#&gt; extent      : 518085, 748515, 4506885, 4740915  (xmin, xmax, ymin, ymax)</span></span>
+<span id="cb26-22"><a></a><span class="co">#&gt; coord. ref. : WGS 84 / UTM zone 15N (EPSG:32615) </span></span>
+<span id="cb26-23"><a></a><span class="co">#&gt; sources     : LC08_L2SP_025031_20160926_20200906_02_T1_SR_B1.TIF  </span></span>
+<span id="cb26-24"><a></a><span class="co">#&gt;               LC08_L2SP_025031_20160926_20200906_02_T1_SR_B2.TIF  </span></span>
+<span id="cb26-25"><a></a><span class="co">#&gt;               LC08_L2SP_025031_20160926_20200906_02_T1_SR_B3.TIF  </span></span>
+<span id="cb26-26"><a></a><span class="co">#&gt;               ... and 3 more sources</span></span>
+<span id="cb26-27"><a></a><span class="co">#&gt; names       : coastal, blue, green, red, nir08, swir16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<hr>
 </section>
 <section id="complete-walkthrough-crop-to-aoi" class="slide level2">
 <h2>Complete Walkthrough: Crop to AOI</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="co"># Transform AOI to match raster CRS (UTM zone 15N)</span></span>
-<span id="cb24-2"><a></a>palo_utm <span class="ot">&lt;-</span> bbox_palo <span class="sc">%&gt;%</span> </span>
-<span id="cb24-3"><a></a>  <span class="fu">st_transform</span>(<span class="fu">crs</span>(landsat_stack))</span>
-<span id="cb24-4"><a></a></span>
-<span id="cb24-5"><a></a><span class="co"># Crop the full scene to study area (saves memory, speeds processing)</span></span>
-<span id="cb24-6"><a></a>landsat_crop <span class="ot">&lt;-</span> <span class="fu">crop</span>(landsat_stack, palo_utm)</span>
-<span id="cb24-7"><a></a></span>
-<span id="cb24-8"><a></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Cropped extent:</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb24-9"><a></a><span class="co">#&gt; </span></span>
-<span id="cb24-10"><a></a><span class="co">#&gt; Cropped extent:</span></span>
-<span id="cb24-11"><a></a><span class="fu">print</span>(<span class="fu">ext</span>(landsat_crop))</span>
-<span id="cb24-12"><a></a><span class="co">#&gt; SpatExtent : 598185, 601065, 4655805, 4659615 (xmin, xmax, ymin, ymax)</span></span>
-<span id="cb24-13"><a></a><span class="fu">cat</span>(<span class="st">"Cropped dimensions:"</span>, <span class="fu">dim</span>(landsat_crop), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb24-14"><a></a><span class="co">#&gt; Cropped dimensions: 127 96 6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="co"># Transform AOI to match raster CRS (UTM zone 15N)</span></span>
+<span id="cb27-2"><a></a>palo_utm <span class="ot">&lt;-</span> bbox_palo <span class="sc">%&gt;%</span> </span>
+<span id="cb27-3"><a></a>  <span class="fu">st_transform</span>(<span class="fu">crs</span>(landsat_stack))</span>
+<span id="cb27-4"><a></a></span>
+<span id="cb27-5"><a></a><span class="co"># Crop the full scene to study area (saves memory, speeds processing)</span></span>
+<span id="cb27-6"><a></a>landsat_crop <span class="ot">&lt;-</span> <span class="fu">crop</span>(landsat_stack, palo_utm)</span>
+<span id="cb27-7"><a></a></span>
+<span id="cb27-8"><a></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Cropped extent:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb27-9"><a></a><span class="co">#&gt; </span></span>
+<span id="cb27-10"><a></a><span class="co">#&gt; Cropped extent:</span></span>
+<span id="cb27-11"><a></a><span class="fu">print</span>(<span class="fu">ext</span>(landsat_crop))</span>
+<span id="cb27-12"><a></a><span class="co">#&gt; SpatExtent : 598185, 601065, 4655805, 4659615 (xmin, xmax, ymin, ymax)</span></span>
+<span id="cb27-13"><a></a><span class="fu">cat</span>(<span class="st">"Cropped dimensions:"</span>, <span class="fu">dim</span>(landsat_crop), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb27-14"><a></a><span class="co">#&gt; Cropped dimensions: 127 96 6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="complete-walkthrough-visualize-band-combinations" class="slide level2">
 <h2>Complete Walkthrough: Visualize Band Combinations</h2>
 <h4 id="natural-color-rgb-what-the-human-eye-would-see">Natural Color (RGB) — What the Human Eye Would See</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">plotRGB</span>(landsat_crop, <span class="at">r =</span> <span class="dv">4</span>, <span class="at">g =</span> <span class="dv">3</span>, <span class="at">b =</span> <span class="dv">2</span>, <span class="at">stretch =</span> <span class="st">"lin"</span>, </span>
-<span id="cb25-2"><a></a>        <span class="at">main =</span> <span class="st">"Natural Color: Red-Green-Blue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a><span class="fu">plotRGB</span>(landsat_crop, <span class="at">r =</span> <span class="dv">4</span>, <span class="at">g =</span> <span class="dv">3</span>, <span class="at">b =</span> <span class="dv">2</span>, <span class="at">stretch =</span> <span class="st">"lin"</span>, </span>
+<span id="cb28-2"><a></a>        <span class="at">main =</span> <span class="st">"Natural Color: Red-Green-Blue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
@@ -773,24 +819,14 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 </div>
 </div>
 </div>
-<div class="columns">
-<div class="column" style="width:50%;">
 <p><strong>Visible</strong>: Water (dark), vegetation (green), urban (gray/tan), clouds (white)</p>
 <p><strong>Limitation</strong>: Flooding can look similar to vegetation in RGB alone.</p>
-</div><div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="https://earthobservatory.nasa.gov/images/35008/natural-color-composite.png" style="width:100.0%"></p>
-<figcaption>Example RGB satellite composite of coastal region</figcaption>
-</figure>
-</div>
-</div></div>
 </section>
 <section id="visualize-color-infrared-vegetation" class="slide level2">
 <h2>Visualize: Color Infrared (Vegetation)</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a><span class="fu">plotRGB</span>(landsat_crop, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">4</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">"lin"</span>,</span>
-<span id="cb26-2"><a></a>        <span class="at">main =</span> <span class="st">"Color Infrared: NIR-Red-Green</span><span class="sc">\n</span><span class="st">(Bright red = healthy vegetation)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a><span class="fu">plotRGB</span>(landsat_crop, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">4</span>, <span class="at">b =</span> <span class="dv">3</span>, <span class="at">stretch =</span> <span class="st">"lin"</span>,</span>
+<span id="cb29-2"><a></a>        <span class="at">main =</span> <span class="st">"Color Infrared: NIR-Red-Green</span><span class="sc">\n</span><span class="st">(Bright red = healthy vegetation)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
@@ -799,24 +835,14 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 </div>
 </div>
 </div>
-<div class="columns">
-<div class="column" style="width:50%;">
 <p><strong>Visible</strong>: - Bright red/magenta = healthy vegetation (strong NIR reflectance) - Dark blue/black = water - Gray/tan = soil/urban</p>
 <p><strong>Why NIR matters</strong>: Vegetation reflects ~50% of NIR light; water absorbs it. This makes forests “glow” red.</p>
-</div><div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellite#:~:text=Color%20Infrared%20Composite.png" style="width:100.0%"></p>
-<figcaption>CIR composite: vegetation mapped as red showing crop health variation</figcaption>
-</figure>
-</div>
-</div></div>
 </section>
 <section id="visualize-water-focused-false-color" class="slide level2">
 <h2>Visualize: Water-Focused False Color</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="fu">plotRGB</span>(landsat_crop, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">6</span>, <span class="at">b =</span> <span class="dv">4</span>, <span class="at">stretch =</span> <span class="st">"lin"</span>,</span>
-<span id="cb27-2"><a></a>        <span class="at">main =</span> <span class="st">"Water Focus: NIR-SWIR1-Red</span><span class="sc">\n</span><span class="st">(Dark blue = open water/flooding)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="fu">plotRGB</span>(landsat_crop, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">g =</span> <span class="dv">6</span>, <span class="at">b =</span> <span class="dv">4</span>, <span class="at">stretch =</span> <span class="st">"lin"</span>,</span>
+<span id="cb30-2"><a></a>        <span class="at">main =</span> <span class="st">"Water Focus: NIR-SWIR1-Red</span><span class="sc">\n</span><span class="st">(Dark blue = open water/flooding)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
@@ -838,29 +864,34 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 </div>
 </div></div>
 </section>
-<section id="complete-walkthrough-spectral-indices-for-water" class="slide level2">
-<h2>Complete Walkthrough: Spectral Indices for Water</h2>
+<section id="complete-walkthrough-ndvi" class="slide level2">
+<h2>Complete Walkthrough: NDVI</h2>
+<p>$ NDVI = $</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a><span class="co"># Extract individual bands for calculations</span></span>
-<span id="cb28-2"><a></a><span class="co"># Calculate key water indices</span></span>
-<span id="cb28-3"><a></a>ndvi  <span class="ot">&lt;-</span> (landsat_crop<span class="sc">$</span>nir08 <span class="sc">-</span> landsat_crop<span class="sc">$</span>red) <span class="sc">/</span> </span>
-<span id="cb28-4"><a></a>  (landsat_crop<span class="sc">$</span>nir08 <span class="sc">+</span> landsat_crop<span class="sc">$</span>red)           <span class="co"># Vegetation focus</span></span>
-<span id="cb28-5"><a></a></span>
-<span id="cb28-6"><a></a><span class="fu">plot</span>(ndvi, <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"white"</span>, <span class="st">"red"</span>))(<span class="dv">256</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a><span class="co"># Extract individual bands for calculations</span></span>
+<span id="cb31-2"><a></a><span class="co"># Calculate key water indices</span></span>
+<span id="cb31-3"><a></a>ndvi  <span class="ot">&lt;-</span> (landsat_crop<span class="sc">$</span>nir08 <span class="sc">-</span> landsat_crop<span class="sc">$</span>red) <span class="sc">/</span> (landsat_crop<span class="sc">$</span>nir08 <span class="sc">+</span> landsat_crop<span class="sc">$</span>red)</span>
+<span id="cb31-4"><a></a></span>
+<span id="cb31-5"><a></a><span class="fu">plot</span>(ndvi, <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"white"</span>, <span class="st">"red"</span>))(<span class="dv">256</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="week-4-2_files/figure-revealjs/water-indices-1.png" style="width:100.0%"></p>
+</figure>
 </div>
-<img data-src="week-4-2_files/figure-revealjs/water-indices-1.png" style="width:100.0%" class="r-stretch"></section>
+</div>
+</div>
+</section>
 <section id="thresholding-to-binary-flood-maps" class="slide level2">
 <h2>Thresholding to Binary Flood Maps</h2>
-<div class="columns">
-<div class="column" style="width:60%;">
+<p>NDVI &lt; 0 typically indicates water. We can apply this threshold to create a binary flood map:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a><span class="co"># Apply thresholds specific to each index</span></span>
-<span id="cb29-2"><a></a>ndvi_flood  <span class="ot">&lt;-</span> <span class="fu">app</span>(ndvi,  <span class="cf">function</span>(x) <span class="fu">ifelse</span>(x <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>))      <span class="co"># NDVI &lt; 0 = water</span></span>
-<span id="cb29-3"><a></a></span>
-<span id="cb29-4"><a></a><span class="co"># Plot: blue = flooded, white = non-flooded</span></span>
-<span id="cb29-5"><a></a><span class="fu">plot</span>(ndvi_flood, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"blue"</span>), </span>
-<span id="cb29-6"><a></a>     <span class="at">main =</span> <span class="fu">c</span>(<span class="st">"NDVI-based"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a><span class="co"># Apply thresholds specific to each index</span></span>
+<span id="cb32-2"><a></a>ndvi_flood  <span class="ot">&lt;-</span> <span class="fu">app</span>(ndvi,  <span class="cf">function</span>(x) <span class="fu">ifelse</span>(x <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>))      <span class="co"># NDVI &lt; 0 = water</span></span>
+<span id="cb32-3"><a></a></span>
+<span id="cb32-4"><a></a><span class="co"># Plot: blue = flooded, white = non-flooded</span></span>
+<span id="cb32-5"><a></a><span class="fu">plot</span>(ndvi_flood, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"blue"</span>), </span>
+<span id="cb32-6"><a></a>     <span class="at">main =</span> <span class="fu">c</span>(<span class="st">"NDVI-based"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
@@ -869,15 +900,55 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 </div>
 </div>
 </div>
-</div><div class="column" style="width:40%;">
-<div class="quarto-figure quarto-figure-center">
+</section>
+<section id="imapct-assessment" class="slide level2">
+<h2>Imapct Assessment:</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a><span class="fu">library</span>(osmdata)</span>
+<span id="cb33-2"><a></a>osm <span class="ot">&lt;-</span>  osmdata<span class="sc">::</span><span class="fu">opq</span>(<span class="fu">st_bbox</span>(<span class="fu">st_transform</span>(palo, <span class="dv">4326</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb33-3"><a></a>    <span class="fu">add_osm_feature</span>(<span class="st">"building"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb33-4"><a></a>    <span class="fu">osmdata_sf</span>() </span>
+<span id="cb33-5"><a></a></span>
+<span id="cb33-6"><a></a>buildings <span class="ot">=</span> <span class="fu">st_transform</span>(osm<span class="sc">$</span>osm_polygons, <span class="fu">crs</span>(landsat_crop))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a>{<span class="fu">plot</span>(ndvi_flood, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"blue"</span>), </span>
+<span id="cb34-2"><a></a>     <span class="at">main =</span> <span class="fu">c</span>(<span class="st">"NDVI-based Flood Map with OSM Buildings"</span>))</span>
+<span id="cb34-3"><a></a><span class="fu">plot</span>(buildings, <span class="at">add =</span> <span class="cn">TRUE</span>)}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
 <figure>
-<p><img data-src="https://www.usgs.gov/media/images/flood-mapping-satellite-imagery.png" style="width:100.0%"></p>
-<figcaption>Binary flood maps from different spectral indices—notice how each method captures water slightly differently</figcaption>
+<p><img data-src="week-4-2_files/figure-revealjs/unnamed-chunk-20-1.png" style="width:100.0%"></p>
 </figure>
 </div>
-<p>Each index has unique sensitivity. <strong>Thresholding strategy</strong>: Conservative (single method) or aggressive (method agreement).</p>
-</div></div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>buildings<span class="sc">$</span>impact <span class="ot">=</span> terra<span class="sc">::</span><span class="fu">extract</span>(ndvi_flood, buildings, <span class="at">fun =</span> max, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)[,<span class="dv">2</span>] <span class="sc">&gt;</span> <span class="dv">0</span></span>
+<span id="cb35-2"><a></a></span>
+<span id="cb35-3"><a></a>{</span>
+<span id="cb35-4"><a></a><span class="fu">plot</span>(ndvi_flood, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"blue"</span>), </span>
+<span id="cb35-5"><a></a>     <span class="at">main =</span> <span class="fu">c</span>(<span class="st">"NDVI-based Flood Map with OSM Buildings"</span>))</span>
+<span id="cb35-6"><a></a><span class="fu">plot</span>(<span class="fu">filter</span>(buildings, impact),</span>
+<span id="cb35-7"><a></a>     <span class="at">add =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb35-8"><a></a>     <span class="at">col =</span> <span class="st">'red'</span>,</span>
+<span id="cb35-9"><a></a>     <span class="at">border =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb35-10"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="week-4-2_files/figure-revealjs/unnamed-chunk-21-1.png" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a></span>
+<span id="cb36-2"><a></a>carto <span class="ot">=</span> <span class="fu">app</span>(ndvi,  <span class="cf">function</span>(x) <span class="fu">ifelse</span>(x <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="cn">NA</span>))</span>
+<span id="cb36-3"><a></a>mapview<span class="sc">::</span><span class="fu">mapview</span>(carto) <span class="sc">+</span> <span class="fu">filter</span>(buildings, impact)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-9bb28d5fc702ffc91371" style="width:100%;height:384px;"></div>
+<script type="application/json" data-for="htmlwidget-9bb28d5fc702ffc91371">{"x":{"options":{"minZoom":1,"maxZoom":52,"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"preferCanvas":false,"bounceAtZoomLimits":false,"maxBounds":[[[-90,-370]],[[90,370]]]},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron","CartoDB.Positron","CartoDB.Positron",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatter","CartoDB.DarkMatter","CartoDB.DarkMatter",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap","OpenStreetMap","OpenStreetMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldImagery","Esri.WorldImagery","Esri.WorldImagery",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenTopoMap","OpenTopoMap","OpenTopoMap",{"errorTileUrl":"","noWrap":false,"detectRetina":false,"pane":"tilePane"}]},{"method":"addRasterImage","args":["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGIAAACBCAYAAAA7dW8iAAAEM0lEQVR4nO2d23HjMAxFkZ0dl+dmUoDjAtyMC0hh/tofa8zFkBQfIAmA9/wlcSRaVxfgA5S+fn9/fwgs5+/qBlji8v28pf72elzvPcf709ooLeQuzgxej+u9VwQiJ464fD9vLRejllHneD2ud9OOCO+q1c7oxawQli98rO3mQlNKgBmhaSSmHJFzgWWHEBlzROldf4jyelzvoUD8/8PPSbazBVOOqCXmEi7MbBFSznUnRGkOWRHKcuf88jTFUXtxV4SkWBvNjyN60JAXiD7tMJWsU2hKuq2Yd4T1buvRfvNCeMG0ENbdQPQJp6aF4MwURvpcroSYmaylz+VKCMuY7r5a7q4S/d9+OGIhbtasjy9ylji19K5y7TAtxIHlEOViQFcqgAWhTAvhAVeTfjFyK3MacesIbRf/rMPgVgiijxhaek2crcYRGpxRciO4F4JIhxgc3ia3Qly+nzetISnExTiiBI1ixBzqqorj4OzizwxVqaoN/juXjggLx2JFZCtdkroJXApxsDpJ1wjubmSdCgUlokhueKl1ncscQTRvF1Hq3Km/pdrkzhEHsS98Vhc7WrzcsV07gihefDzyYrfuPHWbrFNfenUCT+FWCG1l92c3gNvQNBOJAaRbR3BGOeTMBaWh0G2viaO9CnAbR4xA0mXbCsGfWlA7bS6933urZJ2bCa0pNiidUa1hayFq9m3nRuoS+Wfb0FRKaq92KjTx35eGu62FKLlI4d0eE4C7IeWcrctpQo7wklokOhsPtPaQuJCpz22VI3qQSNA5N7kc0PX072umz3uPHSZ7l0JYwb0jWqgNMz1d1tiYxWWy5kn5+FniaZTSbFNgRiSfMyQ5ju++13S2NFqydNo6Iq9hC0fk0LJ06l4ILRf6DPdCSDBDTAjRwIieFIRQAoQoZHRF+ZZCtCyNpo4j1Sb344gRjBhXbOkIaSScAUc0gioORUju1UNoGkhNh8CsI1buCOLtqPm8u82MqQX9kRvdJY6bap9ZIYh0vJiDL0CV/h8Xw2xo0kQsTNa4Z+vXFkgh1Y2FEEL07O8mQhXHFErCFhwhRE0o4s8KIYIQaoAQjJLeDh8LYPZ1AKWlNTy09IJxhBLgCCVAiAZQxTEQnoB7nqvRwvY5YsRW3Ra2FyJk5RoHhFACcsRC3LxjyDI8N2H2tZDRLwaBIxLkuq8jSjXhiAKkBnC540CICeBFHoWMGtTVlPZAiIXgyQOV8GK20ge+82PkPg9H0PljgHq7rnju6yJahIMQb3IXbMZEIHJEIaPFgCOUACGUACHeSK5Dlz5QMQRCvFm9+whCDAJl+QrBpN9isL1XIXgk9WIwxWEMCDGRXHiCEBFWvMMOQkRY8QpNCLEA7CpVRigIipAnk1rLhiOUACGUACEm4+7BWd5AslYCHKEECLEIXqCM0KQEOEIJEEIJEEIJ/wBLf68hmYO+/QAAAABJRU5ErkJggg==",[[42.08247389784549,-91.81355686180419],[42.04768726196073,-91.77795931783035]],"carto - 1","carto - 1",{"tileSize":256,"zIndex":1,"minZoom":0,"opacity":0.8}]},{"method":"removeLayersControl","args":[]},{"method":"addControl","args":["","topright","imageValues-carto - 1","info legend "]},{"method":"addImageQuery","args":["carto - 1",[-91.81355686180419,42.04742080340203,-91.77787781924566,42.08247389784549],"mousemove",7,"Layer"]},{"method":"addLegend","args":[{"colors":["#79784E , #79784E NaN%, #79784E "],"labels":["1"],"na_color":"#BEBEBE","na_label":"NA","opacity":1,"position":"topright","type":"numeric","title":"carto - 1","extra":{"p_1":null,"p_n":null},"layerId":null,"className":"info legend","group":"carto - 1"}]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]},{"method":"addHomeButton","args":[-91.8135568618042,42.04780127070886,-91.77810544042319,42.0824738978455,true,"carto___1","Zoom to carto___1","<strong> carto___1 <\/strong>","bottomright"]},{"method":"createMapPane","args":["polygon",420]},{"method":"addPolygons","args":[[[[{"lng":[-91.7938765,-91.793871,-91.79405819999999,-91.7940569,-91.7941874,-91.7941943,-91.7938765],"lat":[42.07211839999999,42.07192810000001,42.0719251,42.0718784,42.07187629999999,42.07211330000001,42.07211839999999]}]],[[{"lng":[-91.7935178,-91.79351749999999,-91.79374110000001,-91.7937414,-91.7935178],"lat":[42.0723019,42.0722385,42.0722379,42.0723014,42.0723019]}]],[[{"lng":[-91.7935117,-91.7935114,-91.793735,-91.7937352,-91.7935117],"lat":[42.07200030000001,42.0719369,42.07193629999999,42.0719998,42.07200030000001]}]],[[{"lng":[-91.79399340000001,-91.7939923,-91.794206,-91.79420500000001,-91.79443680000001,-91.79443800000001,-91.79439420000001,-91.7943947,-91.7943496,-91.79435000000001,-91.79399340000001],"lat":[42.0726257,42.07251749999998,42.07251620000001,42.07242260000001,42.0724213,42.0725383,42.07253850000001,42.07259070000001,42.072591,42.07262359999999,42.0726257]}]],[[{"lng":[-91.7943981,-91.79439790000001,-91.79442880000002,-91.79442899999999,-91.7943981],"lat":[42.07257169999999,42.0725405,42.07254040000001,42.0725716,42.07257169999999]}]],[[{"lng":[-91.79437780000001,-91.7943774,-91.7944317,-91.7944322,-91.79437780000001],"lat":[42.07267709999999,42.07264349999999,42.072643,42.0726767,42.07267709999999]}]]],null,"filter(buildings, impact)",{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"pane":"polygon","stroke":true,"color":"#333333","weight":0.5,"opacity":0.9,"fill":true,"fillColor":"#6666FF","fillOpacity":0.6,"smoothFactor":1,"noClip":false},["<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>1&emsp;<\/td><\/tr><tr><td>1<\/td><th>osm_id&emsp;<\/th><td>733751493&emsp;<\/td><\/tr><tr><td>2<\/td><th>name&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>3<\/td><th>addr:city&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>4<\/td><th>addr:housenumber&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>5<\/td><th>addr:postcode&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>6<\/td><th>addr:state&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>7<\/td><th>addr:street&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>8<\/td><th>amenity&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>9<\/td><th>building&emsp;<\/th><td>yes&emsp;<\/td><\/tr><tr><td>10<\/td><th>denomination&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>11<\/td><th>ele&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>12<\/td><th>gnis:feature_id&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>13<\/td><th>layer&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>14<\/td><th>linncounty:objectid&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>15<\/td><th>phone&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>16<\/td><th>religion&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>17<\/td><th>source&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>18<\/td><th>website&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>19<\/td><th>impact&emsp;<\/th><td>TRUE&emsp;<\/td><\/tr><tr><td>20<\/td><th>geometry&emsp;<\/th><td>sfc_POLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>2&emsp;<\/td><\/tr><tr><td>1<\/td><th>osm_id&emsp;<\/th><td>733751495&emsp;<\/td><\/tr><tr><td>2<\/td><th>name&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>3<\/td><th>addr:city&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>4<\/td><th>addr:housenumber&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>5<\/td><th>addr:postcode&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>6<\/td><th>addr:state&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>7<\/td><th>addr:street&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>8<\/td><th>amenity&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>9<\/td><th>building&emsp;<\/th><td>greenhouse&emsp;<\/td><\/tr><tr><td>10<\/td><th>denomination&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>11<\/td><th>ele&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>12<\/td><th>gnis:feature_id&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>13<\/td><th>layer&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>14<\/td><th>linncounty:objectid&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>15<\/td><th>phone&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>16<\/td><th>religion&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>17<\/td><th>source&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>18<\/td><th>website&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>19<\/td><th>impact&emsp;<\/th><td>TRUE&emsp;<\/td><\/tr><tr><td>20<\/td><th>geometry&emsp;<\/th><td>sfc_POLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>3&emsp;<\/td><\/tr><tr><td>1<\/td><th>osm_id&emsp;<\/th><td>733751499&emsp;<\/td><\/tr><tr><td>2<\/td><th>name&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>3<\/td><th>addr:city&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>4<\/td><th>addr:housenumber&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>5<\/td><th>addr:postcode&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>6<\/td><th>addr:state&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>7<\/td><th>addr:street&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>8<\/td><th>amenity&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>9<\/td><th>building&emsp;<\/th><td>greenhouse&emsp;<\/td><\/tr><tr><td>10<\/td><th>denomination&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>11<\/td><th>ele&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>12<\/td><th>gnis:feature_id&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>13<\/td><th>layer&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>14<\/td><th>linncounty:objectid&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>15<\/td><th>phone&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>16<\/td><th>religion&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>17<\/td><th>source&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>18<\/td><th>website&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>19<\/td><th>impact&emsp;<\/th><td>TRUE&emsp;<\/td><\/tr><tr><td>20<\/td><th>geometry&emsp;<\/th><td>sfc_POLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>4&emsp;<\/td><\/tr><tr><td>1<\/td><th>osm_id&emsp;<\/th><td>733751507&emsp;<\/td><\/tr><tr><td>2<\/td><th>name&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>3<\/td><th>addr:city&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>4<\/td><th>addr:housenumber&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>5<\/td><th>addr:postcode&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>6<\/td><th>addr:state&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>7<\/td><th>addr:street&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>8<\/td><th>amenity&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>9<\/td><th>building&emsp;<\/th><td>yes&emsp;<\/td><\/tr><tr><td>10<\/td><th>denomination&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>11<\/td><th>ele&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>12<\/td><th>gnis:feature_id&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>13<\/td><th>layer&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>14<\/td><th>linncounty:objectid&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>15<\/td><th>phone&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>16<\/td><th>religion&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>17<\/td><th>source&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>18<\/td><th>website&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>19<\/td><th>impact&emsp;<\/th><td>TRUE&emsp;<\/td><\/tr><tr><td>20<\/td><th>geometry&emsp;<\/th><td>sfc_POLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>5&emsp;<\/td><\/tr><tr><td>1<\/td><th>osm_id&emsp;<\/th><td>733751508&emsp;<\/td><\/tr><tr><td>2<\/td><th>name&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>3<\/td><th>addr:city&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>4<\/td><th>addr:housenumber&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>5<\/td><th>addr:postcode&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>6<\/td><th>addr:state&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>7<\/td><th>addr:street&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>8<\/td><th>amenity&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>9<\/td><th>building&emsp;<\/th><td>shed&emsp;<\/td><\/tr><tr><td>10<\/td><th>denomination&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>11<\/td><th>ele&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>12<\/td><th>gnis:feature_id&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>13<\/td><th>layer&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>14<\/td><th>linncounty:objectid&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>15<\/td><th>phone&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>16<\/td><th>religion&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>17<\/td><th>source&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>18<\/td><th>website&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>19<\/td><th>impact&emsp;<\/th><td>TRUE&emsp;<\/td><\/tr><tr><td>20<\/td><th>geometry&emsp;<\/th><td>sfc_POLYGON&emsp;<\/td><\/tr><\/table><\/div>","<div class='scrollableContainer'><table class=mapview-popup id='popup'><tr class='coord'><td><\/td><th><b>Feature ID&emsp;<\/b><\/th><td>6&emsp;<\/td><\/tr><tr><td>1<\/td><th>osm_id&emsp;<\/th><td>733751509&emsp;<\/td><\/tr><tr><td>2<\/td><th>name&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>3<\/td><th>addr:city&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>4<\/td><th>addr:housenumber&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>5<\/td><th>addr:postcode&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>6<\/td><th>addr:state&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>7<\/td><th>addr:street&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>8<\/td><th>amenity&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>9<\/td><th>building&emsp;<\/th><td>shed&emsp;<\/td><\/tr><tr><td>10<\/td><th>denomination&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>11<\/td><th>ele&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>12<\/td><th>gnis:feature_id&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>13<\/td><th>layer&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>14<\/td><th>linncounty:objectid&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>15<\/td><th>phone&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>16<\/td><th>religion&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>17<\/td><th>source&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>18<\/td><th>website&emsp;<\/th><td>NA&emsp;<\/td><\/tr><tr><td>19<\/td><th>impact&emsp;<\/th><td>TRUE&emsp;<\/td><\/tr><tr><td>20<\/td><th>geometry&emsp;<\/th><td>sfc_POLYGON&emsp;<\/td><\/tr><\/table><\/div>"],{"maxWidth":800,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"closeOnClick":true,"className":""},["1","2","3","4","5","6"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},{"stroke":true,"weight":1,"opacity":0.9,"fillOpacity":0.84,"bringToFront":false,"sendToBack":false}]},{"method":"addHomeButton","args":[-91.79443800000001,42.07187629999999,-91.7935114,42.07267709999999,true,"filter_buildings__impact_","Zoom to filter_buildings__impact_","<strong> filter_buildings__impact_ <\/strong>","bottomright"]},{"method":"addLayersControl","args":[["CartoDB.Positron","CartoDB.DarkMatter","OpenStreetMap","Esri.WorldImagery","OpenTopoMap"],["carto - 1","filter(buildings, impact)"],{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"addLegend","args":[{"colors":["#6666FF"],"labels":["filter(buildings, impact)"],"na_color":null,"na_label":"NA","opacity":1,"position":"topright","type":"factor","title":"","extra":null,"layerId":null,"className":"info legend","group":"filter(buildings, impact)"}]},{"method":"addHomeButton","args":[-91.81355686180419,42.04768726196073,-91.77795931783035,42.08247389784549,true,null,"Zoom to full extent","<strong>Zoom full<\/strong>","bottomleft"]}],"limits":{"lat":[42.04768726196073,42.08247389784549],"lng":[-91.81355686180419,-91.77795931783035]},"fitBounds":[42.04768726196073,-91.81355686180419,42.08247389784549,-91.77795931783035,[]]},"evals":[],"jsHooks":{"render":[{"code":"function(el, x, data) {\n  return (\n      function(el, x, data) {\n      // get the leaflet map\n      var map = this; //HTMLWidgets.find('#' + el.id);\n      // we need a new div element because we have to handle\n      // the mouseover output separately\n      // debugger;\n      function addElement () {\n      // generate new div Element\n      var newDiv = $(document.createElement('div'));\n      // append at end of leaflet htmlwidget container\n      $(el).append(newDiv);\n      //provide ID and style\n      newDiv.addClass('lnlt');\n      newDiv.css({\"position\":\"relative\",\"bottomleft\":\"0px\",\"background-color\":\"rgba(255, 255, 255, 0.7)\",\"box-shadow\":\"0 0 2px #bbb\",\"background-clip\":\"padding-box\",\"margin\":\"0\",\"padding-left\":\"5px\",\"padding-right\":\"5px\",\"color\":\"#333\",\"font-size\":\"9px\",\"font-family\":\"\\\"Helvetica Neue\\\", Arial, Helvetica, sans-serif\",\"text-align\":\"left\",\"z-index\":\"700\"});\n      return newDiv;\n      }\n\n\n      // check for already existing lnlt class to not duplicate\n      var lnlt = $(el).find('.lnlt');\n\n      if(!lnlt.length) {\n      lnlt = addElement();\n\n      // grab the special div we generated in the beginning\n      // and put the mousmove output there\n\n      map.on('mousemove', function (e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                           ' lon: ' + (e.latlng.lng).toFixed(5) +\n                           ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                           ' | zoom: ' + map.getZoom() +\n                           ' | x: ' + L.CRS.EPSG3857.project(e.latlng).x.toFixed(0) +\n                           ' | y: ' + L.CRS.EPSG3857.project(e.latlng).y.toFixed(0) +\n                           ' | epsg: 3857 ' +\n                           ' | proj4: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs ');\n      } else {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      }\n      });\n\n      // remove the lnlt div when mouse leaves map\n      map.on('mouseout', function (e) {\n      var strip = document.querySelector('.lnlt');\n      if( strip !==null) strip.remove();\n      });\n\n      };\n\n      //$(el).keypress(67, function(e) {\n      map.on('preclick', function(e) {\n      if (e.originalEvent.ctrlKey) {\n      if (document.querySelector('.lnlt') === null) lnlt = addElement();\n      lnlt.text(\n                      ' lon: ' + (e.latlng.lng).toFixed(5) +\n                      ' | lat: ' + (e.latlng.lat).toFixed(5) +\n                      ' | zoom: ' + map.getZoom() + ' ');\n      var txt = document.querySelector('.lnlt').textContent;\n      console.log(txt);\n      //txt.innerText.focus();\n      //txt.select();\n      setClipboardText('\"' + txt + '\"');\n      }\n      });\n\n      }\n      ).call(this.getMap(), el, x, data);\n}","data":null},{"code":"function(el, x, data) {\n  return (function(el,x,data){\n           var map = this;\n\n           map.on('keypress', function(e) {\n               console.log(e.originalEvent.code);\n               var key = e.originalEvent.code;\n               if (key === 'KeyE') {\n                   var bb = this.getBounds();\n                   var txt = JSON.stringify(bb);\n                   console.log(txt);\n\n                   setClipboardText('\\'' + txt + '\\'');\n               }\n           })\n        }).call(this.getMap(), el, x, data);\n}","data":null}]}}</script>
+</div>
+</div>
 </section>
 <section id="key-insights-from-the-walkthrough" class="slide level2">
 <h2>Key Insights from the Walkthrough</h2>
@@ -899,18 +970,13 @@ Find scenes  →  Metadata/CC  →  Authenticate  →  Selectively  →  NDVI, f
 <li><strong>STAC Specification</strong>: https://stacspec.org/</li>
 <li><strong>Planetary Computer STAC API</strong>: https://planetarycomputer.microsoft.com/api/stac/v1</li>
 <li><strong><code>rstac</code> Package</strong>: https://cran.r-project.org/package=rstac</li>
-<li><strong><code>sf</code> Package</strong>: https://r-spatial.github.io/sf/</li>
 </ul>
+
+
 </section>
-<section id="next-steps" class="slide level2">
-<h2>Next Steps</h2>
-<ul>
-<li><strong>Lab 4</strong>: Use <code>rstac</code> + <code>terra</code> to download Landsat 8 for Palo 2016 flood</li>
-<li><strong>Assignment</strong>: Query STAC for a water event in your region; summarize what data is available</li>
-<li><strong>Practice</strong>: Validate GeoJSON of a watershed boundary or monitoring network</li>
-</ul>
-
-
+</div></div>
+</section>
+</div></div>
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
