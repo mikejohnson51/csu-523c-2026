@@ -391,11 +391,10 @@ assets_download(
 
 ```{r}
 list.files( path = "../labs/data",
-  pattern = "*.TIF$",
+  pattern = "\\.TIF$",
   recursive = TRUE, 
   full.names = TRUE)
 ```
-
 
 ## From STAC to Analysis: The Full Workflow
 
@@ -456,7 +455,6 @@ All queryable programmatically from R with `rstac`.
 4. Together, these **unlock automated multi-year, multi-region analyses**
 5. For water science: **combine satellite data with ground-truth** (gauges, models) to answer critical operational questions
 
----
 
 ## Complete Walkthrough: 
 ### Palo 2016 Flood Analysis
@@ -657,17 +655,10 @@ buildings = st_transform(osm$osm_polygons, crs(landsat_crop))
 plot(buildings, add = TRUE)}
 ```
 
+## Extract maximum NDVI flood value for each building:
+
 ```{r}
 buildings$impact = terra::extract(ndvi_flood, buildings, fun = max, na.rm = TRUE)[,2] > 0
-
-{
-plot(ndvi_flood, col = c("white", "blue"), 
-     main = c("NDVI-based Flood Map with OSM Buildings"))
-plot(filter(buildings, impact),
-     add = TRUE,
-     col = 'red',
-     border = FALSE)
-}
 
 carto = app(ndvi,  function(x) ifelse(x < 0, 1, NA))
 mapview::mapview(carto) + filter(buildings, impact)
