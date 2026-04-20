@@ -1,0 +1,1101 @@
+---
+title: "Week 5"
+subtitle: "Beyond `collect_metrics()`: Interpretation & Spatial Resampling"
+format:
+  revealjs:
+    smaller: true
+    incremental: false
+    logo: ../csu-rams-logo.png
+    slide-number: c/t
+    footer: "[ESS 523c: Environmental Data Science Applications: Water Resources](https://github.com/mikejohnson51/csu-ess-523c/)"
+    include-before-body: header.html
+    include-after-body: footer-annotations.html
+    theme: [default, csu-css.scss]
+    width: 1600
+    height: 1000
+    countIncrementalSlides: false
+    title-slide-attributes:
+      data-background-color: "#1E4D2B"
+knitr:
+  opts_chunk:
+    echo: true
+    message: false
+    warning: false
+    collapse: true
+    comment: "#>"
+    out.width: "100%"
+---
+
+```{r setup}
+#| echo: false
+#| message: false
+#| warning: false
+hexes <- function(..., size = 64) {
+  x <- c(...)
+  x <- sort(unique(x), decreasing = TRUE)
+  right <- (seq_along(x) - 1) * size
+
+  res <- glue::glue(
+    '![](hexes/<x>.png){.absolute top=-20 right=<right> width="<size>" height="<size * 1.16>"}',
+    .open = "<", .close = ">"
+  )
+
+  paste0(res, collapse = " ")
+}
+
+library(tidymodels)
+library(tibble)
+library(forested)
+library(sf)
+library(dplyr)
+library(ggplot2)
+
+train_color  <- '#1E4D2B'
+test_color   <- '#C8C372'
+data_color   <- "#767381"
+assess_color <- "#84cae1"
+splits_pal   <- c(data_color, train_color, test_color)
+
+theme_set(theme_minimal(base_size = 14))
+```
+
+## Where we left off
+
+On Monday we built a full `tidymodels` pipeline on the `forested` dataset:
+
+- `initial_split()` → `training()` / `testing()`
+- `vfold_cv()` → 10-fold cross-validation on the training set
+- `recipe()` → impute → dummy → normalize
+- `parsnip` spec → `workflow()` → `fit_resamples()`
+- `collect_metrics()` → accuracy, ROC AUC, Brier score
+
+. . .
+
+A logistic regression came out ahead of a decision tree, and we stopped there.
+
+## Today: two questions `collect_metrics()` can't answer
+
+1. **"Which predictors actually drove the prediction?"** — a global ROC AUC doesn't tell you whether the model leaned on `elevation`, `canopy_cover`, or `vapor_max`.
+
+2. **"Is my 0.92 AUC honest?"** — or did the model just memorize spatial context, because neighboring hexagons in Washington state are nearly identical?
+
+. . .
+
+Today's two tools:
+
+- 📊 `vip` — **Variable Importance Plots**: rank predictors by how much a model relied on them.
+- 🗺️ `spatialsample` — **Spatial resampling**: cross-validation schemes that respect the geography of your data.
+
+. . .
+
+And a key insight: **the first tool is not trustworthy without the second.**
+
+## By the end of today you will be able to...
+
+- Extract a **variable importance** ranking from a fitted `tidymodels` workflow with `vip::vip()`
+- Explain why **random `vfold_cv`** inflates skill estimates on spatially autocorrelated data
+- Diagnose spatial autocorrelation in **model residuals** with Moran's I (callback to Week 3)
+- Replace `vfold_cv()` with `spatial_block_cv()` from `spatialsample` and compare honest vs. inflated metrics
+- Re-evaluate variable importance under spatial CV and identify features that were *spatial proxies* vs. *real signal*
+
+# Part 1: Which features mattered? `r hexes("vip")`
+
+## The diagnostic gap
+
+A `collect_metrics()` table answers *how well* a model predicts.
+
+It doesn't answer:
+
+- Which predictors carried the most weight?
+- Would removing one of them hurt the model?
+- Are the predictors the model relies on the ones that make *scientific* sense?
+
+. . .
+
+These are **interpretability** questions, and they're essential before you ship a model to a stakeholder.
+
+:::{.callout-note}
+"A model that scores well but relies on the wrong features will fail the moment conditions change." — every applied ML scientist, eventually.
+:::
+
+## Variable Importance Plots (VIP)
+
+A **Variable Importance Plot** ranks predictors by their contribution to a fitted model.
+
+. . .
+
+Two broad families:
+
+- **Model-specific** — uses internals of the model itself
+    - Decision trees: the total reduction in Gini impurity at nodes that split on each variable
+    - Linear / logistic regression: absolute value of standardized coefficients
+    - Random forests / boosted trees: same as trees, averaged across the ensemble
+
+- **Model-agnostic** (permutation-based) — works for *any* model
+    - Shuffle one predictor's values, re-predict, measure how much performance drops
+    - If shuffling `elevation` cuts AUC by 0.15, `elevation` is important
+
+. . .
+
+:::{.callout-important}
+Variable importance measures **what the model used**, not **what is causally true**. A predictor can rank high because it's a *proxy* for something else (e.g., longitude encoding climate) — we'll return to this in Part 3.
+:::
+
+## The `vip` package `r hexes("vip")`
+
+`vip` is a lightweight, `tidymodels`-friendly interface for importance plots.
+
+- Works with `parsnip` / `workflow` objects via `extract_fit_parsnip()`
+- Supports model-specific importance for most engines
+- Supports permutation importance for *any* model via `vip::vi_permute()`
+- `vip()` returns a `ggplot` — easy to customize
+
+```{r}
+#| eval: false
+library(vip)
+fitted_wf |>
+  extract_fit_parsnip() |>
+  vip()
+```
+
+## Rebuild the forested pipeline `r hexes("rsample", "forested")`
+
+Exactly what we had last week — no new concepts yet:
+
+```{r}
+set.seed(123)
+
+forested_split <- initial_split(forested, strata = forested, prop = 0.8)
+forested_train <- training(forested_split)
+forested_test  <- testing(forested_split)
+
+forested_folds <- vfold_cv(forested_train, v = 10, strata = forested)
+
+forested_recipe <- recipe(forested ~ ., data = forested_train) |>
+  step_impute_mean(all_numeric_predictors()) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_normalize(all_numeric_predictors())
+```
+
+## Fit two models
+
+A logistic regression (our winner from last week) and a decision tree (our runner-up):
+
+```{r}
+log_mod <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+dt_mod <- decision_tree(tree_depth = 10, min_n = 3) |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+# Unfitted workflows (we'll reuse these for fit_resamples later)
+log_wf <- workflow() |>
+  add_recipe(forested_recipe) |>
+  add_model(log_mod)
+
+dt_wf <- workflow() |>
+  add_recipe(forested_recipe) |>
+  add_model(dt_mod)
+
+# One-shot fit on the full training set — gives us a model we can interrogate
+log_fit <- fit(log_wf, data = forested_train)
+dt_fit  <- fit(dt_wf,  data = forested_train)
+```
+
+## Model-specific VIP `r hexes("vip")`
+
+::: columns
+::: {.column width="50%"}
+#### Logistic regression
+
+Importance = absolute value of standardized coefficient.
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4
+library(vip)
+
+log_fit |>
+  extract_fit_parsnip() |>
+  vip(num_features = 10) +
+  labs(title = "Logistic Regression",
+       subtitle = "|standardized coefficient|")
+```
+:::
+
+::: {.column width="50%"}
+#### Decision tree
+
+Importance = total reduction in impurity at splits using each feature.
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4
+dt_fit |>
+  extract_fit_parsnip() |>
+  vip(num_features = 10) +
+  labs(title = "Decision Tree",
+       subtitle = "impurity reduction at splits")
+```
+:::
+:::
+
+## Agreement and disagreement `r hexes("vip")`
+
+A feature's *rank* in each model shows where they agree and where they diverge.
+
+::: columns
+::: {.column width="48%"}
+```{r}
+#| eval: false
+log_imp <- vi(extract_fit_parsnip(log_fit)) |>
+  mutate(rank = rank(-Importance),
+         model = "logistic")
+dt_imp  <- vi(extract_fit_parsnip(dt_fit))  |>
+  mutate(rank = rank(-Importance),
+         model = "tree")
+
+ranks <- bind_rows(log_imp, dt_imp) |>
+  group_by(Variable) |>
+  filter(n() == 2, min(rank) <= 10) |>
+  ungroup()
+
+ggplot(ranks,
+       aes(model, rank, group = Variable)) +
+  geom_line(color = "grey70") +
+  geom_point(aes(color = model), size = 3) +
+  geom_text(data = filter(ranks, model == "logistic"),
+            aes(label = Variable),
+            hjust = 1.1, size = 3) +
+  scale_y_reverse(breaks = 1:15) +
+  scale_color_manual(
+    values = c(train_color, assess_color),
+    guide = "none")
+```
+
+- Flat lines → **robust signal** across models
+- Swinging lines → **model-specific quirks**
+:::
+
+::: {.column width="52%"}
+```{r}
+#| echo: false
+#| fig-width: 6
+#| fig-height: 6
+
+log_imp <- vi(extract_fit_parsnip(log_fit)) |>
+  mutate(rank = rank(-Importance), model = "logistic")
+dt_imp  <- vi(extract_fit_parsnip(dt_fit))  |>
+  mutate(rank = rank(-Importance), model = "tree")
+
+ranks <- bind_rows(log_imp, dt_imp) |>
+  group_by(Variable) |>
+  filter(n() == 2, min(rank) <= 10) |>
+  ungroup()
+
+ggplot(ranks, aes(model, rank, group = Variable)) +
+  geom_line(color = "grey70") +
+  geom_point(aes(color = model), size = 3) +
+  geom_text(data = filter(ranks, model == "logistic"),
+            aes(label = Variable), hjust = 1.1, size = 3.2) +
+  scale_y_reverse(breaks = 1:15) +
+  scale_color_manual(values = c(train_color, assess_color), guide = "none") +
+  labs(x = NULL, y = "VIP rank (1 = most important)",
+       title = "Rank shift between models") +
+  theme(panel.grid.major.x = element_blank())
+```
+:::
+:::
+
+:::{.callout-tip}
+VIP is most informative across **multiple models**. Features important everywhere = probably real signal; features that matter only to one model type are often artifacts of how that model carves up the feature space.
+:::
+
+## Model-agnostic VIP (permutation) `r hexes("vip")`
+
+Permutation importance works on *any* model — no internals required.
+
+**Algorithm:**
+
+1. Fit the model.
+2. Compute a baseline metric (e.g., ROC AUC on a held-out set).
+3. For each predictor: randomly shuffle it, re-predict, recompute the metric.
+4. Importance = baseline metric − shuffled metric.
+
+. . .
+
+A predictor that, when scrambled, doesn't hurt performance was **not being used**.
+
+```{r}
+#| eval: false
+set.seed(321)
+
+# A wrapper that returns the probability of the "Yes" class
+pred_wrapper <- function(object, newdata) {
+  predict(object, new_data = newdata, type = "prob")$.pred_Yes
+}
+
+vip::vi_permute(
+  log_fit,
+  train           = forested_train,
+  target          = "forested",
+  metric          = "roc_auc",
+  reference_class = "Yes",
+  pred_wrapper    = pred_wrapper,
+  nsim            = 5
+) |>
+  vip::vip(num_features = 10) +
+  labs(title = "Logistic regression — permutation importance")
+```
+
+Permutation importance is **slow** (shuffles + re-predicts once per feature per `nsim`), so you usually run it offline and save the result.
+
+## VIP takeaways
+
+✅ VIP gives you a ranked list of *what the model used*
+
+✅ Comparing model-specific VIP across several models reveals robust signals
+
+✅ Permutation importance is model-agnostic — use it when you don't trust a model's internal scoring
+
+. . .
+
+⚠️ VIP is **local to the fit you hand it**:
+
+- Fit on a different training set? Rankings can shift.
+- Use a different CV scheme? Rankings can shift again.
+
+. . .
+
+That second point is the bridge to Part 2.
+
+# Part 2: Is my CV honest? 🗺️
+
+## What does the model actually predict? `r hexes("broom")`
+
+Before asking *is the CV honest*, let's look at the predictions themselves. The forested dataset is spatial — map the predicted probability of forest for every test hexagon:
+
+```{r}
+#| fig-width: 10
+#| fig-height: 4.5
+
+test_preds <- augment(log_fit, new_data = forested_test)
+
+ggplot(test_preds, aes(lon, lat, color = .pred_Yes)) +
+  geom_point(size = 0.8, alpha = 0.85) +
+  scale_color_viridis_c(option = "viridis",
+                        name = "P(forested)",
+                        limits = c(0, 1)) +
+  coord_quickmap() +
+  labs(title = "Predicted probability of forest — logistic model on held-out test set",
+       subtitle = "Spatially coherent bands — that's a hint the model has learned geography")
+```
+
+. . .
+
+Notice the **smooth spatial gradients** in the predicted probabilities. That is informative — but it's also a warning sign: either (a) the environmental drivers really do vary smoothly in space, or (b) the model is using spatial location as a shortcut.
+
+. . .
+
+CV is supposed to tell us which. That's where the honesty question comes in.
+
+## Recall from Week 3: spatial autocorrelation
+
+> Are nearby values more similar than we would expect by chance?
+
+. . .
+
+We tested this with **Moran's I**: a global summary of whether similar values cluster in space.
+
+- **positive Moran's I** → similar neighbors cluster together
+- **near 0** → no strong spatial pattern
+- **negative Moran's I** → neighbors tend to be dissimilar
+
+. . .
+
+And we saw that water-resources outcomes (streamflow error, nutrient concentration, flood exposure) almost always carry *strong* positive spatial autocorrelation.
+
+## Why this matters for ML
+
+`vfold_cv()` assigns rows to folds **randomly**.
+
+If your data is spatially autocorrelated, a random fold assignment guarantees that:
+
+- almost every *test* hexagon has a *training* hexagon as its near neighbor
+- the model learns local geography and gets rewarded for it at assessment time
+- reported metrics describe how well the model **memorizes** neighborhoods, not how well it **generalizes** to new places
+
+. . .
+
+This is a form of **data leakage**.
+
+. . .
+
+:::{.callout-warning}
+The problem is hard to notice because the code still runs, the metrics are still high, and nothing obviously fails. You only catch it when you deploy the model somewhere truly new — like a different state.
+:::
+
+## Diagnosing the problem: Moran's I on *residuals*
+
+Moran's I in Week 3 tested whether *outcome values* cluster.
+
+We can also ask: **do a model's errors cluster?**
+
+. . .
+
+If residuals are spatially autocorrelated, the model is systematically right in some areas and systematically wrong in others — it has not captured the spatial structure, it has **bypassed** it.
+
+. . .
+
+Plan:
+
+1. Attach predictions to the held-out test set
+2. Compute the residual (1 for a miss, 0 for a hit — this is a classification problem)
+3. Map the residuals
+4. Test for clustering with Moran's I
+
+## Residuals, mapped
+
+```{r}
+#| fig-width: 9
+#| fig-height: 4.5
+
+preds <- augment(log_fit, new_data = forested_test) |>
+  mutate(
+    correct  = (.pred_class == forested),
+    residual = as.numeric(!correct)   # 1 = miss, 0 = hit
+  )
+
+ggplot(preds, aes(lon, lat, color = factor(residual))) +
+  geom_point(alpha = 0.7, size = 0.8) +
+  scale_color_manual(values = c("0" = "grey70", "1" = "#B22222"),
+                     labels = c("correct", "miss"),
+                     name = NULL) +
+  coord_quickmap() +
+  labs(title = "Where does the logistic model miss?",
+       subtitle = "Red = held-out hexagon misclassified") +
+  theme(legend.position = "top")
+```
+
+. . .
+
+Do you see clumps of red?  That's spatial autocorrelation in the residuals.
+
+## Quantifying it: Moran's I on residuals
+
+```{r}
+library(ape)
+
+# Use a simple inverse-distance W on a sample of test points
+set.seed(10)
+samp <- preds |> slice_sample(n = 400)
+
+dmat <- as.matrix(dist(cbind(samp$lon, samp$lat)))
+W <- 1 / dmat
+diag(W) <- 0
+W <- W / rowSums(W)
+
+moran_res <- Moran.I(samp$residual, W)
+moran_res
+```
+
+. . .
+
+A positive, significant Moran's I on residuals is the smoking gun: **the model's errors are not random — they cluster.**
+
+## The Moran scatterplot `r hexes("ggplot2")`
+
+Moran's I is the *slope* of a line through this scatterplot:
+
+- **x-axis**: the residual at a point
+- **y-axis**: the average residual of that point's neighbors (the *spatial lag*)
+- points in upper-right / lower-left = clustering
+- diffuse cloud around zero = no spatial structure
+
+```{r}
+#| fig-width: 8
+#| fig-height: 4.5
+
+samp <- samp |>
+  mutate(lag_residual = as.numeric(W %*% residual))
+
+ggplot(samp, aes(residual, lag_residual)) +
+  geom_vline(xintercept = mean(samp$residual), linetype = "dashed", color = "grey50") +
+  geom_hline(yintercept = mean(samp$lag_residual), linetype = "dashed", color = "grey50") +
+  geom_jitter(width = 0.05, height = 0, alpha = 0.4, color = train_color) +
+  geom_smooth(method = "lm", se = FALSE, color = "#B22222", linewidth = 1) +
+  labs(x = "Residual (0 = hit, 1 = miss)",
+       y = "Mean neighbor residual (spatial lag)",
+       title = paste0("Moran scatterplot — slope = ", round(moran_res$observed, 3)),
+       subtitle = "Positive slope confirms: misses cluster next to other misses")
+```
+
+. . .
+
+**The red line's slope *is* Moran's I.** Positive slope → the model's errors are geographically contagious → random CV is overstating performance.
+
+## The leakage visualized
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 4.5
+
+set.seed(42)
+demo <- forested_train |>
+  slice_sample(n = 1000) |>
+  mutate(fold = as.factor(sample(1:10, n(), replace = TRUE)))
+
+ggplot(demo, aes(lon, lat, color = fold)) +
+  geom_point(size = 0.8, alpha = 0.7) +
+  scale_color_viridis_d() +
+  coord_quickmap() +
+  labs(title = "Random vfold_cv fold assignment",
+       subtitle = "Every fold is geographically interleaved with every other one") +
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(override.aes = list(size = 3), nrow = 1))
+```
+
+. . .
+
+Every test point has a training point as a near neighbor.  That's the leakage.
+
+# Part 3: Spatial cross-validation `r hexes("rsample")`
+
+## Enter `spatialsample` `r hexes("rsample")`
+
+The `spatialsample` package (a tidymodels extension) provides resampling schemes that **respect geography**.
+
+<br>
+
+| Function | How it splits |
+|---|---|
+| `spatial_block_cv()` | Tiles the area with a grid; assigns whole blocks to folds |
+| `spatial_clustering_cv()` | k-means on coordinates, uses clusters as folds |
+| `spatial_buffer_vfold_cv()` | Standard v-fold + removes a buffer of points around the held-out fold from training |
+| `spatial_leave_location_out_cv()` | Leave out one named location (watershed, region, ...) |
+
+. . .
+
+All produce familiar `rset` objects — they slot into `fit_resamples()` and `workflow_map()` unchanged.
+
+. . .
+
+📖 Reference: <https://spatialsample.tidymodels.org/>
+
+## Convert to an `sf` object `r hexes("sf")`
+
+`spatialsample` needs spatial coordinates — we pass an `sf` object:
+
+```{r}
+forested_sf <- forested_train |>
+  st_as_sf(coords = c("lon", "lat"), crs = 4326, remove = FALSE)
+
+class(forested_sf)
+```
+
+:::{.callout-note}
+We keep `lon`/`lat` as columns (`remove = FALSE`) so the model can still use them if it wants to — but conceptually that's a smell, see Part 4.
+:::
+
+## Spatial block CV `r hexes("rsample")`
+
+```{r}
+library(spatialsample)
+
+set.seed(123)
+forested_block <- spatial_block_cv(forested_sf, v = 10)
+forested_block
+```
+
+. . .
+
+```{r}
+#| fig-width: 8
+#| fig-height: 4.5
+autoplot(forested_block) +
+  labs(title = "spatial_block_cv: fold assignment")
+```
+
+## Compare the fold maps
+
+::: columns
+::: {.column width="50%"}
+#### Random `vfold_cv`
+
+```{r}
+#| echo: false
+#| fig-width: 5
+#| fig-height: 4
+ggplot(demo, aes(lon, lat, color = fold)) +
+  geom_point(size = 0.6, alpha = 0.7) +
+  scale_color_viridis_d(guide = "none") +
+  coord_quickmap() +
+  labs(title = "Neighbors in every fold")
+```
+
+Every fold contains points from every region of Washington.  A held-out point has a training point next door.
+:::
+
+::: {.column width="50%"}
+#### `spatial_block_cv`
+
+```{r}
+#| echo: false
+#| fig-width: 5
+#| fig-height: 4
+autoplot(forested_block) +
+  labs(title = "One contiguous block per fold") +
+  guides(color = "none")
+```
+
+Each fold is a **contiguous region**.  Holding it out simulates predicting somewhere the model has never seen.
+:::
+:::
+
+## Zoom in on one fold `r hexes("rsample")`
+
+What does *one* spatial fold actually look like? Pull out fold 1 and plot its training and assessment sets:
+
+```{r}
+#| fig-width: 9
+#| fig-height: 4.5
+
+fold1 <- forested_block$splits[[1]]
+train1 <- analysis(fold1)
+test1  <- assessment(fold1)
+
+bind_rows(
+  train1 |> mutate(role = "training"),
+  test1  |> mutate(role = "assessment")
+) |>
+  ggplot(aes(lon, lat, color = role)) +
+  geom_point(alpha = 0.6, size = 0.7) +
+  scale_color_manual(values = c("training" = train_color,
+                                "assessment" = "#B22222")) +
+  coord_quickmap() +
+  labs(title = "Fold 1: train vs. held-out assessment",
+       subtitle = "The model never sees the red region during this fold's training",
+       color = NULL) +
+  theme(legend.position = "top")
+```
+
+. . .
+
+This is the geometry random `vfold_cv` was quietly destroying: under random CV, those red points would have been surrounded by green ones.
+
+## Block size matters `r hexes("rsample")`
+
+`spatial_block_cv()` takes a `cellsize` argument (in **CRS units**). It controls the tile side length — and therefore how much spatial separation you actually get.
+
+::: columns
+::: {.column width="33%"}
+#### Small blocks (~0.1°)
+
+```{r}
+#| echo: false
+#| fig-width: 4
+#| fig-height: 3.5
+set.seed(1)
+b_small <- spatial_block_cv(forested_sf, v = 10, cellsize = 0.1)
+autoplot(b_small) + labs(title = "cellsize = 0.1°") + guides(color = "none")
+```
+
+Too small — folds interleave again, essentially random CV.
+:::
+
+::: {.column width="33%"}
+#### Default (~0.5°)
+
+```{r}
+#| echo: false
+#| fig-width: 4
+#| fig-height: 3.5
+autoplot(forested_block) + labs(title = "spatialsample default") + guides(color = "none")
+```
+
+Usually a reasonable starting point.
+:::
+
+::: {.column width="33%"}
+#### Large blocks (~1.5°)
+
+```{r}
+#| echo: false
+#| fig-width: 4
+#| fig-height: 3.5
+set.seed(1)
+b_large <- spatial_block_cv(forested_sf, v = 5, cellsize = 1.5)
+autoplot(b_large) + labs(title = "cellsize = 1.5°") + guides(color = "none")
+```
+
+Very conservative — few effective folds, high fold-to-fold variance.
+:::
+:::
+
+. . .
+
+:::{.callout-tip}
+Rule of thumb: set `cellsize` to the spatial range of autocorrelation (from the variogram or Moran's I distance bins). You want neighboring *training* points far enough from the test block that the model can't just interpolate.
+:::
+
+## Re-fit the forested workflow `r hexes("parsnip", "workflows")`
+
+Identical to last week — only the `resamples` argument changes:
+
+```{r}
+#| cache: true
+set.seed(2024)
+
+cls_metrics <- metric_set(roc_auc, accuracy, brier_class)
+ctrl        <- control_resamples(save_pred = TRUE)
+
+log_rs_random  <- log_wf |>
+  fit_resamples(resamples = forested_folds,  metrics = cls_metrics, control = ctrl)
+
+log_rs_spatial <- log_wf |>
+  fit_resamples(resamples = forested_block,  metrics = cls_metrics, control = ctrl)
+```
+
+## The moment of truth
+
+```{r}
+bind_rows(
+  collect_metrics(log_rs_random)  |> mutate(scheme = "vfold_cv (random)"),
+  collect_metrics(log_rs_spatial) |> mutate(scheme = "spatial_block_cv")
+) |>
+  select(scheme, .metric, mean, std_err) |>
+  arrange(.metric, scheme)
+```
+
+. . .
+
+:::{.callout-important}
+Spatial CV almost always **lowers** reported skill. That drop is not a bug — it's the model telling you how well it generalizes to unseen geography. The random-CV number was the fiction.
+:::
+
+## ROC curves: random vs spatial folds `r hexes("yardstick")`
+
+Pull the out-of-fold predictions from each scheme and overlay their ROC curves:
+
+```{r}
+#| fig-width: 7
+#| fig-height: 5
+#| fig-align: center
+
+roc_data <- bind_rows(
+  collect_predictions(log_rs_random)  |> mutate(scheme = "vfold_cv (random)"),
+  collect_predictions(log_rs_spatial) |> mutate(scheme = "spatial_block_cv")
+) |>
+  group_by(scheme) |>
+  roc_curve(truth = forested, .pred_Yes)
+
+ggplot(roc_data,
+       aes(1 - specificity, sensitivity, color = scheme)) +
+  geom_abline(linetype = "dashed", color = "grey70") +
+  geom_path(linewidth = 1.1) +
+  scale_color_manual(values = c(train_color, "#B22222")) +
+  coord_equal() +
+  labs(title = "Out-of-fold ROC curves",
+       subtitle = "The spatial curve sits below the random curve at every threshold",
+       color = NULL) +
+  theme(legend.position = "top")
+```
+
+. . .
+
+This is the same story as the AUC numbers, but now you can **see** it: the random-CV curve hugs the corner more tightly because the model is being graded on points it has near-neighbors for.
+
+## It's not just lower — it's more variable `r hexes("yardstick")`
+
+The mean hides the story. Pull **per-fold** metrics with `summarize = FALSE`:
+
+```{r}
+#| fig-width: 9
+#| fig-height: 4
+
+per_fold <- bind_rows(
+  collect_metrics(log_rs_random,  summarize = FALSE) |> mutate(scheme = "vfold_cv (random)"),
+  collect_metrics(log_rs_spatial, summarize = FALSE) |> mutate(scheme = "spatial_block_cv")
+) |> filter(.metric == "roc_auc")
+
+ggplot(per_fold, aes(scheme, .estimate, color = scheme)) +
+  geom_boxplot(width = 0.3, outlier.shape = NA, alpha = 0.3) +
+  geom_jitter(width = 0.08, size = 2.5, alpha = 0.8) +
+  scale_color_manual(values = c(train_color, "#B22222"), guide = "none") +
+  labs(y = "ROC AUC (per fold)", x = NULL,
+       title = "Per-fold ROC AUC by resampling scheme",
+       subtitle = "Spatial CV is both lower on average AND more variable across folds")
+```
+
+. . .
+
+Random CV gives you 10 near-identical numbers (every fold looks like the whole dataset). Spatial CV gives you a **distribution** — and that spread is your honest estimate of how much skill depends on *which* region you're predicting. Report both the mean and the variance.
+
+## Where does spatial CV struggle? `r hexes("ggplot2")`
+
+Each spatial fold's held-out region has a **location**. We can map each fold's held-out AUC to see which regions are hardest to predict:
+
+```{r}
+#| fig-width: 10
+#| fig-height: 4.5
+
+fold_auc <- collect_metrics(log_rs_spatial, summarize = FALSE) |>
+  filter(.metric == "roc_auc") |>
+  select(id, fold_auc = .estimate)
+
+fold_locations <- purrr::map_dfr(
+  seq_along(forested_block$splits),
+  function(i) {
+    assessment(forested_block$splits[[i]]) |>
+      st_drop_geometry() |>
+      select(lon, lat) |>
+      mutate(id = forested_block$id[i])
+  }
+) |> left_join(fold_auc, by = "id")
+
+ggplot(fold_locations, aes(lon, lat, color = fold_auc)) +
+  geom_point(size = 0.8, alpha = 0.8) +
+  scale_color_viridis_c(option = "magma", name = "Fold AUC") +
+  coord_quickmap() +
+  labs(title = "Per-fold ROC AUC mapped to the held-out region",
+       subtitle = "Dark = model struggles in that region; light = model generalizes well there")
+```
+
+. . .
+
+The regions where AUC is *lowest* are the places your model has the least transferable signal. That's a **scientific** finding, not just a number — it tells you where you need more training data or a better feature set.
+
+## Alternative: `spatial_clustering_cv` `r hexes("rsample")`
+
+When blocks don't fit your data (e.g., irregularly shaped study regions), cluster-based folds are often better:
+
+```{r}
+#| fig-width: 8
+#| fig-height: 4
+
+set.seed(123)
+forested_cluster <- spatial_clustering_cv(forested_sf, v = 10)
+
+autoplot(forested_cluster) +
+  labs(title = "spatial_clustering_cv: k-means on coordinates")
+```
+
+. . .
+
+Same API — drop it into `fit_resamples(resamples = forested_cluster)` and go.
+
+## Alternative: buffered v-fold `r hexes("rsample")`
+
+What if you want random folds **but** guarantee no training point is within, say, 10 km of a test point?
+
+```{r}
+#| eval: false
+# Project to a local equal-area CRS first so `buffer` is in meters
+forested_proj <- st_transform(forested_sf, 5070)   # Albers CONUS
+
+forested_buffered <- spatial_buffer_vfold_cv(
+  forested_proj,
+  v      = 10,
+  buffer = 10000   # 10 km (because the CRS is now in meters)
+)
+```
+
+- Each training set has points within `buffer` of held-out points **removed**
+- Preserves fold size randomness; enforces a minimum spatial gap
+- Good compromise when blocks are too coarse but random CV is too leaky
+
+:::{.callout-warning}
+`buffer` is expressed in the units of the CRS. Buffers on geographic (lon/lat) CRSs give meaningless results — always transform to a projected CRS first.
+:::
+
+## Alternative: leave-location-out CV `r hexes("rsample")`
+
+For water resources, the natural spatial unit isn't usually a square block — it's a **watershed**, **gauge basin**, or **ecoregion**. `spatial_leave_location_out_cv()` holds out one named group at a time:
+
+```{r}
+#| fig-width: 8
+#| fig-height: 4
+
+forested_region <- forested_sf |>
+  mutate(region = case_when(
+    lon < -122.5 ~ "Coastal",
+    lon < -120.5 ~ "Cascade",
+    lon < -118.5 ~ "Central",
+    TRUE         ~ "Eastern"
+  ))
+
+set.seed(123)
+forested_lloc <- spatial_leave_location_out_cv(
+  forested_region,
+  group = region
+)
+
+autoplot(forested_lloc) +
+  labs(title = "spatial_leave_location_out_cv — one region held out per fold")
+```
+
+. . .
+
+Each fold trains on 3 regions and predicts the 4th. This directly answers *"if I trained only on coastal WA, could I predict eastern WA?"* — a question `vfold_cv` literally cannot answer.
+
+:::{.callout-note}
+In your project, replace `region` with the natural group — HUC8 watershed, USGS gauge basin, state, PRISM climate zone, etc. The `group` argument just needs a column name.
+:::
+
+## When *not* to reach for spatial CV 🤔
+
+Spatial CV is not a universal "do this instead of `vfold_cv`" replacement. It depends on your **scientific question**:
+
+. . .
+
+✅ **Use spatial CV when:**
+
+- You want to *generalize* to new locations (operational forecasting, transfer to a new study region, national-scale extrapolation)
+- Your test set will be geographically distinct from training data
+- You have significant spatial autocorrelation in residuals (check it!)
+
+. . .
+
+⚠️ **Random CV can still be defensible when:**
+
+- Your question is explicitly "predict well *in the same places and periods* I have training data" (e.g., gap-filling a sensor network where every test point has dense neighbors by design)
+- Your data is **not** spatially structured (rare in water resources)
+- You want a pre-deployment upper-bound estimate and are planning to re-evaluate on independent regions later
+
+. . .
+
+:::{.callout-tip}
+A mature workflow often reports **both**: random CV as a best-case ceiling, spatial CV as a generalization floor. The gap between them is informative — a large gap is a flag that your model is leaning hard on geography.
+:::
+
+# Part 4: Trust your diagnostics
+
+## Re-running VIP under spatial CV
+
+Resampling schemes don't change the **final fit** — `log_fit` is the same object whether we evaluate it with random or spatial folds.
+
+What spatial CV changes is **which features we should trust as important** based on how well they generalize.
+
+. . .
+
+So instead of re-fitting, we'll run a *counterfactual* experiment:
+
+- keep the model fixed
+- **remove** features we suspect are spatial shortcuts (`lon`, `lat`)
+- compare how much performance falls under random vs. spatial CV
+
+If a feature is truly informative, dropping it hurts *both* CV schemes. If it was a spatial proxy, dropping it mostly hurts the random scheme.
+
+## A diagnostic trick: drop `lon` / `lat` and refit
+
+If a feature is truly informative, dropping it should *hurt* the model.
+
+If a feature is a spatial proxy, dropping it should only hurt under random CV — because under spatial CV the model couldn't lean on it anyway.
+
+```{r}
+#| cache: true
+recipe_no_xy <- recipe(forested ~ ., data = forested_train) |>
+  step_rm(lon, lat) |>
+  step_impute_mean(all_numeric_predictors()) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_normalize(all_numeric_predictors())
+
+wf_no_xy <- workflow() |>
+  add_recipe(recipe_no_xy) |>
+  add_model(log_mod)
+
+set.seed(9)
+rs_random_no_xy  <- wf_no_xy |>
+  fit_resamples(resamples = forested_folds, metrics = metric_set(roc_auc))
+rs_spatial_no_xy <- wf_no_xy |>
+  fit_resamples(resamples = forested_block, metrics = metric_set(roc_auc))
+```
+
+## The 2×2 comparison
+
+```{r}
+#| fig-width: 9
+#| fig-height: 4.5
+
+results_2x2 <- bind_rows(
+  collect_metrics(log_rs_random)    |> mutate(scheme = "random vfold",  features = "all"),
+  collect_metrics(log_rs_spatial)   |> mutate(scheme = "spatial block", features = "all"),
+  collect_metrics(rs_random_no_xy)  |> mutate(scheme = "random vfold",  features = "drop lon/lat"),
+  collect_metrics(rs_spatial_no_xy) |> mutate(scheme = "spatial block", features = "drop lon/lat")
+) |>
+  filter(.metric == "roc_auc")
+
+ggplot(results_2x2,
+       aes(scheme, mean, fill = features)) +
+  geom_col(position = position_dodge(width = 0.75), width = 0.65, color = "white") +
+  geom_errorbar(aes(ymin = mean - std_err, ymax = mean + std_err),
+                position = position_dodge(width = 0.75), width = 0.15) +
+  geom_text(aes(label = round(mean, 3), y = mean + std_err + 0.01),
+            position = position_dodge(width = 0.75), size = 3.5) +
+  scale_fill_manual(values = c("all" = train_color, "drop lon/lat" = test_color)) +
+  coord_cartesian(ylim = c(0.7, 1)) +
+  labs(y = "ROC AUC (mean ± SE)", x = NULL,
+       title = "2×2 experiment: CV scheme × feature set",
+       fill = NULL) +
+  theme(legend.position = "top")
+```
+
+. . .
+
+- Random CV + all features → the **inflated headline number** (left-green bar)
+- Random CV + drop coords → still high: `lon`/`lat` were doing *some* work but not all of it
+- Spatial CV + all features → the **honest number**: lower (right-green bar)
+- Spatial CV + drop coords → roughly the same as the honest number: confirms the model can't use coords as a shortcut under spatial CV
+
+The **vertical gap between the two green bars** is the spatial-leakage inflation.
+
+## What this tells us
+
+If a feature's *apparent importance* shrinks when you switch to spatial CV, that feature was partly acting as a **geographic proxy** — encoding *where* rather than *why*.
+
+The features that remain important under spatial CV are the ones carrying **transferable signal**.
+
+. . .
+
+:::{.callout-tip}
+A practical workflow:
+
+1. Fit under random CV, look at VIP → your **hypothesis set** of important features
+2. Fit under spatial CV, look at VIP again → your **robust** important features
+3. Features that only rank high under (1) deserve scientific scrutiny — are they mechanism, or are they geography?
+:::
+
+## Takeaways
+
+1. **`collect_metrics()` is necessary, not sufficient.** You also need to ask *what* the model uses and *whether* your evaluation respects the data's structure.
+
+2. **`vip` gives you the "what".** Model-specific importance for common engines, permutation importance for anything else.
+
+3. **Spatial autocorrelation breaks random CV.** The model gets rewarded for memorizing geography; reported metrics are inflated.
+
+4. **`spatialsample` gives you honest CV.** `spatial_block_cv`, `spatial_clustering_cv`, and buffered variants all slot into the existing tidymodels pipeline.
+
+5. **The two tools must be used together.** VIP under random CV tells you what the model *used to memorize*; VIP under spatial CV tells you what the model *actually learned*.
+
+## Looking ahead
+
+**Week 6**: We'll return to the `forested` problem with a full zoo of model families (random forests, boosted trees, SVMs, neural nets) — and hyperparameter **tuning**. Everything you learned today about honest evaluation still applies.
+
+**For your project**: any time your data is spatial (which in water resources is *always*), default to `spatial_block_cv` or `spatial_clustering_cv`. The cost is a few extra lines; the benefit is numbers you can defend.
+
+. . .
+
+📖 Further reading:
+
+- `spatialsample`: <https://spatialsample.tidymodels.org/>
+- `vip`: <https://koalaverse.github.io/vip/>
+- Roberts et al. (2017), *Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure*
+- Meyer et al. (2019), *Importance of spatial predictor variable selection in machine learning applications*
+
+##  {background-iframe="https://spatialsample.tidymodels.org/"}
+
+::: footer
+:::
