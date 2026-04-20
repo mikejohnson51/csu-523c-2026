@@ -159,16 +159,101 @@ tidymodels::tidymodels_packages()
 
 6️⃣ Evaluate Performance (`yardstick`)
 
-## Data Budget
+## Recap: `lm()` in R
 
-- In any modeling effort, it's crucial to evaluate the performance of a model using different validation techniques to ensure a model can generalize to unseen data. 
+_You've used `lm()` before — this slide frames it as the foundation for everything broom and tidymodels build on top of._
 
-- But data is limited even in the age of "big data".
+:::: {.columns}
+::: {.column width="50%"}
+`lm()` fits a **linear model** by ordinary least squares.
 
-```{r diagram-split}
-#| fig-align: "center"
+```r
+model <- lm(y ~ x1 + x2, data = df)
+```
+
+**Key arguments:**
+
+- `formula` — `response ~ predictors` (`.` = all columns)
+- `data` — the training data frame
+
+**Common follow-up functions:**
+
+| Function | What it returns |
+|---|---|
+| `summary(model)` | Coefficients, R², F-statistic |
+| `coef(model)` | Named coefficient vector |
+| `fitted(model)` | In-sample predictions |
+| `residuals(model)` | Raw residuals |
+:::
+::: {.column width="50%"}
+```{r lm-recap-demo}
+mod <- lm(body_mass_g ~ bill_length_mm + species,
+          data = drop_na(penguins))
+summary(mod)
+```
+
+**Reading the output:**
+
+- `Estimate` — change in *y* per 1-unit increase in *x*
+- `Pr(>|t|)` — p-value: is the coefficient ≠ 0?
+- `Adjusted R²` — proportion of variance explained
+- `F-statistic` — overall model significance
+
+→ `broom` wraps this into tidy tibbles (next slide)
+:::
+::::
+
+---
+
+## Recap: `broom` — tidying model outputs `r hexes("broom")`
+
+`broom` converts messy model objects into tidy tibbles. Three core functions:
+
+| Function | Returns | Use it when you want to ... |
+|---|---|---|
+| `tidy()` | One row per **model term** | Inspect coefficients, p-values, confidence intervals |
+| `glance()` | One row per **model** | Compare overall fit (R², AIC, log-likelihood, …) |
+| `augment()` | One row per **observation** | Add predictions, residuals, influence stats to data |
+
+. . .
+
+```{r broom-lm-demo}
+simple_mod <- lm(body_mass_g ~ bill_length_mm + species, data = drop_na(penguins))
+
+tidy(simple_mod)      # coefficients table
+```
+
+---
+
+## Recap: `broom` in practice
+
+```{r broom-glance-augment}
+glance(simple_mod)    # model-level fit statistics
+
+augment(simple_mod) |>
+  select(body_mass_g, .fitted, .resid) |>
+  head(5)
+```
+
+:::{.callout-note}
+`augment()` on a **workflow** (next slide) works the same way — it just accepts `new_data =` so you can apply the fitted model to held-out data. The column names (`.fitted`, `.pred_class`, `.pred_*`, `.resid`) are always predictable.
+:::
+
+## Predict with your model `r hexes("broom")`
+
+_How do you use your new model?_
+
+  * `augment()` will return the dataset with predictions and residuals added.
+
+```{r augment}
+lm_preds <- augment(simple_mod, new_data = drop_na(penguins))
+```
+
+<br> 
+
+```{r}
 #| echo: false
-knitr::include_graphics("img/whole-game-split.jpg")
+lm_preds
 ```
 
 ## Our typical process will look like this:
@@ -663,9 +748,22 @@ ggplot(skew_data, aes(x = value, fill = type)) +
 :::
 ::::
 
-## On to modeling! {background-color="#C8C372"}
+# On to modeling! {background-color="#C8C372"}
 
 Now that the data is cleaned, understood, and modified, we can move on to modeling.
+
+## Data Budget
+
+- In any modeling effort, it's crucial to evaluate the performance of a model using different validation techniques to ensure a model can generalize to unseen data. 
+
+- But data is limited even in the age of "big data".
+
+```{r diagram-split}
+#| fig-align: "center"
+#| echo: false
+knitr::include_graphics("img/whole-game-split.jpg")
+```
+
 
 ## How we split data 
 
@@ -1811,7 +1909,6 @@ Why Use Workflows?
 
 4. Fit the workflow
 
-
 ## A model workflow `r hexes("parsnip", "workflows")`
 
 ```{r tree-wflow}
@@ -1834,97 +1931,17 @@ dt_wf
 Swap `add_formula()` for `add_recipe(my_recipe)` and the same workflow now carries your feature engineering pipeline *and* the model together — `fit()` will `prep()`/`bake()` for you on every resample.
 :::
 
-## Recap: `lm()` in R
+## Predict with your model `r hexes("workflows", "broom")`
 
-_You've used `lm()` before — this slide frames it as the foundation for everything broom and tidymodels build on top of._
+_How do you apply your fitted workflow to the test set?_
 
-:::: {.columns}
-::: {.column width="50%"}
-`lm()` fits a **linear model** by ordinary least squares.
+  * `augment()` on a workflow accepts `new_data =` and returns the test data with predictions appended.
 
-```r
-model <- lm(y ~ x1 + x2, data = df)
-```
-
-**Key arguments:**
-
-- `formula` — `response ~ predictors` (`.` = all columns)
-- `data` — the training data frame
-
-**Common follow-up functions:**
-
-| Function | What it returns |
-|---|---|
-| `summary(model)` | Coefficients, R², F-statistic |
-| `coef(model)` | Named coefficient vector |
-| `fitted(model)` | In-sample predictions |
-| `residuals(model)` | Raw residuals |
-:::
-::: {.column width="50%"}
-```{r lm-recap-demo}
-mod <- lm(body_mass_g ~ bill_length_mm + species,
-          data = drop_na(penguins))
-summary(mod)
-```
-
-**Reading the output:**
-
-- `Estimate` — change in *y* per 1-unit increase in *x*
-- `Pr(>|t|)` — p-value: is the coefficient ≠ 0?
-- `Adjusted R²` — proportion of variance explained
-- `F-statistic` — overall model significance
-
-→ `broom` wraps this into tidy tibbles (next slide)
-:::
-::::
-
----
-
-## Recap: `broom` — tidying model outputs `r hexes("broom")`
-
-`broom` converts messy model objects into tidy tibbles. Three core functions:
-
-| Function | Returns | Use it when you want to ... |
-|---|---|---|
-| `tidy()` | One row per **model term** | Inspect coefficients, p-values, confidence intervals |
-| `glance()` | One row per **model** | Compare overall fit (R², AIC, log-likelihood, …) |
-| `augment()` | One row per **observation** | Add predictions, residuals, influence stats to data |
-
-. . .
-
-```{r broom-lm-demo}
-simple_mod <- lm(body_mass_g ~ bill_length_mm + species, data = drop_na(penguins))
-
-tidy(simple_mod)      # coefficients table
-```
-
----
-
-## Recap: `broom` in practice
-
-```{r broom-glance-augment}
-glance(simple_mod)    # model-level fit statistics
-
-augment(simple_mod) |>
-  select(body_mass_g, .fitted, .resid) |>
-  head(5)
-```
-
-:::{.callout-note}
-`augment()` on a **workflow** (next slide) works the same way — it just accepts `new_data =` so you can apply the fitted model to held-out data. The column names (`.fitted`, `.pred_class`, `.pred_*`, `.resid`) are always predictable.
-:::
-
-## Predict with your model `r hexes("broom")`
-
-_How do you use your new model?_
-
-  * `augment()` will return the dataset with predictions and residuals added.
-
-```{r augment}
+```{r dt-predict}
 dt_preds <- augment(dt_wf, new_data = forested_test)
 ```
 
-<br> 
+<br>
 
 ```{r}
 #| echo: false
