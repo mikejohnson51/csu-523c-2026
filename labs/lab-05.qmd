@@ -11,6 +11,7 @@ subtitle: 'Using Tidymodels & CAMELS Data'
 ```{r}
 #| message: false
 #| echo: false
+#| warning: false
 library(tidyverse)
 library(tidymodels)
 ```
