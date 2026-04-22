@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lab 5: Machine Learning in Hydrology – ESS 523c</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-8ea72dc5fed832574809a9c94082fbbb.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5b6eb65566b1f8a996f1287d789c0740.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-c63d9198b28a859559c0f0cce9729cfa.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../csu-rams-logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">ESS 523c</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/mikejohnson51/csu-523c-2026/"> <i class="bi bi-github" role="img" aria-label="ESS 523c">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#what-is-tidymodels" id="toc-what-is-tidymodels" class="nav-link" data-scroll-target="#what-is-tidymodels">What is tidymodels?</a></li>
+  <li><a href="#what-is-the-camels-dataset" id="toc-what-is-the-camels-dataset" class="nav-link" data-scroll-target="#what-is-the-camels-dataset">What is the CAMELS dataset?</a></li>
+  </ul></li>
+  <li><a href="#whats-in-the-data" id="toc-whats-in-the-data" class="nav-link" data-scroll-target="#whats-in-the-data">What’s in the data?</a>
+  <ul class="collapse">
+  <li><a href="#lab-goals" id="toc-lab-goals" class="nav-link" data-scroll-target="#lab-goals">Lab Goals</a></li>
+  </ul></li>
+  <li><a href="#lab-set-up" id="toc-lab-set-up" class="nav-link" data-scroll-target="#lab-set-up">Lab Set Up</a>
+  <ul class="collapse">
+  <li><a href="#data-download" id="toc-data-download" class="nav-link" data-scroll-target="#data-download">Data Download</a></li>
+  <li><a href="#getting-the-documentation-pdf" id="toc-getting-the-documentation-pdf" class="nav-link" data-scroll-target="#getting-the-documentation-pdf">Getting the documentation PDF</a></li>
+  <li><a href="#getting-basin-characteristics" id="toc-getting-basin-characteristics" class="nav-link" data-scroll-target="#getting-basin-characteristics">Getting Basin characteristics</a></li>
+  </ul></li>
+  <li><a href="#question-1-your-turn-15-points" id="toc-question-1-your-turn-15-points" class="nav-link" data-scroll-target="#question-1-your-turn-15-points">Question 1: Your Turn (15 points)</a>
+  <ul class="collapse">
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a></li>
+  </ul></li>
+  <li><a href="#question-2-your-turn-20-points" id="toc-question-2-your-turn-20-points" class="nav-link" data-scroll-target="#question-2-your-turn-20-points">Question 2: Your Turn (20 points)</a></li>
+  <li><a href="#model-preparation" id="toc-model-preparation" class="nav-link" data-scroll-target="#model-preparation">Model Preparation</a>
+  <ul class="collapse">
+  <li><a href="#visual-eda" id="toc-visual-eda" class="nav-link" data-scroll-target="#visual-eda">Visual EDA</a></li>
+  </ul></li>
+  <li><a href="#model-building" id="toc-model-building" class="nav-link" data-scroll-target="#model-building">Model Building</a>
+  <ul class="collapse">
+  <li><a href="#lets-start-by-splitting-the-data" id="toc-lets-start-by-splitting-the-data" class="nav-link" data-scroll-target="#lets-start-by-splitting-the-data">Lets start by splitting the data</a></li>
+  <li><a href="#preprocessor-recipe" id="toc-preprocessor-recipe" class="nav-link" data-scroll-target="#preprocessor-recipe">Preprocessor: <code>recipe</code></a></li>
+  <li><a href="#naive-base-lm-approach" id="toc-naive-base-lm-approach" class="nav-link" data-scroll-target="#naive-base-lm-approach">Naive base <code>lm</code> approach:</a></li>
+  <li><a href="#where-things-get-a-little-messy" id="toc-where-things-get-a-little-messy" class="nav-link" data-scroll-target="#where-things-get-a-little-messy">Where things get a little messy…</a>
+  <ul class="collapse">
+  <li><a href="#wrong-version-1-augment" id="toc-wrong-version-1-augment" class="nav-link" data-scroll-target="#wrong-version-1-augment">Wrong version 1: augment</a></li>
+  <li><a href="#wrong-version-2-predict" id="toc-wrong-version-2-predict" class="nav-link" data-scroll-target="#wrong-version-2-predict">Wrong version 2: <code>predict</code></a></li>
+  <li><a href="#correct-version-prep---bake---predict" id="toc-correct-version-prep---bake---predict" class="nav-link" data-scroll-target="#correct-version-prep---bake---predict">Correct version: <code>prep</code> -&gt; <code>bake</code> -&gt; <code>predict</code></a></li>
+  </ul></li>
+  <li><a href="#model-evaluation-statistical-and-visual" id="toc-model-evaluation-statistical-and-visual" class="nav-link" data-scroll-target="#model-evaluation-statistical-and-visual">Model Evaluation: statistical and visual</a></li>
+  <li><a href="#using-a-workflow-instead" id="toc-using-a-workflow-instead" class="nav-link" data-scroll-target="#using-a-workflow-instead">Using a <code>workflow</code> instead</a></li>
+  <li><a href="#making-predictions" id="toc-making-predictions" class="nav-link" data-scroll-target="#making-predictions">Making Predictions</a></li>
+  <li><a href="#model-evaluation-statistical-and-visual-1" id="toc-model-evaluation-statistical-and-visual-1" class="nav-link" data-scroll-target="#model-evaluation-statistical-and-visual-1">Model Evaluation: statistical and visual</a></li>
+  <li><a href="#switch-it-up" id="toc-switch-it-up" class="nav-link" data-scroll-target="#switch-it-up">Switch it up!</a></li>
+  <li><a href="#predictions" id="toc-predictions" class="nav-link" data-scroll-target="#predictions">Predictions</a></li>
+  <li><a href="#model-evaluation-statistical-and-visual-2" id="toc-model-evaluation-statistical-and-visual-2" class="nav-link" data-scroll-target="#model-evaluation-statistical-and-visual-2">Model Evaluation: statistical and visual</a></li>
+  <li><a href="#a-workflowset-approach" id="toc-a-workflowset-approach" class="nav-link" data-scroll-target="#a-workflowset-approach">A <code>workflowset</code> approach</a></li>
+  <li><a href="#final-model" id="toc-final-model" class="nav-link" data-scroll-target="#final-model">Final Model</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">Evaluation</a></li>
+  </ul></li>
+  <li><a href="#question-3-your-turn-40-points" id="toc-question-3-your-turn-40-points" class="nav-link" data-scroll-target="#question-3-your-turn-40-points">Question 3: Your Turn! (40 points)</a></li>
+  <li><a href="#bridge-to-q4-what-the-lectures-cover" id="toc-bridge-to-q4-what-the-lectures-cover" class="nav-link" data-scroll-target="#bridge-to-q4-what-the-lectures-cover">Bridge to Q4: what the lectures cover</a></li>
+  <li><a href="#question-4-build-your-own-200-points" id="toc-question-4-build-your-own-200-points" class="nav-link" data-scroll-target="#question-4-build-your-own-200-points">Question 4: Build your own (200 points)</a>
+  <ul class="collapse">
+  <li><a href="#data-prep-eda-30-week-5-1" id="toc-data-prep-eda-30-week-5-1" class="nav-link" data-scroll-target="#data-prep-eda-30-week-5-1">Data prep &amp; EDA (30) — <em>Week 5-1</em></a></li>
+  <li><a href="#recipe-30-week-5-1" id="toc-recipe-30-week-5-1" class="nav-link" data-scroll-target="#recipe-30-week-5-1">Recipe (30) — <em>Week 5-1</em></a></li>
+  <li><a href="#define-3-models-30-week-6-1" id="toc-define-3-models-30-week-6-1" class="nav-link" data-scroll-target="#define-3-models-30-week-6-1">Define 3 models (30) — <em>Week 6-1</em></a></li>
+  <li><a href="#workflow-set-compare-with-honest-cv-35-week-5-2" id="toc-workflow-set-compare-with-honest-cv-35-week-5-2" class="nav-link" data-scroll-target="#workflow-set-compare-with-honest-cv-35-week-5-2">Workflow set — compare with <em>honest</em> CV (35) — <em>Week 5-2</em></a></li>
+  <li><a href="#tune-the-best-model-25-week-6-1" id="toc-tune-the-best-model-25-week-6-1" class="nav-link" data-scroll-target="#tune-the-best-model-25-week-6-1">Tune the best model (25) — <em>Week 6-1</em></a></li>
+  <li><a href="#variable-importance-25-week-5-2" id="toc-variable-importance-25-week-5-2" class="nav-link" data-scroll-target="#variable-importance-25-week-5-2">Variable importance (25) — <em>Week 5-2</em></a></li>
+  <li><a href="#final-fit-evaluate-25-week-6-1" id="toc-final-fit-evaluate-25-week-6-1" class="nav-link" data-scroll-target="#final-fit-evaluate-25-week-6-1">Final fit &amp; evaluate (25) — <em>Week 6-1</em></a></li>
+  </ul></li>
+  <li><a href="#rubric" id="toc-rubric" class="nav-link" data-scroll-target="#rubric">Rubric</a></li>
+  <li><a href="#submission" id="toc-submission" class="nav-link" data-scroll-target="#submission">Submission:</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+<script src="https://use.fontawesome.com/5235085b15.js"></script>
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 5: Machine Learning in Hydrology</h1>
+<p class="subtitle lead">Using Tidymodels &amp; CAMELS Data</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggplot2' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tibble' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyr' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'readr' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'purrr' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'dplyr' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'lubridate' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'broom' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'infer' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'parsnip' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'rsample' was built under R version 4.4.3</code></pre>
+</div>
+</div>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In this lab, we will explore predictive modeling in hydrology using the <code>tidymodels</code> framework and the CAMELS (Catchment Attributes and Meteorology for Large-sample Studies) dataset.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://ncar.github.io/hydrology/assets/img/datasets/CAMELS_attributes_fig1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:75.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="what-is-tidymodels" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-tidymodels">What is tidymodels?</h2>
+<p><code>tidymodels</code> is an R framework designed for machine learning and statistical modeling. Built on the principles of the <code>tidyverse</code>, <code>tidymodels</code> provides a consistent and modular approach to tasks like data preprocessing, model training, evaluation, and validation. By leveraging the strengths of packages such as <code>recipes</code>, <code>parsnip</code>, and <code>yardstick</code>, <code>tidymodels</code> streamlines the modeling workflow, making it easier to experiment with different models while maintaining reproducibility and interpretability.</p>
+</section>
+<section id="what-is-the-camels-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-the-camels-dataset">What is the CAMELS dataset?</h2>
+<p>The CAMELS dataset is a widely used resource in hydrology and environmental science, providing data on over 500 self-draining river basins across the United States. It includes meteorological forcings, streamflow observations, and catchment attributes such as land cover, topography, and soil properties. This dataset is particularly valuable for large-sample hydrology studies, enabling researchers to develop and test models across diverse climatic and physiographic conditions.</p>
+<p>In this lab, we will focus on predicting mean streamflow for these basins using their associated characteristics. CAMELS has been instrumental in various hydrologic and machine learning applications, including:</p>
+<ul>
+<li><p>Calibrating Hydrologic Models – Used for parameter tuning in models like SAC-SMA, VIC, and HBV, improving regional and large-sample studies.</p></li>
+<li><p>Training Machine Learning Models – Supports deep learning (e.g., LSTMs) and regression-based streamflow predictions, often outperforming traditional methods.</p></li>
+<li><p>Understanding Model Behavior – Assists in assessing model generalization, uncertainty analysis, and the role of catchment attributes.</p></li>
+<li><p>Benchmarking &amp; Regionalization – Facilitates large-scale model comparisons and parameter transfer to ungauged basins.</p></li>
+<li><p>Hybrid Modeling – Enhances physics-based models with machine learning for bias correction and improved hydrologic simulations.</p></li>
+</ul>
+<p>A notable study by Kratzert et al.&nbsp;(2019) demonstrated that LSTMs can outperform conceptual models in streamflow prediction. As part of this lab, we will explore how to programmatically download and load the data into R.</p>
+</section>
+</section>
+<section id="whats-in-the-data" class="level1">
+<h1>What’s in the data?</h1>
+<p>Each record in the CAMELS dataset represents a unique river basin, identified by an outlet USGS NWIS <code>gauge_id</code>. The dataset contains a mix of continuous and categorical variables, including meteorological, catchment, and streamflow summaries.</p>
+<p>The data we are going to download are the basin-level summaries. For example, if we looked at row 1 of the data (Gage: 01013500), all of the attribute values are areal averages over the drainage basin shown below, while the flow metrics are associated with the outlet gage (in red). We can use <code>dataRetrieval::findNLDI()</code> to fetch the basin polygon and upstream flowlines:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the `findNLDI` function to get the basin and flowlines for the first gauge</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>basin <span class="ot">&lt;-</span> dataRetrieval<span class="sc">::</span><span class="fu">findNLDI</span>(<span class="at">nwis =</span> <span class="st">"01013500"</span>, </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="co"># Navigate the "upper tributaries" of the basin</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">nav =</span> <span class="st">"UT"</span>, </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="co"># Return the basin and flowlines</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">find =</span> <span class="fu">c</span>(<span class="st">"basin"</span>, <span class="st">"flowlines"</span>))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the basin, flowlines, and gauge ...</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> basin<span class="sc">$</span>basin, <span class="at">fill =</span> <span class="st">"lightblue"</span>) <span class="sc">+</span> </span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> basin<span class="sc">$</span>UT_flowlines, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span> </span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> basin<span class="sc">$</span>origin, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span> </span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="lab-goals" class="level2">
+<h2 class="anchored" data-anchor-id="lab-goals">Lab Goals</h2>
+<p>This lab’s worked example grounds the <strong>minimum</strong> tidymodels pipeline — split, recipe, workflow, fit, evaluate. Q3 and Q4 then ask you to extend that foundation with everything taught in the lectures.</p>
+<p>By the end of the lab you will have:</p>
+<ul>
+<li>Programmatically downloaded CAMELS data and joined basin-level attribute files into a modeling-ready frame.</li>
+<li>Specified a <code>recipe</code>, dropped it into a <code>workflow</code>, and compared multiple models via <code>workflow_set</code> against cross-validated resamples <em>(Week 5-1)</em>.</li>
+<li>Extracted <strong>variable importance</strong> and interpreted predictor ranks through the <em>geographic-proxy</em> lens <em>(Week 5-2)</em>.</li>
+<li>Evaluated with <strong>spatial cross-validation</strong> and reported the honest gap between random and spatial CV <em>(Week 5-2)</em>.</li>
+<li><strong>Tuned</strong> hyperparameters with <code>tune_grid()</code> and a named grid, then finalized with <code>last_fit()</code> <em>(Week 6-1)</em>.</li>
+<li>Produced a deployed Quarto page communicating the full pipeline.</li>
+</ul>
+<p>The worked example below demonstrates (1) and a stripped-down (2). You’ll apply the remaining capabilities — full workflow comparison, spatial CV, VIP, tuning, and <code>last_fit()</code> — in Q4 using the lecture material as reference.</p>
+</section>
+</section>
+<section id="lab-set-up" class="level1">
+<h1>Lab Set Up</h1>
+<ol type="1">
+<li>Make a new R project where you want this work to take place.</li>
+<li>Create a Quarto document called <code>lab-05.qmd</code> in the project folder.</li>
+<li>Create a <code>data</code> directory in your project folder.</li>
+<li>Instantiate a git archive with <code>usethis::use_git()</code></li>
+<li>Connect it to a Github repository with <code>usethis::use_github()</code></li>
+</ol>
+<p>Let’s start by loading the necessary libraries for this lab (you may need to install some!):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(powerjoin)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glue)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vip)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(baguette)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="data-download" class="level2">
+<h2 class="anchored" data-anchor-id="data-download">Data Download</h2>
+<p>The CAMELS dataset is archived on <a href="https://zenodo.org/records/15529996">Zenodo</a>. Scroll down to the file listing — you will see a set of <code>.txt</code> files (climate, geology, soil, topography, vegetation, hydrology summaries per basin), along with a PDF describing every column. Each file has a direct-download link of the form <code>https://zenodo.org/records/15529996/files/&lt;filename&gt;?download=1</code>.</p>
+<p>We will point all of our downloads at that root:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>root <span class="ot">&lt;-</span> <span class="st">'https://zenodo.org/records/15529996/files'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="getting-the-documentation-pdf" class="level2">
+<h2 class="anchored" data-anchor-id="getting-the-documentation-pdf">Getting the documentation PDF</h2>
+<p>We can download the documentation PDF which provides descriptions for the various columns (many are not self-explanatory). We use <code>download.file</code> to pull it into our <code>data/</code> directory — binary files like PDFs need <code>mode = "wb"</code> on Windows.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="st">'https://zenodo.org/records/15529996/files/camels_attributes_v2.0.pdf?download=1'</span>,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>              <span class="st">'../data/camels_attributes_v2.0.pdf'</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">mode =</span> <span class="st">'wb'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="getting-basin-characteristics" class="level2">
+<h2 class="anchored" data-anchor-id="getting-basin-characteristics">Getting Basin characteristics</h2>
+<p>Now we want to download the <code>.txt</code> files that store the actual data documented in the PDF. Doing this file by file (like we did with the PDF) is possible, but lets look at a better/easier way…</p>
+<ol type="a">
+<li>Lets create a vector storing the data types/file names we want to download:</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>types <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"clim"</span>, <span class="st">"geol"</span>, <span class="st">"soil"</span>, <span class="st">"topo"</span>, <span class="st">"vege"</span>, <span class="st">"hydro"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+glue
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The <code>glue</code> package provides an efficient way to interpolate and manipulate strings. It is particularly useful for dynamically constructing text, formatting outputs, and embedding R expressions within strings.</p>
+<section id="key-features-of-glue" class="level4">
+<h4 class="anchored" data-anchor-id="key-features-of-glue">Key Features of glue:</h4>
+<ul>
+<li><strong>String Interpolation</strong>: Embed R expressions inside strings using <code>{}</code>.</li>
+<li><strong>Improved Readability</strong>: Eliminates the need for cumbersome <code>paste()</code>, <code>paste0()</code> and <code>sprintf()</code> commands.</li>
+<li><strong>Multi-line Strings</strong>: Easily handle multi-line text formatting.</li>
+<li><strong>Safe and Efficient</strong>: Optimized for performance and readability.</li>
+</ul>
+</section>
+<section id="basic-usage" class="level4">
+<h4 class="anchored" data-anchor-id="basic-usage">Basic Usage</h4>
+<ul>
+<li>To use <code>glue</code>, you need to load the package and then call the <code>glue()</code> function with the desired string template. You can embed R expressions within curly braces <code>{}</code> to interpolate values into the string.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>class <span class="ot">&lt;-</span> <span class="st">"ESS 330"</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>year  <span class="ot">&lt;-</span> <span class="dv">2024</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">glue</span>(<span class="st">"We are taking {class} together in {year}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>We are taking ESS 330 together in 2024</code></pre>
+</div>
+</div>
+</section>
+<section id="multiples" class="level3">
+<h3 class="anchored" data-anchor-id="multiples">Multiples</h3>
+<ul>
+<li>You can also use glue to interpolate multiple values at once</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>classes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ESS 330"</span>, <span class="st">"ESS 523c"</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glue</span>(<span class="st">"We are taking {classes} together in {year}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>We are taking ESS 330 together in 2024
+We are taking ESS 523c together in 2024</code></pre>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<ol start="2" type="a">
+<li>Using <code>glue</code>, we can construct the needed URLs and file names for the data we want to download. Zenodo direct-download links end with <code>?download=1</code>, so we append that to the remote URL but keep the local filename clean:</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Where the files live online ...</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>remote_files  <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">'{root}/camels_{types}.txt?download=1'</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># where we want to download the data ...</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>local_files   <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">'data/camels_{types}.txt'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="3" type="a">
+<li>Now we can download the data: <code>walk2</code> comes from the <code>purrr</code> package and is used to apply a function to multiple arguments in parallel (much like <code>map2</code> works over paired lists). Here, we are asking <code>walk2</code> to pass the first element of <code>remote_files</code> and the first element of <code>local_files</code> to the <code>download.file</code> function to download the data, and setting <code>quiet = TRUE</code> to suppress output. The process is then iterated for the second element of each vector, and so on.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">walk2</span>(remote_files, local_files, download.file, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="4" type="a">
+<li>Once downloaded, the data can be read it into R using <code>readr::read_delim()</code>, again instead of applying this to each file individually, we can use <code>map</code> to apply the function to each element of the <code>local_files</code> list.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read and merge data</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>camels <span class="ot">&lt;-</span> <span class="fu">map</span>(local_files, read_delim, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="5" type="a">
+<li>This gives us a list of data.frames, one for each file that we want to merge into a single table. So far in class we have focused on *_join functions to merge data based on a primary and foreign key relationship.</li>
+</ol>
+<p>In this current list, we have &gt;2 tables, but, have a shared column called <code>gauge_id</code> that we can use to merge the data. However, since we have more then a left and right hand table, we need a more robust tool. We will use the <code>powerjoin</code> package to merge the data into a single data frame. <code>powerjoin</code> is a flexible package for joining lists of <code>data.frames</code>. It provides a wide range of join types, including inner, left, right, full, semi, anti, and cross joins making it a versatile tool for data manipulation and analysis, and one that should feel familiar to users of <code>dplyr</code>.</p>
+<p>In this case, we are join to merge every data.frame in the list (n = 6) by the shared <code>gauge_id</code> column. Since we want to keep all data, we want a full join.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>camels <span class="ot">&lt;-</span> <span class="fu">power_full_join</span>(camels ,<span class="at">by =</span> <span class="st">'gauge_id'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Alternatively, we could have read straight form the urls. Strongly consider the implications of this approach as the longevity and persistence of the data is not guaranteed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read and merge data</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>camels <span class="ot">&lt;-</span> <span class="fu">map</span>(remote_files, read_delim, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">power_full_join</span>(<span class="at">by =</span> <span class="st">'gauge_id'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="question-1-your-turn-15-points" class="level1">
+<h1>Question 1: Your Turn (15 points)</h1>
+<ul class="task-list">
+<li><label><input type="checkbox">Make sure all data and the PDF are downloaded into you data directory</label></li>
+<li><label><input type="checkbox">From the documentation PDF, report what <code>zero_q_freq</code> represents</label></li>
+</ul>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
+<p>First, lets make a map of the sites. Use the <code>borders()</code> ggplot function to add state boundaries to the map and initially color the points by the mean flow (<code>q_mean</code>) at each site.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> camels, <span class="fu">aes</span>(<span class="at">x =</span> gauge_lon, <span class="at">y =</span> gauge_lat)) <span class="sc">+</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">borders</span>(<span class="st">"state"</span>, <span class="at">colour =</span> <span class="st">"gray50"</span>) <span class="sc">+</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> q_mean)) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"pink"</span>, <span class="at">high =</span> <span class="st">"dodgerblue"</span>) <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  ggthemes<span class="sc">::</span><span class="fu">theme_map</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can take a moment here to learn a few new things about <code>ggplot2</code>!</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Color scales
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In <code>ggplot</code>, sometimes you want different things (like bars, dots, or lines) to have different colors. But how does R know which colors to use? That’s where color scales come in!</p>
+<p>scales can be used to map data values to colors (<code>scale_color_*</code>) or fill aesthetics (<code>scale_fill_*</code>). There are two main types of color scales:</p>
+<ul>
+<li>Discrete color scales – for things that are categories, like “apples,” “bananas,” and “cherries.” Each gets its own separate color.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"yellow"</span>, <span class="st">"pink"</span>)) <span class="co">#lets you pick your own colors.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Or</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Set1"</span>) <span class="co">#uses a built-in color set.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Continuous color scales – for numbers, like temperature (cold to hot) or height (short to tall). The color changes smoothly.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="co">#makes small numbers blue and big numbers red.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="question-2-your-turn-20-points" class="level1">
+<h1>Question 2: Your Turn (20 points)</h1>
+<ul class="task-list">
+<li><label><input type="checkbox">Make 2 maps of the sites, coloring the points by the <code>aridity</code> and <code>p_mean</code> columns</label></li>
+<li><label><input type="checkbox">Add clear labels, titles, and a color scale that makes sense for each parameter.</label></li>
+<li><label><input type="checkbox">Ensure these render as a single image with your choice of <code>facet_*</code>, <code>patchwork</code>, or <code>ggpubr</code></label></li>
+</ul>
+</section>
+<section id="model-preparation" class="level1">
+<h1>Model Preparation</h1>
+<p>As an initial analysis, lets look at the relationship between aridity, rainfall and mean flow. First, lets make sure there is not significant correlation between these variables. Here, we make sure to drop NAs and only view the 3 columns of interest.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>camels <span class="sc">|&gt;</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(aridity, p_mean, q_mean) <span class="sc">|&gt;</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           aridity     p_mean     q_mean
+aridity  1.0000000 -0.7550090 -0.5817771
+p_mean  -0.7550090  1.0000000  0.8865757
+q_mean  -0.5817771  0.8865757  1.0000000</code></pre>
+</div>
+</div>
+<p>As expected, there is a strong correlation between rainfall and mean flow, and an inverse correlation between aridity and rainfall. While both are high, we are going to see if we can build a model to predict mean flow using aridity and rainfall.</p>
+<section id="visual-eda" class="level2">
+<h2 class="anchored" data-anchor-id="visual-eda">Visual EDA</h2>
+<ol type="a">
+<li>Lets start by looking that the 3 dimensions (variables) of this data. We’ll start with a XY plot of aridity and rainfall. We are going to use the <code>scale_color_viridis_c()</code> function to color the points by the <code>q_mean</code> column. This scale functions maps the color of the points to the values in the <code>q_mean</code> column along the viridis continuous (c) palette. Because a <code>scale_color_*</code> function is applied, it maps to the known color aesthetic in the plot.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a scatter plot of aridity vs rainfall</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(camels, <span class="fu">aes</span>(<span class="at">x =</span> aridity, <span class="at">y =</span> p_mean)) <span class="sc">+</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add points colored by mean flow</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> q_mean)) <span class="sc">+</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add a linear regression line</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply the viridis color scale</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>() <span class="sc">+</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add a title, axis labels, and theme (w/ legend on the bottom)</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span> </span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span> </span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Aridity vs Rainfall vs Runoff"</span>,</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Aridity"</span>,</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Rainfall"</span>,</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Mean Flow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Ok! so it looks like there <strong>is</strong> a relationship between rainfall, aridity, and rainfall but it looks like an exponential decay function and is certainly not linear.</p>
+<p>To test a transformation, we can log transform the x and y axes using the <code>scale_x_log10()</code> and <code>scale_y_log10()</code> functions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(camels, <span class="fu">aes</span>(<span class="at">x =</span> aridity, <span class="at">y =</span> p_mean)) <span class="sc">+</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> q_mean)) <span class="sc">+</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>() <span class="sc">+</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply log transformations to the x and y axes</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span> </span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span> </span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Aridity vs Rainfall vs Runoff"</span>,</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Aridity"</span>,</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Rainfall"</span>,</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Mean Flow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Great! We can see a log-log relationship between aridity and rainfall provides a more linear relationship. This is a common relationship in hydrology and is often used to estimate rainfall in ungauged basins. However, once the data is transformed, the lack of spread in the streamflow data is quite evident with high mean flow values being compressed to the low end of aridity/high end of rainfall.</p>
+<p>To address this, we can visualize how a log transform may benefit the <code>q_mean</code> data as well. Since the data is represented by color, rather than an axis, we can use the <code>trans</code> (transform) argument in the <code>scale_color_viridis_c()</code> function to log transform the color scale.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(camels, <span class="fu">aes</span>(<span class="at">x =</span> aridity, <span class="at">y =</span> p_mean)) <span class="sc">+</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> q_mean)) <span class="sc">+</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply a log transformation to the color scale</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">trans =</span> <span class="st">"log"</span>) <span class="sc">+</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span> </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Expand the legend width ...</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.key.width =</span> <span class="fu">unit</span>(<span class="fl">2.5</span>, <span class="st">"cm"</span>),</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.key.height =</span> <span class="fu">unit</span>(.<span class="dv">5</span>, <span class="st">"cm"</span>)) <span class="sc">+</span> </span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Aridity vs Rainfall vs Runoff"</span>,</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Aridity"</span>,</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Rainfall"</span>,</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Mean Flow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Excellent! Treating these three right skewed variables as log transformed, we can see a more evenly spread relationship between aridity, rainfall, and mean flow. This is a good sign for building a model to predict mean flow using aridity and rainfall.</p>
+</section>
+</section>
+<section id="model-building" class="level1">
+<h1>Model Building</h1>
+<section id="lets-start-by-splitting-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="lets-start-by-splitting-the-data">Lets start by splitting the data</h2>
+<p>First, we set a seed for reproducibility, then transform the <code>q_mean</code> column to a log scale. Remember it is error prone to apply transformations to the outcome variable within a <code>recipe</code>. So, we’ll do it a priori.</p>
+<p>Once set, we can split the data into a training and testing set. We are going to use 80% of the data for training and 20% for testing. We are leaving stratification off in this minimal example, but as Week 5-1 covered, stratified splits often matter when the outcome has structure — you’ll revisit this choice in Q4.</p>
+<p>Additionally, we are going to create a 10-fold cross validation dataset to help us evaluate multi-model setups.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Bad form to perform simple transformations on the outcome variable within a </span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co"># recipe. So, we'll do it here.</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>camels <span class="ot">&lt;-</span> camels <span class="sc">|&gt;</span> </span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">logQmean =</span> <span class="fu">log</span>(q_mean))</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate the split</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>camels_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(camels, <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>camels_train <span class="ot">&lt;-</span> <span class="fu">training</span>(camels_split)</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>camels_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(camels_split)</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>camels_cv <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(camels_train, <span class="at">v =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="preprocessor-recipe" class="level2">
+<h2 class="anchored" data-anchor-id="preprocessor-recipe">Preprocessor: <code>recipe</code></h2>
+<p>In Week 5-1 we saw how a <code>recipe</code> lets us declare a preprocessing pipeline once, estimate its parameters on the training data, and reuse it everywhere — folds, test set, new predictions.</p>
+<p>We learned quite a lot about the data in the visual EDA. We know that the <code>q_mean</code>, <code>aridity</code>, and <code>p_mean</code> columns are right skewed and can be helped by log transformations. We also know that the relationship between <code>aridity</code> and <code>p_mean</code> is non-linear and can be helped by adding an interaction term. Let’s build a small recipe that encodes those decisions (your Q4 recipe will be bigger):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a recipe to preprocess the data</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span>  <span class="fu">recipe</span>(logQmean <span class="sc">~</span> aridity <span class="sc">+</span> p_mean, <span class="at">data =</span> camels_train) <span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Log transform the predictor variables (aridity and p_mean)</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_log</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add an interaction term between aridity and p_mean</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_interact</span>(<span class="at">terms =</span> <span class="sc">~</span> aridity<span class="sc">:</span>p_mean) <span class="sc">|&gt;</span> </span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Drop any rows with missing values in the pred</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_naomit</span>(<span class="fu">all_predictors</span>(), <span class="fu">all_outcomes</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="naive-base-lm-approach" class="level2">
+<h2 class="anchored" data-anchor-id="naive-base-lm-approach">Naive base <code>lm</code> approach:</h2>
+<p>Ok, to start, lets do what we are comfortable with … fitting a linear model to the data. First, we use <code>prep</code> and <code>bake</code> on the training data to apply the <code>recipe.</code> Then, we fit a linear model to the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare the data</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>baked_data <span class="ot">&lt;-</span> <span class="fu">prep</span>(rec, camels_train) <span class="sc">|&gt;</span> </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bake</span>(<span class="at">new_data =</span> <span class="cn">NULL</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Interaction with lm</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="co">#  Base lm sets interaction terms with the * symbol</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>lm_base <span class="ot">&lt;-</span> <span class="fu">lm</span>(logQmean <span class="sc">~</span> aridity <span class="sc">*</span> p_mean, <span class="at">data =</span> baked_data)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_base)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = logQmean ~ aridity * p_mean, data = baked_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.91162 -0.21601 -0.00716  0.21230  2.85706 
+
+Coefficients:
+               Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)    -1.77586    0.16365 -10.852  &lt; 2e-16 ***
+aridity        -0.88397    0.16145  -5.475 6.75e-08 ***
+p_mean          1.48438    0.15511   9.570  &lt; 2e-16 ***
+aridity:p_mean  0.10484    0.07198   1.457    0.146    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.5696 on 531 degrees of freedom
+Multiple R-squared:  0.7697,    Adjusted R-squared:  0.7684 
+F-statistic: 591.6 on 3 and 531 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sanity Interaction term from recipe ... these should be equal!!</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(logQmean <span class="sc">~</span> aridity <span class="sc">+</span> p_mean <span class="sc">+</span> aridity_x_p_mean, <span class="at">data =</span> baked_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = logQmean ~ aridity + p_mean + aridity_x_p_mean, 
+    data = baked_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.91162 -0.21601 -0.00716  0.21230  2.85706 
+
+Coefficients:
+                 Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)      -1.77586    0.16365 -10.852  &lt; 2e-16 ***
+aridity          -0.88397    0.16145  -5.475 6.75e-08 ***
+p_mean            1.48438    0.15511   9.570  &lt; 2e-16 ***
+aridity_x_p_mean  0.10484    0.07198   1.457    0.146    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.5696 on 531 degrees of freedom
+Multiple R-squared:  0.7697,    Adjusted R-squared:  0.7684 
+F-statistic: 591.6 on 3 and 531 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="where-things-get-a-little-messy" class="level2">
+<h2 class="anchored" data-anchor-id="where-things-get-a-little-messy">Where things get a little messy…</h2>
+<p>Ok so now we have our trained model <code>lm_base</code> and want to validate it on the test data.</p>
+<blockquote class="blockquote">
+<p>Remember a models ability to predict on new data is the most important part of the modeling process. It really doesnt matter how well it does on data it has already seen!</p>
+</blockquote>
+<p>We have to be careful about how we do this with the base R approach:</p>
+<section id="wrong-version-1-augment" class="level3">
+<h3 class="anchored" data-anchor-id="wrong-version-1-augment">Wrong version 1: augment</h3>
+<p>The <code>broom</code> package provides a convenient way to extract model predictions and residuals. We can use the <code>augment</code> function to add predicted values to the test data. However, if we use <code>augment</code> directly on the test data, we will get incorrect results because the preprocessing steps defined in the <code>recipe</code> object have not been applied to the test data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(camels_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 135</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(camels_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 536</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>broom<span class="sc">::</span><span class="fu">augment</span>(lm_base, <span class="at">data =</span> camels_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>Error in `$&lt;-`:
+! Assigned data `unname(predict(x, na.action = na.pass, ...))` must be
+  compatible with existing data.
+✖ Existing data has 135 rows.
+✖ Assigned data has 535 rows.
+ℹ Only vectors of size 1 are recycled.
+Caused by error in `vectbl_recycle_rhs_rows()`:
+! Can't recycle input of size 535 to size 135.</code></pre>
+</div>
+</div>
+</section>
+<section id="wrong-version-2-predict" class="level3">
+<h3 class="anchored" data-anchor-id="wrong-version-2-predict">Wrong version 2: <code>predict</code></h3>
+<p>The <code>predict</code> function can be used to make predictions on new data. However, if we use <code>predict</code> directly on the test data, we will get incorrect results because the preprocessing steps defined in the <code>recipe</code> object have not been applied to the test data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>camels_test<span class="sc">$</span>p2 <span class="ot">=</span> <span class="fu">predict</span>(lm_base, <span class="at">newdata =</span> camels_test)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Scales way off!</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(camels_test, <span class="fu">aes</span>(<span class="at">x =</span> p2, <span class="at">y =</span> logQmean)) <span class="sc">+</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Linear fit line, no error bands</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1:1 line</span></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Linear Model Using `predict()`"</span>,</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Predicted Log Mean Flow"</span>,</span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Observed Log Mean Flow"</span>) <span class="sc">+</span></span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="correct-version-prep---bake---predict" class="level3">
+<h3 class="anchored" data-anchor-id="correct-version-prep---bake---predict">Correct version: <code>prep</code> -&gt; <code>bake</code> -&gt; <code>predict</code></h3>
+<p>To correctly evaluate the model on the test data, we need to apply the same preprocessing steps to the test data that we applied to the training data. We can do this using the <code>prep</code> and <code>bake</code> functions with the <code>recipe</code> object. This ensures the test data is transformed in the same way as the training data before making predictions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span>  <span class="fu">bake</span>(<span class="fu">prep</span>(rec), <span class="at">new_data =</span> camels_test)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>test_data<span class="sc">$</span>lm_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(lm_base, <span class="at">newdata =</span> test_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="model-evaluation-statistical-and-visual" class="level2">
+<h2 class="anchored" data-anchor-id="model-evaluation-statistical-and-visual">Model Evaluation: statistical and visual</h2>
+<p>Now that we have the predicted values, we can evaluate the model using the <code>metrics</code> function from the <code>yardstick</code> package. This function calculates common regression metrics such as RMSE, R-squared, and MAE between the observed and predicted values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(test_data, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> lm_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard       0.583
+2 rsq     standard       0.742
+3 mae     standard       0.390</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(test_data, <span class="fu">aes</span>(<span class="at">x =</span> logQmean, <span class="at">y =</span> lm_pred, <span class="at">colour =</span> aridity)) <span class="sc">+</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply a gradient color scale</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient2</span>(<span class="at">low =</span> <span class="st">"brown"</span>, <span class="at">mid =</span> <span class="st">"orange"</span>, <span class="at">high =</span> <span class="st">"darkgreen"</span>) <span class="sc">+</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span> </span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Linear Model: Observed vs Predicted"</span>,</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Observed Log Mean Flow"</span>,</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Predicted Log Mean Flow"</span>,</span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Aridity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Ok so that was a bit burdensome, is really error prone (fragile), and is worthless if we wanted to test a different algorithm… lets look at a better approach!</p>
+</section>
+<section id="using-a-workflow-instead" class="level2">
+<h2 class="anchored" data-anchor-id="using-a-workflow-instead">Using a <code>workflow</code> instead</h2>
+<p><code>tidymodels</code> provides a framework for building and evaluating models using a consistent and modular workflow. The <code>workflows</code> package lets you bundle a <strong>preprocessor</strong> (recipe or formula) and a <strong>model spec</strong> into a single object, then fit them together. This makes it easier to experiment with different models, compare performance, and ensure reproducibility.</p>
+<p>Here, we use <code>linear_reg()</code> to define a linear regression model, set the engine to <code>lm</code>, and the mode to <code>regression</code>. We then add our recipe to the workflow, fit the model to the training data, and extract the coefficients.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define model</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>lm_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># define the engine</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># define the mode</span></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Instantiate a workflow ...</span></span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>lm_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add the recipe</span></span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span></span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add the model</span></span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lm_model) <span class="sc">%&gt;%</span></span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Fit the model to the training data</span></span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train) </span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the model coefficients from the workflow</span></span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">extract_fit_engine</span>(lm_wf))<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Estimate Std. Error    t value     Pr(&gt;|t|)
+(Intercept)      -1.7758557 0.16364755 -10.851710 6.463654e-25
+aridity          -0.8839738 0.16144589  -5.475357 6.745512e-08
+p_mean            1.4843771 0.15511117   9.569762 4.022500e-20
+aridity_x_p_mean  0.1048449 0.07198145   1.456555 1.458304e-01</code></pre>
+</div>
+</div>
+<p>Lets ensure we replicated the results from the lm_base model. How do they look to you?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># From the base implementation</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_base)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 Estimate Std. Error    t value     Pr(&gt;|t|)
+(Intercept)    -1.7758557 0.16364755 -10.851710 6.463654e-25
+aridity        -0.8839738 0.16144589  -5.475357 6.745512e-08
+p_mean          1.4843771 0.15511117   9.569762 4.022500e-20
+aridity:p_mean  0.1048449 0.07198145   1.456555 1.458304e-01</code></pre>
+</div>
+</div>
+</section>
+<section id="making-predictions" class="level2">
+<h2 class="anchored" data-anchor-id="making-predictions">Making Predictions</h2>
+<p>Now that <code>lm_wf</code> is a workflow, data is not embedded in the model, we can use augment with the new_data argument to make predictions on the test data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>lm_data <span class="ot">&lt;-</span> <span class="fu">augment</span>(lm_wf, <span class="at">new_data =</span> camels_test)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(lm_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 135  62</code></pre>
+</div>
+</div>
+</section>
+<section id="model-evaluation-statistical-and-visual-1" class="level2">
+<h2 class="anchored" data-anchor-id="model-evaluation-statistical-and-visual-1">Model Evaluation: statistical and visual</h2>
+<p>As with EDA, graphical and statistical evaluation of the model is key. Here, we use the <code>metrics</code> function to extract the default regression metrics (rmse, rsq, mae) between the observed and predicted mean streamflow values.</p>
+<p>We then create a scatter plot of the observed vs predicted values, colored by aridity, to visualize the model performance.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(lm_data, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard       0.583
+2 rsq     standard       0.742
+3 mae     standard       0.390</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(lm_data, <span class="fu">aes</span>(<span class="at">x =</span> logQmean, <span class="at">y =</span> .pred, <span class="at">colour =</span> aridity)) <span class="sc">+</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>() <span class="sc">+</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>() <span class="sc">+</span></span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="switch-it-up" class="level2">
+<h2 class="anchored" data-anchor-id="switch-it-up">Switch it up!</h2>
+<p>The real power of this approach is that we can easily switch out the models/recipes and see how it performs. Here, we are going to instead use a random forest model to predict mean streamflow. We define a random forest model using the <code>rand_forest</code> function, set the engine to <code>ranger</code>, and the mode to <code>regression</code>. We then add the recipe, fit the model, and evaluate the skill.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(baguette)</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>rf_model <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>, <span class="at">importance =</span> <span class="st">"impurity"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>rf_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add the recipe</span></span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span></span>
+<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add the model</span></span>
+<span id="cb65-10"><a href="#cb65-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(rf_model) <span class="sc">%&gt;%</span></span>
+<span id="cb65-11"><a href="#cb65-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Fit the model</span></span>
+<span id="cb65-12"><a href="#cb65-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="predictions" class="level2">
+<h2 class="anchored" data-anchor-id="predictions">Predictions</h2>
+<ul>
+<li>Make predictions on the test data using the <code>augment</code> function and the <code>new_data</code> argument.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>rf_data <span class="ot">&lt;-</span> <span class="fu">augment</span>(rf_wf, <span class="at">new_data =</span> camels_test)</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(rf_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 135  61</code></pre>
+</div>
+</div>
+</section>
+<section id="model-evaluation-statistical-and-visual-2" class="level2">
+<h2 class="anchored" data-anchor-id="model-evaluation-statistical-and-visual-2">Model Evaluation: statistical and visual</h2>
+<p>Evaluate the model using the <code>metrics</code> function and create a scatter plot of the observed vs predicted values, colored by aridity.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(rf_data, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard       0.587
+2 rsq     standard       0.741
+3 mae     standard       0.363</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(rf_data, <span class="fu">aes</span>(<span class="at">x =</span> logQmean, <span class="at">y =</span> .pred, <span class="at">colour =</span> aridity)) <span class="sc">+</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>() <span class="sc">+</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>() <span class="sc">+</span></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Awesome! We just set up a completely new model and were able to utilize all of the things we had done for the linear model. This is the power of the <code>tidymodels</code> framework!</p>
+<p>That said, we still have some repetition — and, more importantly, we are eyeballing metrics on a single train/test split rather than comparing the two models head-to-head under a fair, resampled evaluation. <code>workflow_set()</code> lets us do both in a few lines.</p>
+</section>
+<section id="a-workflowset-approach" class="level2">
+<h2 class="anchored" data-anchor-id="a-workflowset-approach">A <code>workflowset</code> approach</h2>
+<p><code>workflow_set</code> is a powerful tool for comparing multiple models on the same data. It allows you to define a set of workflows, fit them to the same data, and evaluate their performance using a common metric. Here, we are going to create a <code>workflow_set</code> object with the linear regression and random forest models, fit them to the training data, and compare their performance using the <code>autoplot</code> and <code>rank_results</code> functions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>wf <span class="ot">&lt;-</span> <span class="fu">workflow_set</span>(<span class="fu">list</span>(rec), <span class="fu">list</span>(lm_model, rf_model)) <span class="sc">%&gt;%</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow_map</span>(<span class="st">'fit_resamples'</span>, <span class="at">resamples =</span> camels_cv) </span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(wf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rank_results</span>(wf, <span class="at">rank_metric =</span> <span class="st">"rsq"</span>, <span class="at">select_best =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 9
+  wflow_id          .config .metric  mean std_err     n preprocessor model  rank
+  &lt;chr&gt;             &lt;chr&gt;   &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt; &lt;chr&gt;        &lt;chr&gt; &lt;int&gt;
+1 recipe_rand_fore… pre0_m… rmse    0.563  0.0259    10 recipe       rand…     1
+2 recipe_rand_fore… pre0_m… rsq     0.771  0.0269    10 recipe       rand…     1
+3 recipe_linear_reg pre0_m… rmse    0.569  0.0260    10 recipe       line…     2
+4 recipe_linear_reg pre0_m… rsq     0.770  0.0223    10 recipe       line…     2</code></pre>
+</div>
+</div>
+<p>Overall it seems the random forest model is outperforming the linear model. This is not surprising given the non-linear relationship between the predictors and the outcome :)</p>
+</section>
+<section id="final-model" class="level2">
+<h2 class="anchored" data-anchor-id="final-model">Final Model</h2>
+<p>The workflow-set comparison above told us the random forest wins. Let’s fit it once more on the full training set so we have a single model object to interrogate:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>final <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">|&gt;</span></span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(rf_model) <span class="sc">|&gt;</span></span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> camels_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation">Evaluation</h2>
+<p>A proper evaluation has three parts:</p>
+<ol type="1">
+<li><strong>Variable importance</strong> — which predictors is the model actually using? Week 5-2 introduced <code>vip::vip()</code> paired with <code>extract_fit_parsnip()</code> to pull the underlying model object out of a fitted workflow.</li>
+<li><strong>Test-set metrics</strong> — apply the trained model to data it has never seen.</li>
+<li><strong>A predicted-vs-observed plot</strong> — the visual sanity check; the 1:1 line should run through the cloud.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Variable importance (Week 5-2 pattern)</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>final <span class="sc">|&gt;</span></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">|&gt;</span></span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>  vip<span class="sc">::</span><span class="fu">vip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predictions on the test set</span></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>rf_data <span class="ot">&lt;-</span> <span class="fu">augment</span>(final, <span class="at">new_data =</span> camels_test)</span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Regression metrics (rmse, rsq, mae by default)</span></span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(rf_data, <span class="at">truth =</span> logQmean, <span class="at">estimate =</span> .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard       0.593
+2 rsq     standard       0.735
+3 mae     standard       0.366</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(rf_data, <span class="fu">aes</span>(<span class="at">x =</span> logQmean, <span class="at">y =</span> .pred, <span class="at">colour =</span> aridity)) <span class="sc">+</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>() <span class="sc">+</span></span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1:1 line — perfect prediction</span></span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Actual regression line for contrast</span></span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Random Forest Model: Observed vs Predicted"</span>,</span>
+<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Observed Log Mean Flow"</span>,</span>
+<span id="cb78-11"><a href="#cb78-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Predicted Log Mean Flow"</span>,</span>
+<span id="cb78-12"><a href="#cb78-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Aridity"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-05_files/figure-html/unnamed-chunk-39-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>That’s the <strong>minimum</strong> end-to-end loop. Q4 asks you to do the full version: swap in spatial CV, tune the hyperparameters, and close with <code>last_fit()</code> — all patterns the lectures cover in detail.</p>
+</section>
+</section>
+<section id="question-3-your-turn-40-points" class="level1">
+<h1>Question 3: Your Turn! (40 points)</h1>
+<p>Extend the <code>workflow_set</code> above (which already contains the linear model and the random forest) by adding two more models from the Week 6-1 zoo:</p>
+<ul class="task-list">
+<li><label><input type="checkbox">Build an <code>xgboost</code> (engine) regression (mode) model using <code>boost_tree</code></label></li>
+<li><label><input type="checkbox">Build a neural network model using the <code>nnet</code> engine from the <code>baguette</code> package using the <code>bag_mlp</code> function</label></li>
+<li><label><input type="checkbox">Add both to the workflow set and refit against the resamples</label></li>
+<li><label><input type="checkbox">Compare all four (linear, random forest, xgboost, neural network) with <code>autoplot()</code> and <code>rank_results()</code></label></li>
+<li><label><input type="checkbox">Which of the four would you move forward with? Justify the pick in 2–3 sentences.</label></li>
+</ul>
+</section>
+<section id="bridge-to-q4-what-the-lectures-cover" class="level1">
+<h1>Bridge to Q4: what the lectures cover</h1>
+<p>The worked example above stops at a single random-forest fit with default hyperparameters. Q4 asks you to extend it with the rest of the unit. Before starting, re-skim the relevant lecture sections — you’ll be lifting patterns directly from them:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Q4 task</th>
+<th>Lecture reference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>EDA with <code>skimr</code>/<code>visdat</code>, normality checks, stratification</td>
+<td><strong>Week 5-1</strong> — <em>Exploratory Data Analysis</em>, <em>Data Normality</em>, <em>Stratification</em></td>
+</tr>
+<tr class="even">
+<td><code>recipe</code> design (impute, dummy, normalize, interact)</td>
+<td><strong>Week 5-1</strong> — <em>Feature engineering with <code>recipes</code></em>, <em>Common normalization techniques</em></td>
+</tr>
+<tr class="odd">
+<td>Workflow sets across multiple models</td>
+<td><strong>Week 5-1</strong> — <em>Further simplification: <code>workflowsets</code></em></td>
+</tr>
+<tr class="even">
+<td>Variable importance &amp; geographic-proxy interpretation</td>
+<td><strong>Week 5-2</strong> — Part 1 (<em>VIP</em>), <em>Which predictors carry geography?</em></td>
+</tr>
+<tr class="odd">
+<td>Spatial cross-validation (<code>spatial_block_cv</code>, <code>spatial_clustering_cv</code>, <code>spatial_leave_location_out_cv</code>)</td>
+<td><strong>Week 5-2</strong> — Part 3, <em>Applying this to your data</em>, <em>The same idea in regression</em></td>
+</tr>
+<tr class="even">
+<td>Random-vs-spatial CV gap as a leakage diagnostic</td>
+<td><strong>Week 5-2</strong> — <em>The moment of truth</em>, <em>What a leaky model looks like</em>, <em>The 2×2 comparison</em></td>
+</tr>
+<tr class="odd">
+<td>Hyperparameter tuning, named grids, <code>finalize_workflow()</code>, <code>last_fit()</code></td>
+<td><strong>Week 6-1</strong> — <em>Optimizing Models via Tuning</em>, <em>The final fit!</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>If a line item in the rubric below doesn’t look familiar, that’s your cue to re-watch the relevant lecture slide — do not try to infer the API from this lab alone.</strong></p>
+</section>
+<section id="question-4-build-your-own-200-points" class="level1">
+<h1>Question 4: Build your own (200 points)</h1>
+<p>Borrowing from the workflow presented above, build your own complete ML pipeline to predict mean streamflow using the CAMELS dataset.</p>
+<p>This question asks you to apply the full toolkit from Week 5 and Week 6: EDA, recipes, workflow sets, <strong>spatial cross-validation</strong> (CAMELS is a spatial dataset — random CV will flatter your model), hyperparameter <strong>tuning</strong>, variable importance, and a clean final fit with <code>last_fit()</code>. Q4 is the bulk of the lab — budget time accordingly.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Benchmark</strong>: a well-built model typically achieves <strong>R² &gt; 0.9 under random CV</strong>. Under spatial CV, expect a 0.05–0.10 drop — that’s honest generalization, not a failure. <strong>Report both.</strong> If spatial CV stays within ~0.05 of random CV, you have strong evidence your predictors carry transferable signal.</p>
+</div>
+</div>
+<section id="data-prep-eda-30-week-5-1" class="level2">
+<h2 class="anchored" data-anchor-id="data-prep-eda-30-week-5-1">Data prep &amp; EDA (30) — <em>Week 5-1</em></h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Set a seed for reproducibility</label></li>
+<li><label><input type="checkbox">Use <code>skimr::skim()</code> and/or <code>visdat::vis_dat()</code> on your working data. Describe — in 3–4 sentences — what this tells you about missingness, variable types, and distributions. Use this to justify decisions you make in the recipe below.</label></li>
+<li><label><input type="checkbox">Visualize the distribution of <code>q_mean</code> (and your chosen predictors) — note anything skewed, bimodal, or bounded that will drive a <code>step_*</code> choice.</label></li>
+<li><label><input type="checkbox"><em>Optional but encouraged</em>: run <code>ape::Moran.I()</code> on each numeric predictor (Week 5-2 slide <em>“Which predictors carry geography?”</em>) to see which features carry spatial structure. High Moran’s I = candidate geographic proxy to revisit in the VIP step.</label></li>
+<li><label><input type="checkbox">Create an initial split with 75% used for training and 25% for testing. Consider whether stratification (e.g., by <code>aridity</code> quartile or hydrologic class) is appropriate and <strong>explain your choice</strong>.</label></li>
+<li><label><input type="checkbox">Extract your training and testing sets</label></li>
+</ul>
+</section>
+<section id="recipe-30-week-5-1" class="level2">
+<h2 class="anchored" data-anchor-id="recipe-30-week-5-1">Recipe (30) — <em>Week 5-1</em></h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Define a formula you want to use to predict <code>logQmean</code></label></li>
+<li><label><input type="checkbox">In 5–7 sentences, justify your predictor choice. Consult the downloaded PDF; ground <strong>each</strong> recipe step (log, normalize, interact, naomit, impute, …) in what the EDA above showed.</label></li>
+<li><label><input type="checkbox">Build a recipe that handles those predictors. Your recipe should contain <strong>at least three</strong> <code>step_*</code> calls beyond the formula, and each should be there for a reason you can name.</label></li>
+</ul>
+</section>
+<section id="define-3-models-30-week-6-1" class="level2">
+<h2 class="anchored" data-anchor-id="define-3-models-30-week-6-1">Define 3 models (30) — <em>Week 6-1</em></h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Define a random forest model using the <code>rand_forest</code> function (engine <code>ranger</code>, mode <code>regression</code>)</label></li>
+<li><label><input type="checkbox">Define two other models of your choice. The Week 6-1 zoo (<code>linear_reg</code>, <code>boost_tree</code>, <code>svm_rbf</code>, <code>svm_poly</code>, <code>mlp</code>, <code>bag_mlp</code>, <code>decision_tree</code>) is a good menu — the comparison table in that deck summarizes strengths and weaknesses.</label></li>
+<li><label><input type="checkbox">For each model, briefly note (one sentence) why it’s a reasonable candidate for this regression problem — what kind of structure does it capture?</label></li>
+</ul>
+</section>
+<section id="workflow-set-compare-with-honest-cv-35-week-5-2" class="level2">
+<h2 class="anchored" data-anchor-id="workflow-set-compare-with-honest-cv-35-week-5-2">Workflow set — compare with <em>honest</em> CV (35) — <em>Week 5-2</em></h2>
+<p>With your preprocessing steps and models defined, build a <code>workflow_set</code> and compare the models across resamples. Because CAMELS basins are spatially distributed, a random <code>vfold_cv</code> can over-state performance if your model leans on geographic proximity — the Week 5-2 deck walks through this carefully, including when the gap is real and when it isn’t.</p>
+<ul class="task-list">
+<li><label><input type="checkbox">Build a 10-fold <code>vfold_cv</code> <strong>and</strong> a <code>spatialsample::spatial_block_cv()</code> (or <code>spatial_clustering_cv()</code>) on the training data. You will need to <code>st_as_sf()</code> the training data using <code>gauge_lon</code>/<code>gauge_lat</code> (Week 5-2, <em>Applying this to your data</em>).</label></li>
+<li><label><input type="checkbox">Fit your workflow set over <strong>both</strong> resampling schemes with <code>workflow_map("fit_resamples", ...)</code></label></li>
+<li><label><input type="checkbox">Use <code>autoplot()</code> and <code>rank_results()</code> to compare the models under each scheme</label></li>
+<li><label><input type="checkbox">Describe the gap (5–7 sentences): which model wins, how much does performance drop when you move from random to spatial CV, and which number do you trust as your generalization estimate? What does the spread of per-fold metrics tell you about <em>where</em> your model struggles? Recall from lecture that a <strong>small</strong> gap is a signal that your predictors carry real transferable signal — not a failed diagnostic.</label></li>
+</ul>
+</section>
+<section id="tune-the-best-model-25-week-6-1" class="level2">
+<h2 class="anchored" data-anchor-id="tune-the-best-model-25-week-6-1">Tune the best model (25) — <em>Week 6-1</em></h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Tag <strong>at least two</strong> hyperparameters with <code>tune()</code> in your chosen model specification</label></li>
+<li><label><input type="checkbox">Build a named grid (e.g.&nbsp;<code>grid_space_filling()</code>, <code>grid_regular()</code>) — do not just pass an integer to <code>tune_grid()</code>. Justify your grid choice in one sentence.</label></li>
+<li><label><input type="checkbox">Run <code>tune_grid()</code> against your <strong>spatial</strong> resamples with <code>control_grid(save_pred = TRUE)</code></label></li>
+<li><label><input type="checkbox">Show the tuning landscape with <code>autoplot()</code> and identify the best combination with <code>show_best()</code> / <code>select_best()</code></label></li>
+<li><label><input type="checkbox">In 2–3 sentences, describe which hyperparameters mattered most and what you learned about the model’s sensitivity</label></li>
+</ul>
+</section>
+<section id="variable-importance-25-week-5-2" class="level2">
+<h2 class="anchored" data-anchor-id="variable-importance-25-week-5-2">Variable importance (25) — <em>Week 5-2</em></h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Produce a <code>vip::vip()</code> plot for your tuned model (pattern: <code>extract_fit_parsnip() |&gt; vip()</code>)</label></li>
+<li><label><input type="checkbox">Interpret the top predictors (4–6 sentences). Cross-reference against the predictor Moran’s I you computed in EDA — are any of the top VIP features <em>also</em> highly spatially autocorrelated? If so, they could be acting as <strong>geographic proxies</strong> — discuss whether the importance reflects <em>mechanism</em> or <em>location</em> (Week 5-2, Part 4).</label></li>
+<li><label><input type="checkbox">If the model you chose cannot provide VIP, instead discuss the interpretability trade-off you accepted and how you would diagnose the same question (permutation importance via <code>vip::vi_permute()</code>, partial dependence, etc.).</label></li>
+</ul>
+</section>
+<section id="final-fit-evaluate-25-week-6-1" class="level2">
+<h2 class="anchored" data-anchor-id="final-fit-evaluate-25-week-6-1">Final fit &amp; evaluate (25) — <em>Week 6-1</em></h2>
+<p>Use the canonical tidymodels closing move (Week 6-1, <em>The final fit!</em>):</p>
+<ul class="task-list">
+<li><label><input type="checkbox"><code>finalize_workflow()</code> your tuned workflow with the best hyperparameters</label></li>
+<li><label><input type="checkbox">Run <code>last_fit()</code> against your original <code>initial_split()</code> object — this trains on the full training set and evaluates on the held-out test set in one call</label></li>
+<li><label><input type="checkbox">Use <code>collect_metrics()</code> and <code>collect_predictions()</code> to report final test-set performance</label></li>
+<li><label><input type="checkbox">Create a plot of observed vs predicted <code>logQmean</code> on the <strong>test set</strong> with clear title, axis labels, and a compelling color scale (e.g., colored by aridity or region). Include a 1:1 reference line.</label></li>
+<li><label><input type="checkbox">In 3–5 sentences, describe what you think of the results — including how the test-set metrics compare to your spatial-CV estimate, where the model under- or over-predicts, and what you’d investigate next.</label></li>
+</ul>
+</section>
+</section>
+<section id="rubric" class="level1">
+<h1>Rubric</h1>
+<ul class="task-list">
+<li><label><input type="checkbox"><strong>Q1</strong>: Download data (15 pts)</label></li>
+<li><label><input type="checkbox"><strong>Q2</strong>: Make 2 maps (20 pts)</label></li>
+<li><label><input type="checkbox"><strong>Q3</strong>: Add xgboost + neural network to the workflow set (40 pts)</label></li>
+<li><label><input type="checkbox"><strong>Q4a</strong>: Data prep &amp; EDA (30 pts)</label></li>
+<li><label><input type="checkbox"><strong>Q4b</strong>: Recipe with justification (30 pts)</label></li>
+<li><label><input type="checkbox"><strong>Q4c</strong>: Define 3 models (30 pts)</label></li>
+<li><label><input type="checkbox"><strong>Q4d</strong>: Workflow set + spatial CV comparison (35 pts)</label></li>
+<li><label><input type="checkbox"><strong>Q4e</strong>: Tuning (named grid, ≥ 2 hyperparameters, autoplot) (25 pts)</label></li>
+<li><label><input type="checkbox"><strong>Q4f</strong>: VIP interpretation with geographic-proxy lens (25 pts)</label></li>
+<li><label><input type="checkbox"><strong>Q4g</strong>: <code>last_fit()</code> evaluation &amp; plot (25 pts)</label></li>
+<li><label><input type="checkbox"><strong>Well-structured, compelling Qmd deployed as web page</strong> (25 pts)</label></li>
+</ul>
+<p><strong>Total: 300 points</strong> (Q4 = 200 pts / 67%)</p>
+</section>
+<section id="submission" class="level1">
+<h1>Submission:</h1>
+<p>Once you have completed the above steps, you can submit your lab for grading. The lab should be submitted as a URL to your deployed repo page. The repo should contain the <code>lab-05.qmd</code> file with all the code, data, and output.</p>
+<p>Good luck!</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+  Reveal.addEventListener( 'slidechanged', function( event ) {
+    console.log("hello")
+    
+    slide_id = event.currentSlide.id
+    link = "annotations" + ".html#" + slide_id
+    
+    var annotation_div = document.createElement('div')
+    annotation_div.setAttribute("class", "annotation-link")
+    
+    var notes_link = document.createElement('a')
+    notes_link.setAttribute("href", link)
+    notes_link.setAttribute("target", "_blank")
+    
+    var iii = document.createElement('i')
+    iii.setAttribute("class", "fa fa-info")
+    notes_link.appendChild(iii)
+    
+    annotation_div.appendChild(notes_link)
+    
+    var tmp = event.currentTarget.getElementsByClassName("annotation-link")
+    if (tmp.length === 1) {
+      tmp[0].remove()
+    }
+    
+    if (event.currentSlide.classList.contains("annotation")) {
+      event.currentTarget.append(annotation_div)
+    }
+  } );
+
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

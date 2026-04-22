@@ -1972,6 +1972,11 @@
 </div><div class="column" style="width:40%;">
 <p><br><br><br> <img data-src="img/forest_mountain.svg" class="absolute" style="height: 300px; "></p>
 </div></div>
+</section></section>
+<section>
+<section id="two-algorithms-to-try" class="title-slide slide level1 center" data-background-color="#C8C372">
+<h1>Two algorithms to try</h1>
+<p>We have a problem (predict whether a hexagon is forested), data (<code>forested_train</code>), and a way to evaluate predictions. Before we wire up the full tidymodels plumbing, let’s look at the two models we’ll compare today.</p>
 </section>
 <section id="logistic-regression" class="slide level2">
 <h2>Logistic regression</h2>
@@ -1995,8 +2000,8 @@
 </div>
 </div></div>
 </section>
-<section id="decision-trees" class="slide level2">
-<h2>Decision trees</h2>
+<section id="decision-trees-structure-pruning" class="slide level2">
+<h2>Decision trees — structure &amp; pruning</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="cell" data-layout-align="center">
@@ -2009,32 +2014,16 @@
 </div>
 </div>
 </div><div class="column" style="width:50%;">
-
-</div></div>
-</section>
-<section id="decision-trees-1" class="slide level2">
-<h2>Decision trees</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="week-5-1_files/figure-revealjs/plot-tree-fit-2-1.png" class="quarto-figure quarto-figure-center" style="width:100.0%"></p>
-</figure>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:50%;">
 <ul>
 <li><p>Series of splits or if/then statements based on predictors</p></li>
 <li><p>First the tree <em>grows</em> until some condition is met (maximum depth, no more data)</p></li>
 <li><p>Then the tree is <em>pruned</em> to reduce its complexity</p></li>
+<li><p>Each terminal leaf predicts a class (or, for regression, a numeric value)</p></li>
 </ul>
 </div></div>
 </section>
-<section id="decision-trees-2" class="slide level2">
-<h2>Decision trees</h2>
+<section id="decision-trees-what-predictions-look-like" class="slide level2">
+<h2>Decision trees — what predictions look like</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="cell" data-layout-align="center">
@@ -2056,6 +2045,7 @@
 </div>
 </div>
 </div>
+<p>A tree’s decision boundary is <strong>stepwise</strong> — in contrast to the smooth S-curve of logistic regression.</p>
 </div></div>
 </section>
 <section id="when-would-you-reach-for-each" class="slide level2">
@@ -2071,7 +2061,7 @@
 <li>Assumes a (largely) linear relationship on the log-odds scale</li>
 </ul>
 </div><div class="column" style="width:50%;">
-<h4 id="decision-trees-3">Decision trees</h4>
+<h4 id="decision-trees">Decision trees</h4>
 <ul>
 <li>Step-wise, rectangular splits on predictors</li>
 <li>Handles <strong>non-linearities</strong> and <strong>interactions</strong> natively</li>
@@ -2083,7 +2073,7 @@
 </section>
 <section id="what-algorithm-is-best-for-estimating-forested-plots" class="slide level2">
 <h2>What algorithm is best for estimating forested plots?</h2>
-<p>We can only really know by testing them …</p>
+<p>We can only really know by testing them … but we know the options!</p>
 <div class="columns">
 <div class="column" style="width:50%;">
 <h4 id="logistic-regression-2">Logistic regression</h4>
@@ -2097,74 +2087,12 @@
 </div>
 </div>
 </div><div class="column" style="width:50%;">
-<h4 id="decision-trees-4">Decision trees</h4>
+<h4 id="decision-trees-1">Decision trees</h4>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure>
 <p><img data-src="week-5-1_files/figure-revealjs/plot-tree-preds-2-1.png" style="width:100.0%"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-</section>
-<section id="fitting-your-model" class="slide level2">
-<h2>Fitting your model:</h2>
-<ul>
-<li>OK! So you have split data, you have a model, and you have an engine and mode</li>
-<li>Now you need to fit the model!</li>
-<li>This is done using the <code>fit()</code> function</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a></a>dt_model <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb61-2"><a></a>  <span class="fu">set_engine</span>(<span class="st">'rpart'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb61-3"><a></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
-<span id="cb61-4"><a></a></span>
-<span id="cb61-5"><a></a><span class="co"># Model, formula, data inputs</span></span>
-<span id="cb61-6"><a></a>(output <span class="ot">&lt;-</span> <span class="fu">fit</span>(dt_model, forested <span class="sc">~</span> ., <span class="at">data =</span> forested_train) )</span>
-<span id="cb61-7"><a></a><span class="co">#&gt; parsnip model object</span></span>
-<span id="cb61-8"><a></a><span class="co">#&gt; </span></span>
-<span id="cb61-9"><a></a><span class="co">#&gt; n= 5685 </span></span>
-<span id="cb61-10"><a></a><span class="co">#&gt; </span></span>
-<span id="cb61-11"><a></a><span class="co">#&gt; node), split, n, loss, yval, (yprob)</span></span>
-<span id="cb61-12"><a></a><span class="co">#&gt;       * denotes terminal node</span></span>
-<span id="cb61-13"><a></a><span class="co">#&gt; </span></span>
-<span id="cb61-14"><a></a><span class="co">#&gt;  1) root 5685 2571 Yes (0.54775726 0.45224274)  </span></span>
-<span id="cb61-15"><a></a><span class="co">#&gt;    2) land_type=Tree 3025  289 Yes (0.90446281 0.09553719) *</span></span>
-<span id="cb61-16"><a></a><span class="co">#&gt;    3) land_type=Barren,Non-tree vegetation 2660  378 No (0.14210526 0.85789474)  </span></span>
-<span id="cb61-17"><a></a><span class="co">#&gt;      6) temp_annual_max&lt; 13.395 351  155 Yes (0.55840456 0.44159544)  </span></span>
-<span id="cb61-18"><a></a><span class="co">#&gt;       12) tree_no_tree=Tree 91    5 Yes (0.94505495 0.05494505) *</span></span>
-<span id="cb61-19"><a></a><span class="co">#&gt;       13) tree_no_tree=No tree 260  110 No (0.42307692 0.57692308) *</span></span>
-<span id="cb61-20"><a></a><span class="co">#&gt;      7) temp_annual_max&gt;=13.395 2309  182 No (0.07882200 0.92117800) *</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="component-extracts" class="slide level2">
-<h2>Component extracts:</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<ul>
-<li><p>While <code>tidymodels</code> provides a standard interface to all models all base models have specific methods (remember <code>summary.lm</code>? )</p></li>
-<li><p>To use these, you must extract the underlying object.</p></li>
-<li><p><code>extract_fit_engine()</code> extracts the underlying model object</p></li>
-<li><p><code>extract_fit_parsnip()</code> extracts the parsnip object</p></li>
-<li><p><code>extract_recipe()</code> extracts the recipe object</p></li>
-<li><p><code>extract_preprocessor()</code> extracts the preprocessor object</p></li>
-<li><p>… many more</p></li>
-</ul>
-</div><div class="column" style="width:50%;">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a></a>ex <span class="ot">&lt;-</span> <span class="fu">extract_fit_engine</span>(output)</span>
-<span id="cb62-2"><a></a><span class="fu">class</span>(ex) <span class="co"># the class of the engine used!</span></span>
-<span id="cb62-3"><a></a><span class="co">#&gt; [1] "rpart"</span></span>
-<span id="cb62-4"><a></a></span>
-<span id="cb62-5"><a></a><span class="co"># Use rpart plot and text methods ...</span></span>
-<span id="cb62-6"><a></a><span class="fu">plot</span>(ex)</span>
-<span id="cb62-7"><a></a><span class="fu">text</span>(ex, <span class="at">cex =</span> <span class="fl">0.9</span>, <span class="at">use.n =</span> <span class="cn">TRUE</span>, <span class="at">xpd =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="week-5-1_files/figure-revealjs/unnamed-chunk-54-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -2179,7 +2107,7 @@
 <section id="why-preprocess" class="slide level2">
 <h2>Why preprocess? <img data-src="hexes/recipes.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
 <ul>
-<li><p>So far we’ve fed a raw formula (<code>forested ~ .</code>) straight to a model.</p></li>
+<li><p>A raw formula (<code>forested ~ .</code>) would send features to the model untouched.</p></li>
 <li><p>But many models care how their features look — different scales, skewed distributions, missing values, or categorical levels can bias the fit.</p></li>
 <li><p><code>recipes</code> lets us <em>declare</em> a preprocessing pipeline <strong>once</strong>, <strong>estimate its parameters from the training data</strong>, and apply it consistently to every new data set (folds, test set, future predictions).</p></li>
 </ul>
@@ -2207,73 +2135,98 @@
 </section>
 <section id="common-normalization-techniques" class="slide level2">
 <h2>Common Normalization Techniques</h2>
-<h4 id="min-max-scaling">1. <code>Min-Max Scaling</code></h4>
-<ul>
-<li><p>Transforms data into a fixed range (typically [0,1]).</p></li>
-<li><p>Preserves relationships but sensitive to outliers.</p></li>
-<li><p>Formula: <span class="math display">\[ x' = \frac{x - x_{min}}{x_{max} - x_{min}} \]</span></p></li>
-<li><p>Implemented using <code>step_range()</code> in <code>recipes</code>.</p></li>
-</ul>
-<h4 id="z-score-standardization-standard-scaling">2. <code>Z-Score Standardization (Standard Scaling)</code></h4>
-<ul>
-<li><p>Centers data to have zero mean and unit variance.</p></li>
-<li><p>More robust to outliers compared to min-max scaling.</p></li>
-<li><p>Formula: <span class="math display">\[ x' = \frac{x - \mu}{\sigma} \]</span></p></li>
-<li><p>Implemented using <code>step_normalize()</code> in <code>recipes</code>.</p></li>
-</ul>
-</section>
-<section id="common-normalization-techniques-1" class="slide level2">
-<h2>Common Normalization Techniques</h2>
-<h4 id="power-variance-stabilizing-transforms">3. <code>Power / Variance-Stabilizing Transforms</code></h4>
-<ul>
-<li><p>Reshape skewed distributions toward normality before scaling.</p></li>
-<li><p>Less sensitive to outliers than min-max scaling.</p></li>
-<li><p>Box-Cox (positive data) and Yeo-Johnson (positive or negative) estimate an optimal power transform from the data.</p></li>
-<li><p>Implemented using <code>step_YeoJohnson()</code> or <code>step_BoxCox()</code> in <code>recipes</code>.</p></li>
-</ul>
-<h4 id="log-transformation">4. <code>Log Transformation</code></h4>
-<ul>
-<li><p>Useful for skewed distributions to reduce the impact of extreme values.</p></li>
-<li><p>Implemented using <code>step_log()</code> in <code>recipes</code>.</p></li>
-</ul>
-</section>
-<section id="common-normalization-techniques-2" class="slide level2">
-<h2>Common Normalization Techniques</h2>
-<h4 id="principal-component-analysis-pca">5. <code>Principal Component Analysis (PCA)</code></h4>
-<ul>
-<li><p>Projects data into a lower-dimensional space while maintaining variance.</p></li>
-<li><p>Used in high-dimensional datasets.</p></li>
-<li><p>Implemented using <code>step_pca()</code> in <code>recipes</code>.</p></li>
-</ul>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Technique</th>
+<th>Idea</th>
+<th>When to use</th>
+<th><code>step_*</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Min-max</strong></td>
+<td>rescale to <span class="math inline">\([0, 1]\)</span>: <span class="math inline">\(x' = \frac{x - x_\text{min}}{x_\text{max} - x_\text{min}}\)</span></td>
+<td>Need a bounded range; beware outliers</td>
+<td><code>step_range()</code></td>
+</tr>
+<tr class="even">
+<td><strong>Z-score</strong></td>
+<td>center + scale: <span class="math inline">\(x' = \frac{x - \mu}{\sigma}\)</span></td>
+<td>Symmetric-ish features, different units</td>
+<td><code>step_normalize()</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Power</strong></td>
+<td>Box-Cox (positive) or Yeo-Johnson (any sign) estimate an optimal power transform</td>
+<td>Reshape skew toward normality before scaling</td>
+<td><code>step_YeoJohnson()</code>, <code>step_BoxCox()</code></td>
+</tr>
+<tr class="even">
+<td><strong>Log</strong></td>
+<td><span class="math inline">\(x' = \log(x)\)</span></td>
+<td>Right-skewed positive data (e.g.&nbsp;streamflow)</td>
+<td><code>step_log()</code></td>
+</tr>
+<tr class="odd">
+<td><strong>PCA</strong></td>
+<td>project to a lower-dimensional basis that preserves variance</td>
+<td>Many correlated numeric predictors</td>
+<td><code>step_pca()</code></td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Tip</strong></p>
+</div>
+<div class="callout-content">
+<p>For environmental variables (streamflow, precipitation, concentrations) <strong>log</strong> is by far the most common first move — they’re almost always right-skewed.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="other-feature-engineering-tasks" class="slide level2">
 <h2>Other Feature Engineering Tasks</h2>
-<h4 id="handling-missing-data">Handling Missing Data</h4>
+<p>Beyond scaling, three <code>recipes</code> moves you’ll reach for most often in water resources:</p>
+<h4 id="handling-missing-values">Handling missing values</h4>
 <ul>
-<li><code>step_impute_mean()</code></li>
-<li><code>step_impute_median()</code></li>
-<li><code>step_impute_knn()</code></li>
+<li><code>step_impute_mean()</code> / <code>step_impute_median()</code> — fast, parametric fill</li>
+<li><code>step_impute_knn()</code> — use neighboring rows (preserves covariance structure)</li>
 </ul>
-<p>can be used to fill missing values.</p>
-<h4 id="encoding-categorical-variables">Encoding Categorical Variables</h4>
+<h4 id="encoding-categorical-variables">Encoding categorical variables</h4>
 <ul>
-<li><p><code>step_dummy()</code> creates dummy variables for categorical features.</p></li>
-<li><p><code>step_other()</code> groups infrequent categories into an “other” category.</p></li>
+<li><code>step_dummy(all_nominal_predictors())</code> — one-hot encodes factors</li>
+<li><code>step_other()</code> — collapses rare levels into “other”</li>
 </ul>
-<h4 id="creating-interaction-terms">Creating Interaction Terms</h4>
+<h4 id="creating-interaction-terms">Creating interaction terms</h4>
 <ul>
-<li><code>step_interact()</code> generates interaction terms between predictors.</li>
+<li><code>step_interact(terms = ~ aridity:p_mean)</code> — add variable products when the effect of one predictor depends on another</li>
 </ul>
-<h4 id="feature-extraction">Feature Extraction</h4>
-<ul>
-<li><code>step_pca()</code> or <code>step_ica()</code> can be used to extract important components.</li>
-</ul>
-<h4 id="text-feature-engineering">Text Feature Engineering</h4>
-<p><code>step_tokenize()</code>, <code>step_stopwords()</code>, and <code>step_tf()</code> for text processing.</p>
-<h4 id="binning-numerical-data">Binning Numerical Data</h4>
-<p><code>step_bin2factor()</code> converts continuous variables into categorical bins.</p>
-<h4 id="polynomial-and-spline-features">Polynomial and Spline Features</h4>
-<p><code>step_poly()</code> and <code>step_bs()</code> for generating polynomial and spline transformations.</p>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>The full <code>step_*</code> catalog (text, splines, binning, dimension reduction, …) lives at <a href="https://recipes.tidymodels.org/reference/" class="uri">https://recipes.tidymodels.org/reference/</a>. Search there when you need something not listed here.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="implementing-a-recipe-in-tidymodels" class="slide level2">
 <h2>Implementing a recipe in <code>tidymodels</code></h2>
@@ -2288,35 +2241,35 @@
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb63-2"><a></a></span>
-<span id="cb63-3"><a></a>(recipe_obj <span class="ot">&lt;-</span> <span class="fu">recipe</span>(flipper_length_mm <span class="sc">~</span></span>
-<span id="cb63-4"><a></a>                       bill_length_mm <span class="sc">+</span> body_mass_g <span class="sc">+</span></span>
-<span id="cb63-5"><a></a>                       sex <span class="sc">+</span> island <span class="sc">+</span> species,</span>
-<span id="cb63-6"><a></a>                      <span class="at">data =</span> penguins) <span class="sc">|&gt;</span></span>
-<span id="cb63-7"><a></a>  <span class="fu">step_impute_mean</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb63-8"><a></a>  <span class="fu">step_dummy</span>(<span class="fu">all_factor_predictors</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb63-9"><a></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()))</span>
-<span id="cb63-10"><a></a></span>
-<span id="cb63-11"><a></a><span class="co"># Prepare and apply transformations</span></span>
-<span id="cb63-12"><a></a>prep_recipe     <span class="ot">&lt;-</span> <span class="fu">prep</span>(recipe_obj, <span class="at">training =</span> penguins)</span>
-<span id="cb63-13"><a></a></span>
-<span id="cb63-14"><a></a>normalized_data <span class="ot">&lt;-</span> <span class="fu">bake</span>(prep_recipe, <span class="at">new_data =</span> <span class="cn">NULL</span>) <span class="sc">|&gt;</span></span>
-<span id="cb63-15"><a></a>  <span class="fu">mutate</span>(<span class="at">species =</span> penguins<span class="sc">$</span>species) <span class="sc">|&gt;</span></span>
-<span id="cb63-16"><a></a>  <span class="fu">drop_na</span>()</span>
-<span id="cb63-17"><a></a></span>
-<span id="cb63-18"><a></a><span class="fu">head</span>(normalized_data)</span>
-<span id="cb63-19"><a></a><span class="co">#&gt; # A tibble: 6 × 9</span></span>
-<span id="cb63-20"><a></a><span class="co">#&gt;   bill_length_mm body_mass_g flipper_length_mm sex_male island_Dream</span></span>
-<span id="cb63-21"><a></a><span class="co">#&gt;            &lt;dbl&gt;       &lt;dbl&gt;             &lt;int&gt;    &lt;dbl&gt;        &lt;dbl&gt;</span></span>
-<span id="cb63-22"><a></a><span class="co">#&gt; 1         -0.895      -0.568               181    0.990       -0.764</span></span>
-<span id="cb63-23"><a></a><span class="co">#&gt; 2         -0.822      -0.506               186   -1.01        -0.764</span></span>
-<span id="cb63-24"><a></a><span class="co">#&gt; 3         -0.675      -1.19                195   -1.01        -0.764</span></span>
-<span id="cb63-25"><a></a><span class="co">#&gt; 4         -1.33       -0.940               193   -1.01        -0.764</span></span>
-<span id="cb63-26"><a></a><span class="co">#&gt; 5         -0.858      -0.692               190    0.990       -0.764</span></span>
-<span id="cb63-27"><a></a><span class="co">#&gt; 6         -0.931      -0.723               181   -1.01        -0.764</span></span>
-<span id="cb63-28"><a></a><span class="co">#&gt; # ℹ 4 more variables: island_Torgersen &lt;dbl&gt;, species_Chinstrap &lt;dbl&gt;,</span></span>
-<span id="cb63-29"><a></a><span class="co">#&gt; #   species_Gentoo &lt;dbl&gt;, species &lt;fct&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb61-2"><a></a></span>
+<span id="cb61-3"><a></a>(recipe_obj <span class="ot">&lt;-</span> <span class="fu">recipe</span>(flipper_length_mm <span class="sc">~</span></span>
+<span id="cb61-4"><a></a>                       bill_length_mm <span class="sc">+</span> body_mass_g <span class="sc">+</span></span>
+<span id="cb61-5"><a></a>                       sex <span class="sc">+</span> island <span class="sc">+</span> species,</span>
+<span id="cb61-6"><a></a>                      <span class="at">data =</span> penguins) <span class="sc">|&gt;</span></span>
+<span id="cb61-7"><a></a>  <span class="fu">step_impute_mean</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb61-8"><a></a>  <span class="fu">step_dummy</span>(<span class="fu">all_factor_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb61-9"><a></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()))</span>
+<span id="cb61-10"><a></a></span>
+<span id="cb61-11"><a></a><span class="co"># Prepare and apply transformations</span></span>
+<span id="cb61-12"><a></a>prep_recipe     <span class="ot">&lt;-</span> <span class="fu">prep</span>(recipe_obj, <span class="at">training =</span> penguins)</span>
+<span id="cb61-13"><a></a></span>
+<span id="cb61-14"><a></a>normalized_data <span class="ot">&lt;-</span> <span class="fu">bake</span>(prep_recipe, <span class="at">new_data =</span> <span class="cn">NULL</span>) <span class="sc">|&gt;</span></span>
+<span id="cb61-15"><a></a>  <span class="fu">mutate</span>(<span class="at">species =</span> penguins<span class="sc">$</span>species) <span class="sc">|&gt;</span></span>
+<span id="cb61-16"><a></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb61-17"><a></a></span>
+<span id="cb61-18"><a></a><span class="fu">head</span>(normalized_data)</span>
+<span id="cb61-19"><a></a><span class="co">#&gt; # A tibble: 6 × 9</span></span>
+<span id="cb61-20"><a></a><span class="co">#&gt;   bill_length_mm body_mass_g flipper_length_mm sex_male island_Dream</span></span>
+<span id="cb61-21"><a></a><span class="co">#&gt;            &lt;dbl&gt;       &lt;dbl&gt;             &lt;int&gt;    &lt;dbl&gt;        &lt;dbl&gt;</span></span>
+<span id="cb61-22"><a></a><span class="co">#&gt; 1         -0.895      -0.568               181    0.990       -0.764</span></span>
+<span id="cb61-23"><a></a><span class="co">#&gt; 2         -0.822      -0.506               186   -1.01        -0.764</span></span>
+<span id="cb61-24"><a></a><span class="co">#&gt; 3         -0.675      -1.19                195   -1.01        -0.764</span></span>
+<span id="cb61-25"><a></a><span class="co">#&gt; 4         -1.33       -0.940               193   -1.01        -0.764</span></span>
+<span id="cb61-26"><a></a><span class="co">#&gt; 5         -0.858      -0.692               190    0.990       -0.764</span></span>
+<span id="cb61-27"><a></a><span class="co">#&gt; 6         -0.931      -0.723               181   -1.01        -0.764</span></span>
+<span id="cb61-28"><a></a><span class="co">#&gt; # ℹ 4 more variables: island_Torgersen &lt;dbl&gt;, species_Chinstrap &lt;dbl&gt;,</span></span>
+<span id="cb61-29"><a></a><span class="co">#&gt; #   species_Gentoo &lt;dbl&gt;, species &lt;fct&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div><div class="column" style="width:50%;">
 <h4 id="explanation">Explanation:</h4>
@@ -2331,45 +2284,107 @@
 </div></div>
 </div>
 </section>
-<section id="build-a-model-with-normalized-data" class="slide level2">
-<h2>Build a model with normalized data</h2>
-<div class="columns">
-<div class="column" style="width:45%;">
+<section id="a-recipe-for-our-running-example" class="slide level2">
+<h2>A recipe for our running example <img data-src="hexes/recipes.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
+<p>Back to <code>forested</code>. Before we fit any models, let’s declare the preprocessing pipeline we want every model in this deck to use — impute missing numeric values, dummy-encode the nominal predictors, and normalize everything numeric:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> ., <span class="at">data =</span> normalized_data)</span>
-<span id="cb64-2"><a></a></span>
-<span id="cb64-3"><a></a><span class="fu">glance</span>(model)</span>
-<span id="cb64-4"><a></a><span class="co">#&gt; # A tibble: 1 × 12</span></span>
-<span id="cb64-5"><a></a><span class="co">#&gt;   r.squared adj.r.squared sigma statistic   p.value    df logLik   AIC   BIC</span></span>
-<span id="cb64-6"><a></a><span class="co">#&gt;       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span id="cb64-7"><a></a><span class="co">#&gt; 1     0.863         0.861  5.23      294. 2.15e-136     7 -1020. 2057. 2092.</span></span>
-<span id="cb64-8"><a></a><span class="co">#&gt; # ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</span></span>
-<span id="cb64-9"><a></a></span>
-<span id="cb64-10"><a></a>pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(model, normalized_data)</span>
-<span id="cb64-11"><a></a><span class="fu">head</span>(pred <span class="sc">|&gt;</span> <span class="fu">select</span>(flipper_length_mm, .fitted, .resid))</span>
-<span id="cb64-12"><a></a><span class="co">#&gt; # A tibble: 6 × 3</span></span>
-<span id="cb64-13"><a></a><span class="co">#&gt;   flipper_length_mm .fitted .resid</span></span>
-<span id="cb64-14"><a></a><span class="co">#&gt;               &lt;int&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb64-15"><a></a><span class="co">#&gt; 1               181    193. -11.5 </span></span>
-<span id="cb64-16"><a></a><span class="co">#&gt; 2               186    192.  -5.55</span></span>
-<span id="cb64-17"><a></a><span class="co">#&gt; 3               195    189.   6.31</span></span>
-<span id="cb64-18"><a></a><span class="co">#&gt; 4               193    188.   4.65</span></span>
-<span id="cb64-19"><a></a><span class="co">#&gt; 5               190    192.  -2.04</span></span>
-<span id="cb64-20"><a></a><span class="co">#&gt; 6               181    190.  -9.28</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a></a>forested_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(forested <span class="sc">~</span> ., <span class="at">data =</span> forested_train) <span class="sc">|&gt;</span></span>
+<span id="cb62-2"><a></a>  <span class="fu">step_impute_mean</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb62-3"><a></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb62-4"><a></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
+<span id="cb62-5"><a></a></span>
+<span id="cb62-6"><a></a>forested_recipe</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div><div class="column" style="width:55%;">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>We’ll reuse <code>forested_recipe</code> for every model we specify for the rest of today (decision tree, logistic regression, workflow set) — the point of a recipe is to define preprocessing <strong>once</strong> and reuse it everywhere. The same recipe carries forward into Wednesday’s lecture (VIP + spatial CV) and next week’s (more model families + tuning).</p>
+</div>
+</div>
+</div>
+</section>
+<section id="fitting-your-model" class="slide level2">
+<h2>Fitting your model:</h2>
+<ul>
+<li>OK! So you have split data, a recipe, and a model spec (with engine + mode)</li>
+<li>Now you need to fit the model!</li>
+<li>Before we reach for <code>workflow()</code>, it’s useful to see how a recipe + model compose manually: <code>prep()</code> the recipe on the training data, <code>bake()</code> it to get the transformed frame, then hand that frame to <code>fit()</code>.</li>
+</ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a></a><span class="fu">ggscatter</span>(pred,</span>
-<span id="cb65-2"><a></a>          <span class="at">x =</span> <span class="st">"flipper_length_mm"</span>, <span class="at">y =</span> <span class="st">".fitted"</span>,</span>
-<span id="cb65-3"><a></a>          <span class="at">add =</span> <span class="st">"reg.line"</span>, <span class="at">conf.int =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb65-4"><a></a>          <span class="at">cor.coef =</span> <span class="cn">TRUE</span>, <span class="at">cor.method =</span> <span class="st">"pearson"</span>,</span>
-<span id="cb65-5"><a></a>          <span class="at">color =</span> <span class="st">"species"</span>, <span class="at">palette =</span> <span class="st">"jco"</span>) <span class="sc">+</span></span>
-<span id="cb65-6"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Observed vs. Fitted: Flipper Length"</span>,</span>
-<span id="cb65-7"><a></a>       <span class="at">x =</span> <span class="st">"Observed (mm)"</span>, <span class="at">y =</span> <span class="st">"Fitted (mm)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a></a>dt_model <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb63-2"><a></a>  <span class="fu">set_engine</span>(<span class="st">'rpart'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb63-3"><a></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb63-4"><a></a></span>
+<span id="cb63-5"><a></a><span class="co"># Estimate preprocessing parameters (means, dummy levels, etc.) from training data</span></span>
+<span id="cb63-6"><a></a>prepped     <span class="ot">&lt;-</span> <span class="fu">prep</span>(forested_recipe, <span class="at">training =</span> forested_train)</span>
+<span id="cb63-7"><a></a></span>
+<span id="cb63-8"><a></a><span class="co"># Apply the pipeline</span></span>
+<span id="cb63-9"><a></a>forested_baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(prepped, <span class="at">new_data =</span> <span class="cn">NULL</span>)</span>
+<span id="cb63-10"><a></a></span>
+<span id="cb63-11"><a></a><span class="co"># Fit the model against the fully preprocessed training data</span></span>
+<span id="cb63-12"><a></a><span class="co"># Note: `.` now picks up the dummy-encoded + normalized columns produced by the recipe</span></span>
+<span id="cb63-13"><a></a>(output <span class="ot">&lt;-</span> <span class="fu">fit</span>(dt_model, forested <span class="sc">~</span> ., <span class="at">data =</span> forested_baked))</span>
+<span id="cb63-14"><a></a><span class="co">#&gt; parsnip model object</span></span>
+<span id="cb63-15"><a></a><span class="co">#&gt; </span></span>
+<span id="cb63-16"><a></a><span class="co">#&gt; n= 5685 </span></span>
+<span id="cb63-17"><a></a><span class="co">#&gt; </span></span>
+<span id="cb63-18"><a></a><span class="co">#&gt; node), split, n, loss, yval, (yprob)</span></span>
+<span id="cb63-19"><a></a><span class="co">#&gt;       * denotes terminal node</span></span>
+<span id="cb63-20"><a></a><span class="co">#&gt; </span></span>
+<span id="cb63-21"><a></a><span class="co">#&gt;  1) root 5685 2571 Yes (0.54775726 0.45224274)  </span></span>
+<span id="cb63-22"><a></a><span class="co">#&gt;    2) land_type_Tree&gt;=-0.06433113 3025  289 Yes (0.90446281 0.09553719) *</span></span>
+<span id="cb63-23"><a></a><span class="co">#&gt;    3) land_type_Tree&lt; -0.06433113 2660  378 No (0.14210526 0.85789474)  </span></span>
+<span id="cb63-24"><a></a><span class="co">#&gt;      6) temp_annual_max&lt; -0.1737334 351  155 Yes (0.55840456 0.44159544)  </span></span>
+<span id="cb63-25"><a></a><span class="co">#&gt;       12) tree_no_tree_No.tree&lt; 0.04242667 91    5 Yes (0.94505495 0.05494505) *</span></span>
+<span id="cb63-26"><a></a><span class="co">#&gt;       13) tree_no_tree_No.tree&gt;=0.04242667 260  110 No (0.42307692 0.57692308) *</span></span>
+<span id="cb63-27"><a></a><span class="co">#&gt;      7) temp_annual_max&gt;=-0.1737334 2309  182 No (0.07882200 0.92117800) *</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Tip</strong></p>
+</div>
+<div class="callout-content">
+<p>This <code>prep → bake → fit</code> dance is what <code>workflow()</code> automates on the next slide. Seeing it once makes the workflow version less magical.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="component-extracts" class="slide level2">
+<h2>Component extracts:</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><p>While <code>tidymodels</code> provides a standard interface to all models all base models have specific methods (remember <code>summary.lm</code>? )</p></li>
+<li><p>To use these, you must extract the underlying object.</p></li>
+<li><p><code>extract_fit_engine()</code> extracts the underlying model object</p></li>
+<li><p><code>extract_fit_parsnip()</code> extracts the parsnip object</p></li>
+<li><p><code>extract_recipe()</code> extracts the recipe object</p></li>
+<li><p><code>extract_preprocessor()</code> extracts the preprocessor object</p></li>
+<li><p>… many more</p></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a></a>ex <span class="ot">&lt;-</span> <span class="fu">extract_fit_engine</span>(output)</span>
+<span id="cb64-2"><a></a><span class="fu">class</span>(ex) <span class="co"># the class of the engine used!</span></span>
+<span id="cb64-3"><a></a><span class="co">#&gt; [1] "rpart"</span></span>
+<span id="cb64-4"><a></a></span>
+<span id="cb64-5"><a></a><span class="co"># Use rpart plot and text methods ...</span></span>
+<span id="cb64-6"><a></a><span class="fu">plot</span>(ex)</span>
+<span id="cb64-7"><a></a><span class="fu">text</span>(ex, <span class="at">cex =</span> <span class="fl">0.9</span>, <span class="at">use.n =</span> <span class="cn">TRUE</span>, <span class="at">xpd =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-1_files/figure-revealjs/example-plot-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-1_files/figure-revealjs/unnamed-chunk-55-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -2381,55 +2396,42 @@
 <h1>A model workflow</h1>
 
 </section>
-<section id="workflows" class="slide level2">
-<h2>Workflows? <img data-src="hexes/workflows.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
-<p>The <code>workflows</code> package in <code>tidymodels</code> helps:</p>
-<ul>
-<li><p>Manage preprocessing and modeling in a structured pipeline</p></li>
-<li><p>Avoid repetitive code</p></li>
-<li><p>Reduce errors when integrating steps</p></li>
-</ul>
-<div class="fragment">
-<p>Think of them as containers for:</p>
-<ul>
-<li><p>Preprocessing steps (e.g., feature engineering, transformations)</p></li>
-<li><p>Model specification</p></li>
-<li><p>Fitting approaches</p></li>
-</ul>
-</div>
-<div class="fragment">
-<p>Why Use Workflows?</p>
-<p>✅ Keeps preprocessing and modeling together<br>
-</p>
-<p>✅ Ensures consistency in data handling &nbsp;</p>
-<p>✅ Makes code easier to read and maintain&nbsp;</p>
-</div>
-</section>
-<section id="basic-workflow-structure" class="slide level2">
-<h2>Basic Workflow Structure: <img data-src="hexes/workflows.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
+<section id="workflows-a-container-for-your-pipeline" class="slide level2">
+<h2>Workflows — a container for your pipeline <img data-src="hexes/workflows.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
+<p>The <code>workflows</code> package bundles a <strong>preprocessor</strong> (recipe or formula) and a <strong>model spec</strong> into a single object. Instead of managing <code>prep → bake → fit</code> by hand, you hand the workflow your training data and it does the bookkeeping on every resample.</p>
+<p><strong>The four-step pattern:</strong></p>
 <ol type="1">
-<li><p>Create a workflow object (similar to how <code>ggplot()</code> instantiates a canvas)</p></li>
-<li><p>Add a formula or recipe (preprocessor)</p></li>
-<li><p>Add the model</p></li>
-<li><p>Fit the workflow</p></li>
+<li>Create a workflow (<code>workflow()</code> — like <code>ggplot()</code> instantiates a canvas)</li>
+<li>Add a preprocessor (<code>add_recipe()</code> or <code>add_formula()</code>)</li>
+<li>Add a model (<code>add_model()</code>)</li>
+<li>Fit it (<code>fit()</code> or <code>fit_resamples()</code>)</li>
 </ol>
+<div class="fragment">
+<p><strong>Why bother?</strong></p>
+<p>✅ Preprocessing and modeling travel together — no forgetting to bake the test set ✅ Same skeleton for every model — swap in a new <code>add_model()</code> spec and go ✅ Works identically with a single <code>fit()</code>, resamples, or tuning</p>
+</div>
 </section>
 <section id="a-model-workflow-1" class="slide level2">
 <h2>A model workflow <img data-src="hexes/workflows.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "> <img data-src="hexes/parsnip.png" class="absolute" style="top: -20px; right: 64px; width: 64px; height: 74.24px; "></h2>
+<p>Instead of <code>prep</code>/<code>bake</code>/<code>fit</code> by hand, drop the recipe and the model into a <code>workflow()</code> and let it do the bookkeeping:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a></a>dt_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb66-2"><a></a>  <span class="fu">add_formula</span>(forested <span class="sc">~</span> .) <span class="sc">%&gt;%</span></span>
-<span id="cb66-3"><a></a>  <span class="fu">add_model</span>(dt_model) <span class="sc">%&gt;%</span></span>
-<span id="cb66-4"><a></a>  <span class="fu">fit</span>(<span class="at">data =</span> forested_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a></a>dt_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb65-2"><a></a>  <span class="fu">add_recipe</span>(forested_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb65-3"><a></a>  <span class="fu">add_model</span>(dt_model) <span class="sc">%&gt;%</span></span>
+<span id="cb65-4"><a></a>  <span class="fu">fit</span>(<span class="at">data =</span> forested_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div class="cell">
 <pre><code>#&gt; ══ Workflow [trained] ══════════════════════════════════════════════════════════
-#&gt; Preprocessor: Formula
+#&gt; Preprocessor: Recipe
 #&gt; Model: decision_tree()
 #&gt; 
 #&gt; ── Preprocessor ────────────────────────────────────────────────────────────────
-#&gt; forested ~ .
+#&gt; 3 Recipe Steps
+#&gt; 
+#&gt; • step_impute_mean()
+#&gt; • step_dummy()
+#&gt; • step_normalize()
 #&gt; 
 #&gt; ── Model ───────────────────────────────────────────────────────────────────────
 #&gt; n= 5685 
@@ -2438,12 +2440,12 @@
 #&gt;       * denotes terminal node
 #&gt; 
 #&gt;  1) root 5685 2571 Yes (0.54775726 0.45224274)  
-#&gt;    2) land_type=Tree 3025  289 Yes (0.90446281 0.09553719) *
-#&gt;    3) land_type=Barren,Non-tree vegetation 2660  378 No (0.14210526 0.85789474)  
-#&gt;      6) temp_annual_max&lt; 13.395 351  155 Yes (0.55840456 0.44159544)  
-#&gt;       12) tree_no_tree=Tree 91    5 Yes (0.94505495 0.05494505) *
-#&gt;       13) tree_no_tree=No tree 260  110 No (0.42307692 0.57692308) *
-#&gt;      7) temp_annual_max&gt;=13.395 2309  182 No (0.07882200 0.92117800) *</code></pre>
+#&gt;    2) land_type_Tree&gt;=-0.06433113 3025  289 Yes (0.90446281 0.09553719) *
+#&gt;    3) land_type_Tree&lt; -0.06433113 2660  378 No (0.14210526 0.85789474)  
+#&gt;      6) temp_annual_max&lt; -0.1737334 351  155 Yes (0.55840456 0.44159544)  
+#&gt;       12) tree_no_tree_No.tree&lt; 0.04242667 91    5 Yes (0.94505495 0.05494505) *
+#&gt;       13) tree_no_tree_No.tree&gt;=0.04242667 260  110 No (0.42307692 0.57692308) *
+#&gt;      7) temp_annual_max&gt;=-0.1737334 2309  182 No (0.07882200 0.92117800) *</code></pre>
 </div>
 <div class="fragment">
 <div class="callout callout-tip callout-titled callout-style-default">
@@ -2455,7 +2457,7 @@
 <p><strong>Tip</strong></p>
 </div>
 <div class="callout-content">
-<p>Swap <code>add_formula()</code> for <code>add_recipe(my_recipe)</code> and the same workflow now carries your feature engineering pipeline <em>and</em> the model together — <code>fit()</code> will <code>prep()</code>/<code>bake()</code> for you on every resample.</p>
+<p><code>add_recipe()</code> means the workflow carries your feature engineering pipeline <em>and</em> the model together — <code>fit()</code> automatically <code>prep()</code>/<code>bake()</code>s for every resample. (You <em>can</em> use <code>add_formula()</code> instead if you don’t need any preprocessing, but once you have a recipe there’s no reason to.)</p>
 </div>
 </div>
 </div>
@@ -2468,7 +2470,7 @@
 <li><code>augment()</code> on a workflow accepts <code>new_data =</code> and returns the test data with predictions appended.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a></a>dt_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(dt_wf, <span class="at">new_data =</span> forested_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a></a>dt_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(dt_wf, <span class="at">new_data =</span> forested_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div class="cell">
@@ -2501,13 +2503,13 @@
 <li><p>The default metrics for <em>regression</em> models are <strong>rmse</strong>, <strong>rsq</strong> (R²), and <strong>mae</strong></p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a></a><span class="co"># We have a classification model</span></span>
-<span id="cb70-2"><a></a><span class="fu">metrics</span>(dt_preds, <span class="at">truth =</span> forested, <span class="at">estimate =</span> .pred_class)</span>
-<span id="cb70-3"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
-<span id="cb70-4"><a></a><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
-<span id="cb70-5"><a></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
-<span id="cb70-6"><a></a><span class="co">#&gt; 1 accuracy binary         0.885</span></span>
-<span id="cb70-7"><a></a><span class="co">#&gt; 2 kap      binary         0.768</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a></a><span class="co"># We have a classification model</span></span>
+<span id="cb69-2"><a></a><span class="fu">metrics</span>(dt_preds, <span class="at">truth =</span> forested, <span class="at">estimate =</span> .pred_class)</span>
+<span id="cb69-3"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span id="cb69-4"><a></a><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span id="cb69-5"><a></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span id="cb69-6"><a></a><span class="co">#&gt; 1 accuracy binary         0.885</span></span>
+<span id="cb69-7"><a></a><span class="co">#&gt; 2 kap      binary         0.768</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section>
 <section>
@@ -2525,58 +2527,71 @@
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a></a>log_mod <span class="ot">=</span> <span class="fu">logistic_reg</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb71-2"><a></a>  <span class="fu">set_engine</span>(<span class="st">"glm"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb71-3"><a></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
-<span id="cb71-4"><a></a></span>
-<span id="cb71-5"><a></a>log_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb71-6"><a></a>  <span class="fu">add_formula</span>(forested <span class="sc">~</span> .) <span class="sc">%&gt;%</span></span>
-<span id="cb71-7"><a></a>  <span class="fu">add_model</span>(log_mod) <span class="sc">%&gt;%</span></span>
-<span id="cb71-8"><a></a>  <span class="fu">fit</span>(<span class="at">data =</span> forested_train)</span>
-<span id="cb71-9"><a></a></span>
-<span id="cb71-10"><a></a>log_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(log_wf, <span class="at">new_data =</span> forested_test)</span>
-<span id="cb71-11"><a></a></span>
-<span id="cb71-12"><a></a><span class="fu">metrics</span>(log_preds, <span class="at">truth =</span> forested, <span class="at">estimate =</span> .pred_class)</span>
-<span id="cb71-13"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
-<span id="cb71-14"><a></a><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
-<span id="cb71-15"><a></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
-<span id="cb71-16"><a></a><span class="co">#&gt; 1 accuracy binary         0.890</span></span>
-<span id="cb71-17"><a></a><span class="co">#&gt; 2 kap      binary         0.777</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a></a>log_mod <span class="ot">=</span> <span class="fu">logistic_reg</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb70-2"><a></a>  <span class="fu">set_engine</span>(<span class="st">"glm"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb70-3"><a></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb70-4"><a></a></span>
+<span id="cb70-5"><a></a>log_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb70-6"><a></a>  <span class="fu">add_recipe</span>(forested_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb70-7"><a></a>  <span class="fu">add_model</span>(log_mod) <span class="sc">%&gt;%</span></span>
+<span id="cb70-8"><a></a>  <span class="fu">fit</span>(<span class="at">data =</span> forested_train)</span>
+<span id="cb70-9"><a></a></span>
+<span id="cb70-10"><a></a>log_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(log_wf, <span class="at">new_data =</span> forested_test)</span>
+<span id="cb70-11"><a></a></span>
+<span id="cb70-12"><a></a><span class="fu">metrics</span>(log_preds, <span class="at">truth =</span> forested, <span class="at">estimate =</span> .pred_class)</span>
+<span id="cb70-13"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span id="cb70-14"><a></a><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span id="cb70-15"><a></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span id="cb70-16"><a></a><span class="co">#&gt; 1 accuracy binary         0.890</span></span>
+<span id="cb70-17"><a></a><span class="co">#&gt; 2 kap      binary         0.777</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Note how little changed: same recipe, same workflow skeleton — only the model spec is different. That swap is the whole point of <code>tidymodels</code>.</p>
+</div>
+</div>
 </div>
 </div>
 </section>
 <section id="so-who-wins" class="slide level2">
 <h2>So who wins?</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a></a><span class="fu">metrics</span>(dt_preds, <span class="at">truth =</span> forested, <span class="at">estimate =</span> .pred_class)</span>
-<span id="cb72-2"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
-<span id="cb72-3"><a></a><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
-<span id="cb72-4"><a></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
-<span id="cb72-5"><a></a><span class="co">#&gt; 1 accuracy binary         0.885</span></span>
-<span id="cb72-6"><a></a><span class="co">#&gt; 2 kap      binary         0.768</span></span>
-<span id="cb72-7"><a></a><span class="fu">metrics</span>(log_preds, <span class="at">truth =</span> forested, <span class="at">estimate =</span> .pred_class)</span>
-<span id="cb72-8"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
-<span id="cb72-9"><a></a><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
-<span id="cb72-10"><a></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
-<span id="cb72-11"><a></a><span class="co">#&gt; 1 accuracy binary         0.890</span></span>
-<span id="cb72-12"><a></a><span class="co">#&gt; 2 kap      binary         0.777</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a></a><span class="fu">metrics</span>(dt_preds, <span class="at">truth =</span> forested, <span class="at">estimate =</span> .pred_class)</span>
+<span id="cb71-2"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span id="cb71-3"><a></a><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span id="cb71-4"><a></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span id="cb71-5"><a></a><span class="co">#&gt; 1 accuracy binary         0.885</span></span>
+<span id="cb71-6"><a></a><span class="co">#&gt; 2 kap      binary         0.768</span></span>
+<span id="cb71-7"><a></a><span class="fu">metrics</span>(log_preds, <span class="at">truth =</span> forested, <span class="at">estimate =</span> .pred_class)</span>
+<span id="cb71-8"><a></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span id="cb71-9"><a></a><span class="co">#&gt;   .metric  .estimator .estimate</span></span>
+<span id="cb71-10"><a></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span id="cb71-11"><a></a><span class="co">#&gt; 1 accuracy binary         0.890</span></span>
+<span id="cb71-12"><a></a><span class="co">#&gt; 2 kap      binary         0.777</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Right out of the gate, there doesn’t seem to be much difference, but …</p>
 </section>
-<section id="dont-get-too-confident" class="slide level2">
-<h2>Don’t get too confident!</h2>
+<section id="dont-get-too-confident-use-resamples" class="slide level2">
+<h2>Don’t get too confident — use resamples</h2>
 <ul>
 <li>We have a single point-estimate of performance — one train/test split produces <strong>one number</strong> that can be misleadingly high or low depending on which rows ended up in the test set.</li>
 <li>Resampling repeatedly holds out different subsets, fits the model each time, and <strong>averages</strong> the metric — giving a more stable and trustworthy estimate of skill.</li>
 <li>Instead, we can use our <code>resamples</code> to better understand the skill of a model based on the iterative leave-out policy:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a></a>dt_wf_rs <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb73-2"><a></a>  <span class="fu">add_formula</span>(forested <span class="sc">~</span> .) <span class="sc">%&gt;%</span></span>
-<span id="cb73-3"><a></a>  <span class="fu">add_model</span>(dt_model) <span class="sc">%&gt;%</span></span>
-<span id="cb73-4"><a></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> forested_folds, </span>
-<span id="cb73-5"><a></a>                <span class="co"># Here we just ask tidymodels to save all predictions...</span></span>
-<span id="cb73-6"><a></a>                <span class="at">control   =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a></a>dt_wf_rs <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb72-2"><a></a>  <span class="fu">add_recipe</span>(forested_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb72-3"><a></a>  <span class="fu">add_model</span>(dt_model) <span class="sc">%&gt;%</span></span>
+<span id="cb72-4"><a></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> forested_folds,</span>
+<span id="cb72-5"><a></a>                <span class="co"># Here we just ask tidymodels to save all predictions...</span></span>
+<span id="cb72-6"><a></a>                <span class="at">control   =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div class="cell">
@@ -2599,17 +2614,17 @@
 </div>
 </div>
 </section>
-<section id="dont-get-too-confident-1" class="slide level2">
-<h2>Don’t get too confident!</h2>
+<section id="dont-get-too-confident-same-pattern-other-model" class="slide level2">
+<h2>Don’t get too confident — same pattern, other model</h2>
 <ul>
 <li>We can execute the same workflow for the logistic regression model, this time evaluating the resamples instead of the test data.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a></a>log_wf_rs <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb75-2"><a></a>  <span class="fu">add_formula</span>(forested <span class="sc">~</span> .) <span class="sc">%&gt;%</span></span>
-<span id="cb75-3"><a></a>  <span class="fu">add_model</span>(log_mod) <span class="sc">%&gt;%</span></span>
-<span id="cb75-4"><a></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> forested_folds,</span>
-<span id="cb75-5"><a></a>                <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a></a>log_wf_rs <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb74-2"><a></a>  <span class="fu">add_recipe</span>(forested_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb74-3"><a></a>  <span class="fu">add_model</span>(log_mod) <span class="sc">%&gt;%</span></span>
+<span id="cb74-4"><a></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> forested_folds,</span>
+<span id="cb74-5"><a></a>                <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div class="cell">
@@ -2630,8 +2645,8 @@
 #&gt; 10 &lt;split [5117/568]&gt; Fold10 &lt;tibble [3 × 4]&gt; &lt;tibble [0 × 4]&gt; &lt;tibble&gt;</code></pre>
 </div>
 </section>
-<section id="dont-get-too-confident-2" class="slide level2">
-<h2>Don’t get too confident!</h2>
+<section id="dont-get-too-confident-collect-the-metrics" class="slide level2">
+<h2>Don’t get too confident — collect the metrics</h2>
 <ul>
 <li><p>Since we now have an “ensemble” of models (across the folds), we can collect a summary of the metrics across them.</p></li>
 <li><p>The default metrics for classification ensembles are:</p>
@@ -2642,21 +2657,21 @@
 </ul></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a></a></span>
-<span id="cb77-2"><a></a><span class="fu">collect_metrics</span>(log_wf_rs)</span>
-<span id="cb77-3"><a></a><span class="co">#&gt; # A tibble: 3 × 6</span></span>
-<span id="cb77-4"><a></a><span class="co">#&gt;   .metric     .estimator   mean     n std_err .config        </span></span>
-<span id="cb77-5"><a></a><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          </span></span>
-<span id="cb77-6"><a></a><span class="co">#&gt; 1 accuracy    binary     0.906     10 0.00360 pre0_mod0_post0</span></span>
-<span id="cb77-7"><a></a><span class="co">#&gt; 2 brier_class binary     0.0714    10 0.00191 pre0_mod0_post0</span></span>
-<span id="cb77-8"><a></a><span class="co">#&gt; 3 roc_auc     binary     0.961     10 0.00164 pre0_mod0_post0</span></span>
-<span id="cb77-9"><a></a><span class="fu">collect_metrics</span>(dt_wf_rs)</span>
-<span id="cb77-10"><a></a><span class="co">#&gt; # A tibble: 3 × 6</span></span>
-<span id="cb77-11"><a></a><span class="co">#&gt;   .metric     .estimator   mean     n std_err .config        </span></span>
-<span id="cb77-12"><a></a><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          </span></span>
-<span id="cb77-13"><a></a><span class="co">#&gt; 1 accuracy    binary     0.896     10 0.00385 pre0_mod0_post0</span></span>
-<span id="cb77-14"><a></a><span class="co">#&gt; 2 brier_class binary     0.0889    10 0.00224 pre0_mod0_post0</span></span>
-<span id="cb77-15"><a></a><span class="co">#&gt; 3 roc_auc     binary     0.909     10 0.00267 pre0_mod0_post0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a></a></span>
+<span id="cb76-2"><a></a><span class="fu">collect_metrics</span>(log_wf_rs)</span>
+<span id="cb76-3"><a></a><span class="co">#&gt; # A tibble: 3 × 6</span></span>
+<span id="cb76-4"><a></a><span class="co">#&gt;   .metric     .estimator   mean     n std_err .config        </span></span>
+<span id="cb76-5"><a></a><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          </span></span>
+<span id="cb76-6"><a></a><span class="co">#&gt; 1 accuracy    binary     0.906     10 0.00360 pre0_mod0_post0</span></span>
+<span id="cb76-7"><a></a><span class="co">#&gt; 2 brier_class binary     0.0714    10 0.00191 pre0_mod0_post0</span></span>
+<span id="cb76-8"><a></a><span class="co">#&gt; 3 roc_auc     binary     0.961     10 0.00164 pre0_mod0_post0</span></span>
+<span id="cb76-9"><a></a><span class="fu">collect_metrics</span>(dt_wf_rs)</span>
+<span id="cb76-10"><a></a><span class="co">#&gt; # A tibble: 3 × 6</span></span>
+<span id="cb76-11"><a></a><span class="co">#&gt;   .metric     .estimator   mean     n std_err .config        </span></span>
+<span id="cb76-12"><a></a><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          </span></span>
+<span id="cb76-13"><a></a><span class="co">#&gt; 1 accuracy    binary     0.896     10 0.00385 pre0_mod0_post0</span></span>
+<span id="cb76-14"><a></a><span class="co">#&gt; 2 brier_class binary     0.0889    10 0.00224 pre0_mod0_post0</span></span>
+<span id="cb76-15"><a></a><span class="co">#&gt; 3 roc_auc     binary     0.909     10 0.00267 pre0_mod0_post0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="further-simplification-workflowsets" class="slide level2">
@@ -2691,12 +2706,12 @@
 <li><p>Both must be lists, by nature of the underlying <code>purrr</code> code.</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a></a>(wf_obj <span class="ot">&lt;-</span> <span class="fu">workflow_set</span>(<span class="fu">list</span>(forested <span class="sc">~</span>.), <span class="fu">list</span>(log_mod, dt_model)))</span>
-<span id="cb78-2"><a></a><span class="co">#&gt; # A workflow set/tibble: 2 × 4</span></span>
-<span id="cb78-3"><a></a><span class="co">#&gt;   wflow_id              info             option    result    </span></span>
-<span id="cb78-4"><a></a><span class="co">#&gt;   &lt;chr&gt;                 &lt;list&gt;           &lt;list&gt;    &lt;list&gt;    </span></span>
-<span id="cb78-5"><a></a><span class="co">#&gt; 1 formula_logistic_reg  &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</span></span>
-<span id="cb78-6"><a></a><span class="co">#&gt; 2 formula_decision_tree &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a></a>(wf_obj <span class="ot">&lt;-</span> <span class="fu">workflow_set</span>(<span class="fu">list</span>(forested_recipe), <span class="fu">list</span>(log_mod, dt_model)))</span>
+<span id="cb77-2"><a></a><span class="co">#&gt; # A workflow set/tibble: 2 × 4</span></span>
+<span id="cb77-3"><a></a><span class="co">#&gt;   wflow_id             info             option    result    </span></span>
+<span id="cb77-4"><a></a><span class="co">#&gt;   &lt;chr&gt;                &lt;list&gt;           &lt;list&gt;    &lt;list&gt;    </span></span>
+<span id="cb77-5"><a></a><span class="co">#&gt; 1 recipe_logistic_reg  &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</span></span>
+<span id="cb77-6"><a></a><span class="co">#&gt; 2 recipe_decision_tree &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="iterative-execution" class="slide level2">
@@ -2706,17 +2721,17 @@
 <li><p>Here we are mapping the <code>fit_resamples</code> function across the <code>workflow_set</code> combinations using the <code>resamples</code> argument to specify the resamples we want to use (<code>forested_folds</code>).</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a></a>wf_obj <span class="ot">&lt;-</span> </span>
-<span id="cb79-2"><a></a>  <span class="fu">workflow_set</span>(<span class="fu">list</span>(forested <span class="sc">~</span>.), <span class="fu">list</span>(log_mod, dt_model)) <span class="sc">%&gt;%</span></span>
-<span id="cb79-3"><a></a>  <span class="fu">workflow_map</span>(<span class="st">"fit_resamples"</span>, <span class="at">resamples =</span> forested_folds) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a></a>wf_obj <span class="ot">&lt;-</span></span>
+<span id="cb78-2"><a></a>  <span class="fu">workflow_set</span>(<span class="fu">list</span>(forested_recipe), <span class="fu">list</span>(log_mod, dt_model)) <span class="sc">%&gt;%</span></span>
+<span id="cb78-3"><a></a>  <span class="fu">workflow_map</span>(<span class="st">"fit_resamples"</span>, <span class="at">resamples =</span> forested_folds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div class="cell">
 <pre><code>#&gt; # A workflow set/tibble: 2 × 4
-#&gt;   wflow_id              info             option    result   
-#&gt;   &lt;chr&gt;                 &lt;list&gt;           &lt;list&gt;    &lt;list&gt;   
-#&gt; 1 formula_logistic_reg  &lt;tibble [1 × 4]&gt; &lt;opts[1]&gt; &lt;rsmp[+]&gt;
-#&gt; 2 formula_decision_tree &lt;tibble [1 × 4]&gt; &lt;opts[1]&gt; &lt;rsmp[+]&gt;</code></pre>
+#&gt;   wflow_id             info             option    result   
+#&gt;   &lt;chr&gt;                &lt;list&gt;           &lt;list&gt;    &lt;list&gt;   
+#&gt; 1 recipe_logistic_reg  &lt;tibble [1 × 4]&gt; &lt;opts[1]&gt; &lt;rsmp[+]&gt;
+#&gt; 2 recipe_decision_tree &lt;tibble [1 × 4]&gt; &lt;opts[1]&gt; &lt;rsmp[+]&gt;</code></pre>
 </div>
 </section>
 <section id="rapid-comparison" class="slide level2">
@@ -2725,9 +2740,9 @@
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a></a><span class="co"># Quick plot function</span></span>
-<span id="cb81-2"><a></a><span class="fu">autoplot</span>(wf_obj) <span class="sc">+</span> </span>
-<span id="cb81-3"><a></a>  <span class="fu">theme_linedraw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a></a><span class="co"># Quick plot function</span></span>
+<span id="cb80-2"><a></a><span class="fu">autoplot</span>(wf_obj) <span class="sc">+</span> </span>
+<span id="cb80-3"><a></a>  <span class="fu">theme_linedraw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
@@ -2738,19 +2753,19 @@
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a></a><span class="co"># Long list of results, ranked by accuracy</span></span>
-<span id="cb82-2"><a></a><span class="fu">rank_results</span>(wf_obj, </span>
-<span id="cb82-3"><a></a>            <span class="at">rank_metric =</span> <span class="st">"accuracy"</span>, </span>
-<span id="cb82-4"><a></a>            <span class="at">select_best =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb82-5"><a></a><span class="co">#&gt; # A tibble: 6 × 9</span></span>
-<span id="cb82-6"><a></a><span class="co">#&gt;   wflow_id         .config .metric   mean std_err     n preprocessor model  rank</span></span>
-<span id="cb82-7"><a></a><span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;   &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt; &lt;chr&gt;        &lt;chr&gt; &lt;int&gt;</span></span>
-<span id="cb82-8"><a></a><span class="co">#&gt; 1 formula_logisti… pre0_m… accura… 0.906  0.00360    10 formula      logi…     1</span></span>
-<span id="cb82-9"><a></a><span class="co">#&gt; 2 formula_logisti… pre0_m… brier_… 0.0714 0.00191    10 formula      logi…     1</span></span>
-<span id="cb82-10"><a></a><span class="co">#&gt; 3 formula_logisti… pre0_m… roc_auc 0.961  0.00164    10 formula      logi…     1</span></span>
-<span id="cb82-11"><a></a><span class="co">#&gt; 4 formula_decisio… pre0_m… accura… 0.896  0.00385    10 formula      deci…     2</span></span>
-<span id="cb82-12"><a></a><span class="co">#&gt; 5 formula_decisio… pre0_m… brier_… 0.0889 0.00224    10 formula      deci…     2</span></span>
-<span id="cb82-13"><a></a><span class="co">#&gt; 6 formula_decisio… pre0_m… roc_auc 0.909  0.00267    10 formula      deci…     2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a></a><span class="co"># Long list of results, ranked by accuracy</span></span>
+<span id="cb81-2"><a></a><span class="fu">rank_results</span>(wf_obj, </span>
+<span id="cb81-3"><a></a>            <span class="at">rank_metric =</span> <span class="st">"accuracy"</span>, </span>
+<span id="cb81-4"><a></a>            <span class="at">select_best =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb81-5"><a></a><span class="co">#&gt; # A tibble: 6 × 9</span></span>
+<span id="cb81-6"><a></a><span class="co">#&gt;   wflow_id         .config .metric   mean std_err     n preprocessor model  rank</span></span>
+<span id="cb81-7"><a></a><span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;   &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt; &lt;chr&gt;        &lt;chr&gt; &lt;int&gt;</span></span>
+<span id="cb81-8"><a></a><span class="co">#&gt; 1 recipe_logistic… pre0_m… accura… 0.906  0.00360    10 recipe       logi…     1</span></span>
+<span id="cb81-9"><a></a><span class="co">#&gt; 2 recipe_logistic… pre0_m… brier_… 0.0714 0.00191    10 recipe       logi…     1</span></span>
+<span id="cb81-10"><a></a><span class="co">#&gt; 3 recipe_logistic… pre0_m… roc_auc 0.961  0.00164    10 recipe       logi…     1</span></span>
+<span id="cb81-11"><a></a><span class="co">#&gt; 4 recipe_decision… pre0_m… accura… 0.896  0.00385    10 recipe       deci…     2</span></span>
+<span id="cb81-12"><a></a><span class="co">#&gt; 5 recipe_decision… pre0_m… brier_… 0.0889 0.00224    10 recipe       deci…     2</span></span>
+<span id="cb81-13"><a></a><span class="co">#&gt; 6 recipe_decision… pre0_m… roc_auc 0.909  0.00267    10 recipe       deci…     2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div></div>
 <div class="fragment">
@@ -2775,7 +2790,7 @@
 <section id="the-whole-game---status-update-1" class="slide level2">
 <h2>The whole game - status update</h2>
 
-<img data-src="img/whole-game-transparent-select.jpg" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"><p>On Wednesday, we’ll talk more about models we can choose from…</p>
+<img data-src="img/whole-game-transparent-select.jpg" class="quarto-figure quarto-figure-center r-stretch" style="width:100.0%"><p>On <strong>Wednesday</strong> we’ll ask two things <code>collect_metrics()</code> can’t answer: <em>which predictors did the model actually use</em> (VIP) and <em>is our 0.9-ish score honest</em> (spatial cross-validation on autocorrelated data). <strong>Next week</strong> we’ll meet a bigger zoo of model families and learn to tune them.</p>
 
 
 </section></section>

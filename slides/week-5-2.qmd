@@ -247,43 +247,38 @@ dt_fit |>
 A feature's *rank* in each model shows where they agree and where they diverge.
 
 ::: columns
-::: {.column width="48%"}
+::: {.column width="42%"}
 ```{r}
 #| eval: false
-log_imp <- vi(extract_fit_parsnip(log_fit)) |>
-  mutate(rank = rank(-Importance),
-         model = "logistic")
-dt_imp  <- vi(extract_fit_parsnip(dt_fit))  |>
-  mutate(rank = rank(-Importance),
-         model = "tree")
-
-ranks <- bind_rows(log_imp, dt_imp) |>
+# Rank each model's features,
+# keep the top 10 from either
+ranks <- bind_rows(
+  vi(extract_fit_parsnip(log_fit)) |>
+    mutate(model = "logistic"),
+  vi(extract_fit_parsnip(dt_fit)) |>
+    mutate(model = "tree")
+) |>
+  group_by(model) |>
+  mutate(rank = rank(-Importance)) |>
   group_by(Variable) |>
-  filter(n() == 2, min(rank) <= 10) |>
-  ungroup()
+  filter(n() == 2, min(rank) <= 10)
 
 ggplot(ranks,
        aes(model, rank, group = Variable)) +
   geom_line(color = "grey70") +
-  geom_point(aes(color = model), size = 3) +
-  geom_text(data = filter(ranks, model == "logistic"),
-            aes(label = Variable),
-            hjust = 1.1, size = 3) +
-  scale_y_reverse(breaks = 1:15) +
-  scale_color_manual(
-    values = c(train_color, assess_color),
-    guide = "none")
+  geom_point(aes(color = model)) +
+  scale_y_reverse()
 ```
 
-- Flat lines → **robust signal** across models
-- Swinging lines → **model-specific quirks**
+- Flat lines → **robust signal**
+- Swinging lines → **model-specific**
 :::
 
-::: {.column width="52%"}
+::: {.column width="58%"}
 ```{r}
 #| echo: false
 #| fig-width: 6
-#| fig-height: 6
+#| fig-height: 4.5
 
 log_imp <- vi(extract_fit_parsnip(log_fit)) |>
   mutate(rank = rank(-Importance), model = "logistic")
@@ -375,11 +370,36 @@ That second point is the bridge to Part 2.
 
 ## What does the model actually predict? `r hexes("broom")`
 
-Before asking *is the CV honest*, let's look at the predictions themselves. The forested dataset is spatial — map the predicted probability of forest for every test hexagon:
+The forested dataset is spatial — map the predicted probability of forest for every test hexagon:
 
+::: columns
+::: {.column width="42%"}
 ```{r}
-#| fig-width: 10
-#| fig-height: 4.5
+#| eval: false
+test_preds <- augment(log_fit,
+                      new_data = forested_test)
+
+ggplot(test_preds,
+       aes(lon, lat, color = .pred_Yes)) +
+  geom_point(size = 0.8, alpha = 0.85) +
+  scale_color_viridis_c(
+    name = "P(forested)",
+    limits = c(0, 1)) +
+  coord_quickmap()
+```
+
+. . .
+
+Notice the **smooth spatial gradients**. That's informative — but also a warning sign: either (a) environmental drivers really do vary smoothly, or (b) the model is using location as a shortcut.
+
+CV is supposed to tell us which.
+:::
+
+::: {.column width="58%"}
+```{r}
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 5
 
 test_preds <- augment(log_fit, new_data = forested_test)
 
@@ -389,17 +409,11 @@ ggplot(test_preds, aes(lon, lat, color = .pred_Yes)) +
                         name = "P(forested)",
                         limits = c(0, 1)) +
   coord_quickmap() +
-  labs(title = "Predicted probability of forest — logistic model on held-out test set",
-       subtitle = "Spatially coherent bands — that's a hint the model has learned geography")
+  labs(title = "Predicted P(forested) — test set",
+       subtitle = "Spatially coherent bands hint the model has learned geography")
 ```
-
-. . .
-
-Notice the **smooth spatial gradients** in the predicted probabilities. That is informative — but it's also a warning sign: either (a) the environmental drivers really do vary smoothly in space, or (b) the model is using spatial location as a shortcut.
-
-. . .
-
-CV is supposed to tell us which. That's where the honesty question comes in.
+:::
+:::
 
 ## Recall from Week 3: spatial autocorrelation
 
@@ -421,20 +435,101 @@ And we saw that water-resources outcomes (streamflow error, nutrient concentrati
 
 `vfold_cv()` assigns rows to folds **randomly**.
 
-If your data is spatially autocorrelated, a random fold assignment guarantees that:
+If a model relies on geographic interpolation, random fold assignment gives it an easy ride:
 
 - almost every *test* hexagon has a *training* hexagon as its near neighbor
-- the model learns local geography and gets rewarded for it at assessment time
-- reported metrics describe how well the model **memorizes** neighborhoods, not how well it **generalizes** to new places
+- the model can lean on local geography to predict and get rewarded at assessment time
+- reported metrics reflect *memorization of neighborhoods*, not *generalization to new places*
 
 . . .
 
-This is a form of **data leakage**.
+This is a form of **data leakage** — but note the "if". Whether it happens depends on your model and features: a model that has strong environmental predictors may not lean on geography at all.
 
 . . .
 
 :::{.callout-warning}
-The problem is hard to notice because the code still runs, the metrics are still high, and nothing obviously fails. You only catch it when you deploy the model somewhere truly new — like a different state.
+The problem is hard to notice because the code still runs and the metrics are still high. You only catch it by **comparing random CV to spatial CV**. If they agree, you're fine. If spatial is lower, you've found leakage.
+:::
+
+## Which *predictors* carry geography? `r hexes("ape")`
+
+Before looking at residuals, let's use Moran's I on the **predictors themselves**. Features with high spatial autocorrelation are the ones a model *could* use as a shortcut for location:
+
+::: columns
+::: {.column width="42%"}
+```{r}
+#| eval: false
+library(ape)
+
+set.seed(10)
+samp <- slice_sample(forested_train, n = 400)
+dmat <- as.matrix(dist(cbind(samp$lon, samp$lat)))
+W <- 1 / dmat; diag(W) <- 0
+W <- W / rowSums(W)
+
+preds_I <- samp |>
+  select(where(is.numeric), -forested) |>
+  map_dfr(
+    ~ tibble(I = Moran.I(.x, W)$observed),
+    .id = "variable"
+  ) |>
+  arrange(desc(I))
+```
+
+**Reading the ranking:**
+
+- `lon`/`lat` top the list — by construction
+- `precip`, `vapor_*`, `temp_*` are highly spatial (climate varies smoothly)
+- `eastness`/`northness` near zero — aspect flips within a hillside
+- `year` ≈ 0 — it's temporal, not spatial
+:::
+
+::: {.column width="58%"}
+```{r}
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 5.2
+
+library(ape)
+
+set.seed(10)
+samp_pred <- slice_sample(forested_train, n = 400)
+dmat_pred <- as.matrix(dist(cbind(samp_pred$lon, samp_pred$lat)))
+W_pred <- 1 / dmat_pred; diag(W_pred) <- 0
+W_pred <- W_pred / rowSums(W_pred)
+
+numeric_preds <- samp_pred |>
+  select(where(is.numeric)) |>
+  select(-any_of("forested"))
+
+preds_I <- purrr::map_dfr(
+  names(numeric_preds),
+  \(nm) {
+    x <- numeric_preds[[nm]]
+    ok <- is.finite(x)
+    if (sum(ok) < 50) return(tibble(variable = nm, I = NA_real_))
+    res <- tryCatch(
+      Moran.I(x[ok], W_pred[ok, ok] / rowSums(W_pred[ok, ok])),
+      error = function(e) list(observed = NA_real_)
+    )
+    tibble(variable = nm, I = res$observed)
+  }
+) |> arrange(desc(I))
+
+ggplot(preds_I, aes(I, reorder(variable, I),
+                    fill = I)) +
+  geom_col() +
+  scale_fill_viridis_c(option = "magma", guide = "none") +
+  labs(x = "Moran's I (inverse-distance W)",
+       y = NULL,
+       title = "Predictor-level spatial autocorrelation",
+       subtitle = "High I = could serve as a geographic proxy")
+```
+:::
+:::
+
+:::{.callout-tip}
+Cross-reference this with your VIP plot. If your top-ranked features also sit near the top of this chart, they *could* be doing double duty as location encoders — a candidate for the spatial-CV check next.
 :::
 
 ## Diagnosing the problem: Moran's I on *residuals*
@@ -458,14 +553,40 @@ Plan:
 
 ## Residuals, mapped
 
+::: columns
+::: {.column width="42%"}
 ```{r}
-#| fig-width: 9
-#| fig-height: 4.5
+#| eval: false
+preds <- augment(log_fit,
+                 new_data = forested_test) |>
+  mutate(
+    correct  = (.pred_class == forested),
+    residual = as.numeric(!correct)
+    # 1 = miss, 0 = hit
+  )
+
+ggplot(preds,
+       aes(lon, lat,
+           color = factor(residual))) +
+  geom_point(alpha = 0.7, size = 0.8) +
+  coord_quickmap()
+```
+
+. . .
+
+Do you see clumps of red? That's spatial autocorrelation in the residuals.
+:::
+
+::: {.column width="58%"}
+```{r}
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 5
 
 preds <- augment(log_fit, new_data = forested_test) |>
   mutate(
     correct  = (.pred_class == forested),
-    residual = as.numeric(!correct)   # 1 = miss, 0 = hit
+    residual = as.numeric(!correct)
   )
 
 ggplot(preds, aes(lon, lat, color = factor(residual))) +
@@ -478,10 +599,8 @@ ggplot(preds, aes(lon, lat, color = factor(residual))) +
        subtitle = "Red = held-out hexagon misclassified") +
   theme(legend.position = "top")
 ```
-
-. . .
-
-Do you see clumps of red?  That's spatial autocorrelation in the residuals.
+:::
+:::
 
 ## Quantifying it: Moran's I on residuals
 
@@ -503,19 +622,28 @@ moran_res
 
 . . .
 
-A positive, significant Moran's I on residuals is the smoking gun: **the model's errors are not random — they cluster.**
+A **positive, significant** Moran's I on residuals is the smoking gun: the model's errors cluster. A **small** Moran's I means the opposite — your model's errors are well-scattered and the predictors are doing their job. Our logistic model here lands near zero, which is *good news*, not proof of nothing-to-see. We'll still run spatial CV to confirm, and later in Part 4 we'll construct a counter-example where the leakage *is* real.
 
 ## The Moran scatterplot `r hexes("ggplot2")`
 
 Moran's I is the *slope* of a line through this scatterplot:
 
-- **x-axis**: the residual at a point
-- **y-axis**: the average residual of that point's neighbors (the *spatial lag*)
-- points in upper-right / lower-left = clustering
-- diffuse cloud around zero = no spatial structure
+::: columns
+::: {.column width="42%"}
+- **x-axis**: residual at a point
+- **y-axis**: mean residual of its neighbors (*spatial lag*)
+- upper-right / lower-left points → clustering
+- diffuse cloud around zero → no spatial structure
 
+. . .
+
+**The red line's slope *is* Moran's I.** Positive slope → the model's errors are geographically contagious → random CV is overstating performance.
+:::
+
+::: {.column width="58%"}
 ```{r}
-#| fig-width: 8
+#| echo: false
+#| fig-width: 6
 #| fig-height: 4.5
 
 samp <- samp |>
@@ -529,12 +657,10 @@ ggplot(samp, aes(residual, lag_residual)) +
   labs(x = "Residual (0 = hit, 1 = miss)",
        y = "Mean neighbor residual (spatial lag)",
        title = paste0("Moran scatterplot — slope = ", round(moran_res$observed, 3)),
-       subtitle = "Positive slope confirms: misses cluster next to other misses")
+       subtitle = "Misses cluster next to other misses")
 ```
-
-. . .
-
-**The red line's slope *is* Moran's I.** Positive slope → the model's errors are geographically contagious → random CV is overstating performance.
+:::
+:::
 
 ## The leakage visualized
 
@@ -600,24 +726,65 @@ class(forested_sf)
 We keep `lon`/`lat` as columns (`remove = FALSE`) so the model can still use them if it wants to — but conceptually that's a smell, see Part 4.
 :::
 
-## Spatial block CV `r hexes("rsample")`
+## Applying this to *your* data `r hexes("sf")`
+
+Most real datasets don't arrive as `sf` objects — they're plain data frames with coordinate columns. Three things to watch for:
+
+::: columns
+::: {.column width="50%"}
+**1. Column names vary.** The `forested` data uses `lon`/`lat`, but your data might use `longitude`/`latitude`, `gauge_lon`/`gauge_lat`, `X`/`Y`, `easting`/`northing`. Pass whatever you have to `coords = c(x, y)`:
 
 ```{r}
+#| eval: false
+# forested: columns are lon / lat
+forested_sf <- forested_train |>
+  st_as_sf(coords = c("lon", "lat"),
+           crs = 4326, remove = FALSE)
+
+# CAMELS basins: columns are gauge_lon / gauge_lat
+camels_sf <- camels_train |>
+  st_as_sf(coords = c("gauge_lon", "gauge_lat"),
+           crs = 4326, remove = FALSE)
+```
+:::
+
+::: {.column width="50%"}
+**2. The CRS must match the coordinates.** Lon/lat in decimal degrees is `EPSG:4326`. If your data is projected (UTM, Albers, State Plane), use that EPSG code instead — otherwise your spatial blocks will be nonsense.
+
+**3. `remove = FALSE` is a modeling choice.** Keeping the coordinate columns means your model *can* use them as predictors. Drop them in the recipe (`step_rm(lon, lat)`) if you want to force the model to rely on environmental features only.
+
+:::{.callout-tip}
+Rule of thumb: always `plot(st_geometry(your_sf))` once after conversion — if the points don't land where you expect, the column order or CRS is wrong.
+:::
+:::
+:::
+
+## Spatial block CV `r hexes("rsample")`
+
+::: columns
+::: {.column width="42%"}
+```{r}
+#| results: hold
 library(spatialsample)
 
 set.seed(123)
 forested_block <- spatial_block_cv(forested_sf, v = 10)
-forested_block
+
+# Peek at the first few splits
+print(forested_block, n = 3)
 ```
+:::
 
-. . .
-
+::: {.column width="58%"}
 ```{r}
-#| fig-width: 8
-#| fig-height: 4.5
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 5
 autoplot(forested_block) +
   labs(title = "spatial_block_cv: fold assignment")
 ```
+:::
+:::
 
 ## Compare the fold maps
 
@@ -659,9 +826,33 @@ Each fold is a **contiguous region**.  Holding it out simulates predicting somew
 
 What does *one* spatial fold actually look like? Pull out fold 1 and plot its training and assessment sets:
 
+::: columns
+::: {.column width="42%"}
 ```{r}
-#| fig-width: 9
-#| fig-height: 4.5
+#| eval: false
+fold1  <- forested_block$splits[[1]]
+train1 <- analysis(fold1)
+test1  <- assessment(fold1)
+
+bind_rows(
+  train1 |> mutate(role = "training"),
+  test1  |> mutate(role = "assessment")
+) |>
+  ggplot(aes(lon, lat, color = role)) +
+  geom_point(alpha = 0.6, size = 0.7) +
+  coord_quickmap()
+```
+
+. . .
+
+This is the geometry random `vfold_cv` was quietly destroying: under random CV, those red points would have been surrounded by green ones.
+:::
+
+::: {.column width="58%"}
+```{r}
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 5
 
 fold1 <- forested_block$splits[[1]]
 train1 <- analysis(fold1)
@@ -677,14 +868,12 @@ bind_rows(
                                 "assessment" = "#B22222")) +
   coord_quickmap() +
   labs(title = "Fold 1: train vs. held-out assessment",
-       subtitle = "The model never sees the red region during this fold's training",
+       subtitle = "Model never sees the red region during this fold's training",
        color = NULL) +
   theme(legend.position = "top")
 ```
-
-. . .
-
-This is the geometry random `vfold_cv` was quietly destroying: under random CV, those red points would have been surrounded by green ones.
+:::
+:::
 
 ## Block size matters `r hexes("rsample")`
 
@@ -773,74 +962,197 @@ bind_rows(
 . . .
 
 :::{.callout-important}
-Spatial CV almost always **lowers** reported skill. That drop is not a bug — it's the model telling you how well it generalizes to unseen geography. The random-CV number was the fiction.
+**The gap is tiny** — about 0.005 in ROC AUC. That's the honest answer: on *this* data with *these* predictors, random CV was not lying. The environmental features (canopy, vapor, elevation, …) carry real transferable signal, so the model doesn't need to memorize geography.
 :::
 
-## ROC curves: random vs spatial folds `r hexes("yardstick")`
+. . .
 
-Pull the out-of-fold predictions from each scheme and overlay their ROC curves:
+So *does* spatial CV ever matter? Yes — but only when a model is actually leaning on geography. Let's build that model deliberately on the next slide.
+
+## What a leaky model looks like `r hexes("rsample")`
+
+To make spatial leakage *actually* happen, we'd need a model that **can only use geography**. Fit a decision tree on `lon` + `lat` alone — no environmental predictors:
 
 ```{r}
-#| fig-width: 7
-#| fig-height: 5
-#| fig-align: center
+#| cache: true
+geo_recipe <- recipe(forested ~ lon + lat, data = forested_train) |>
+  step_normalize(all_numeric_predictors())
 
-roc_data <- bind_rows(
-  collect_predictions(log_rs_random)  |> mutate(scheme = "vfold_cv (random)"),
-  collect_predictions(log_rs_spatial) |> mutate(scheme = "spatial_block_cv")
+geo_model <- decision_tree(tree_depth = 10, min_n = 3) |>
+  set_engine("rpart") |> set_mode("classification")
+
+geo_wf <- workflow() |> add_recipe(geo_recipe) |> add_model(geo_model)
+
+set.seed(9)
+geo_rs_random  <- fit_resamples(geo_wf, forested_folds, metrics = cls_metrics, control = ctrl)
+geo_rs_spatial <- fit_resamples(geo_wf, forested_block, metrics = cls_metrics, control = ctrl)
+```
+
+. . .
+
+```{r}
+#| echo: false
+bind_rows(
+  collect_metrics(geo_rs_random)  |> mutate(scheme = "vfold_cv (random)"),
+  collect_metrics(geo_rs_spatial) |> mutate(scheme = "spatial_block_cv")
 ) |>
-  group_by(scheme) |>
+  filter(.metric %in% c("roc_auc", "accuracy")) |>
+  select(scheme, .metric, mean, std_err) |>
+  arrange(.metric, scheme)
+```
+
+:::{.callout-warning}
+**Now the gap shows up.** Random CV still gives the tree high marks — every held-out hexagon has a neighbor from a different fold to interpolate from. Spatial CV drops ~0.05 AUC because whole regions of Washington are held out and the model has *no other signal* to fall back on. **That gap is spatial leakage — caught red-handed.**
+:::
+
+## ROC curves: all four fits overlaid `r hexes("yardstick")`
+
+Overlay the out-of-fold predictions from each model × CV scheme:
+
+::: columns
+::: {.column width="42%"}
+```{r}
+#| eval: false
+roc_data <- bind_rows(
+  collect_predictions(log_rs_random)  |>
+    mutate(model = "all features",
+           scheme = "random"),
+  collect_predictions(log_rs_spatial) |>
+    mutate(model = "all features",
+           scheme = "spatial"),
+  collect_predictions(geo_rs_random)  |>
+    mutate(model = "geo-only",
+           scheme = "random"),
+  collect_predictions(geo_rs_spatial) |>
+    mutate(model = "geo-only",
+           scheme = "spatial")
+) |>
+  group_by(model, scheme) |>
   roc_curve(truth = forested, .pred_Yes)
 
 ggplot(roc_data,
-       aes(1 - specificity, sensitivity, color = scheme)) +
-  geom_abline(linetype = "dashed", color = "grey70") +
+       aes(1 - specificity, sensitivity,
+           color = scheme, linetype = model)) +
   geom_path(linewidth = 1.1) +
-  scale_color_manual(values = c(train_color, "#B22222")) +
-  coord_equal() +
-  labs(title = "Out-of-fold ROC curves",
-       subtitle = "The spatial curve sits below the random curve at every threshold",
-       color = NULL) +
-  theme(legend.position = "top")
+  coord_equal()
 ```
 
-. . .
+The all-features pair is **on top of each other** — no leakage to find. The geo-only pair shows **visible daylight** between random and spatial — the spatial curve sagging is what leakage looks like.
+:::
 
-This is the same story as the AUC numbers, but now you can **see** it: the random-CV curve hugs the corner more tightly because the model is being graded on points it has near-neighbors for.
+::: {.column width="58%"}
+```{r}
+#| echo: false
+#| fig-width: 6
+#| fig-height: 5
+
+roc_data <- bind_rows(
+  collect_predictions(log_rs_random)  |> mutate(model = "all features", scheme = "random"),
+  collect_predictions(log_rs_spatial) |> mutate(model = "all features", scheme = "spatial"),
+  collect_predictions(geo_rs_random)  |> mutate(model = "geo-only",     scheme = "random"),
+  collect_predictions(geo_rs_spatial) |> mutate(model = "geo-only",     scheme = "spatial")
+) |>
+  group_by(model, scheme) |>
+  roc_curve(truth = forested, .pred_Yes)
+
+ggplot(roc_data,
+       aes(1 - specificity, sensitivity, color = scheme, linetype = model)) +
+  geom_abline(linetype = "dotted", color = "grey70") +
+  geom_path(linewidth = 1.1) +
+  scale_color_manual(values = c("random" = train_color, "spatial" = "#B22222")) +
+  coord_equal() +
+  labs(title = "Out-of-fold ROC curves — 2 models × 2 CV schemes",
+       subtitle = "Geo-only: random vs spatial show real daylight. All features: no gap.",
+       color = NULL, linetype = NULL) +
+  theme(legend.position = "top")
+```
+:::
+:::
 
 ## It's not just lower — it's more variable `r hexes("yardstick")`
 
-The mean hides the story. Pull **per-fold** metrics with `summarize = FALSE`:
+The mean hides the story. Pull **per-fold** metrics for both models × both schemes:
 
+::: columns
+::: {.column width="42%"}
 ```{r}
-#| fig-width: 9
-#| fig-height: 4
+#| eval: false
+per_fold <- bind_rows(
+  collect_metrics(log_rs_random,  summarize = FALSE) |>
+    mutate(model = "all features", scheme = "random"),
+  collect_metrics(log_rs_spatial, summarize = FALSE) |>
+    mutate(model = "all features", scheme = "spatial"),
+  collect_metrics(geo_rs_random,  summarize = FALSE) |>
+    mutate(model = "geo-only",     scheme = "random"),
+  collect_metrics(geo_rs_spatial, summarize = FALSE) |>
+    mutate(model = "geo-only",     scheme = "spatial")
+) |> filter(.metric == "roc_auc")
+
+ggplot(per_fold,
+       aes(interaction(model, scheme), .estimate,
+           color = scheme)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.08)
+```
+
+All-features: both CV schemes give tight, near-identical distributions → no leakage. Geo-only: spatial folds show **lower mean AND wider spread** — the model's performance depends heavily on *which* region you hold out.
+:::
+
+::: {.column width="58%"}
+```{r}
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 4.2
 
 per_fold <- bind_rows(
-  collect_metrics(log_rs_random,  summarize = FALSE) |> mutate(scheme = "vfold_cv (random)"),
-  collect_metrics(log_rs_spatial, summarize = FALSE) |> mutate(scheme = "spatial_block_cv")
+  collect_metrics(log_rs_random,  summarize = FALSE) |> mutate(model = "all features", scheme = "random"),
+  collect_metrics(log_rs_spatial, summarize = FALSE) |> mutate(model = "all features", scheme = "spatial"),
+  collect_metrics(geo_rs_random,  summarize = FALSE) |> mutate(model = "geo-only",     scheme = "random"),
+  collect_metrics(geo_rs_spatial, summarize = FALSE) |> mutate(model = "geo-only",     scheme = "spatial")
 ) |> filter(.metric == "roc_auc")
 
 ggplot(per_fold, aes(scheme, .estimate, color = scheme)) +
-  geom_boxplot(width = 0.3, outlier.shape = NA, alpha = 0.3) +
-  geom_jitter(width = 0.08, size = 2.5, alpha = 0.8) +
-  scale_color_manual(values = c(train_color, "#B22222"), guide = "none") +
+  geom_boxplot(width = 0.35, outlier.shape = NA, alpha = 0.3) +
+  geom_jitter(width = 0.08, size = 2, alpha = 0.8) +
+  facet_wrap(~model) +
+  scale_color_manual(values = c("random" = train_color, "spatial" = "#B22222"), guide = "none") +
   labs(y = "ROC AUC (per fold)", x = NULL,
-       title = "Per-fold ROC AUC by resampling scheme",
-       subtitle = "Spatial CV is both lower on average AND more variable across folds")
+       title = "Per-fold ROC AUC",
+       subtitle = "All-features: no gap. Geo-only: spatial CV is lower AND more variable.")
 ```
-
-. . .
-
-Random CV gives you 10 near-identical numbers (every fold looks like the whole dataset). Spatial CV gives you a **distribution** — and that spread is your honest estimate of how much skill depends on *which* region you're predicting. Report both the mean and the variance.
+:::
+:::
 
 ## Where does spatial CV struggle? `r hexes("ggplot2")`
 
-Each spatial fold's held-out region has a **location**. We can map each fold's held-out AUC to see which regions are hardest to predict:
+Each spatial fold's held-out region has a **location**. Map each fold's AUC to see which regions are hardest to predict:
 
+::: columns
+::: {.column width="42%"}
 ```{r}
-#| fig-width: 10
-#| fig-height: 4.5
+#| eval: false
+fold_auc <- collect_metrics(
+    log_rs_spatial, summarize = FALSE) |>
+  filter(.metric == "roc_auc") |>
+  select(id, fold_auc = .estimate)
+
+# join each fold's AUC back to its
+# held-out coordinates (see repo)
+
+ggplot(fold_locations,
+       aes(lon, lat, color = fold_auc)) +
+  geom_point() +
+  scale_color_viridis_c(option = "magma")
+```
+
+Regions where AUC is *lowest* are where your model has the least transferable signal — a **scientific** finding telling you where to invest more training data or features.
+:::
+
+::: {.column width="58%"}
+```{r}
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 4.2
 
 fold_auc <- collect_metrics(log_rs_spatial, summarize = FALSE) |>
   filter(.metric == "roc_auc") |>
@@ -860,32 +1172,46 @@ ggplot(fold_locations, aes(lon, lat, color = fold_auc)) +
   geom_point(size = 0.8, alpha = 0.8) +
   scale_color_viridis_c(option = "magma", name = "Fold AUC") +
   coord_quickmap() +
-  labs(title = "Per-fold ROC AUC mapped to the held-out region",
-       subtitle = "Dark = model struggles in that region; light = model generalizes well there")
+  labs(title = "Per-fold ROC AUC by held-out region",
+       subtitle = "Dark = model struggles there")
 ```
-
-. . .
-
-The regions where AUC is *lowest* are the places your model has the least transferable signal. That's a **scientific** finding, not just a number — it tells you where you need more training data or a better feature set.
+:::
+:::
 
 ## Alternative: `spatial_clustering_cv` `r hexes("rsample")`
 
 When blocks don't fit your data (e.g., irregularly shaped study regions), cluster-based folds are often better:
 
+::: columns
+::: {.column width="42%"}
 ```{r}
-#| fig-width: 8
-#| fig-height: 4
+#| eval: false
+set.seed(123)
+forested_cluster <- spatial_clustering_cv(
+  forested_sf, v = 10
+)
 
+autoplot(forested_cluster)
+```
+
+. . .
+
+Same API — drop it into `fit_resamples(resamples = forested_cluster)` and go.
+:::
+
+::: {.column width="58%"}
+```{r}
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 4.5
 set.seed(123)
 forested_cluster <- spatial_clustering_cv(forested_sf, v = 10)
 
 autoplot(forested_cluster) +
   labs(title = "spatial_clustering_cv: k-means on coordinates")
 ```
-
-. . .
-
-Same API — drop it into `fit_resamples(resamples = forested_cluster)` and go.
+:::
+:::
 
 ## Alternative: buffered v-fold `r hexes("rsample")`
 
@@ -913,11 +1239,38 @@ forested_buffered <- spatial_buffer_vfold_cv(
 
 ## Alternative: leave-location-out CV `r hexes("rsample")`
 
-For water resources, the natural spatial unit isn't usually a square block — it's a **watershed**, **gauge basin**, or **ecoregion**. `spatial_leave_location_out_cv()` holds out one named group at a time:
+For water resources, the natural unit is usually a **watershed**, **gauge basin**, or **ecoregion** — not a square block. `spatial_leave_location_out_cv()` holds out one named group at a time:
 
+::: columns
+::: {.column width="42%"}
 ```{r}
-#| fig-width: 8
-#| fig-height: 4
+#| eval: false
+forested_region <- forested_sf |>
+  mutate(region = case_when(
+    lon < -122.5 ~ "Coastal",
+    lon < -120.5 ~ "Cascade",
+    lon < -118.5 ~ "Central",
+    TRUE         ~ "Eastern"
+  ))
+
+set.seed(123)
+forested_lloc <-
+  spatial_leave_location_out_cv(
+    forested_region,
+    group = region
+  )
+
+autoplot(forested_lloc)
+```
+
+Each fold trains on 3 regions and predicts the 4th — answers *"could I predict eastern WA from coastal WA?"*, which `vfold_cv` can't. In your project, swap `region` for HUC8, gauge basin, or climate zone.
+:::
+
+::: {.column width="58%"}
+```{r}
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 4.5
 
 forested_region <- forested_sf |>
   mutate(region = case_when(
@@ -934,15 +1287,9 @@ forested_lloc <- spatial_leave_location_out_cv(
 )
 
 autoplot(forested_lloc) +
-  labs(title = "spatial_leave_location_out_cv — one region held out per fold")
+  labs(title = "One region held out per fold")
 ```
-
-. . .
-
-Each fold trains on 3 regions and predicts the 4th. This directly answers *"if I trained only on coastal WA, could I predict eastern WA?"* — a question `vfold_cv` literally cannot answer.
-
-:::{.callout-note}
-In your project, replace `region` with the natural group — HUC8 watershed, USGS gauge basin, state, PRISM climate zone, etc. The `group` argument just needs a column name.
+:::
 :::
 
 ## When *not* to reach for spatial CV 🤔
@@ -973,99 +1320,146 @@ A mature workflow often reports **both**: random CV as a best-case ceiling, spat
 
 # Part 4: Trust your diagnostics
 
-## Re-running VIP under spatial CV
+## Putting the pieces together
 
-Resampling schemes don't change the **final fit** — `log_fit` is the same object whether we evaluate it with random or spatial folds.
+We now have two models under two CV schemes — that's a 2×2 we can reason about:
 
-What spatial CV changes is **which features we should trust as important** based on how well they generalize.
+- **All-features model** under random CV vs spatial CV — gap is tiny → predictors carry real signal
+- **Geo-only model** under random CV vs spatial CV — gap is large → model is leaning on geography
+
+The *size of the gap* between random and spatial CV is a **diagnostic of how much the model depends on geographic shortcuts**. You compute it, read it, and decide whether your model is trustworthy on new geography.
 
 . . .
 
-So instead of re-fitting, we'll run a *counterfactual* experiment:
-
-- keep the model fixed
-- **remove** features we suspect are spatial shortcuts (`lon`, `lat`)
-- compare how much performance falls under random vs. spatial CV
-
-If a feature is truly informative, dropping it hurts *both* CV schemes. If it was a spatial proxy, dropping it mostly hurts the random scheme.
-
-## A diagnostic trick: drop `lon` / `lat` and refit
-
-If a feature is truly informative, dropping it should *hurt* the model.
-
-If a feature is a spatial proxy, dropping it should only hurt under random CV — because under spatial CV the model couldn't lean on it anyway.
-
-```{r}
-#| cache: true
-recipe_no_xy <- recipe(forested ~ ., data = forested_train) |>
-  step_rm(lon, lat) |>
-  step_impute_mean(all_numeric_predictors()) |>
-  step_dummy(all_nominal_predictors()) |>
-  step_normalize(all_numeric_predictors())
-
-wf_no_xy <- workflow() |>
-  add_recipe(recipe_no_xy) |>
-  add_model(log_mod)
-
-set.seed(9)
-rs_random_no_xy  <- wf_no_xy |>
-  fit_resamples(resamples = forested_folds, metrics = metric_set(roc_auc))
-rs_spatial_no_xy <- wf_no_xy |>
-  fit_resamples(resamples = forested_block, metrics = metric_set(roc_auc))
-```
+VIP told us *what* the model used. Spatial CV told us *whether those features generalize*. Together they answer "can I trust this model outside the training area?"
 
 ## The 2×2 comparison
 
+::: columns
+::: {.column width="55%"}
 ```{r}
-#| fig-width: 9
-#| fig-height: 4.5
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 5
 
 results_2x2 <- bind_rows(
-  collect_metrics(log_rs_random)    |> mutate(scheme = "random vfold",  features = "all"),
-  collect_metrics(log_rs_spatial)   |> mutate(scheme = "spatial block", features = "all"),
-  collect_metrics(rs_random_no_xy)  |> mutate(scheme = "random vfold",  features = "drop lon/lat"),
-  collect_metrics(rs_spatial_no_xy) |> mutate(scheme = "spatial block", features = "drop lon/lat")
+  collect_metrics(log_rs_random)  |> mutate(scheme = "random", model = "all features"),
+  collect_metrics(log_rs_spatial) |> mutate(scheme = "spatial", model = "all features"),
+  collect_metrics(geo_rs_random)  |> mutate(scheme = "random", model = "geo-only"),
+  collect_metrics(geo_rs_spatial) |> mutate(scheme = "spatial", model = "geo-only")
 ) |>
   filter(.metric == "roc_auc")
 
 ggplot(results_2x2,
-       aes(scheme, mean, fill = features)) +
+       aes(model, mean, fill = scheme)) +
   geom_col(position = position_dodge(width = 0.75), width = 0.65, color = "white") +
   geom_errorbar(aes(ymin = mean - std_err, ymax = mean + std_err),
                 position = position_dodge(width = 0.75), width = 0.15) +
-  geom_text(aes(label = round(mean, 3), y = mean + std_err + 0.01),
-            position = position_dodge(width = 0.75), size = 3.5) +
-  scale_fill_manual(values = c("all" = train_color, "drop lon/lat" = test_color)) +
+  geom_text(aes(label = round(mean, 3), y = mean + std_err + 0.02),
+            position = position_dodge(width = 0.75), size = 4) +
+  scale_fill_manual(values = c("random" = train_color, "spatial" = "#B22222")) +
   coord_cartesian(ylim = c(0.7, 1)) +
   labs(y = "ROC AUC (mean ± SE)", x = NULL,
-       title = "2×2 experiment: CV scheme × feature set",
+       title = "2×2: model × CV scheme",
+       fill = NULL) +
+  theme(legend.position = "top")
+```
+:::
+
+::: {.column width="45%"}
+- **All features, random ≈ spatial** → no leakage; random CV was telling the truth
+- **Geo-only, random ≫ spatial** → the gap *is* the leakage
+- The diagnostic is the **within-model** gap, not the between-model one
+
+. . .
+
+**Read it this way:** compare the two bars *within each model*. Equal = trust the number. Unequal = your model's random-CV score is inflated by exactly that much.
+:::
+:::
+
+## The same idea in **regression** `r hexes("yardstick")`
+
+Every example above used classification (`forested`: Yes/No) — but the same leakage story applies to regression. You just swap the metric.
+
+::: columns
+::: {.column width="50%"}
+Pretend we're predicting **log mean streamflow** (`logQmean`) from basin attributes for CAMELS gauges — a spatial regression problem. The 2×2 would be built the same way:
+
+```{r}
+#| eval: false
+# Same four workflows, swap the metric
+cls_metrics <- metric_set(rmse, rsq, mae)
+
+rs_random  <- lm_wf |>
+  fit_resamples(resamples = camels_folds,
+                metrics   = cls_metrics)
+rs_spatial <- lm_wf |>
+  fit_resamples(resamples = camels_block,
+                metrics   = cls_metrics)
+
+# ... repeat for no-xy recipe, then plot rsq
+```
+
+- Classification: higher ROC AUC = better → spatial CV usually **lowers** AUC
+- Regression: higher R² = better → spatial CV usually **lowers** R²
+- Regression: lower RMSE = better → spatial CV usually **raises** RMSE
+:::
+
+::: {.column width="50%"}
+```{r}
+#| echo: false
+#| fig-width: 6
+#| fig-height: 4.5
+
+# Illustrative regression 2×2 — same shape as the classification
+# version, translated to an R² axis (higher = better).
+reg_2x2 <- tibble::tribble(
+  ~model,          ~scheme,   ~mean, ~std_err,
+  "all features",  "random",   0.88,  0.015,
+  "all features",  "spatial",  0.86,  0.020,
+  "geo-only",      "random",   0.72,  0.025,
+  "geo-only",      "spatial",  0.54,  0.040
+)
+
+ggplot(reg_2x2, aes(model, mean, fill = scheme)) +
+  geom_col(position = position_dodge(width = 0.75), width = 0.65, color = "white") +
+  geom_errorbar(aes(ymin = mean - std_err, ymax = mean + std_err),
+                position = position_dodge(width = 0.75), width = 0.15) +
+  geom_text(aes(label = round(mean, 2), y = mean + std_err + 0.015),
+            position = position_dodge(width = 0.75), size = 3.5) +
+  scale_fill_manual(values = c("random" = train_color, "spatial" = "#B22222")) +
+  coord_cartesian(ylim = c(0.4, 1)) +
+  labs(y = "R² (mean ± SE)", x = NULL,
+       title = "Same 2×2 — illustrative regression case",
+       subtitle = "Within-model gap = spatial-leakage inflation",
        fill = NULL) +
   theme(legend.position = "top")
 ```
 
-. . .
+The **within-model gap** (random vs spatial) is the diagnostic — just on a regression metric instead of AUC.
+:::
+:::
 
-- Random CV + all features → the **inflated headline number** (left-green bar)
-- Random CV + drop coords → still high: `lon`/`lat` were doing *some* work but not all of it
-- Spatial CV + all features → the **honest number**: lower (right-green bar)
-- Spatial CV + drop coords → roughly the same as the honest number: confirms the model can't use coords as a shortcut under spatial CV
-
-The **vertical gap between the two green bars** is the spatial-leakage inflation.
+:::{.callout-important}
+**For your lab:** CAMELS basins have `gauge_lon`/`gauge_lat`. Random `vfold_cv` on CAMELS is the regression version of the story above. Build a `spatial_block_cv` next to it and report both — the delta is the honest cost of generalization.
+:::
 
 ## What this tells us
 
-If a feature's *apparent importance* shrinks when you switch to spatial CV, that feature was partly acting as a **geographic proxy** — encoding *where* rather than *why*.
+The **within-model gap** between random and spatial CV is a diagnostic: it measures how much the model's performance depended on geographic interpolation.
 
-The features that remain important under spatial CV are the ones carrying **transferable signal**.
+- **Small gap** (our all-features model): the predictors carry transferable signal — random CV was honest.
+- **Large gap** (our geo-only model): performance was inflated by geography — trust spatial CV.
 
 . . .
 
 :::{.callout-tip}
 A practical workflow:
 
-1. Fit under random CV, look at VIP → your **hypothesis set** of important features
-2. Fit under spatial CV, look at VIP again → your **robust** important features
-3. Features that only rank high under (1) deserve scientific scrutiny — are they mechanism, or are they geography?
+1. Fit your model. Look at VIP → identify your top features.
+2. Run **both** random and spatial CV.
+3. If the two CV scores agree → random CV was telling the truth, ship it.
+4. If spatial CV is meaningfully lower → your model is leaning on geography. Suspect the top features that rank in VIP — they may be spatial proxies (elevation as climate, etc). Consider removing them and refitting.
 :::
 
 ## Takeaways
@@ -1074,11 +1468,11 @@ A practical workflow:
 
 2. **`vip` gives you the "what".** Model-specific importance for common engines, permutation importance for anything else.
 
-3. **Spatial autocorrelation breaks random CV.** The model gets rewarded for memorizing geography; reported metrics are inflated.
+3. **Spatial CV is a diagnostic, not a punishment.** Sometimes the gap is tiny (our all-features model) — that's evidence your predictors generalize. Sometimes it's huge (our geo-only model) — that's the leakage being caught.
 
-4. **`spatialsample` gives you honest CV.** `spatial_block_cv`, `spatial_clustering_cv`, and buffered variants all slot into the existing tidymodels pipeline.
+4. **`spatialsample` gives you the other CV scheme.** `spatial_block_cv`, `spatial_clustering_cv`, and buffered variants all slot into the existing tidymodels pipeline.
 
-5. **The two tools must be used together.** VIP under random CV tells you what the model *used to memorize*; VIP under spatial CV tells you what the model *actually learned*.
+5. **The two tools must be used together.** VIP alone tells you what the model *used*; the random-vs-spatial CV gap tells you whether those features *generalize*.
 
 ## Looking ahead
 

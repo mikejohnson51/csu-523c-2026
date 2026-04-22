@@ -412,37 +412,32 @@
 <h2>Agreement and disagreement <img data-src="hexes/vip.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
 <p>A feature’s <em>rank</em> in each model shows where they agree and where they diverge.</p>
 <div class="columns">
-<div class="column" style="width:48%;">
+<div class="column" style="width:42%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a>log_imp <span class="ot">&lt;-</span> <span class="fu">vi</span>(<span class="fu">extract_fit_parsnip</span>(log_fit)) <span class="sc">|&gt;</span></span>
-<span id="cb6-2"><a></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">rank</span>(<span class="sc">-</span>Importance),</span>
-<span id="cb6-3"><a></a>         <span class="at">model =</span> <span class="st">"logistic"</span>)</span>
-<span id="cb6-4"><a></a>dt_imp  <span class="ot">&lt;-</span> <span class="fu">vi</span>(<span class="fu">extract_fit_parsnip</span>(dt_fit))  <span class="sc">|&gt;</span></span>
-<span id="cb6-5"><a></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">rank</span>(<span class="sc">-</span>Importance),</span>
-<span id="cb6-6"><a></a>         <span class="at">model =</span> <span class="st">"tree"</span>)</span>
-<span id="cb6-7"><a></a></span>
-<span id="cb6-8"><a></a>ranks <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(log_imp, dt_imp) <span class="sc">|&gt;</span></span>
-<span id="cb6-9"><a></a>  <span class="fu">group_by</span>(Variable) <span class="sc">|&gt;</span></span>
-<span id="cb6-10"><a></a>  <span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">==</span> <span class="dv">2</span>, <span class="fu">min</span>(rank) <span class="sc">&lt;=</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-11"><a></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb6-12"><a></a></span>
-<span id="cb6-13"><a></a><span class="fu">ggplot</span>(ranks,</span>
-<span id="cb6-14"><a></a>       <span class="fu">aes</span>(model, rank, <span class="at">group =</span> Variable)) <span class="sc">+</span></span>
-<span id="cb6-15"><a></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"grey70"</span>) <span class="sc">+</span></span>
-<span id="cb6-16"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> model), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb6-17"><a></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> <span class="fu">filter</span>(ranks, model <span class="sc">==</span> <span class="st">"logistic"</span>),</span>
-<span id="cb6-18"><a></a>            <span class="fu">aes</span>(<span class="at">label =</span> Variable),</span>
-<span id="cb6-19"><a></a>            <span class="at">hjust =</span> <span class="fl">1.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb6-20"><a></a>  <span class="fu">scale_y_reverse</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>) <span class="sc">+</span></span>
-<span id="cb6-21"><a></a>  <span class="fu">scale_color_manual</span>(</span>
-<span id="cb6-22"><a></a>    <span class="at">values =</span> <span class="fu">c</span>(train_color, assess_color),</span>
-<span id="cb6-23"><a></a>    <span class="at">guide =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="co"># Rank each model's features,</span></span>
+<span id="cb6-2"><a></a><span class="co"># keep the top 10 from either</span></span>
+<span id="cb6-3"><a></a>ranks <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb6-4"><a></a>  <span class="fu">vi</span>(<span class="fu">extract_fit_parsnip</span>(log_fit)) <span class="sc">|&gt;</span></span>
+<span id="cb6-5"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"logistic"</span>),</span>
+<span id="cb6-6"><a></a>  <span class="fu">vi</span>(<span class="fu">extract_fit_parsnip</span>(dt_fit)) <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"tree"</span>)</span>
+<span id="cb6-8"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb6-9"><a></a>  <span class="fu">group_by</span>(model) <span class="sc">|&gt;</span></span>
+<span id="cb6-10"><a></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">rank</span>(<span class="sc">-</span>Importance)) <span class="sc">|&gt;</span></span>
+<span id="cb6-11"><a></a>  <span class="fu">group_by</span>(Variable) <span class="sc">|&gt;</span></span>
+<span id="cb6-12"><a></a>  <span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">==</span> <span class="dv">2</span>, <span class="fu">min</span>(rank) <span class="sc">&lt;=</span> <span class="dv">10</span>)</span>
+<span id="cb6-13"><a></a></span>
+<span id="cb6-14"><a></a><span class="fu">ggplot</span>(ranks,</span>
+<span id="cb6-15"><a></a>       <span class="fu">aes</span>(model, rank, <span class="at">group =</span> Variable)) <span class="sc">+</span></span>
+<span id="cb6-16"><a></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"grey70"</span>) <span class="sc">+</span></span>
+<span id="cb6-17"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> model)) <span class="sc">+</span></span>
+<span id="cb6-18"><a></a>  <span class="fu">scale_y_reverse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
-<li>Flat lines → <strong>robust signal</strong> across models</li>
-<li>Swinging lines → <strong>model-specific quirks</strong></li>
+<li>Flat lines → <strong>robust signal</strong></li>
+<li>Swinging lines → <strong>model-specific</strong></li>
 </ul>
-</div><div class="column" style="width:52%;">
+</div><div class="column" style="width:58%;">
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -525,32 +520,35 @@
 </section>
 <section id="what-does-the-model-actually-predict" class="slide level2">
 <h2>What does the model actually predict? <img data-src="hexes/broom.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
-<p>Before asking <em>is the CV honest</em>, let’s look at the predictions themselves. The forested dataset is spatial — map the predicted probability of forest for every test hexagon:</p>
+<p>The forested dataset is spatial — map the predicted probability of forest for every test hexagon:</p>
+<div class="columns">
+<div class="column" style="width:42%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a>test_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(log_fit, <span class="at">new_data =</span> forested_test)</span>
-<span id="cb8-2"><a></a></span>
-<span id="cb8-3"><a></a><span class="fu">ggplot</span>(test_preds, <span class="fu">aes</span>(lon, lat, <span class="at">color =</span> .pred_Yes)) <span class="sc">+</span></span>
-<span id="cb8-4"><a></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">0.8</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
-<span id="cb8-5"><a></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">"viridis"</span>,</span>
-<span id="cb8-6"><a></a>                        <span class="at">name =</span> <span class="st">"P(forested)"</span>,</span>
-<span id="cb8-7"><a></a>                        <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb8-8"><a></a>  <span class="fu">coord_quickmap</span>() <span class="sc">+</span></span>
-<span id="cb8-9"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Predicted probability of forest — logistic model on held-out test set"</span>,</span>
-<span id="cb8-10"><a></a>       <span class="at">subtitle =</span> <span class="st">"Spatially coherent bands — that's a hint the model has learned geography"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a>test_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(log_fit,</span>
+<span id="cb8-2"><a></a>                      <span class="at">new_data =</span> forested_test)</span>
+<span id="cb8-3"><a></a></span>
+<span id="cb8-4"><a></a><span class="fu">ggplot</span>(test_preds,</span>
+<span id="cb8-5"><a></a>       <span class="fu">aes</span>(lon, lat, <span class="at">color =</span> .pred_Yes)) <span class="sc">+</span></span>
+<span id="cb8-6"><a></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">0.8</span>, <span class="at">alpha =</span> <span class="fl">0.85</span>) <span class="sc">+</span></span>
+<span id="cb8-7"><a></a>  <span class="fu">scale_color_viridis_c</span>(</span>
+<span id="cb8-8"><a></a>    <span class="at">name =</span> <span class="st">"P(forested)"</span>,</span>
+<span id="cb8-9"><a></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb8-10"><a></a>  <span class="fu">coord_quickmap</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>. . .</p>
+<p>Notice the <strong>smooth spatial gradients</strong>. That’s informative — but also a warning sign: either (a) environmental drivers really do vary smoothly, or (b) the model is using location as a shortcut.</p>
+<p>CV is supposed to tell us which.</p>
+</div><div class="column" style="width:58%;">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-9-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-10-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>Notice the <strong>smooth spatial gradients</strong> in the predicted probabilities. That is informative — but it’s also a warning sign: either (a) the environmental drivers really do vary smoothly in space, or (b) the model is using spatial location as a shortcut.</p>
-</div>
-<div class="fragment">
-<p>CV is supposed to tell us which. That’s where the honesty question comes in.</p>
-</div>
+</div></div>
 </section>
 <section id="recall-from-week-3-spatial-autocorrelation" class="slide level2">
 <h2>Recall from Week 3: spatial autocorrelation</h2>
@@ -572,14 +570,14 @@
 <section id="why-this-matters-for-ml" class="slide level2">
 <h2>Why this matters for ML</h2>
 <p><code>vfold_cv()</code> assigns rows to folds <strong>randomly</strong>.</p>
-<p>If your data is spatially autocorrelated, a random fold assignment guarantees that:</p>
+<p>If a model relies on geographic interpolation, random fold assignment gives it an easy ride:</p>
 <ul>
 <li>almost every <em>test</em> hexagon has a <em>training</em> hexagon as its near neighbor</li>
-<li>the model learns local geography and gets rewarded for it at assessment time</li>
-<li>reported metrics describe how well the model <strong>memorizes</strong> neighborhoods, not how well it <strong>generalizes</strong> to new places</li>
+<li>the model can lean on local geography to predict and get rewarded at assessment time</li>
+<li>reported metrics reflect <em>memorization of neighborhoods</em>, not <em>generalization to new places</em></li>
 </ul>
 <div class="fragment">
-<p>This is a form of <strong>data leakage</strong>.</p>
+<p>This is a form of <strong>data leakage</strong> — but note the “if”. Whether it happens depends on your model and features: a model that has strong environmental predictors may not lean on geography at all.</p>
 </div>
 <div class="fragment">
 <div class="callout callout-warning callout-titled callout-style-default">
@@ -591,8 +589,62 @@
 <p><strong>Warning</strong></p>
 </div>
 <div class="callout-content">
-<p>The problem is hard to notice because the code still runs, the metrics are still high, and nothing obviously fails. You only catch it when you deploy the model somewhere truly new — like a different state.</p>
+<p>The problem is hard to notice because the code still runs and the metrics are still high. You only catch it by <strong>comparing random CV to spatial CV</strong>. If they agree, you’re fine. If spatial is lower, you’ve found leakage.</p>
 </div>
+</div>
+</div>
+</div>
+</section>
+<section id="which-predictors-carry-geography" class="slide level2">
+<h2>Which <em>predictors</em> carry geography? <img data-src="hexes/ape.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
+<p>Before looking at residuals, let’s use Moran’s I on the <strong>predictors themselves</strong>. Features with high spatial autocorrelation are the ones a model <em>could</em> use as a shortcut for location:</p>
+<div class="columns">
+<div class="column" style="width:42%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="fu">library</span>(ape)</span>
+<span id="cb9-2"><a></a></span>
+<span id="cb9-3"><a></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb9-4"><a></a>samp <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(forested_train, <span class="at">n =</span> <span class="dv">400</span>)</span>
+<span id="cb9-5"><a></a>dmat <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">dist</span>(<span class="fu">cbind</span>(samp<span class="sc">$</span>lon, samp<span class="sc">$</span>lat)))</span>
+<span id="cb9-6"><a></a>W <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> dmat; <span class="fu">diag</span>(W) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb9-7"><a></a>W <span class="ot">&lt;-</span> W <span class="sc">/</span> <span class="fu">rowSums</span>(W)</span>
+<span id="cb9-8"><a></a></span>
+<span id="cb9-9"><a></a>preds_I <span class="ot">&lt;-</span> samp <span class="sc">|&gt;</span></span>
+<span id="cb9-10"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric), <span class="sc">-</span>forested) <span class="sc">|&gt;</span></span>
+<span id="cb9-11"><a></a>  <span class="fu">map_dfr</span>(</span>
+<span id="cb9-12"><a></a>    <span class="sc">~</span> <span class="fu">tibble</span>(<span class="at">I =</span> <span class="fu">Moran.I</span>(.x, W)<span class="sc">$</span>observed),</span>
+<span id="cb9-13"><a></a>    <span class="at">.id =</span> <span class="st">"variable"</span></span>
+<span id="cb9-14"><a></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-15"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(I))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Reading the ranking:</strong></p>
+<ul>
+<li><code>lon</code>/<code>lat</code> top the list — by construction</li>
+<li><code>precip</code>, <code>vapor_*</code>, <code>temp_*</code> are highly spatial (climate varies smoothly)</li>
+<li><code>eastness</code>/<code>northness</code> near zero — aspect flips within a hillside</li>
+<li><code>year</code> ≈ 0 — it’s temporal, not spatial</li>
+</ul>
+</div><div class="column" style="width:58%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-12-1.png" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Tip</strong></p>
+</div>
+<div class="callout-content">
+<p>Cross-reference this with your VIP plot. If your top-ranked features also sit near the top of this chart, they <em>could</em> be doing double duty as location encoders — a candidate for the spatial-CV check next.</p>
 </div>
 </div>
 </div>
@@ -616,98 +668,98 @@
 </section>
 <section id="residuals-mapped" class="slide level2">
 <h2>Residuals, mapped</h2>
+<div class="columns">
+<div class="column" style="width:42%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a>preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(log_fit, <span class="at">new_data =</span> forested_test) <span class="sc">|&gt;</span></span>
-<span id="cb9-2"><a></a>  <span class="fu">mutate</span>(</span>
-<span id="cb9-3"><a></a>    <span class="at">correct  =</span> (.pred_class <span class="sc">==</span> forested),</span>
-<span id="cb9-4"><a></a>    <span class="at">residual =</span> <span class="fu">as.numeric</span>(<span class="sc">!</span>correct)   <span class="co"># 1 = miss, 0 = hit</span></span>
-<span id="cb9-5"><a></a>  )</span>
-<span id="cb9-6"><a></a></span>
-<span id="cb9-7"><a></a><span class="fu">ggplot</span>(preds, <span class="fu">aes</span>(lon, lat, <span class="at">color =</span> <span class="fu">factor</span>(residual))) <span class="sc">+</span></span>
-<span id="cb9-8"><a></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb9-9"><a></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"grey70"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#B22222"</span>),</span>
-<span id="cb9-10"><a></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"correct"</span>, <span class="st">"miss"</span>),</span>
-<span id="cb9-11"><a></a>                     <span class="at">name =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb9-12"><a></a>  <span class="fu">coord_quickmap</span>() <span class="sc">+</span></span>
-<span id="cb9-13"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Where does the logistic model miss?"</span>,</span>
-<span id="cb9-14"><a></a>       <span class="at">subtitle =</span> <span class="st">"Red = held-out hexagon misclassified"</span>) <span class="sc">+</span></span>
-<span id="cb9-15"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a>preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(log_fit,</span>
+<span id="cb10-2"><a></a>                 <span class="at">new_data =</span> forested_test) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-4"><a></a>    <span class="at">correct  =</span> (.pred_class <span class="sc">==</span> forested),</span>
+<span id="cb10-5"><a></a>    <span class="at">residual =</span> <span class="fu">as.numeric</span>(<span class="sc">!</span>correct)</span>
+<span id="cb10-6"><a></a>    <span class="co"># 1 = miss, 0 = hit</span></span>
+<span id="cb10-7"><a></a>  )</span>
+<span id="cb10-8"><a></a></span>
+<span id="cb10-9"><a></a><span class="fu">ggplot</span>(preds,</span>
+<span id="cb10-10"><a></a>       <span class="fu">aes</span>(lon, lat,</span>
+<span id="cb10-11"><a></a>           <span class="at">color =</span> <span class="fu">factor</span>(residual))) <span class="sc">+</span></span>
+<span id="cb10-12"><a></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb10-13"><a></a>  <span class="fu">coord_quickmap</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-10-1.png" style="width:100.0%" class="r-stretch"><div class="fragment">
+<p>. . .</p>
 <p>Do you see clumps of red? That’s spatial autocorrelation in the residuals.</p>
+</div><div class="column" style="width:58%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-14-1.png" style="width:100.0%"></p>
+</figure>
 </div>
+</div>
+</div>
+</div></div>
 </section>
 <section id="quantifying-it-morans-i-on-residuals" class="slide level2">
 <h2>Quantifying it: Moran’s I on residuals</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">library</span>(ape)</span>
-<span id="cb10-2"><a></a></span>
-<span id="cb10-3"><a></a><span class="co"># Use a simple inverse-distance W on a sample of test points</span></span>
-<span id="cb10-4"><a></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
-<span id="cb10-5"><a></a>samp <span class="ot">&lt;-</span> preds <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">400</span>)</span>
-<span id="cb10-6"><a></a></span>
-<span id="cb10-7"><a></a>dmat <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">dist</span>(<span class="fu">cbind</span>(samp<span class="sc">$</span>lon, samp<span class="sc">$</span>lat)))</span>
-<span id="cb10-8"><a></a>W <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> dmat</span>
-<span id="cb10-9"><a></a><span class="fu">diag</span>(W) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb10-10"><a></a>W <span class="ot">&lt;-</span> W <span class="sc">/</span> <span class="fu">rowSums</span>(W)</span>
-<span id="cb10-11"><a></a></span>
-<span id="cb10-12"><a></a>moran_res <span class="ot">&lt;-</span> <span class="fu">Moran.I</span>(samp<span class="sc">$</span>residual, W)</span>
-<span id="cb10-13"><a></a>moran_res</span>
-<span id="cb10-14"><a></a><span class="co">#&gt; $observed</span></span>
-<span id="cb10-15"><a></a><span class="co">#&gt; [1] 0.006698239</span></span>
-<span id="cb10-16"><a></a><span class="co">#&gt; </span></span>
-<span id="cb10-17"><a></a><span class="co">#&gt; $expected</span></span>
-<span id="cb10-18"><a></a><span class="co">#&gt; [1] -0.002506266</span></span>
-<span id="cb10-19"><a></a><span class="co">#&gt; </span></span>
-<span id="cb10-20"><a></a><span class="co">#&gt; $sd</span></span>
-<span id="cb10-21"><a></a><span class="co">#&gt; [1] 0.004710679</span></span>
-<span id="cb10-22"><a></a><span class="co">#&gt; </span></span>
-<span id="cb10-23"><a></a><span class="co">#&gt; $p.value</span></span>
-<span id="cb10-24"><a></a><span class="co">#&gt; [1] 0.05070528</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="fu">library</span>(ape)</span>
+<span id="cb11-2"><a></a></span>
+<span id="cb11-3"><a></a><span class="co"># Use a simple inverse-distance W on a sample of test points</span></span>
+<span id="cb11-4"><a></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb11-5"><a></a>samp <span class="ot">&lt;-</span> preds <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">400</span>)</span>
+<span id="cb11-6"><a></a></span>
+<span id="cb11-7"><a></a>dmat <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">dist</span>(<span class="fu">cbind</span>(samp<span class="sc">$</span>lon, samp<span class="sc">$</span>lat)))</span>
+<span id="cb11-8"><a></a>W <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> dmat</span>
+<span id="cb11-9"><a></a><span class="fu">diag</span>(W) <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb11-10"><a></a>W <span class="ot">&lt;-</span> W <span class="sc">/</span> <span class="fu">rowSums</span>(W)</span>
+<span id="cb11-11"><a></a></span>
+<span id="cb11-12"><a></a>moran_res <span class="ot">&lt;-</span> <span class="fu">Moran.I</span>(samp<span class="sc">$</span>residual, W)</span>
+<span id="cb11-13"><a></a>moran_res</span>
+<span id="cb11-14"><a></a><span class="co">#&gt; $observed</span></span>
+<span id="cb11-15"><a></a><span class="co">#&gt; [1] 0.006698239</span></span>
+<span id="cb11-16"><a></a><span class="co">#&gt; </span></span>
+<span id="cb11-17"><a></a><span class="co">#&gt; $expected</span></span>
+<span id="cb11-18"><a></a><span class="co">#&gt; [1] -0.002506266</span></span>
+<span id="cb11-19"><a></a><span class="co">#&gt; </span></span>
+<span id="cb11-20"><a></a><span class="co">#&gt; $sd</span></span>
+<span id="cb11-21"><a></a><span class="co">#&gt; [1] 0.004710679</span></span>
+<span id="cb11-22"><a></a><span class="co">#&gt; </span></span>
+<span id="cb11-23"><a></a><span class="co">#&gt; $p.value</span></span>
+<span id="cb11-24"><a></a><span class="co">#&gt; [1] 0.05070528</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
-<p>A positive, significant Moran’s I on residuals is the smoking gun: <strong>the model’s errors are not random — they cluster.</strong></p>
+<p>A <strong>positive, significant</strong> Moran’s I on residuals is the smoking gun: the model’s errors cluster. A <strong>small</strong> Moran’s I means the opposite — your model’s errors are well-scattered and the predictors are doing their job. Our logistic model here lands near zero, which is <em>good news</em>, not proof of nothing-to-see. We’ll still run spatial CV to confirm, and later in Part 4 we’ll construct a counter-example where the leakage <em>is</em> real.</p>
 </div>
 </section>
 <section id="the-moran-scatterplot" class="slide level2">
 <h2>The Moran scatterplot <img data-src="hexes/ggplot2.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
 <p>Moran’s I is the <em>slope</em> of a line through this scatterplot:</p>
+<div class="columns">
+<div class="column" style="width:42%;">
 <ul>
-<li><strong>x-axis</strong>: the residual at a point</li>
-<li><strong>y-axis</strong>: the average residual of that point’s neighbors (the <em>spatial lag</em>)</li>
-<li>points in upper-right / lower-left = clustering</li>
-<li>diffuse cloud around zero = no spatial structure</li>
+<li><strong>x-axis</strong>: residual at a point</li>
+<li><strong>y-axis</strong>: mean residual of its neighbors (<em>spatial lag</em>)</li>
+<li>upper-right / lower-left points → clustering</li>
+<li>diffuse cloud around zero → no spatial structure</li>
 </ul>
+<p>. . .</p>
+<p><strong>The red line’s slope <em>is</em> Moran’s I.</strong> Positive slope → the model’s errors are geographically contagious → random CV is overstating performance.</p>
+</div><div class="column" style="width:58%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>samp <span class="ot">&lt;-</span> samp <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a></a>  <span class="fu">mutate</span>(<span class="at">lag_residual =</span> <span class="fu">as.numeric</span>(W <span class="sc">%*%</span> residual))</span>
-<span id="cb11-3"><a></a></span>
-<span id="cb11-4"><a></a><span class="fu">ggplot</span>(samp, <span class="fu">aes</span>(residual, lag_residual)) <span class="sc">+</span></span>
-<span id="cb11-5"><a></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">mean</span>(samp<span class="sc">$</span>residual), <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"grey50"</span>) <span class="sc">+</span></span>
-<span id="cb11-6"><a></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">mean</span>(samp<span class="sc">$</span>lag_residual), <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"grey50"</span>) <span class="sc">+</span></span>
-<span id="cb11-7"><a></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.05</span>, <span class="at">height =</span> <span class="dv">0</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">color =</span> train_color) <span class="sc">+</span></span>
-<span id="cb11-8"><a></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"#B22222"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb11-9"><a></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Residual (0 = hit, 1 = miss)"</span>,</span>
-<span id="cb11-10"><a></a>       <span class="at">y =</span> <span class="st">"Mean neighbor residual (spatial lag)"</span>,</span>
-<span id="cb11-11"><a></a>       <span class="at">title =</span> <span class="fu">paste0</span>(<span class="st">"Moran scatterplot — slope = "</span>, <span class="fu">round</span>(moran_res<span class="sc">$</span>observed, <span class="dv">3</span>)),</span>
-<span id="cb11-12"><a></a>       <span class="at">subtitle =</span> <span class="st">"Positive slope confirms: misses cluster next to other misses"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-12-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-16-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p><strong>The red line’s slope <em>is</em> Moran’s I.</strong> Positive slope → the model’s errors are geographically contagious → random CV is overstating performance.</p>
-</div>
+</div></div>
 </section>
 <section id="the-leakage-visualized" class="slide level2">
 <h2>The leakage visualized</h2>
 
-<img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-13-1.png" style="width:100.0%" class="r-stretch"><div class="fragment">
+<img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-17-1.png" style="width:100.0%" class="r-stretch"><div class="fragment">
 <p>Every test point has a training point as a near neighbor. That’s the leakage.</p>
 </div>
 </section></section>
@@ -781,42 +833,73 @@
 </div>
 </div>
 </section>
+<section id="applying-this-to-your-data" class="slide level2">
+<h2>Applying this to <em>your</em> data <img data-src="hexes/sf.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
+<p>Most real datasets don’t arrive as <code>sf</code> objects — they’re plain data frames with coordinate columns. Three things to watch for:</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>1. Column names vary.</strong> The <code>forested</code> data uses <code>lon</code>/<code>lat</code>, but your data might use <code>longitude</code>/<code>latitude</code>, <code>gauge_lon</code>/<code>gauge_lat</code>, <code>X</code>/<code>Y</code>, <code>easting</code>/<code>northing</code>. Pass whatever you have to <code>coords = c(x, y)</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a><span class="co"># forested: columns are lon / lat</span></span>
+<span id="cb13-2"><a></a>forested_sf <span class="ot">&lt;-</span> forested_train <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"lon"</span>, <span class="st">"lat"</span>),</span>
+<span id="cb13-4"><a></a>           <span class="at">crs =</span> <span class="dv">4326</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb13-5"><a></a></span>
+<span id="cb13-6"><a></a><span class="co"># CAMELS basins: columns are gauge_lon / gauge_lat</span></span>
+<span id="cb13-7"><a></a>camels_sf <span class="ot">&lt;-</span> camels_train <span class="sc">|&gt;</span></span>
+<span id="cb13-8"><a></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"gauge_lon"</span>, <span class="st">"gauge_lat"</span>),</span>
+<span id="cb13-9"><a></a>           <span class="at">crs =</span> <span class="dv">4326</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column" style="width:50%;">
+<p><strong>2. The CRS must match the coordinates.</strong> Lon/lat in decimal degrees is <code>EPSG:4326</code>. If your data is projected (UTM, Albers, State Plane), use that EPSG code instead — otherwise your spatial blocks will be nonsense.</p>
+<p><strong>3. <code>remove = FALSE</code> is a modeling choice.</strong> Keeping the coordinate columns means your model <em>can</em> use them as predictors. Drop them in the recipe (<code>step_rm(lon, lat)</code>) if you want to force the model to rely on environmental features only.</p>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Tip</strong></p>
+</div>
+<div class="callout-content">
+<p>Rule of thumb: always <code>plot(st_geometry(your_sf))</code> once after conversion — if the points don’t land where you expect, the column order or CRS is wrong.</p>
+</div>
+</div>
+</div>
+</div></div>
+</section>
 <section id="spatial-block-cv" class="slide level2">
 <h2>Spatial block CV <img data-src="hexes/rsample.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
+<div class="columns">
+<div class="column" style="width:42%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a><span class="fu">library</span>(spatialsample)</span>
-<span id="cb13-2"><a></a></span>
-<span id="cb13-3"><a></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb13-4"><a></a>forested_block <span class="ot">&lt;-</span> <span class="fu">spatial_block_cv</span>(forested_sf, <span class="at">v =</span> <span class="dv">10</span>)</span>
-<span id="cb13-5"><a></a>forested_block</span>
-<span id="cb13-6"><a></a><span class="co">#&gt; #  10-fold spatial block cross-validation </span></span>
-<span id="cb13-7"><a></a><span class="co">#&gt; # A tibble: 10 × 2</span></span>
-<span id="cb13-8"><a></a><span class="co">#&gt;    splits             id    </span></span>
-<span id="cb13-9"><a></a><span class="co">#&gt;    &lt;list&gt;             &lt;chr&gt; </span></span>
-<span id="cb13-10"><a></a><span class="co">#&gt;  1 &lt;split [5125/560]&gt; Fold01</span></span>
-<span id="cb13-11"><a></a><span class="co">#&gt;  2 &lt;split [5114/571]&gt; Fold02</span></span>
-<span id="cb13-12"><a></a><span class="co">#&gt;  3 &lt;split [5116/569]&gt; Fold03</span></span>
-<span id="cb13-13"><a></a><span class="co">#&gt;  4 &lt;split [5138/547]&gt; Fold04</span></span>
-<span id="cb13-14"><a></a><span class="co">#&gt;  5 &lt;split [5111/574]&gt; Fold05</span></span>
-<span id="cb13-15"><a></a><span class="co">#&gt;  6 &lt;split [5109/576]&gt; Fold06</span></span>
-<span id="cb13-16"><a></a><span class="co">#&gt;  7 &lt;split [5123/562]&gt; Fold07</span></span>
-<span id="cb13-17"><a></a><span class="co">#&gt;  8 &lt;split [5115/570]&gt; Fold08</span></span>
-<span id="cb13-18"><a></a><span class="co">#&gt;  9 &lt;split [5086/599]&gt; Fold09</span></span>
-<span id="cb13-19"><a></a><span class="co">#&gt; 10 &lt;split [5128/557]&gt; Fold10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a><span class="fu">library</span>(spatialsample)</span>
+<span id="cb14-2"><a></a></span>
+<span id="cb14-3"><a></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb14-4"><a></a>forested_block <span class="ot">&lt;-</span> <span class="fu">spatial_block_cv</span>(forested_sf, <span class="at">v =</span> <span class="dv">10</span>)</span>
+<span id="cb14-5"><a></a></span>
+<span id="cb14-6"><a></a><span class="co"># Peek at the first few splits</span></span>
+<span id="cb14-7"><a></a><span class="fu">print</span>(forested_block, <span class="at">n =</span> <span class="dv">3</span>)</span>
+<span id="cb14-8"><a></a><span class="co">#&gt; #  10-fold spatial block cross-validation </span></span>
+<span id="cb14-9"><a></a><span class="co">#&gt; # A tibble: 10 × 2</span></span>
+<span id="cb14-10"><a></a><span class="co">#&gt;   splits             id    </span></span>
+<span id="cb14-11"><a></a><span class="co">#&gt;   &lt;list&gt;             &lt;chr&gt; </span></span>
+<span id="cb14-12"><a></a><span class="co">#&gt; 1 &lt;split [5125/560]&gt; Fold01</span></span>
+<span id="cb14-13"><a></a><span class="co">#&gt; 2 &lt;split [5114/571]&gt; Fold02</span></span>
+<span id="cb14-14"><a></a><span class="co">#&gt; 3 &lt;split [5116/569]&gt; Fold03</span></span>
+<span id="cb14-15"><a></a><span class="co">#&gt; # ℹ 7 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="fragment">
+</div><div class="column" style="width:58%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a><span class="fu">autoplot</span>(forested_block) <span class="sc">+</span></span>
-<span id="cb14-2"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"spatial_block_cv: fold assignment"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-16-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-21-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-</div>
+</div></div>
 </section>
 <section id="compare-the-fold-maps" class="slide level2">
 <h2>Compare the fold maps</h2>
@@ -827,7 +910,7 @@
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-17-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-22-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -839,7 +922,7 @@
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-18-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-23-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -850,8 +933,10 @@
 <section id="zoom-in-on-one-fold" class="slide level2">
 <h2>Zoom in on one fold <img data-src="hexes/rsample.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
 <p>What does <em>one</em> spatial fold actually look like? Pull out fold 1 and plot its training and assessment sets:</p>
+<div class="columns">
+<div class="column" style="width:42%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>fold1 <span class="ot">&lt;-</span> forested_block<span class="sc">$</span>splits[[<span class="dv">1</span>]]</span>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>fold1  <span class="ot">&lt;-</span> forested_block<span class="sc">$</span>splits[[<span class="dv">1</span>]]</span>
 <span id="cb15-2"><a></a>train1 <span class="ot">&lt;-</span> <span class="fu">analysis</span>(fold1)</span>
 <span id="cb15-3"><a></a>test1  <span class="ot">&lt;-</span> <span class="fu">assessment</span>(fold1)</span>
 <span id="cb15-4"><a></a></span>
@@ -861,24 +946,21 @@
 <span id="cb15-8"><a></a>) <span class="sc">|&gt;</span></span>
 <span id="cb15-9"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(lon, lat, <span class="at">color =</span> role)) <span class="sc">+</span></span>
 <span id="cb15-10"><a></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">size =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb15-11"><a></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"training"</span> <span class="ot">=</span> train_color,</span>
-<span id="cb15-12"><a></a>                                <span class="st">"assessment"</span> <span class="ot">=</span> <span class="st">"#B22222"</span>)) <span class="sc">+</span></span>
-<span id="cb15-13"><a></a>  <span class="fu">coord_quickmap</span>() <span class="sc">+</span></span>
-<span id="cb15-14"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Fold 1: train vs. held-out assessment"</span>,</span>
-<span id="cb15-15"><a></a>       <span class="at">subtitle =</span> <span class="st">"The model never sees the red region during this fold's training"</span>,</span>
-<span id="cb15-16"><a></a>       <span class="at">color =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb15-17"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-11"><a></a>  <span class="fu">coord_quickmap</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>. . .</p>
+<p>This is the geometry random <code>vfold_cv</code> was quietly destroying: under random CV, those red points would have been surrounded by green ones.</p>
+</div><div class="column" style="width:58%;">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-19-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-25-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>This is the geometry random <code>vfold_cv</code> was quietly destroying: under random CV, those red points would have been surrounded by green ones.</p>
-</div>
+</div></div>
 </section>
 <section id="block-size-matters" class="slide level2">
 <h2>Block size matters <img data-src="hexes/rsample.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
@@ -890,7 +972,7 @@
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-20-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-26-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -902,7 +984,7 @@
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-21-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-27-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -914,7 +996,7 @@
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-22-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-28-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
@@ -982,142 +1064,205 @@
 <p><strong>Important</strong></p>
 </div>
 <div class="callout-content">
-<p>Spatial CV almost always <strong>lowers</strong> reported skill. That drop is not a bug — it’s the model telling you how well it generalizes to unseen geography. The random-CV number was the fiction.</p>
+<p><strong>The gap is tiny</strong> — about 0.005 in ROC AUC. That’s the honest answer: on <em>this</em> data with <em>these</em> predictors, random CV was not lying. The environmental features (canopy, vapor, elevation, …) carry real transferable signal, so the model doesn’t need to memorize geography.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment">
+<p>So <em>does</em> spatial CV ever matter? Yes — but only when a model is actually leaning on geography. Let’s build that model deliberately on the next slide.</p>
+</div>
+</section>
+<section id="what-a-leaky-model-looks-like" class="slide level2">
+<h2>What a leaky model looks like <img data-src="hexes/rsample.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
+<p>To make spatial leakage <em>actually</em> happen, we’d need a model that <strong>can only use geography</strong>. Fit a decision tree on <code>lon</code> + <code>lat</code> alone — no environmental predictors:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a>geo_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(forested <span class="sc">~</span> lon <span class="sc">+</span> lat, <span class="at">data =</span> forested_train) <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
+<span id="cb18-3"><a></a></span>
+<span id="cb18-4"><a></a>geo_model <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">tree_depth =</span> <span class="dv">10</span>, <span class="at">min_n =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-5"><a></a>  <span class="fu">set_engine</span>(<span class="st">"rpart"</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb18-6"><a></a></span>
+<span id="cb18-7"><a></a>geo_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> <span class="fu">add_recipe</span>(geo_recipe) <span class="sc">|&gt;</span> <span class="fu">add_model</span>(geo_model)</span>
+<span id="cb18-8"><a></a></span>
+<span id="cb18-9"><a></a><span class="fu">set.seed</span>(<span class="dv">9</span>)</span>
+<span id="cb18-10"><a></a>geo_rs_random  <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(geo_wf, forested_folds, <span class="at">metrics =</span> cls_metrics, <span class="at">control =</span> ctrl)</span>
+<span id="cb18-11"><a></a>geo_rs_spatial <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(geo_wf, forested_block, <span class="at">metrics =</span> cls_metrics, <span class="at">control =</span> ctrl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<div class="cell">
+<pre><code>#&gt; # A tibble: 4 × 4
+#&gt;   scheme            .metric   mean std_err
+#&gt;   &lt;chr&gt;             &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 spatial_block_cv  accuracy 0.788 0.0163 
+#&gt; 2 vfold_cv (random) accuracy 0.834 0.00381
+#&gt; 3 spatial_block_cv  roc_auc  0.796 0.0182 
+#&gt; 4 vfold_cv (random) roc_auc  0.839 0.00511</code></pre>
+</div>
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Warning</strong></p>
+</div>
+<div class="callout-content">
+<p><strong>Now the gap shows up.</strong> Random CV still gives the tree high marks — every held-out hexagon has a neighbor from a different fold to interpolate from. Spatial CV drops ~0.05 AUC because whole regions of Washington are held out and the model has <em>no other signal</em> to fall back on. <strong>That gap is spatial leakage — caught red-handed.</strong></p>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="roc-curves-random-vs-spatial-folds" class="slide level2">
-<h2>ROC curves: random vs spatial folds <img data-src="hexes/yardstick.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
-<p>Pull the out-of-fold predictions from each scheme and overlay their ROC curves:</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a>roc_data <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb18-2"><a></a>  <span class="fu">collect_predictions</span>(log_rs_random)  <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scheme =</span> <span class="st">"vfold_cv (random)"</span>),</span>
-<span id="cb18-3"><a></a>  <span class="fu">collect_predictions</span>(log_rs_spatial) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scheme =</span> <span class="st">"spatial_block_cv"</span>)</span>
-<span id="cb18-4"><a></a>) <span class="sc">|&gt;</span></span>
-<span id="cb18-5"><a></a>  <span class="fu">group_by</span>(scheme) <span class="sc">|&gt;</span></span>
-<span id="cb18-6"><a></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> forested, .pred_Yes)</span>
-<span id="cb18-7"><a></a></span>
-<span id="cb18-8"><a></a><span class="fu">ggplot</span>(roc_data,</span>
-<span id="cb18-9"><a></a>       <span class="fu">aes</span>(<span class="dv">1</span> <span class="sc">-</span> specificity, sensitivity, <span class="at">color =</span> scheme)) <span class="sc">+</span></span>
-<span id="cb18-10"><a></a>  <span class="fu">geom_abline</span>(<span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"grey70"</span>) <span class="sc">+</span></span>
-<span id="cb18-11"><a></a>  <span class="fu">geom_path</span>(<span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
-<span id="cb18-12"><a></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(train_color, <span class="st">"#B22222"</span>)) <span class="sc">+</span></span>
-<span id="cb18-13"><a></a>  <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
-<span id="cb18-14"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Out-of-fold ROC curves"</span>,</span>
-<span id="cb18-15"><a></a>       <span class="at">subtitle =</span> <span class="st">"The spatial curve sits below the random curve at every threshold"</span>,</span>
-<span id="cb18-16"><a></a>       <span class="at">color =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb18-17"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="roc-curves-all-four-fits-overlaid" class="slide level2">
+<h2>ROC curves: all four fits overlaid <img data-src="hexes/yardstick.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
+<p>Overlay the out-of-fold predictions from each model × CV scheme:</p>
+<div class="columns">
+<div class="column" style="width:42%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a>roc_data <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb20-2"><a></a>  <span class="fu">collect_predictions</span>(log_rs_random)  <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"all features"</span>,</span>
+<span id="cb20-4"><a></a>           <span class="at">scheme =</span> <span class="st">"random"</span>),</span>
+<span id="cb20-5"><a></a>  <span class="fu">collect_predictions</span>(log_rs_spatial) <span class="sc">|&gt;</span></span>
+<span id="cb20-6"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"all features"</span>,</span>
+<span id="cb20-7"><a></a>           <span class="at">scheme =</span> <span class="st">"spatial"</span>),</span>
+<span id="cb20-8"><a></a>  <span class="fu">collect_predictions</span>(geo_rs_random)  <span class="sc">|&gt;</span></span>
+<span id="cb20-9"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"geo-only"</span>,</span>
+<span id="cb20-10"><a></a>           <span class="at">scheme =</span> <span class="st">"random"</span>),</span>
+<span id="cb20-11"><a></a>  <span class="fu">collect_predictions</span>(geo_rs_spatial) <span class="sc">|&gt;</span></span>
+<span id="cb20-12"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"geo-only"</span>,</span>
+<span id="cb20-13"><a></a>           <span class="at">scheme =</span> <span class="st">"spatial"</span>)</span>
+<span id="cb20-14"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb20-15"><a></a>  <span class="fu">group_by</span>(model, scheme) <span class="sc">|&gt;</span></span>
+<span id="cb20-16"><a></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> forested, .pred_Yes)</span>
+<span id="cb20-17"><a></a></span>
+<span id="cb20-18"><a></a><span class="fu">ggplot</span>(roc_data,</span>
+<span id="cb20-19"><a></a>       <span class="fu">aes</span>(<span class="dv">1</span> <span class="sc">-</span> specificity, sensitivity,</span>
+<span id="cb20-20"><a></a>           <span class="at">color =</span> scheme, <span class="at">linetype =</span> model)) <span class="sc">+</span></span>
+<span id="cb20-21"><a></a>  <span class="fu">geom_path</span>(<span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
+<span id="cb20-22"><a></a>  <span class="fu">coord_equal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The all-features pair is <strong>on top of each other</strong> — no leakage to find. The geo-only pair shows <strong>visible daylight</strong> between random and spatial — the spatial curve sagging is what leakage looks like.</p>
+</div><div class="column" style="width:58%;">
+<div class="cell">
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
+<div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-25-1.png" class="quarto-figure quarto-figure-center" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-34-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>This is the same story as the AUC numbers, but now you can <strong>see</strong> it: the random-CV curve hugs the corner more tightly because the model is being graded on points it has near-neighbors for.</p>
-</div>
+</div></div>
 </section>
 <section id="its-not-just-lower-its-more-variable" class="slide level2">
 <h2>It’s not just lower — it’s more variable <img data-src="hexes/yardstick.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
-<p>The mean hides the story. Pull <strong>per-fold</strong> metrics with <code>summarize = FALSE</code>:</p>
+<p>The mean hides the story. Pull <strong>per-fold</strong> metrics for both models × both schemes:</p>
+<div class="columns">
+<div class="column" style="width:42%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>per_fold <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb19-2"><a></a>  <span class="fu">collect_metrics</span>(log_rs_random,  <span class="at">summarize =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scheme =</span> <span class="st">"vfold_cv (random)"</span>),</span>
-<span id="cb19-3"><a></a>  <span class="fu">collect_metrics</span>(log_rs_spatial, <span class="at">summarize =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scheme =</span> <span class="st">"spatial_block_cv"</span>)</span>
-<span id="cb19-4"><a></a>) <span class="sc">|&gt;</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"roc_auc"</span>)</span>
-<span id="cb19-5"><a></a></span>
-<span id="cb19-6"><a></a><span class="fu">ggplot</span>(per_fold, <span class="fu">aes</span>(scheme, .estimate, <span class="at">color =</span> scheme)) <span class="sc">+</span></span>
-<span id="cb19-7"><a></a>  <span class="fu">geom_boxplot</span>(<span class="at">width =</span> <span class="fl">0.3</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb19-8"><a></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.08</span>, <span class="at">size =</span> <span class="fl">2.5</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb19-9"><a></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(train_color, <span class="st">"#B22222"</span>), <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb19-10"><a></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"ROC AUC (per fold)"</span>, <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb19-11"><a></a>       <span class="at">title =</span> <span class="st">"Per-fold ROC AUC by resampling scheme"</span>,</span>
-<span id="cb19-12"><a></a>       <span class="at">subtitle =</span> <span class="st">"Spatial CV is both lower on average AND more variable across folds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a>per_fold <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb21-2"><a></a>  <span class="fu">collect_metrics</span>(log_rs_random,  <span class="at">summarize =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"all features"</span>, <span class="at">scheme =</span> <span class="st">"random"</span>),</span>
+<span id="cb21-4"><a></a>  <span class="fu">collect_metrics</span>(log_rs_spatial, <span class="at">summarize =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-5"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"all features"</span>, <span class="at">scheme =</span> <span class="st">"spatial"</span>),</span>
+<span id="cb21-6"><a></a>  <span class="fu">collect_metrics</span>(geo_rs_random,  <span class="at">summarize =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-7"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"geo-only"</span>,     <span class="at">scheme =</span> <span class="st">"random"</span>),</span>
+<span id="cb21-8"><a></a>  <span class="fu">collect_metrics</span>(geo_rs_spatial, <span class="at">summarize =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-9"><a></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"geo-only"</span>,     <span class="at">scheme =</span> <span class="st">"spatial"</span>)</span>
+<span id="cb21-10"><a></a>) <span class="sc">|&gt;</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"roc_auc"</span>)</span>
+<span id="cb21-11"><a></a></span>
+<span id="cb21-12"><a></a><span class="fu">ggplot</span>(per_fold,</span>
+<span id="cb21-13"><a></a>       <span class="fu">aes</span>(<span class="fu">interaction</span>(model, scheme), .estimate,</span>
+<span id="cb21-14"><a></a>           <span class="at">color =</span> scheme)) <span class="sc">+</span></span>
+<span id="cb21-15"><a></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb21-16"><a></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.08</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>All-features: both CV schemes give tight, near-identical distributions → no leakage. Geo-only: spatial folds show <strong>lower mean AND wider spread</strong> — the model’s performance depends heavily on <em>which</em> region you hold out.</p>
+</div><div class="column" style="width:58%;">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-26-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-36-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>Random CV gives you 10 near-identical numbers (every fold looks like the whole dataset). Spatial CV gives you a <strong>distribution</strong> — and that spread is your honest estimate of how much skill depends on <em>which</em> region you’re predicting. Report both the mean and the variance.</p>
-</div>
+</div></div>
 </section>
 <section id="where-does-spatial-cv-struggle" class="slide level2">
 <h2>Where does spatial CV struggle? <img data-src="hexes/ggplot2.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
-<p>Each spatial fold’s held-out region has a <strong>location</strong>. We can map each fold’s held-out AUC to see which regions are hardest to predict:</p>
+<p>Each spatial fold’s held-out region has a <strong>location</strong>. Map each fold’s AUC to see which regions are hardest to predict:</p>
+<div class="columns">
+<div class="column" style="width:42%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a>fold_auc <span class="ot">&lt;-</span> <span class="fu">collect_metrics</span>(log_rs_spatial, <span class="at">summarize =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-2"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"roc_auc"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a></a>  <span class="fu">select</span>(id, <span class="at">fold_auc =</span> .estimate)</span>
-<span id="cb20-4"><a></a></span>
-<span id="cb20-5"><a></a>fold_locations <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dfr</span>(</span>
-<span id="cb20-6"><a></a>  <span class="fu">seq_along</span>(forested_block<span class="sc">$</span>splits),</span>
-<span id="cb20-7"><a></a>  <span class="cf">function</span>(i) {</span>
-<span id="cb20-8"><a></a>    <span class="fu">assessment</span>(forested_block<span class="sc">$</span>splits[[i]]) <span class="sc">|&gt;</span></span>
-<span id="cb20-9"><a></a>      <span class="fu">st_drop_geometry</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-10"><a></a>      <span class="fu">select</span>(lon, lat) <span class="sc">|&gt;</span></span>
-<span id="cb20-11"><a></a>      <span class="fu">mutate</span>(<span class="at">id =</span> forested_block<span class="sc">$</span>id[i])</span>
-<span id="cb20-12"><a></a>  }</span>
-<span id="cb20-13"><a></a>) <span class="sc">|&gt;</span> <span class="fu">left_join</span>(fold_auc, <span class="at">by =</span> <span class="st">"id"</span>)</span>
-<span id="cb20-14"><a></a></span>
-<span id="cb20-15"><a></a><span class="fu">ggplot</span>(fold_locations, <span class="fu">aes</span>(lon, lat, <span class="at">color =</span> fold_auc)) <span class="sc">+</span></span>
-<span id="cb20-16"><a></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">0.8</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb20-17"><a></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">"magma"</span>, <span class="at">name =</span> <span class="st">"Fold AUC"</span>) <span class="sc">+</span></span>
-<span id="cb20-18"><a></a>  <span class="fu">coord_quickmap</span>() <span class="sc">+</span></span>
-<span id="cb20-19"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Per-fold ROC AUC mapped to the held-out region"</span>,</span>
-<span id="cb20-20"><a></a>       <span class="at">subtitle =</span> <span class="st">"Dark = model struggles in that region; light = model generalizes well there"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a>fold_auc <span class="ot">&lt;-</span> <span class="fu">collect_metrics</span>(</span>
+<span id="cb22-2"><a></a>    log_rs_spatial, <span class="at">summarize =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"roc_auc"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a></a>  <span class="fu">select</span>(id, <span class="at">fold_auc =</span> .estimate)</span>
+<span id="cb22-5"><a></a></span>
+<span id="cb22-6"><a></a><span class="co"># join each fold's AUC back to its</span></span>
+<span id="cb22-7"><a></a><span class="co"># held-out coordinates (see repo)</span></span>
+<span id="cb22-8"><a></a></span>
+<span id="cb22-9"><a></a><span class="fu">ggplot</span>(fold_locations,</span>
+<span id="cb22-10"><a></a>       <span class="fu">aes</span>(lon, lat, <span class="at">color =</span> fold_auc)) <span class="sc">+</span></span>
+<span id="cb22-11"><a></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb22-12"><a></a>  <span class="fu">scale_color_viridis_c</span>(<span class="at">option =</span> <span class="st">"magma"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Regions where AUC is <em>lowest</em> are where your model has the least transferable signal — a <strong>scientific</strong> finding telling you where to invest more training data or features.</p>
+</div><div class="column" style="width:58%;">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-27-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-38-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>The regions where AUC is <em>lowest</em> are the places your model has the least transferable signal. That’s a <strong>scientific</strong> finding, not just a number — it tells you where you need more training data or a better feature set.</p>
-</div>
+</div></div>
 </section>
 <section id="alternative-spatial_clustering_cv" class="slide level2">
 <h2>Alternative: <code>spatial_clustering_cv</code> <img data-src="hexes/rsample.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
 <p>When blocks don’t fit your data (e.g., irregularly shaped study regions), cluster-based folds are often better:</p>
+<div class="columns">
+<div class="column" style="width:42%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb21-2"><a></a>forested_cluster <span class="ot">&lt;-</span> <span class="fu">spatial_clustering_cv</span>(forested_sf, <span class="at">v =</span> <span class="dv">10</span>)</span>
-<span id="cb21-3"><a></a></span>
-<span id="cb21-4"><a></a><span class="fu">autoplot</span>(forested_cluster) <span class="sc">+</span></span>
-<span id="cb21-5"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"spatial_clustering_cv: k-means on coordinates"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb23-2"><a></a>forested_cluster <span class="ot">&lt;-</span> <span class="fu">spatial_clustering_cv</span>(</span>
+<span id="cb23-3"><a></a>  forested_sf, <span class="at">v =</span> <span class="dv">10</span></span>
+<span id="cb23-4"><a></a>)</span>
+<span id="cb23-5"><a></a></span>
+<span id="cb23-6"><a></a><span class="fu">autoplot</span>(forested_cluster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>. . .</p>
+<p>Same API — drop it into <code>fit_resamples(resamples = forested_cluster)</code> and go.</p>
+</div><div class="column" style="width:58%;">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-28-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-40-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>Same API — drop it into <code>fit_resamples(resamples = forested_cluster)</code> and go.</p>
-</div>
+</div></div>
 </section>
 <section id="alternative-buffered-v-fold" class="slide level2">
 <h2>Alternative: buffered v-fold <img data-src="hexes/rsample.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
 <p>What if you want random folds <strong>but</strong> guarantee no training point is within, say, 10 km of a test point?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="co"># Project to a local equal-area CRS first so `buffer` is in meters</span></span>
-<span id="cb22-2"><a></a>forested_proj <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(forested_sf, <span class="dv">5070</span>)   <span class="co"># Albers CONUS</span></span>
-<span id="cb22-3"><a></a></span>
-<span id="cb22-4"><a></a>forested_buffered <span class="ot">&lt;-</span> <span class="fu">spatial_buffer_vfold_cv</span>(</span>
-<span id="cb22-5"><a></a>  forested_proj,</span>
-<span id="cb22-6"><a></a>  <span class="at">v      =</span> <span class="dv">10</span>,</span>
-<span id="cb22-7"><a></a>  <span class="at">buffer =</span> <span class="dv">10000</span>   <span class="co"># 10 km (because the CRS is now in meters)</span></span>
-<span id="cb22-8"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="co"># Project to a local equal-area CRS first so `buffer` is in meters</span></span>
+<span id="cb24-2"><a></a>forested_proj <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(forested_sf, <span class="dv">5070</span>)   <span class="co"># Albers CONUS</span></span>
+<span id="cb24-3"><a></a></span>
+<span id="cb24-4"><a></a>forested_buffered <span class="ot">&lt;-</span> <span class="fu">spatial_buffer_vfold_cv</span>(</span>
+<span id="cb24-5"><a></a>  forested_proj,</span>
+<span id="cb24-6"><a></a>  <span class="at">v      =</span> <span class="dv">10</span>,</span>
+<span id="cb24-7"><a></a>  <span class="at">buffer =</span> <span class="dv">10000</span>   <span class="co"># 10 km (because the CRS is now in meters)</span></span>
+<span id="cb24-8"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Each training set has points within <code>buffer</code> of held-out points <strong>removed</strong></li>
@@ -1140,48 +1285,39 @@
 </section>
 <section id="alternative-leave-location-out-cv" class="slide level2">
 <h2>Alternative: leave-location-out CV <img data-src="hexes/rsample.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
-<p>For water resources, the natural spatial unit isn’t usually a square block — it’s a <strong>watershed</strong>, <strong>gauge basin</strong>, or <strong>ecoregion</strong>. <code>spatial_leave_location_out_cv()</code> holds out one named group at a time:</p>
+<p>For water resources, the natural unit is usually a <strong>watershed</strong>, <strong>gauge basin</strong>, or <strong>ecoregion</strong> — not a square block. <code>spatial_leave_location_out_cv()</code> holds out one named group at a time:</p>
+<div class="columns">
+<div class="column" style="width:42%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a>forested_region <span class="ot">&lt;-</span> forested_sf <span class="sc">|&gt;</span></span>
-<span id="cb23-2"><a></a>  <span class="fu">mutate</span>(<span class="at">region =</span> <span class="fu">case_when</span>(</span>
-<span id="cb23-3"><a></a>    lon <span class="sc">&lt;</span> <span class="sc">-</span><span class="fl">122.5</span> <span class="sc">~</span> <span class="st">"Coastal"</span>,</span>
-<span id="cb23-4"><a></a>    lon <span class="sc">&lt;</span> <span class="sc">-</span><span class="fl">120.5</span> <span class="sc">~</span> <span class="st">"Cascade"</span>,</span>
-<span id="cb23-5"><a></a>    lon <span class="sc">&lt;</span> <span class="sc">-</span><span class="fl">118.5</span> <span class="sc">~</span> <span class="st">"Central"</span>,</span>
-<span id="cb23-6"><a></a>    <span class="cn">TRUE</span>         <span class="sc">~</span> <span class="st">"Eastern"</span></span>
-<span id="cb23-7"><a></a>  ))</span>
-<span id="cb23-8"><a></a></span>
-<span id="cb23-9"><a></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb23-10"><a></a>forested_lloc <span class="ot">&lt;-</span> <span class="fu">spatial_leave_location_out_cv</span>(</span>
-<span id="cb23-11"><a></a>  forested_region,</span>
-<span id="cb23-12"><a></a>  <span class="at">group =</span> region</span>
-<span id="cb23-13"><a></a>)</span>
-<span id="cb23-14"><a></a></span>
-<span id="cb23-15"><a></a><span class="fu">autoplot</span>(forested_lloc) <span class="sc">+</span></span>
-<span id="cb23-16"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"spatial_leave_location_out_cv — one region held out per fold"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a>forested_region <span class="ot">&lt;-</span> forested_sf <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a></a>  <span class="fu">mutate</span>(<span class="at">region =</span> <span class="fu">case_when</span>(</span>
+<span id="cb25-3"><a></a>    lon <span class="sc">&lt;</span> <span class="sc">-</span><span class="fl">122.5</span> <span class="sc">~</span> <span class="st">"Coastal"</span>,</span>
+<span id="cb25-4"><a></a>    lon <span class="sc">&lt;</span> <span class="sc">-</span><span class="fl">120.5</span> <span class="sc">~</span> <span class="st">"Cascade"</span>,</span>
+<span id="cb25-5"><a></a>    lon <span class="sc">&lt;</span> <span class="sc">-</span><span class="fl">118.5</span> <span class="sc">~</span> <span class="st">"Central"</span>,</span>
+<span id="cb25-6"><a></a>    <span class="cn">TRUE</span>         <span class="sc">~</span> <span class="st">"Eastern"</span></span>
+<span id="cb25-7"><a></a>  ))</span>
+<span id="cb25-8"><a></a></span>
+<span id="cb25-9"><a></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb25-10"><a></a>forested_lloc <span class="ot">&lt;-</span></span>
+<span id="cb25-11"><a></a>  <span class="fu">spatial_leave_location_out_cv</span>(</span>
+<span id="cb25-12"><a></a>    forested_region,</span>
+<span id="cb25-13"><a></a>    <span class="at">group =</span> region</span>
+<span id="cb25-14"><a></a>  )</span>
+<span id="cb25-15"><a></a></span>
+<span id="cb25-16"><a></a><span class="fu">autoplot</span>(forested_lloc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Each fold trains on 3 regions and predicts the 4th — answers <em>“could I predict eastern WA from coastal WA?”</em>, which <code>vfold_cv</code> can’t. In your project, swap <code>region</code> for HUC8, gauge basin, or climate zone.</p>
+</div><div class="column" style="width:58%;">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-30-1.png" style="width:100.0%"></p>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-43-1.png" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>Each fold trains on 3 regions and predicts the 4th. This directly answers <em>“if I trained only on coastal WA, could I predict eastern WA?”</em> — a question <code>vfold_cv</code> literally cannot answer.</p>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Note</strong></p>
-</div>
-<div class="callout-content">
-<p>In your project, replace <code>region</code> with the natural group — HUC8 watershed, USGS gauge basin, state, PRISM climate zone, etc. The <code>group</code> argument just needs a column name.</p>
-</div>
-</div>
-</div>
-</div>
+</div></div>
 </section>
 <section id="when-not-to-reach-for-spatial-cv" class="slide level2">
 <h2>When <em>not</em> to reach for spatial CV 🤔</h2>
@@ -1223,82 +1359,98 @@
 <h1>Part 4: Trust your diagnostics</h1>
 
 </section>
-<section id="re-running-vip-under-spatial-cv" class="slide level2">
-<h2>Re-running VIP under spatial CV</h2>
-<p>Resampling schemes don’t change the <strong>final fit</strong> — <code>log_fit</code> is the same object whether we evaluate it with random or spatial folds.</p>
-<p>What spatial CV changes is <strong>which features we should trust as important</strong> based on how well they generalize.</p>
-<div class="fragment">
-<p>So instead of re-fitting, we’ll run a <em>counterfactual</em> experiment:</p>
+<section id="putting-the-pieces-together" class="slide level2">
+<h2>Putting the pieces together</h2>
+<p>We now have two models under two CV schemes — that’s a 2×2 we can reason about:</p>
 <ul>
-<li>keep the model fixed</li>
-<li><strong>remove</strong> features we suspect are spatial shortcuts (<code>lon</code>, <code>lat</code>)</li>
-<li>compare how much performance falls under random vs.&nbsp;spatial CV</li>
+<li><strong>All-features model</strong> under random CV vs spatial CV — gap is tiny → predictors carry real signal</li>
+<li><strong>Geo-only model</strong> under random CV vs spatial CV — gap is large → model is leaning on geography</li>
 </ul>
-<p>If a feature is truly informative, dropping it hurts <em>both</em> CV schemes. If it was a spatial proxy, dropping it mostly hurts the random scheme.</p>
-</div>
-</section>
-<section id="a-diagnostic-trick-drop-lon-lat-and-refit" class="slide level2">
-<h2>A diagnostic trick: drop <code>lon</code> / <code>lat</code> and refit</h2>
-<p>If a feature is truly informative, dropping it should <em>hurt</em> the model.</p>
-<p>If a feature is a spatial proxy, dropping it should only hurt under random CV — because under spatial CV the model couldn’t lean on it anyway.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a>recipe_no_xy <span class="ot">&lt;-</span> <span class="fu">recipe</span>(forested <span class="sc">~</span> ., <span class="at">data =</span> forested_train) <span class="sc">|&gt;</span></span>
-<span id="cb24-2"><a></a>  <span class="fu">step_rm</span>(lon, lat) <span class="sc">|&gt;</span></span>
-<span id="cb24-3"><a></a>  <span class="fu">step_impute_mean</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb24-4"><a></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb24-5"><a></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
-<span id="cb24-6"><a></a></span>
-<span id="cb24-7"><a></a>wf_no_xy <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-8"><a></a>  <span class="fu">add_recipe</span>(recipe_no_xy) <span class="sc">|&gt;</span></span>
-<span id="cb24-9"><a></a>  <span class="fu">add_model</span>(log_mod)</span>
-<span id="cb24-10"><a></a></span>
-<span id="cb24-11"><a></a><span class="fu">set.seed</span>(<span class="dv">9</span>)</span>
-<span id="cb24-12"><a></a>rs_random_no_xy  <span class="ot">&lt;-</span> wf_no_xy <span class="sc">|&gt;</span></span>
-<span id="cb24-13"><a></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> forested_folds, <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc))</span>
-<span id="cb24-14"><a></a>rs_spatial_no_xy <span class="ot">&lt;-</span> wf_no_xy <span class="sc">|&gt;</span></span>
-<span id="cb24-15"><a></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> forested_block, <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <em>size of the gap</em> between random and spatial CV is a <strong>diagnostic of how much the model depends on geographic shortcuts</strong>. You compute it, read it, and decide whether your model is trustworthy on new geography.</p>
+<div class="fragment">
+<p>VIP told us <em>what</em> the model used. Spatial CV told us <em>whether those features generalize</em>. Together they answer “can I trust this model outside the training area?”</p>
 </div>
 </section>
 <section id="the-22-comparison" class="slide level2">
 <h2>The 2×2 comparison</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a>results_2x2 <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb25-2"><a></a>  <span class="fu">collect_metrics</span>(log_rs_random)    <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scheme =</span> <span class="st">"random vfold"</span>,  <span class="at">features =</span> <span class="st">"all"</span>),</span>
-<span id="cb25-3"><a></a>  <span class="fu">collect_metrics</span>(log_rs_spatial)   <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scheme =</span> <span class="st">"spatial block"</span>, <span class="at">features =</span> <span class="st">"all"</span>),</span>
-<span id="cb25-4"><a></a>  <span class="fu">collect_metrics</span>(rs_random_no_xy)  <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scheme =</span> <span class="st">"random vfold"</span>,  <span class="at">features =</span> <span class="st">"drop lon/lat"</span>),</span>
-<span id="cb25-5"><a></a>  <span class="fu">collect_metrics</span>(rs_spatial_no_xy) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">scheme =</span> <span class="st">"spatial block"</span>, <span class="at">features =</span> <span class="st">"drop lon/lat"</span>)</span>
-<span id="cb25-6"><a></a>) <span class="sc">|&gt;</span></span>
-<span id="cb25-7"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"roc_auc"</span>)</span>
-<span id="cb25-8"><a></a></span>
-<span id="cb25-9"><a></a><span class="fu">ggplot</span>(results_2x2,</span>
-<span id="cb25-10"><a></a>       <span class="fu">aes</span>(scheme, mean, <span class="at">fill =</span> features)) <span class="sc">+</span></span>
-<span id="cb25-11"><a></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.75</span>), <span class="at">width =</span> <span class="fl">0.65</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb25-12"><a></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> std_err, <span class="at">ymax =</span> mean <span class="sc">+</span> std_err),</span>
-<span id="cb25-13"><a></a>                <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.75</span>), <span class="at">width =</span> <span class="fl">0.15</span>) <span class="sc">+</span></span>
-<span id="cb25-14"><a></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(mean, <span class="dv">3</span>), <span class="at">y =</span> mean <span class="sc">+</span> std_err <span class="sc">+</span> <span class="fl">0.01</span>),</span>
-<span id="cb25-15"><a></a>            <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.75</span>), <span class="at">size =</span> <span class="fl">3.5</span>) <span class="sc">+</span></span>
-<span id="cb25-16"><a></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"all"</span> <span class="ot">=</span> train_color, <span class="st">"drop lon/lat"</span> <span class="ot">=</span> test_color)) <span class="sc">+</span></span>
-<span id="cb25-17"><a></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb25-18"><a></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"ROC AUC (mean ± SE)"</span>, <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb25-19"><a></a>       <span class="at">title =</span> <span class="st">"2×2 experiment: CV scheme × feature set"</span>,</span>
-<span id="cb25-20"><a></a>       <span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb25-21"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-44-1.png" style="width:100.0%"></p>
+</figure>
 </div>
-<img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-32-1.png" style="width:100.0%" class="r-stretch"><div class="fragment">
+</div>
+</div>
+</div><div class="column" style="width:45%;">
 <ul>
-<li>Random CV + all features → the <strong>inflated headline number</strong> (left-green bar)</li>
-<li>Random CV + drop coords → still high: <code>lon</code>/<code>lat</code> were doing <em>some</em> work but not all of it</li>
-<li>Spatial CV + all features → the <strong>honest number</strong>: lower (right-green bar)</li>
-<li>Spatial CV + drop coords → roughly the same as the honest number: confirms the model can’t use coords as a shortcut under spatial CV</li>
+<li><strong>All features, random ≈ spatial</strong> → no leakage; random CV was telling the truth</li>
+<li><strong>Geo-only, random ≫ spatial</strong> → the gap <em>is</em> the leakage</li>
+<li>The diagnostic is the <strong>within-model</strong> gap, not the between-model one</li>
 </ul>
-<p>The <strong>vertical gap between the two green bars</strong> is the spatial-leakage inflation.</p>
+<p>. . .</p>
+<p><strong>Read it this way:</strong> compare the two bars <em>within each model</em>. Equal = trust the number. Unequal = your model’s random-CV score is inflated by exactly that much.</p>
+</div></div>
+</section>
+<section id="the-same-idea-in-regression" class="slide level2">
+<h2>The same idea in <strong>regression</strong> <img data-src="hexes/yardstick.png" class="absolute" style="top: -20px; right: 0px; width: 64px; height: 74.24px; "></h2>
+<p>Every example above used classification (<code>forested</code>: Yes/No) — but the same leakage story applies to regression. You just swap the metric.</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Pretend we’re predicting <strong>log mean streamflow</strong> (<code>logQmean</code>) from basin attributes for CAMELS gauges — a spatial regression problem. The 2×2 would be built the same way:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a><span class="co"># Same four workflows, swap the metric</span></span>
+<span id="cb26-2"><a></a>cls_metrics <span class="ot">&lt;-</span> <span class="fu">metric_set</span>(rmse, rsq, mae)</span>
+<span id="cb26-3"><a></a></span>
+<span id="cb26-4"><a></a>rs_random  <span class="ot">&lt;-</span> lm_wf <span class="sc">|&gt;</span></span>
+<span id="cb26-5"><a></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> camels_folds,</span>
+<span id="cb26-6"><a></a>                <span class="at">metrics   =</span> cls_metrics)</span>
+<span id="cb26-7"><a></a>rs_spatial <span class="ot">&lt;-</span> lm_wf <span class="sc">|&gt;</span></span>
+<span id="cb26-8"><a></a>  <span class="fu">fit_resamples</span>(<span class="at">resamples =</span> camels_block,</span>
+<span id="cb26-9"><a></a>                <span class="at">metrics   =</span> cls_metrics)</span>
+<span id="cb26-10"><a></a></span>
+<span id="cb26-11"><a></a><span class="co"># ... repeat for no-xy recipe, then plot rsq</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Classification: higher ROC AUC = better → spatial CV usually <strong>lowers</strong> AUC</li>
+<li>Regression: higher R² = better → spatial CV usually <strong>lowers</strong> R²</li>
+<li>Regression: lower RMSE = better → spatial CV usually <strong>raises</strong> RMSE</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="week-5-2_files/figure-revealjs/unnamed-chunk-46-1.png" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The <strong>within-model gap</strong> (random vs spatial) is the diagnostic — just on a regression metric instead of AUC.</p>
+</div></div>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p><strong>For your lab:</strong> CAMELS basins have <code>gauge_lon</code>/<code>gauge_lat</code>. Random <code>vfold_cv</code> on CAMELS is the regression version of the story above. Build a <code>spatial_block_cv</code> next to it and report both — the delta is the honest cost of generalization.</p>
+</div>
+</div>
 </div>
 </section>
 <section id="what-this-tells-us" class="slide level2">
 <h2>What this tells us</h2>
-<p>If a feature’s <em>apparent importance</em> shrinks when you switch to spatial CV, that feature was partly acting as a <strong>geographic proxy</strong> — encoding <em>where</em> rather than <em>why</em>.</p>
-<p>The features that remain important under spatial CV are the ones carrying <strong>transferable signal</strong>.</p>
+<p>The <strong>within-model gap</strong> between random and spatial CV is a diagnostic: it measures how much the model’s performance depended on geographic interpolation.</p>
+<ul>
+<li><strong>Small gap</strong> (our all-features model): the predictors carry transferable signal — random CV was honest.</li>
+<li><strong>Large gap</strong> (our geo-only model): performance was inflated by geography — trust spatial CV.</li>
+</ul>
 <div class="fragment">
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
@@ -1311,9 +1463,10 @@
 <div class="callout-content">
 <p>A practical workflow:</p>
 <ol type="1">
-<li>Fit under random CV, look at VIP → your <strong>hypothesis set</strong> of important features</li>
-<li>Fit under spatial CV, look at VIP again → your <strong>robust</strong> important features</li>
-<li>Features that only rank high under (1) deserve scientific scrutiny — are they mechanism, or are they geography?</li>
+<li>Fit your model. Look at VIP → identify your top features.</li>
+<li>Run <strong>both</strong> random and spatial CV.</li>
+<li>If the two CV scores agree → random CV was telling the truth, ship it.</li>
+<li>If spatial CV is meaningfully lower → your model is leaning on geography. Suspect the top features that rank in VIP — they may be spatial proxies (elevation as climate, etc). Consider removing them and refitting.</li>
 </ol>
 </div>
 </div>
@@ -1325,9 +1478,9 @@
 <ol type="1">
 <li><p><strong><code>collect_metrics()</code> is necessary, not sufficient.</strong> You also need to ask <em>what</em> the model uses and <em>whether</em> your evaluation respects the data’s structure.</p></li>
 <li><p><strong><code>vip</code> gives you the “what”.</strong> Model-specific importance for common engines, permutation importance for anything else.</p></li>
-<li><p><strong>Spatial autocorrelation breaks random CV.</strong> The model gets rewarded for memorizing geography; reported metrics are inflated.</p></li>
-<li><p><strong><code>spatialsample</code> gives you honest CV.</strong> <code>spatial_block_cv</code>, <code>spatial_clustering_cv</code>, and buffered variants all slot into the existing tidymodels pipeline.</p></li>
-<li><p><strong>The two tools must be used together.</strong> VIP under random CV tells you what the model <em>used to memorize</em>; VIP under spatial CV tells you what the model <em>actually learned</em>.</p></li>
+<li><p><strong>Spatial CV is a diagnostic, not a punishment.</strong> Sometimes the gap is tiny (our all-features model) — that’s evidence your predictors generalize. Sometimes it’s huge (our geo-only model) — that’s the leakage being caught.</p></li>
+<li><p><strong><code>spatialsample</code> gives you the other CV scheme.</strong> <code>spatial_block_cv</code>, <code>spatial_clustering_cv</code>, and buffered variants all slot into the existing tidymodels pipeline.</p></li>
+<li><p><strong>The two tools must be used together.</strong> VIP alone tells you what the model <em>used</em>; the random-vs-spatial CV gap tells you whether those features <em>generalize</em>.</p></li>
 </ol>
 </section>
 <section id="looking-ahead" class="slide level2">

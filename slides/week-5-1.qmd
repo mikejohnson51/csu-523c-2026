@@ -1465,8 +1465,11 @@ plot_rates <- left_join(rates, bin_midpoints, by = join_by(A)) %>%
   theme_bw(base_size = 18)
 ```
 
-## Logistic regression
+# Two algorithms to try {background-color="#C8C372"}
 
+We have a problem (predict whether a hexagon is forested), data (`forested_train`), and a way to evaluate predictions. Before we wire up the full tidymodels plumbing, let's look at the two models we'll compare today.
+
+## Logistic regression
 
 ::: columns
 ::: {.column width="50%"}
@@ -1495,7 +1498,7 @@ plot_rates +
 :::
 :::
 
-## Decision trees
+## Decision trees — structure & pruning
 
 ::: columns
 ::: {.column width="50%"}
@@ -1504,35 +1507,13 @@ plot_rates +
 #| fig.width: 8
 #| fig.height: 7
 
-tree_fit <- decision_tree(mode = "classification") %>% 
+tree_fit <- decision_tree(mode = "classification") %>%
   fit(class ~ A, data = mutate(dat, class = forcats::fct_rev(class)))
 
 tree_preds <- augment(tree_fit, new_data = bin_midpoints)
 ```
 
 ```{r plot-tree-fit}
-#| echo: false
-#| fig.width: 4
-#| fig.height: 3.5
-#| fig-align: center
-
-library(rpart.plot)
-tree_fit %>%
-  extract_fit_engine() %>%
-  rpart.plot(roundint = FALSE)
-```
-
-:::
-
-::: {.column width="50%"}
-:::
-:::
-
-## Decision trees
-
-::: columns
-::: {.column width="50%"}
-```{r plot-tree-fit-2}
 #| echo: false
 #| fig.width: 4
 #| fig.height: 3.5
@@ -1551,10 +1532,12 @@ tree_fit %>%
 -   First the tree *grows* until some condition is met (maximum depth, no more data)
 
 -   Then the tree is *pruned* to reduce its complexity
+
+-   Each terminal leaf predicts a class (or, for regression, a numeric value)
 :::
 :::
 
-## Decision trees
+## Decision trees — what predictions look like
 
 ::: columns
 ::: {.column width="50%"}
@@ -1580,6 +1563,8 @@ tree_fit %>%
 plot_rates +
   geom_step(aes(A, .pred_one, col = I(test_color)), linewidth = 2, alpha = 0.8, data = tree_preds)
 ```
+
+A tree's decision boundary is **stepwise** — in contrast to the smooth S-curve of logistic regression.
 :::
 :::
 
@@ -1609,7 +1594,8 @@ plot_rates +
 
 ## What algorithm is best for estimating forested plots?
 
-We can only really know by testing them ...
+We can only really know by testing them ... but we know the options! 
+
 
 ::: columns
 ::: {.column width="50%"}
@@ -1637,52 +1623,11 @@ plot_rates +
 :::
 :::
 
-## Fitting your model: 
-
- - OK! So you have split data, you have a model, and you have an engine and mode
- - Now you need to fit the model!
- - This is done using the `fit()` function
-
-```{r}
-dt_model <- decision_tree() %>% 
-  set_engine('rpart') %>%
-  set_mode("classification")
-
-# Model, formula, data inputs
-(output <- fit(dt_model, forested ~ ., data = forested_train) )
-```
-
-## Component extracts:
-
-::: columns
-::: {.column width="50%"}
-- While `tidymodels` provides a standard interface to all models all base models have specific methods (remember `summary.lm`? )
-
-- To use these, you must extract the underlying object.
-
-- `extract_fit_engine()` extracts the underlying model object
-- `extract_fit_parsnip()` extracts the parsnip object
-- `extract_recipe()` extracts the recipe object
-- `extract_preprocessor()` extracts the preprocessor object
-- ...  many more
-:::
-::: {.column width="50%"}
-```{r}
-ex <- extract_fit_engine(output)
-class(ex) # the class of the engine used!
-
-# Use rpart plot and text methods ...
-plot(ex)
-text(ex, cex = 0.9, use.n = TRUE, xpd = TRUE)
-```
-:::
-:::
-
 # Feature engineering with `recipes` {background-color="#C8C372"}
 
 ## Why preprocess? `r hexes("recipes")`
 
-- So far we've fed a raw formula (`forested ~ .`) straight to a model.
+- A raw formula (`forested ~ .`) would send features to the model untouched.
 
 - But many models care how their features look — different scales, skewed distributions, missing values, or categorical levels can bias the fit.
 
@@ -1700,89 +1645,39 @@ Preprocessing parameters (means, sds, imputed values, PCA loadings) are learned 
 
 ## Common Normalization Techniques
 
-#### 1. `Min-Max Scaling`
+| Technique | Idea | When to use | `step_*` |
+|---|---|---|---|
+| **Min-max** | rescale to $[0, 1]$: $x' = \frac{x - x_\text{min}}{x_\text{max} - x_\text{min}}$ | Need a bounded range; beware outliers | `step_range()` |
+| **Z-score** | center + scale: $x' = \frac{x - \mu}{\sigma}$ | Symmetric-ish features, different units | `step_normalize()` |
+| **Power** | Box-Cox (positive) or Yeo-Johnson (any sign) estimate an optimal power transform | Reshape skew toward normality before scaling | `step_YeoJohnson()`, `step_BoxCox()` |
+| **Log** | $x' = \log(x)$ | Right-skewed positive data (e.g. streamflow) | `step_log()` |
+| **PCA** | project to a lower-dimensional basis that preserves variance | Many correlated numeric predictors | `step_pca()` |
 
-  - Transforms data into a fixed range (typically [0,1]).
-
-  - Preserves relationships but sensitive to outliers.
-
-  - Formula: $$ x' = \frac{x - x_{min}}{x_{max} - x_{min}} $$
-
-  - Implemented using `step_range()` in `recipes`.
-
-#### 2. `Z-Score Standardization (Standard Scaling)`
-
-  - Centers data to have zero mean and unit variance.
-
-  - More robust to outliers compared to min-max scaling.
-
-  - Formula: $$ x' = \frac{x - \mu}{\sigma} $$
-
-  - Implemented using `step_normalize()` in `recipes`.
-
-## Common Normalization Techniques
-
-#### 3. `Power / Variance-Stabilizing Transforms`
-
-  - Reshape skewed distributions toward normality before scaling.
-
-  - Less sensitive to outliers than min-max scaling.
-
-  - Box-Cox (positive data) and Yeo-Johnson (positive or negative) estimate an optimal power transform from the data.
-
-  - Implemented using `step_YeoJohnson()` or `step_BoxCox()` in `recipes`.
-
-#### 4. `Log Transformation`
-
-  - Useful for skewed distributions to reduce the impact of extreme values.
-
-  - Implemented using `step_log()` in `recipes`.
-
-## Common Normalization Techniques
-
-#### 5. `Principal Component Analysis (PCA)`
-
-  - Projects data into a lower-dimensional space while maintaining variance.
-
-  - Used in high-dimensional datasets.
-
-  - Implemented using `step_pca()` in `recipes`.
+:::{.callout-tip}
+For environmental variables (streamflow, precipitation, concentrations) **log** is by far the most common first move — they're almost always right-skewed.
+:::
 
 ## Other Feature Engineering Tasks
 
-#### Handling Missing Data
+Beyond scaling, three `recipes` moves you'll reach for most often in water resources:
 
-  - `step_impute_mean()`
-  - `step_impute_median()`
-  - `step_impute_knn()`
+#### Handling missing values
 
-can be used to fill missing values.
+- `step_impute_mean()` / `step_impute_median()` — fast, parametric fill
+- `step_impute_knn()` — use neighboring rows (preserves covariance structure)
 
-#### Encoding Categorical Variables
+#### Encoding categorical variables
 
-  - `step_dummy()` creates dummy variables for categorical features.
+- `step_dummy(all_nominal_predictors())` — one-hot encodes factors
+- `step_other()` — collapses rare levels into "other"
 
-  - `step_other()` groups infrequent categories into an "other" category.
+#### Creating interaction terms
 
-#### Creating Interaction Terms
+- `step_interact(terms = ~ aridity:p_mean)` — add variable products when the effect of one predictor depends on another
 
-  - `step_interact()` generates interaction terms between predictors.
-
-#### Feature Extraction
-
-  - `step_pca()` or `step_ica()` can be used to extract important components.
-
-#### Text Feature Engineering
-
-`step_tokenize()`, `step_stopwords()`, and `step_tf()` for text processing.
-
-#### Binning Numerical Data
-
-`step_bin2factor()` converts continuous variables into categorical bins.
-
-#### Polynomial and Spline Features
-
-`step_poly()` and `step_bs()` for generating polynomial and spline transformations.
+:::{.callout-note}
+The full `step_*` catalog (text, splines, binning, dimension reduction, …) lives at <https://recipes.tidymodels.org/reference/>. Search there when you need something not listed here.
+:::
 
 ## Implementing a recipe in `tidymodels`
 
@@ -1841,79 +1736,103 @@ head(normalized_data)
 :::
 ::::
 
-## Build a model with normalized data
+## A recipe for our running example `r hexes("recipes")`
 
-:::: {.columns}
-::: {.column width="45%"}
-```{r example-model}
-model <- lm(flipper_length_mm ~ ., data = normalized_data)
+Back to `forested`. Before we fit any models, let's declare the preprocessing pipeline we want every model in this deck to use — impute missing numeric values, dummy-encode the nominal predictors, and normalize everything numeric:
 
-glance(model)
+```{r forested-recipe}
+forested_recipe <- recipe(forested ~ ., data = forested_train) |>
+  step_impute_mean(all_numeric_predictors()) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_normalize(all_numeric_predictors())
 
-pred <- augment(model, normalized_data)
-head(pred |> select(flipper_length_mm, .fitted, .resid))
+forested_recipe
+```
+
+:::{.callout-note}
+We'll reuse `forested_recipe` for every model we specify for the rest of today (decision tree, logistic regression, workflow set) — the point of a recipe is to define preprocessing **once** and reuse it everywhere. The same recipe carries forward into Wednesday's lecture (VIP + spatial CV) and next week's (more model families + tuning).
+:::
+
+## Fitting your model:
+
+ - OK! So you have split data, a recipe, and a model spec (with engine + mode)
+ - Now you need to fit the model!
+ - Before we reach for `workflow()`, it's useful to see how a recipe + model compose manually: `prep()` the recipe on the training data, `bake()` it to get the transformed frame, then hand that frame to `fit()`.
+
+```{r}
+dt_model <- decision_tree() %>%
+  set_engine('rpart') %>%
+  set_mode("classification")
+
+# Estimate preprocessing parameters (means, dummy levels, etc.) from training data
+prepped     <- prep(forested_recipe, training = forested_train)
+
+# Apply the pipeline
+forested_baked <- bake(prepped, new_data = NULL)
+
+# Fit the model against the fully preprocessed training data
+# Note: `.` now picks up the dummy-encoded + normalized columns produced by the recipe
+(output <- fit(dt_model, forested ~ ., data = forested_baked))
+```
+
+:::{.callout-tip}
+This `prep → bake → fit` dance is what `workflow()` automates on the next slide. Seeing it once makes the workflow version less magical.
+:::
+
+## Component extracts:
+
+::: columns
+::: {.column width="50%"}
+- While `tidymodels` provides a standard interface to all models all base models have specific methods (remember `summary.lm`? )
+
+- To use these, you must extract the underlying object.
+
+- `extract_fit_engine()` extracts the underlying model object
+- `extract_fit_parsnip()` extracts the parsnip object
+- `extract_recipe()` extracts the recipe object
+- `extract_preprocessor()` extracts the preprocessor object
+- ...  many more
+:::
+::: {.column width="50%"}
+```{r}
+ex <- extract_fit_engine(output)
+class(ex) # the class of the engine used!
+
+# Use rpart plot and text methods ...
+plot(ex)
+text(ex, cex = 0.9, use.n = TRUE, xpd = TRUE)
 ```
 :::
-::: {.column width="55%"}
-```{r example-plot}
-ggscatter(pred,
-          x = "flipper_length_mm", y = ".fitted",
-          add = "reg.line", conf.int = TRUE,
-          cor.coef = TRUE, cor.method = "pearson",
-          color = "species", palette = "jco") +
-  labs(title = "Observed vs. Fitted: Flipper Length",
-       x = "Observed (mm)", y = "Fitted (mm)")
-```
 :::
-::::
 
 # A model workflow {background-color="#C8C372"}
 
-## Workflows? `r hexes("workflows")`
+## Workflows — a container for your pipeline `r hexes("workflows")`
 
-The `workflows` package in `tidymodels` helps:
+The `workflows` package bundles a **preprocessor** (recipe or formula) and a **model spec** into a single object. Instead of managing `prep → bake → fit` by hand, you hand the workflow your training data and it does the bookkeeping on every resample.
 
-  - Manage preprocessing and modeling in a structured pipeline
+**The four-step pattern:**
 
-  - Avoid repetitive code
+1. Create a workflow (`workflow()` — like `ggplot()` instantiates a canvas)
+2. Add a preprocessor (`add_recipe()` or `add_formula()`)
+3. Add a model (`add_model()`)
+4. Fit it (`fit()` or `fit_resamples()`)
 
-  - Reduce errors when integrating steps
+. . .
 
-. . . 
+**Why bother?**
 
-Think of them as containers for:
-
-  - Preprocessing steps (e.g., feature engineering, transformations)
-
-  - Model specification
-
-  - Fitting approaches
-  
-. . .   
-
-Why Use Workflows? 
-
-  ✅ Keeps preprocessing and modeling together\
-  
-  ✅ Ensures consistency in data handling \ 
-  
-  ✅ Makes code easier to read and maintain\ 
-
-## Basic Workflow Structure:  `r hexes("workflows")`
-
-1. Create a workflow object (similar to how `ggplot()` instantiates a canvas)
-
-2. Add a formula or recipe (preprocessor)
-
-3. Add the model
-
-4. Fit the workflow
+✅ Preprocessing and modeling travel together — no forgetting to bake the test set
+✅ Same skeleton for every model — swap in a new `add_model()` spec and go
+✅ Works identically with a single `fit()`, resamples, or tuning
 
 ## A model workflow `r hexes("parsnip", "workflows")`
 
+Instead of `prep`/`bake`/`fit` by hand, drop the recipe and the model into a `workflow()` and let it do the bookkeeping:
+
 ```{r tree-wflow}
 dt_wf <- workflow() %>%
-  add_formula(forested ~ .) %>%
+  add_recipe(forested_recipe) %>%
   add_model(dt_model) %>%
   fit(data = forested_train)
 ```
@@ -1928,7 +1847,7 @@ dt_wf
 . . .
 
 :::{.callout-tip}
-Swap `add_formula()` for `add_recipe(my_recipe)` and the same workflow now carries your feature engineering pipeline *and* the model together — `fit()` will `prep()`/`bake()` for you on every resample.
+`add_recipe()` means the workflow carries your feature engineering pipeline *and* the model together — `fit()` automatically `prep()`/`bake()`s for every resample. (You *can* use `add_formula()` instead if you don't need any preprocessing, but once you have a recipe there's no reason to.)
 :::
 
 ## Predict with your model `r hexes("workflows", "broom")`
@@ -1982,7 +1901,7 @@ log_mod = logistic_reg() %>%
   set_mode("classification")
 
 log_wf <- workflow() %>%
-  add_formula(forested ~ .) %>%
+  add_recipe(forested_recipe) %>%
   add_model(log_mod) %>%
   fit(data = forested_train)
 
@@ -1990,6 +1909,10 @@ log_preds <- augment(log_wf, new_data = forested_test)
 
 metrics(log_preds, truth = forested, estimate = .pred_class)
 ```
+
+:::{.callout-note}
+Note how little changed: same recipe, same workflow skeleton — only the model spec is different. That swap is the whole point of `tidymodels`.
+:::
 
 ## So who wins?
 
@@ -1999,7 +1922,7 @@ metrics(log_preds, truth = forested, estimate = .pred_class)
 ```
 Right out of the gate, there doesn't seem to be much difference, but ...
 
-## Don't get too confident!
+## Don't get too confident — use resamples
 
  - We have a single point-estimate of performance — one train/test split produces **one number** that can be misleadingly high or low depending on which rows ended up in the test set.
  - Resampling repeatedly holds out different subsets, fits the model each time, and **averages** the metric — giving a more stable and trustworthy estimate of skill.
@@ -2007,9 +1930,9 @@ Right out of the gate, there doesn't seem to be much difference, but ...
  
 ```{r}
 dt_wf_rs <- workflow() %>%
-  add_formula(forested ~ .) %>%
+  add_recipe(forested_recipe) %>%
   add_model(dt_model) %>%
-  fit_resamples(resamples = forested_folds, 
+  fit_resamples(resamples = forested_folds,
                 # Here we just ask tidymodels to save all predictions...
                 control   = control_resamples(save_pred = TRUE))
 ```
@@ -2025,13 +1948,13 @@ dt_wf_rs[1,]
 `tidyr::unnest` could be used to expand any of those list columns!
 :::
 
-## Don't get too confident!
+## Don't get too confident — same pattern, other model
 
 - We can execute the same workflow for the logistic regression model, this time evaluating the resamples instead of the test data.
 
 ```{r}
 log_wf_rs <- workflow() %>%
-  add_formula(forested ~ .) %>%
+  add_recipe(forested_recipe) %>%
   add_model(log_mod) %>%
   fit_resamples(resamples = forested_folds,
                 control = control_resamples(save_pred = TRUE))
@@ -2044,7 +1967,7 @@ log_wf_rs <- workflow() %>%
 log_wf_rs
 ```
 
-## Don't get too confident!
+## Don't get too confident — collect the metrics
 
 - Since we now have an "ensemble" of models (across the folds), we can collect a summary of the metrics across them.
 
@@ -2087,7 +2010,7 @@ Does the idea of implementing a process over a list of elements ring a bell?
 - Both must be lists, by nature of the underlying `purrr` code. 
 
 ```{r}
-(wf_obj <- workflow_set(list(forested ~.), list(log_mod, dt_model)))
+(wf_obj <- workflow_set(list(forested_recipe), list(log_mod, dt_model)))
 ```
 
 ## Iterative execution
@@ -2097,9 +2020,9 @@ Does the idea of implementing a process over a list of elements ring a bell?
 - Here we are mapping the `fit_resamples` function across the `workflow_set` combinations using the `resamples` argument to specify the resamples we want to use (`forested_folds`).
 
 ```{r}
-wf_obj <- 
-  workflow_set(list(forested ~.), list(log_mod, dt_model)) %>%
-  workflow_map("fit_resamples", resamples = forested_folds) 
+wf_obj <-
+  workflow_set(list(forested_recipe), list(log_mod, dt_model)) %>%
+  workflow_map("fit_resamples", resamples = forested_folds)
 ```
 <br>
 
@@ -2148,7 +2071,7 @@ Keep in mind: we compared these models **out of the box**, with no feature engin
 knitr::include_graphics("img/whole-game-transparent-select.jpg")
 ```
 
-On Wednesday, we'll talk more about models we can choose from...
+On **Wednesday** we'll ask two things `collect_metrics()` can't answer: *which predictors did the model actually use* (VIP) and *is our 0.9-ish score honest* (spatial cross-validation on autocorrelated data). **Next week** we'll meet a bigger zoo of model families and learn to tune them.
 
 
 
