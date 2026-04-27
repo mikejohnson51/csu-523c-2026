@@ -67,7 +67,7 @@ Machine learning (ML) is widely used in environmental science for tasks such as 
 ## By the end of today you will be able to...
 
 - Distinguish **classification** from **regression** modes and pick the right one for an environmental question
-- Specify six major model families with `parsnip` (linear, logistic, tree, random forest, boosted trees, SVM, neural network)
+- Specify seven major model families with `parsnip` (linear, logistic, tree, random forest, boosted trees, SVM, neural network)
 - Read and interpret classification metrics from a **confusion matrix**: accuracy, sensitivity, specificity, ROC AUC, Brier score
 - Compare models *systematically* using `workflow_set()` over cross-validation folds
 
@@ -169,7 +169,7 @@ We will use the `forested` dataset for classification. Each row is a 6,000-acre 
 
 ```{r}       
 set.seed(123)
-forested_split <- initial_split(forested, strata = tree_no_tree)
+forested_split <- initial_split(forested, strata = forested)
 forested_train <- training(forested_split)
 forested_test  <- testing(forested_split)
 forested_folds <- vfold_cv(forested_train, v = 10)
@@ -186,7 +186,7 @@ forested_recipe <- recipe(forested ~ ., data = forested_train) |>
 ## Unified Interface for ML Models `r hexes("parsnip")`
 
 - The `parsnip` package is a part of the `tidymodels` framework
-- It provides a consistent interface for specifying models through specifications
+- It provides a consistent interface for specifying models across many different algorithms
 - The combination of a specification, mode, and engine is called a model
 - Let's look at the parsnip [documentation](https://www.tidymodels.org/find/parsnip/)!
 
@@ -213,7 +213,7 @@ Regression models default to `rmse`, `rsq`, `mae` instead — covered in the Reg
 - Hyperparameters are settings that control the learning process of a model.
 - They are set before training and affect the model's performance.
 - Hyperparameters can be tuned to optimize the model's predictive power.
-- More on model tuning next week!
+- More on model tuning later in today's lecture!
 
 ## Today's model zoo, at a glance
 
@@ -252,6 +252,7 @@ knitr::include_graphics('img/lm-gif.gif')
 #### Specification
 
 ```{r}
+#| collapse: false
 linear_reg()
 ```
 
@@ -270,6 +271,7 @@ This example predicts `elevation` from the other columns — it's a **syntactic 
 :::
 
 ```{r}
+# penalty and mixture are available when engine = "glmnet" (regularized regression)
 lm_mod <- linear_reg(mode = "regression", engine = "lm")
 
 workflow() |>
@@ -288,10 +290,13 @@ Logistic Regression is used for _binary_ classification tasks. It models the pro
 ::: columns
 ::: {.column width="50%"}
 
-  - **Sigmoid Function**: Converts linear outputs into probabilities between 0 and 1.
-  - **Decision Boundary**: A threshold (often 0.5) determines classification.
-  - **Log-Loss (Binary Cross-Entropy)**: Measures the error between predicted probabilities and actual labels.
-  - **Regularization (L1 and L2)**: Helps in feature selection and prevents overfitting.
+  - **Sigmoid Function**: Squashes any real number into a probability between 0 and 1. A large positive score → near 1 ("yes"); a large negative score → near 0 ("no"). *(top plot: the S-curve)*
+
+  - **Decision Boundary**: Once we have probabilities, we pick a cutoff (default 0.5) to assign a class. Everything above → "Yes", below → "No". *(top plot: the dashed line separating the two groups)*
+
+  - **Log-Loss (Binary Cross-Entropy)**: The model's training objective — penalizes confident wrong predictions harshly. Lower is better. *(bottom plot: loss falling as training progresses)*
+
+  - **Regularization (L1 and L2)**: A penalty added to the loss that shrinks large coefficients toward zero — prevents the model from over-relying on any single feature.
   
 :::
 ::: {.column width="50%"}
@@ -322,14 +327,15 @@ knitr::include_graphics('img/log-reg.gif')
 
 #### Hyperparameters in Logistic Regression
 
- - **penalty**: Type of regularization (L1, L2, or none).
- - **mixture**: A number between zero and one giving the proportion of L1 regularization (i.e. lasso) in the model
+ - **`penalty`** (λ): Strength of regularization — how much large coefficients are penalized. *Higher → simpler model, less overfitting but potentially underfit. Lower → model fits training data more closely, risk of overfitting.* Tuned on a log scale (e.g., 10⁻⁵ to 1).
+ - **`mixture`** (α): Blend of L1 (lasso) and L2 (ridge) regularization. `0` → pure ridge (shrinks all coefficients, keeps all features). `1` → pure lasso (drives some coefficients to exactly zero, effectively removing features). Values between 0–1 blend both behaviors.
 
 ##  Logistic Regression in `tidymodels`
 
 #### Specification
 
 ```{r}
+#| collapse: false
 logistic_reg()
 ```
 
@@ -344,8 +350,8 @@ show_engines('logistic_reg') |>
 ## Example `r hexes("parsnip", "workflows", "yardstick")`
 
 ```{r}
-log_model <- logistic_reg(penalty = .01) |> 
-  set_engine("glmnet") |> 
+log_model <- logistic_reg(penalty = 0.01, mixture = 0) |>
+  set_engine("glmnet") |>
   set_mode('classification')
 
 workflow() |>
@@ -396,16 +402,16 @@ knitr::include_graphics('img/dt_image.png')
   - **Mean Squared Error (MSE)**: Used for regression trees to minimize variance within nodes.\
   
 #### Hyperparameters in Decision Trees
-  Key hyperparameters include:\
-  - `cost_complexity`: complexity parameter for pruning\
-  - `tree_depth`: maximum depth of the tree\
-  - `min_n`: minimum number of observations in a node\
+  - **`cost_complexity`** (Cp): Penalty applied to each additional split during pruning. *Higher → more pruning, simpler tree, less overfitting. Lower → tree grows more freely and fits training data more closely.* Default is 0.01; setting near 0 allows full growth.
+  - **`tree_depth`**: Maximum number of splits from root to leaf. *Higher → tree can capture more complex patterns. Lower → simpler, more generalizable tree. Depth 1 creates a single-split "stump."* Typical range: 3–15.
+  - **`min_n`**: Minimum number of observations required in a node before attempting a split. *Higher → fewer, larger leaves (acts as regularization). Lower → finer-grained splits that may overfit noise.*
    
 ## Decision Tree using tidymodels
 
 #### Specification
 
 ```{r}
+#| collapse: false
 decision_tree()
 ```
 
@@ -420,7 +426,7 @@ show_engines('decision_tree') |>
 ## Example `r hexes("parsnip", "workflows", "yardstick")`
 
 ```{r}
-dt_model <- decision_tree(tree_depth = 10, min_n = 3) |>
+dt_model <- decision_tree(cost_complexity = 0.01, tree_depth = 10, min_n = 3) |>
   set_engine("rpart") |>
   set_mode('classification')
 
@@ -437,7 +443,7 @@ Notice the pattern: *recipe → model → fit_resamples → collect_metrics*. It
 
 # Random Forest
 
-Random Forests provide an ensemble learning method that constructs _multiple decision trees_ and aggregates their predictions to improve accuracy and reduce overfitting. It is used for both classification and regression tasks.
+Random Forest is an ensemble learning method that constructs _multiple decision trees_ and aggregates their predictions to improve accuracy and reduce overfitting. It can be used for both classification and regression tasks.
 
 ## Components of a Random Forest
 
@@ -459,16 +465,16 @@ knitr::include_graphics('img/rand-forest.gif')
 3. Aggregating predictions from all trees to produce the final output.
 
 ### Hyperparameters in Random Forest
-- **Number of Trees (`ntree`)**: Determines how many trees are included in the forest.
-- **Maximum Depth (`max_depth`)**: Limits the depth of individual trees to prevent overfitting.
-- **Minimum Samples per Leaf (`min_n`)**: Specifies the minimum number of observations required in a leaf node.
-- **Number of Features (`mtry`)**: Controls how many features are randomly selected at each split.
+- **`trees`**: Number of trees in the ensemble. *More trees → more stable, reliable predictions. Diminishing returns beyond ~500. Unlike depth, adding trees almost never hurts — it's mainly a compute budget question.* Start with 500–1000.
+- **`min_n`**: Minimum observations needed before a node can split. *Higher → shallower, more regularized trees with larger leaves. Lower → deeper trees that fit training data more closely.* Acts as implicit depth control across all trees.
+- **`mtry`**: Number of features randomly considered at each split. *Lower → more diverse, decorrelated trees (often better ensemble performance). Higher → each tree is individually stronger but trees become more similar.* Default is √p (classification) or p/3 (regression), where p = number of predictors.
 
 ## Random Forest Implementation using Tidymodels
 
 #### Specification
 
 ```{r}
+#| collapse: false
 rand_forest()
 ```
 
@@ -484,7 +490,7 @@ show_engines('rand_forest') |>
 
 ```{r}
 # Define a Random Forest model
-rf_model <- rand_forest(trees = 10) |>
+rf_model <- rand_forest(trees = 10, mtry = 4, min_n = 5) |>
   set_engine("ranger", importance = "impurity") |>
   set_mode("classification")
 
@@ -523,31 +529,53 @@ Boosting is an ensemble learning technique that builds multiple weak models (oft
 4. Updating the predictions by adding a fraction of the new tree’s output.
 5. Repeating until a stopping criterion is met (e.g., a maximum number of trees or performance threshold).
 
-#### Hyperparameters in XGBoost
-- **`nrounds` (Number of Trees)**: The number of boosting iterations.
-- **`max_depth`**: The maximum depth of trees.
-- **`eta` (Learning Rate)**: Controls how much each tree contributes to the model.
-- **`gamma`**: Minimum loss reduction required to split a node.
-- **`colsample_bytree`**: Fraction of features to consider for each tree.
+#### Hyperparameters in Boosted Trees (parsnip names)
+- **`trees`**: Number of boosting rounds (sequential trees added). *More trees → potentially better accuracy, but overfitting risk grows. Use `stop_iter` to halt early if improvement plateaus.*
+- **`tree_depth`**: Depth of each individual tree. *Unlike random forest, boosted trees intentionally use shallow trees (depth 1–6) — they learn complexity through accumulation, not deep single trees.*
+- **`learn_rate`** (XGBoost: `eta`): Shrinkage applied to each tree's contribution. *Lower → smaller updates per tree, needs more trees but generalizes better. Higher → faster learning but risk of overshooting.* Typical range: 0.001–0.1.
+- **`loss_reduction`** (XGBoost: `gamma`): Minimum improvement in loss required to make a split. *Higher → more conservative splits, simpler trees.* Default 0; increase to regularize.
+- **`mtry`** (XGBoost: `colsample_bytree`): Fraction of features randomly sampled per tree. *Adds the same diversifying randomness as in random forest — reduces correlation between successive trees.*
 
-## Boost Implementation using Tidymodels
+## Boosted Trees in `tidymodels`
+
+#### Specification
 
 ```{r}
-# Define an XGBoost model
-b_model <- boost_tree() |>
+#| collapse: false
+boost_tree()
+```
+
+#### engines & modes `r hexes("parsnip")`
+
+```{r}
+show_engines('boost_tree') |>
+  mutate(specification = "boost_tree") |>
+  flextable()
+```
+
+## Example `r hexes("parsnip", "workflows", "yardstick")`
+
+```{r}
+b_model <- boost_tree(
+  trees          = 15,
+  tree_depth     = 6,
+  learn_rate     = 0.3,
+  loss_reduction = 0,
+  mtry           = 1
+) |>
   set_engine("xgboost") |>
   set_mode("classification")
 
 workflow() |>
   add_recipe(forested_recipe) |>
-  add_model(b_model) |> 
+  add_model(b_model) |>
   fit_resamples(resamples = forested_folds) |>
   collect_metrics()
 ```
 
 # Support Vector Machine (SVM)
 
-Support Vector Machines (SVM) is a supervised learning algorithm used for classification and regression tasks. It works by finding the optimal hyperplane that best separates data points into different classes.
+Support Vector Machines (SVMs) are a supervised learning algorithm used for classification and regression tasks. It works by finding the optimal hyperplane that best separates data points into different classes.
 
 ## Components of SVM
 - **Support Vectors**: Data points that define the hyperplane.\
@@ -562,26 +590,43 @@ Support Vector Machines (SVM) is a supervised learning algorithm used for classi
 3. Maximizing the margin between the hyperplane and the closest points.\
 4. Using a regularization parameter (`C`) to control trade-offs between a wider margin and misclassifications.\
 
-####  Hyperparameters in SVM
-Key hyperparameters include:\
-- **`C` (Regularization Parameter)**: Controls the trade-off between maximizing margin and minimizing classification error.\
-- **`kernel`**: Determines the transformation of input space (e.g., linear, radial basis function (RBF), polynomial).\
-- **`gamma`**: Controls the influence of individual training samples on the decision boundary (RBF/polynomial kernels).
+####  Hyperparameters in SVM (parsnip names)
+- **`cost`** (C): Trade-off between a wide margin and misclassifying training points. *High → tries to correctly classify every training point (narrow margin, risk of overfitting). Low → accepts some misclassifications for a wider, more robust margin.*
+- **`degree`** (`svm_poly()` only): Degree of the polynomial kernel. *Higher → more complex, curved decision boundary. Degree 1 = linear; degree 2 = quadratic.* Rarely go above 3.
+- **`rbf_sigma`** (`svm_rbf()` only): Controls how far each training point's influence reaches. *High → tight local influence (complex, wiggly boundary). Low → wide influence (smooth, global boundary).* Tuned on a log scale.
 
-## SVM Implementation using Tidymodels
+## SVM in `tidymodels`
+
+#### Specification
 
 ```{r}
-# Define an SVM model
-svm_model <- svm_poly() |>
+#| collapse: false
+svm_poly()  # polynomial kernel
+svm_rbf()   # radial basis function kernel
+```
+
+#### engines & modes `r hexes("parsnip")`
+
+```{r}
+show_engines('svm_poly') |>
+  mutate(specification = "svm_poly") |>
+  flextable()
+```
+
+## Example `r hexes("parsnip", "workflows", "yardstick")`
+
+```{r}
+svm_model <- svm_poly(cost = 1, degree = 1) |>
   set_engine("kernlab") |>
   set_mode("classification")
 
 workflow() |>
   add_recipe(forested_recipe) |>
-  add_model(svm_model) |> 
+  add_model(svm_model) |>
   fit_resamples(resamples = forested_folds) |>
   collect_metrics()
 ```
+
 # Neural Networks
 
 A Neural Network is a computational model inspired by the structure of the human brain. It consists of layers of interconnected neurons that transform input data to learn patterns and make predictions. Neural Networks are widely used for tasks such as image recognition, natural language processing, and time series forecasting.
@@ -621,12 +666,12 @@ knitr::include_graphics('img/nn.gif')
   - Iteration: The process repeats over multiple epochs until convergence.
 
 #### Hyperparameters in Neural Networks
-- hidden_units: Number of neurons in hidden layers.
-- penalty: Regularization term to prevent overfitting.
-- dropout: Fraction of neurons randomly dropped during training.
-- epochs: Number of training iterations.
-- activation: Activation function for neurons (e.g., ReLU, Sigmoid).
-- learn_rate: Step size for weight updates.
+- **`hidden_units`**: Number of neurons in the hidden layer(s). *More neurons → capacity to learn more complex patterns, but slower training and higher overfitting risk. For tabular data, 5–100 is a typical starting range.*
+- **`penalty`** (weight decay): L2 regularization on the weights. *Higher → simpler, more generalizable network. Lower → network fits training data more closely.*
+- **`dropout`**: Fraction of neurons randomly disabled each training batch. *Forces the network to not rely on any single neuron — a strong regularizer. Typical values: 0.1–0.5. Set to 0 to disable.*
+- **`epochs`**: Number of complete passes through the training data. *Too few → underfitting. Too many → overfitting. Pair with early stopping when possible.*
+- **`activation`**: Non-linearity applied to each neuron's output. *ReLU (default) works well for hidden layers and avoids vanishing gradients. Sigmoid/tanh are used in specific output-layer or recurrent contexts.*
+- **`learn_rate`**: Step size for gradient descent weight updates. *Too high → training oscillates and fails to converge. Too low → training is very slow.* Typical range: 0.001–0.01.
 
 ## Variants of Neural Networks
 
@@ -647,6 +692,7 @@ Which one you choose depends on your dataset size, computational resources, and 
 #### Specification
 
 ```{r}
+#| collapse: false
 mlp()
 ```
 
@@ -661,8 +707,13 @@ show_engines("mlp") |>
 ## Example `r hexes("parsnip", "workflows", "yardstick")`
 
 ```{r}
-nn_model <- mlp(hidden_units = 5, penalty = 0.01) |> 
-  set_engine("nnet") |> 
+nn_model <- mlp(
+  hidden_units = 5,
+  penalty      = 0.01,
+  epochs       = 100
+  # dropout, activation, learn_rate require engine = "brulee" or "keras"
+) |>
+  set_engine("nnet") |>
   set_mode("classification")
 
 workflow() |>
@@ -674,7 +725,7 @@ workflow() |>
 
 ## Wrap up `r hexes("workflows", "parsnip", "rsample")`
 
-Lets combine all the models and evaluate their performance using cross-validation. 
+Let's combine all the models and evaluate their performance using cross-validation.
 
  - We learned about cross-validation last week and its importance in evaluating model performance.
 
@@ -699,9 +750,13 @@ wf <-  workflow_set(list(forested_recipe),
 
 ```{r}
 autoplot(wf) +
-  theme_linedraw(18) + 
+  theme_linedraw(18) +
   theme(legend.position = 'bottom')
 ```
+
+:::{.callout-note appearance="simple"}
+**How to read this plot:** Each dot is the mean CV metric across 10 folds; whiskers are ±1 SE. A model whose interval is highest *and* tightest is both accurate and consistent. Overlapping intervals mean the difference may not be meaningful — prefer the simpler model when in doubt.
+:::
 
 ## Model Evaluation `r hexes("yardstick")`
 
@@ -748,18 +803,22 @@ library(forested)
 set.seed(123)
 
 # Initialize split
-forested_split <- initial_split(forested, prop = 0.8)
+forested_split <- initial_split(forested, strata = forested)
 forested_train <- training(forested_split)
 forested_test  <- testing(forested_split)
 
 # Build Resamples
 forested_folds <- vfold_cv(forested_train, v = 10)
 
-# Set a model specification with mode (default engine)
-dt_mod         <- decision_tree(cost_complexity = 0.0001, mode = "classification")
+# Winning model from the model zoo comparison
+b_mod_eval <- boost_tree(
+  trees = 15, tree_depth = 6, learn_rate = 0.3, loss_reduction = 0, mtry = 1
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
 
-# Bare bones workflow & fit
-forested_wflow <- workflow(forested ~ ., dt_mod)
+# Workflow using the recipe built earlier
+forested_wflow <- workflow(forested_recipe, b_mod_eval)
 forested_fit   <- fit(forested_wflow, forested_train)
 
 # Extracting Predictions:
@@ -778,6 +837,17 @@ augment(forested_fit, new_data = forested_train)
   - The majority of these are measures of correlation and residual error
 
 # Classification: 
+
+:::{.callout-warning}
+## Training-set metrics are optimistic
+
+The next examples evaluate against `forested_train` — the same data the model saw during fitting.
+
+- These numbers look good *by design*: the model has already seen this data.
+- For an honest estimate of performance on **new data**, always use cross-validation results (`collect_metrics()` on resamples) or the held-out `forested_test` via `last_fit()`.
+
+We use training data here only to illustrate what each metric measures with clean, consistent outputs.
+:::
 
 ## Confusion matrix `r hexes("yardstick")`
 
@@ -841,7 +911,6 @@ augment(forested_fit, new_data = forested_train) |>
 :::
 ::: {.column width="60%"}
 ```{r sens-2}
-#| code-line-numbers: "3-6"
 augment(forested_fit, new_data = forested_train) |>
   sensitivity(truth = forested, estimate = .pred_class)
 ```
@@ -884,6 +953,12 @@ What happens for a 20% threshold?
 
 -   sensitivity ⬆️, specificity ⬇️
 
+. . .
+
+:::{.callout-tip appearance="simple"}
+**Environmental context:** For rare or high-stakes events — flood detection, wildfire risk, species presence — a **false negative** (missing a real event) is usually far more costly than a false positive. This pushes the threshold lower to maximize sensitivity, accepting more false alarms. The right threshold is a domain decision, not a statistical one.
+:::
+
 ## Varying the threshold
 
 ::: columns
@@ -920,12 +995,12 @@ augment(forested_fit, new_data = forested_train) |>
 
 ::: columns
 ::: {.column width="50%"}
-For an ROC (receiver operator characteristic) curve, we plot
+The previous plot showed sensitivity and specificity each varying with threshold. An ROC curve shows the **same tradeoff differently**: sweep every possible threshold and plot
 
-- the false positive rate (1 - specificity) on the x-axis
-- the true positive rate (sensitivity) on the y-axis
+- false positive rate (1 − specificity) on the x-axis
+- true positive rate (sensitivity) on the y-axis
 
-with sensitivity and specificity calculated at all possible thresholds.
+The diagonal line = random guessing (AUC 0.5). A good model hugs the top-left corner.
 :::
 
 ::: {.column width="50%"}
@@ -948,17 +1023,13 @@ p_roc
 
 ::: columns
 ::: {.column width="50%"}
-The ROC AUC is the probability that a randomly chosen positive instance is ranked higher than a randomly chosen negative instance.
+**ROC AUC** = area under the ROC curve = the model's ability to *separate* the two classes.
 
- - The ROC AUC is a measure of how well the model separates the two classes.
- - The ROC AUC is a number between 0 and 1.
+Intuition: give the model a random forested and a random non-forested hexagon — AUC is the probability it scores the forested one higher.
 
-- ROC AUC = 1 💯 
-   - perfect classification
-- ROC AUC = 0.5 😐
-   - random guessing
-- ROC AUC < 0.5 😱
-   - worse than random guessing
+- ROC AUC = 1 💯 — perfect separation
+- ROC AUC = 0.5 😐 — no better than flipping a coin (the diagonal)
+- ROC AUC < 0.5 😱 — actively worse than random
 :::
 
 ::: {.column width="50%"}
@@ -974,14 +1045,18 @@ p_roc
 
 ## ROC curves `r hexes("yardstick")`
 
-(A ROC AUC of 0.7-0.8 is considered acceptable, 0.8-0.9 is good, and >0.9 is excellent.)
-```{r roc-auc}
-# Assumes _first_ factor level is event; there are options to change that
-augment(forested_fit, new_data = forested_train) |>  
-  roc_curve(truth = forested, .pred_Yes)  |> 
-  dplyr::slice(1, 20, 50)
+`roc_curve()` returns a tibble with one row per evaluated threshold — sensitivity and specificity at each point. `roc_auc()` summarises the whole curve into one number.
 
-augment(forested_fit, new_data = forested_train) |>  
+(AUC 0.7–0.8 = acceptable, 0.8–0.9 = good, >0.9 = excellent)
+
+```{r roc-auc}
+#| collapse: false
+# Assumes _first_ factor level is event; there are options to change that
+augment(forested_fit, new_data = forested_train) |>
+  roc_curve(truth = forested, .pred_Yes) |>
+  dplyr::slice(1, 20, 50)   # peek at 3 rows from the threshold sweep
+
+augment(forested_fit, new_data = forested_train) |>
   roc_auc(truth = forested, .pred_Yes)
 ```
 
@@ -1123,7 +1198,7 @@ $$
 ::: footer
 :::
 
-## Metrics Selection model performance `r hexes("yardstick")`
+## Custom Metric Sets `r hexes("yardstick")`
 
 We can use `metric_set()` to combine multiple calculations into one
 
@@ -1151,7 +1226,7 @@ augment(forested_fit, new_data = forested_train) |>
 :::{.callout-note}
 The specificity for `"Tree"` is a good bit lower than it is for `"No tree"`.
 
-So, when this index classifies the plot as having a tree, the model does not do well at correctly identifying the plot as non-forested when it is indeed non-forested.
+Among hexagons where the remote sensing index shows tree cover, the model more often predicts *forested* even when the ground truth is non-forested — these are the plots most likely to be confused.
 :::
 
 
@@ -1177,7 +1252,7 @@ We're going to keep tuning on the **same `forested` classification problem** —
 From earlier in this deck we already have:
 
 - `forested_split` — 75/25 stratified split
-- `forested_train`, `forested_test` — the two halves
+- `forested_train`, `forested_test` — 75% training, 25% test
 - `forested_folds` — 10-fold CV on the training set
 - `forested_recipe` — impute → dummy → normalize
 
@@ -1185,10 +1260,11 @@ From earlier in this deck we already have:
 
 ```{r}
 #| label: recap-check
+#| collapse: false
 forested_recipe
 ```
 
-# Optimizing Models via Tuning Hyperparameter 
+# Optimizing Models via Hyperparameter Tuning
 
 ## Tuning parameters
 
@@ -1215,6 +1291,7 @@ The function itself just returns... itself:
 
 ```{r}
 #| label: tune
+#| collapse: false
 
 tune()
 
@@ -1248,6 +1325,7 @@ Some _possible_ parameters:
 
 ```{r}
 #| label: boot-spec
+#| collapse: false
 
 b_mod <-
   boost_tree(trees = tune(), learn_rate = tune()) |>
@@ -1376,12 +1454,13 @@ Space-filling designs (SFD) attempt to cover the parameter space without redunda
 
 ```{r get-param}
 #| tidy: false
+#| collapse: false
 
 # Extract
 (b_wflow |>
   extract_parameter_set_dials())
 
-# Individual functions: 
+# Individual functions:
 (trees())
 (learn_rate())
 ```
@@ -1402,34 +1481,37 @@ A parameter set can be updated (e.g. to change the ranges).
 ## Create a SFD curve `r hexes(c("dials", "workflows"))`
 
 ```{r}
-#| label: get-grid 
-#| code-line-numbers: "5"
+#| label: get-grid
+#| code-line-numbers: "6"
+#| collapse: false
 set.seed(12)
 
-(grid <- 
-  b_wflow |> 
-  extract_parameter_set_dials() |> 
+(grid <-
+  b_wflow |>
+  extract_parameter_set_dials() |>
   grid_space_filling(size = 25))
 ```
 
 ## Create a regular grid `r hexes(c("dials", "workflows"))`
 
-```{r get-regular-grid} 
+```{r get-regular-grid}
 #| label: reg-grid
-#| code-line-numbers: "5"
+#| code-line-numbers: "6"
+#| collapse: false
 set.seed(12)
 
-(grid <- 
-  b_wflow |> 
-  extract_parameter_set_dials() |> 
+(grid <-
+  b_wflow |>
+  extract_parameter_set_dials() |>
   grid_regular(levels = 4))
 ```
 
 ## Update parameter ranges `r hexes(c("dials", "workflows"))`
 
-```{r mod-grid-code} 
+```{r mod-grid-code}
 #| label: update-param
 #| code-line-numbers: "4-5|"
+#| collapse: false
 b_param <- 
   b_wflow |> 
   extract_parameter_set_dials() |> 
@@ -1457,7 +1539,7 @@ grid |>
   scale_y_log10()
 ```
 
-Note that the learning rates are uniform on the log-10 scale and this shows 2 of 4 dimensions.
+Note that the learning rates are uniform on the log-10 scale — both tuning parameters are shown.
 
 # Use the `tune_*()` functions to tune models
 
@@ -1510,9 +1592,10 @@ b_res <-
 
 ## Grid Search `r hexes(c("dials", "workflows", "tune"))` 
 
-```{r} 
+```{r}
 #| label: b-grid-tune-res
-b_res 
+#| collapse: false
+b_res
 ```
 
 ## Grid results `r hexes(c("tune"))`
@@ -1531,13 +1614,73 @@ autoplot(b_res)
 
 ```{r}
 #| label: b-metrics
+#| collapse: false
 collect_metrics(b_res)
 ```
+
+## Iterative Search — Bayesian Optimization `r hexes(c("tune"))`
+
+- Fits a **Gaussian process surrogate model** on results so far
+- Suggests the *most promising* next candidate (balances exploration vs. exploitation)
+- Requires far fewer iterations than grid search to reach similar quality
+- Can warm-start from an existing grid search result to avoid re-evaluating already-known points
+
+Key function: `tune_bayes()` — same syntax as `tune_grid()`
+
+## Bayesian Search Example `r hexes(c("tune", "workflows"))`
+
+```{r}
+#| label: b-bayes-tune
+#| cache: true
+#| collapse: false
+set.seed(9)
+b_bayes <-
+  b_wflow |>
+  tune_bayes(
+    resamples  = forested_folds,
+    initial    = b_res,       # warm-start: skip candidates already evaluated
+    iter       = 10,
+    param_info = b_param,
+    metrics    = metric_set(roc_auc)
+  )
+
+show_best(b_bayes, metric = "roc_auc")
+```
+
+:::{.callout-tip}
+Passing `initial = b_res` means Bayesian search starts from what the grid search already learned — no wasted evaluations on territory already explored.
+:::
+
+## Bayesian Search Results `r hexes(c("tune"))`
+
+```{r}
+#| label: b-bayes-plot
+#| fig-align: center
+#| fig-width: 9
+#| fig-height: 5
+#| out-width: "85%"
+autoplot(b_bayes, type = "performance")
+```
+
+## Grid Search vs Bayesian Optimization
+
+| | Grid Search | Bayesian Optimization |
+|---|---|---|
+| **How it works** | Pre-defined candidates evaluated in parallel | Learns from previous results, suggests next point |
+| **Best when** | Compute is cheap; reproducibility matters | Fitting is expensive; budget is tight |
+| **Parallelism** | Fully parallel | Sequential by design |
+| **Warm starting** | No | Yes — can reuse grid results with `initial = b_res` |
+| **tidymodels fn** | `tune_grid()` | `tune_bayes()` |
+
+. . .
+
+In practice: start with a grid search to understand the landscape, then hand the results to Bayesian search for refinement.
 
 ## Choose a parameter combination `r hexes(c("tune"))`
 
 ```{r}
 #| label: b-metrics-best-roc
+#| collapse: false
 show_best(b_res, metric = "roc_auc")
 ```
 
@@ -1547,6 +1690,7 @@ Create your own tibble for final parameters or use one of the `tune::select_*()`
 
 ```{r}
 #| label: b-metrics-select-best
+#| collapse: false
 (b_best <- select_best(b_res, metric = "roc_auc"))
 ```
 
@@ -1580,11 +1724,20 @@ Let's fit the model on the training set and verify our performance using the tes
 
 . . .
 
-We've seen `fit()` and `predict()` (+ `augment()`) but there is a shortcut:
+`last_fit(workflow, split)` does three things in one call:
+
+1. Fits the finalized workflow on the **full training set**
+2. Predicts on the **held-out test set**
+3. Returns metrics and predictions — ready for `collect_metrics()` / `collect_predictions()`
+
+:::{.callout-important appearance="simple"}
+Call `last_fit()` **once**, at the very end. Using the test set to make any modeling decisions (threshold, features, model choice) invalidates it as an honest estimate.
+:::
 
 . . . 
 
 ```{r}
+#| collapse: false
 # the boosted tree workflow can be `finalized` with the best parameters
 final_workflow <- finalize_workflow(b_wflow, b_best)
 
@@ -1595,6 +1748,7 @@ final_workflow <- finalize_workflow(b_wflow, b_best)
 ## The final fit!
 
 ```{r}
+#| collapse: false
 # Metrics on the held-out test set
 collect_metrics(final_fit)
 
@@ -1607,6 +1761,34 @@ collect_predictions(final_fit) |>
   roc_curve(truth = forested, .pred_Yes) |>
   autoplot()
 ```
+
+## What did the model learn? `r hexes("vip")`
+
+::: columns
+::: {.column width="60%"}
+```{r}
+#| label: final-vip
+#| fig-align: center
+#| out-width: 100%
+#| fig-height: 6
+library(vip)
+
+extract_fit_parsnip(final_fit) |>
+  vip(num_features = 15, geom = "col") +
+  labs(title = "Boosted tree: top predictors of forested status") +
+  theme_linedraw(14)
+```
+:::
+::: {.column width="40%"}
+Variable importance connects performance back to science: *which features drove the prediction?*
+
+:::{.callout-note}
+Recall from week 5: different families give different importance estimates — logistic regression uses standardized coefficients, random forest uses impurity reduction, boosted trees use gain.
+
+Agreement across families = robust signal. Disagreement = worth investigating.
+:::
+:::
+:::
 
 ## The whole game
 
