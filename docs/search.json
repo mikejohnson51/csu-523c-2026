@@ -613,7 +613,7 @@
     "href": "index.html#about-this-course",
     "title": "ESS 523c: Environmental Data Science Applications",
     "section": "About This Course",
-    "text": "About This Course\nThis course focuses on analyzing and understanding water resources through the lens of modern data science. Building on the foundational R skills from ESS/WR 523a, we examine key innovations in data science, geospatial processing and machine learning for hydrological prediction and model parameterization — with an emphasis using real data.\nEvery dataset, every example, and every lab draws from systems you will encounter in professional practice. The course is organized around a single professional question: what does it take to turn raw environmental data into a reproducible, publishable result that informs real decisions? Each week answers a piece of that question with a different class of data and methods — from spatial analysis through to machine learning workflows applied directly to hydrological problems.\nBy the end of the course you will have built a public portfolio of six published analyses spanning data wrangling, vector data, raster data, machine learning, and time series — using the same data infrastructure that federal agencies and consulting firms use operationally.\n\n\n\n\n\n\nOpen Science\n\n\n\nAll course materials — slides, labs, and code — are open source under the Apache 2.0 license and built with Quarto. If you find something that could be improved, please submit an issue on the course GitHub repository.\n\n\n\n📋 Grading\n\n\n\nComponent\nCount\nPoints Each\nTotal\n\n\n\n\nLabs\n7\n950\n950\n\n\nFinal Project (optional)\n1\n150 EC\n+150\n\n\nTotal (required)\n\n\n950\n\n\n\nGrade scale (percentage of 950 required points): A+ ≥ 96.67% · A ≥ 93.33% · A– ≥ 90% · B+ ≥ 86.67% · B ≥ 83.33% · B– ≥ 80% · C+ ≥ 76.67% · C ≥ 70% · D ≥ 60% · F &lt; 60%\nLabs - with the exception of Lab 0 - are assigned on Wednesdays and due the following Wednesday before class. All submissions are deployed as GitHub Pages. Collaboration on concepts is encouraged; code, writing, and results must be individually produced.\n\n📅 Schedule\n\n\n\n  \n    Week 1\n    Data Science Tools & Digital Environment\n  \n  \n    \n      🎓\n      Lecture\n      Day 1: Digital Environment — Files, Paths, URLs & Git\n      complete\n    \n    \n      📝\n      HW\n      Lab 0: Verify Your Environment + Meet Your Tools\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Day 2: Data Manipulation, Visualization & Relational Data\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 1: Streamflow Across the Colorado River Basin\n      Due 4/1/26\n    \n  \n\n\n\n  \n    Week 2\n    Vector Data — Features, Projections & Measures\n  \n  \n    \n      🎓\n      Lecture\n      Spatial Data: Simple Features, CRS & Measurements\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Interactive Mapping with Leaflet\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 2: Measuring Distance to National Borders\n      Due 4/8/26\n    \n  \n\n\n\n  \n    Week 3\n    Vector Data — Predicates, Simplification & Tesselations\n  \n  \n    \n      🎓\n      Lecture\n      Spatial Data: Predicates, Simplification, Tesselations\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Spatial Statistics & Function Writing\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 3: MAUP in Practice\n      Due 4/19/26\n    \n    \n      🔬\n      Lab Hints\n      Lab 3: Q5 and Q6 hints\n      new\n    \n  \n\n\n\n  \n    Week 4\n    Raster Data\n  \n  \n    \n      🎓\n      Lecture\n      Raster Data: Structure, values, operations\n      new\n    \n    \n      ⚙️\n      Tech Talk\n      JSON, GeoJSON, STAC\n      new\n    \n    \n      🔬\n      Lab\n      Lab 4: Palo Iowa Flood Analysis\n      Due 4/22/26\n    \n  \n\n\n\n  \n    Week 5\n    Machine Learning Part 1\n  \n  \n    \n      🎓\n      Lecture\n      Feature Engineering & Model Workflows\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Spatial Cross-Validation & Model Interpretation\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 5: Machine Learning over CAMELS\n      Due 5/06/26\n    \n  \n\n\n\n  \n    Week 6\n    Machine Learning Part 2\n  \n  \n    \n      🎓\n      Lecture\n      Model Types, Metrics, and Tuning\n      new\n    \n  \n  \n      🔬\n      Final Assignment\n      Personal Website  (Extra Credit)\n      Due 5/15/26\n    \n\n\n\n  Reuse and licensing: Unless otherwise noted, all course materials are licensed under\n  Apache 2.0.\n  Slides, labs, and code are built with Quarto.\n  Found something that needs fixing?\n  Submit an issue on GitHub."
+    "text": "About This Course\nThis course focuses on analyzing and understanding water resources through the lens of modern data science. Building on the foundational R skills from ESS/WR 523a, we examine key innovations in data science, geospatial processing and machine learning for hydrological prediction and model parameterization — with an emphasis using real data.\nEvery dataset, every example, and every lab draws from systems you will encounter in professional practice. The course is organized around a single professional question: what does it take to turn raw environmental data into a reproducible, publishable result that informs real decisions? Each week answers a piece of that question with a different class of data and methods — from spatial analysis through to machine learning workflows applied directly to hydrological problems.\nBy the end of the course you will have built a public portfolio of six published analyses spanning data wrangling, vector data, raster data, machine learning, and time series — using the same data infrastructure that federal agencies and consulting firms use operationally.\n\n\n\n\n\n\nOpen Science\n\n\n\nAll course materials — slides, labs, and code — are open source under the Apache 2.0 license and built with Quarto. If you find something that could be improved, please submit an issue on the course GitHub repository.\n\n\n\n📋 Grading\n\n\n\nComponent\nCount\nPoints Each\nTotal\n\n\n\n\nLabs\n7\n950\n950\n\n\nFinal Project (optional)\n1\n150 EC\n+150\n\n\nTotal (required)\n\n\n950\n\n\n\nGrade scale (percentage of 950 required points): A+ ≥ 96.67% · A ≥ 93.33% · A– ≥ 90% · B+ ≥ 86.67% · B ≥ 83.33% · B– ≥ 80% · C+ ≥ 76.67% · C ≥ 70% · D ≥ 60% · F &lt; 60%\nLabs - with the exception of Lab 0 - are assigned on Wednesdays and due the following Wednesday before class. All submissions are deployed as GitHub Pages. Collaboration on concepts is encouraged; code, writing, and results must be individually produced.\n\n📅 Schedule\n\n\n\n  \n    Week 1\n    Data Science Tools & Digital Environment\n  \n  \n    \n      🎓\n      Lecture\n      Day 1: Digital Environment — Files, Paths, URLs & Git\n      complete\n    \n    \n      📝\n      HW\n      Lab 0: Verify Your Environment + Meet Your Tools\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Day 2: Data Manipulation, Visualization & Relational Data\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 1: Streamflow Across the Colorado River Basin\n      Due 4/1/26\n    \n  \n\n\n\n  \n    Week 2\n    Vector Data — Features, Projections & Measures\n  \n  \n    \n      🎓\n      Lecture\n      Spatial Data: Simple Features, CRS & Measurements\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Interactive Mapping with Leaflet\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 2: Measuring Distance to National Borders\n      Due 4/8/26\n    \n  \n\n\n\n  \n    Week 3\n    Vector Data — Predicates, Simplification & Tesselations\n  \n  \n    \n      🎓\n      Lecture\n      Spatial Data: Predicates, Simplification, Tesselations\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Spatial Statistics & Function Writing\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 3: MAUP in Practice\n      Due 4/19/26\n    \n    \n      🔬\n      Lab Hints\n      Lab 3: Q5 and Q6 hints\n      new\n    \n  \n\n\n\n  \n    Week 4\n    Raster Data\n  \n  \n    \n      🎓\n      Lecture\n      Raster Data: Structure, values, operations\n      new\n    \n    \n      ⚙️\n      Tech Talk\n      JSON, GeoJSON, STAC\n      new\n    \n    \n      🔬\n      Lab\n      Lab 4: Palo Iowa Flood Analysis\n      Due 4/22/26\n    \n  \n\n\n\n  \n    Week 5\n    Machine Learning Part 1\n  \n  \n    \n      🎓\n      Lecture\n      Feature Engineering & Model Workflows\n      complete\n    \n    \n      ⚙️\n      Tech Talk\n      Spatial Cross-Validation & Model Interpretation\n      complete\n    \n    \n      🔬\n      Lab\n      Lab 5: Machine Learning over CAMELS\n      Due 5/06/26\n    \n  \n\n\n\n  \n    Week 6\n    Machine Learning Part 2\n  \n  \n    \n      🎓\n      Lecture\n      Model Types, Metrics, and Tuning\n      new\n    \n  \n  \n      🔬\n      Final Assignment\n      Personal Website  (Extra Credit)\n      Due 5/15/26\n    \n\n\n\n  \n    Week 7\n    Timeseries and Prediction\n  \n  \n    \n      🎓\n      Lecture\n      Timeseries and Prediction\n      new\n    \n  \n  \n      🔬\n      Final Assignment\n      Predicting the Poudre\n      Due 5/13/26\n    \n\n\n\n  Reuse and licensing: Unless otherwise noted, all course materials are licensed under\n  Apache 2.0.\n  Slides, labs, and code are built with Quarto.\n  Found something that needs fixing?\n  Submit an issue on GitHub."
   },
   {
     "objectID": "slides/week-1-1.html#search-programmatically",
@@ -12577,5 +12577,1195 @@
     "title": "Week 6",
     "section": "Grid Search vs Bayesian Optimization",
     "text": "Grid Search vs Bayesian Optimization\n\n\n\n\n\n\n\n\n\nGrid Search\nBayesian Optimization\n\n\n\n\nHow it works\nPre-defined candidates evaluated in parallel\nLearns from previous results, suggests next point\n\n\nBest when\nCompute is cheap; reproducibility matters\nFitting is expensive; budget is tight\n\n\nParallelism\nFully parallel\nSequential by design\n\n\nWarm starting\nNo\nYes — can reuse grid results with initial = b_res\n\n\ntidymodels fn\ntune_grid()\ntune_bayes()\n\n\n\n\nIn practice: start with a grid search to understand the landscape, then hand the results to Bayesian search for refinement."
+  },
+  {
+    "objectID": "slides/week-7-1.html#learning-objectives",
+    "href": "slides/week-7-1.html#learning-objectives",
+    "title": "Week 7",
+    "section": "Learning Objectives",
+    "text": "Learning Objectives\nBy the end of this lecture, you should be able to:\n\nUnderstand what time series data is and why it’s useful\nWork with date and time objects in R\nLoad and visualize time series data in R\nApply basic time series operations: decomposition, smoothing, and forecasting\nUse ts, zoo, and xts objects for time-indexed data\nUnderstand tidy approaches using tsibble and feasts\nRecognize real-world environmental science applications of time series"
+  },
+  {
+    "objectID": "slides/week-7-1.html#what-is-time-series-data",
+    "href": "slides/week-7-1.html#what-is-time-series-data",
+    "title": "Week 7",
+    "section": "What is Time Series Data?",
+    "text": "What is Time Series Data?\nTime series data is a collection of observations recorded sequentially over time. Unlike other data types, time series data is ordered, and that order carries critical information.\nExamples:\n\nStreamflow measurements (e.g., daily CFS at a USGS gage)\nAtmospheric CO₂ levels (e.g., Mauna Loa Observatory)\nSnowpack depth over time\nUrban water consumption by month\n\nWhy Time Series Matter\nTime series analysis helps us:\n\nUnderstand trends and patterns\nDetect anomalies (e.g., droughts, sensor failures)\nForecast future values (e.g., streamflow, temperature)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#working-with-date-objects-in-r",
+    "href": "slides/week-7-1.html#working-with-date-objects-in-r",
+    "title": "Week 7",
+    "section": "Working with Date Objects in R",
+    "text": "Working with Date Objects in R\n\nTime series analysis depends on accurate and well-formatted date/time information.\nBefore we can analyze time series data, we need to understand how R handles dates and times.\nR has built-in classes for date and time objects, which are essential for time series analysis."
+  },
+  {
+    "objectID": "slides/week-7-1.html#base-r-date-functions",
+    "href": "slides/week-7-1.html#base-r-date-functions",
+    "title": "Week 7",
+    "section": "Base R Date Functions",
+    "text": "Base R Date Functions\nR has several native classes for handling dates and times:\n\nDate: Date object\n\n\nas.Date(\"2024-04-08\")\n#&gt; [1] \"2024-04-08\"\n\n\nPOSIXct: Date and time\n\n\nas.POSIXct(\"2024-04-08 14:30:00\")\n#&gt; [1] \"2024-04-08 14:30:00 MDT\"\n\n\nPOSIXlt: List of date and time components\n\n\n(lt &lt;- as.POSIXlt(\"2024-04-08 14:30:00\"))\n#&gt; [1] \"2024-04-08 14:30:00 MDT\"\n\nlt$hour\n#&gt; [1] 14"
+  },
+  {
+    "objectID": "slides/week-7-1.html#date-sequences",
+    "href": "slides/week-7-1.html#date-sequences",
+    "title": "Week 7",
+    "section": "Date Sequences",
+    "text": "Date Sequences\nYou can create sequences of dates using the seq.Date() function:\n\nfrom: Start date\nto: End date (optional)\nby: Interval (e.g., “day”, “month”, “year”)\nlength.out: Number of dates to generate\n\n\nseq.Date(from = as.Date(\"2024-01-01\"), by = \"month\", length.out = 12)\n#&gt;  [1] \"2024-01-01\" \"2024-02-01\" \"2024-03-01\" \"2024-04-01\" \"2024-05-01\"\n#&gt;  [6] \"2024-06-01\" \"2024-07-01\" \"2024-08-01\" \"2024-09-01\" \"2024-10-01\"\n#&gt; [11] \"2024-11-01\" \"2024-12-01\""
+  },
+  {
+    "objectID": "slides/week-7-1.html#section",
+    "href": "slides/week-7-1.html#section",
+    "title": "Week 7",
+    "section": "",
+    "text": "You can also use seq() to create sequences of POSIXct/lt objects:\n\nfrom: Start date/time\nto: End date/time (optional)\nby: Interval (e.g., “hour”, “minute”, “second”)\nlength.out: Number of dates to generate\n\n\nseq(from = as.POSIXct(\"2024-01-01 00:00\"), \n    to = as.POSIXct(\"2024-01-02 00:00\"), \n    by = \"hour\")\n#&gt;  [1] \"2024-01-01 00:00:00 MST\" \"2024-01-01 01:00:00 MST\"\n#&gt;  [3] \"2024-01-01 02:00:00 MST\" \"2024-01-01 03:00:00 MST\"\n#&gt;  [5] \"2024-01-01 04:00:00 MST\" \"2024-01-01 05:00:00 MST\"\n#&gt;  [7] \"2024-01-01 06:00:00 MST\" \"2024-01-01 07:00:00 MST\"\n#&gt;  [9] \"2024-01-01 08:00:00 MST\" \"2024-01-01 09:00:00 MST\"\n#&gt; [11] \"2024-01-01 10:00:00 MST\" \"2024-01-01 11:00:00 MST\"\n#&gt; [13] \"2024-01-01 12:00:00 MST\" \"2024-01-01 13:00:00 MST\"\n#&gt; [15] \"2024-01-01 14:00:00 MST\" \"2024-01-01 15:00:00 MST\"\n#&gt; [17] \"2024-01-01 16:00:00 MST\" \"2024-01-01 17:00:00 MST\"\n#&gt; [19] \"2024-01-01 18:00:00 MST\" \"2024-01-01 19:00:00 MST\"\n#&gt; [21] \"2024-01-01 20:00:00 MST\" \"2024-01-01 21:00:00 MST\"\n#&gt; [23] \"2024-01-01 22:00:00 MST\" \"2024-01-01 23:00:00 MST\"\n#&gt; [25] \"2024-01-02 00:00:00 MST\""
+  },
+  {
+    "objectID": "slides/week-7-1.html#timezones",
+    "href": "slides/week-7-1.html#timezones",
+    "title": "Week 7",
+    "section": "Timezones",
+    "text": "Timezones\n\nBy default, R uses the system’s timezone.\nThe Sys.timezone() function returns the current timezone.\nIf you want to use another timezone, say GMT/UTC, you can change it:\n\n\nSys.timezone()\n#&gt; [1] \"America/Denver\"\n\nas.POSIXct(\"2024-04-08 14:30:00\", tz = \"GMT\")\n#&gt; [1] \"2024-04-08 14:30:00 GMT\"\n\n(obj = as.POSIXct(\"2024-04-08 14:30:00\"))\n#&gt; [1] \"2024-04-08 14:30:00 MDT\"\n\nformat(obj, tz = \"EST\")\n#&gt; [1] \"2024-04-08 15:30:00\""
+  },
+  {
+    "objectID": "slides/week-7-1.html#lubridate-package",
+    "href": "slides/week-7-1.html#lubridate-package",
+    "title": "Week 7",
+    "section": "lubridate Package ",
+    "text": "lubridate Package \n\nThe lubridate package comes with the tidyverse and is designed to make working with dates and times easier.\nIt provides a consistent set of functions for parsing, manipulating, and formatting date-time objects.\n\n\nlibrary(lubridate)\nymd(\"20240408\")        # Parse date\n#&gt; [1] \"2024-04-08\"\nymd_hms(\"20240408 123000\")\n#&gt; [1] \"2024-04-08 12:30:00 UTC\"\n\nnow()                  # Current date and time\n#&gt; [1] \"2026-05-04 13:39:43 MDT\"\ndate &lt;- ymd(\"2023-12-01\")\nmonth(date)           # Extract month\n#&gt; [1] 12\nday(date)\n#&gt; [1] 1\nweek(date)\n#&gt; [1] 48\n\nUse lubridate to handle inconsistent formats and to align data with time zones, daylight savings, etc."
+  },
+  {
+    "objectID": "slides/week-7-1.html#lubridate-timezones",
+    "href": "slides/week-7-1.html#lubridate-timezones",
+    "title": "Week 7",
+    "section": "lubridate timezones ",
+    "text": "lubridate timezones \nlubridate also provides functions for working with time zones. You can convert between time zones using with_tz() and force_tz().\n\n(date &lt;- ymd_hms(\"2024-04-08 14:30:00\", tz = \"America/New_York\"))\n#&gt; [1] \"2024-04-08 14:30:00 EDT\"\n\n# Change time zone without changing time\nforce_tz(date, \"America/Los_Angeles\")  \n#&gt; [1] \"2024-04-08 14:30:00 PDT\"\n\n# Convert to another timezone\nwith_tz(date, \"America/Los_Angeles\")  \n#&gt; [1] \"2024-04-08 11:30:00 PDT\""
+  },
+  {
+    "objectID": "slides/week-7-1.html#r-packages-for-time-series",
+    "href": "slides/week-7-1.html#r-packages-for-time-series",
+    "title": "Week 7",
+    "section": "R Packages for Time Series",
+    "text": "R Packages for Time Series\nR has several packages/systems for time series analysis, including:\n\nts: Base R time series class\nzoo: Provides a flexible class for ordered observations\nxts: Extensible time series class for irregularly spaced data\nforecast: Functions for forecasting time series data\ntsibble: Tidy time series data frames\nfeasts: Functions for time series analysis and visualization\nmodeltime: Time series modeling with tidymodels\n\n\nlibrary(tidyverse)\nlibrary(zoo)\nlibrary(tsibble)\nlibrary(feasts)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#key-concepts-in-time-series",
+    "href": "slides/week-7-1.html#key-concepts-in-time-series",
+    "title": "Week 7",
+    "section": "Key Concepts in Time Series",
+    "text": "Key Concepts in Time Series\n\n1. Trend: Long-term increase or decrease in the data\n2. Seasonality: Repeating short-term cycle (e.g., annual snowmelt)\n3. Noise: Random variation\n4. Stationarity: Statistical properties (mean, variance) don’t change over time\n5. Autocorrelation: Correlation of a time series with its own past values"
+  },
+  {
+    "objectID": "slides/week-7-1.html#introducing-the-mauna-loa-co₂-dataset",
+    "href": "slides/week-7-1.html#introducing-the-mauna-loa-co₂-dataset",
+    "title": "Week 7",
+    "section": "Introducing the Mauna Loa CO₂ Dataset",
+    "text": "Introducing the Mauna Loa CO₂ Dataset"
+  },
+  {
+    "objectID": "slides/week-7-1.html#mauna-loa-co₂-dataset",
+    "href": "slides/week-7-1.html#mauna-loa-co₂-dataset",
+    "title": "Week 7",
+    "section": "Mauna Loa CO₂ Dataset",
+    "text": "Mauna Loa CO₂ Dataset\n\nThe co2 dataset is a classic example of time series data. It contains monthly atmospheric CO₂ concentrations measured at the Mauna Loa Observatory in Hawaii.\nco2 is a built-in dataset representing monthly CO₂ concentrations from 1959 onward.\n\n\nclass(co2)\n#&gt; [1] \"ts\"\nco2\n#&gt;         Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct\n#&gt; 1959 315.42 316.31 316.50 317.56 318.13 318.00 316.39 314.65 313.68 313.18\n#&gt; 1960 316.27 316.81 317.42 318.87 319.87 319.43 318.01 315.74 314.00 313.68\n#&gt; 1961 316.73 317.54 318.38 319.31 320.42 319.61 318.42 316.63 314.83 315.16\n#&gt; 1962 317.78 318.40 319.53 320.42 320.85 320.45 319.45 317.25 316.11 315.27\n#&gt; 1963 318.58 318.92 319.70 321.22 322.08 321.31 319.58 317.61 316.05 315.83\n#&gt; 1964 319.41 320.07 320.74 321.40 322.06 321.73 320.27 318.54 316.54 316.71\n#&gt; 1965 319.27 320.28 320.73 321.97 322.00 321.71 321.05 318.71 317.66 317.14\n#&gt; 1966 320.46 321.43 322.23 323.54 323.91 323.59 322.24 320.20 318.48 317.94\n#&gt; 1967 322.17 322.34 322.88 324.25 324.83 323.93 322.38 320.76 319.10 319.24\n#&gt; 1968 322.40 322.99 323.73 324.86 325.40 325.20 323.98 321.95 320.18 320.09\n#&gt; 1969 323.83 324.26 325.47 326.50 327.21 326.54 325.72 323.50 322.22 321.62\n#&gt; 1970 324.89 325.82 326.77 327.97 327.91 327.50 326.18 324.53 322.93 322.90\n#&gt; 1971 326.01 326.51 327.01 327.62 328.76 328.40 327.20 325.27 323.20 323.40\n#&gt; 1972 326.60 327.47 327.58 329.56 329.90 328.92 327.88 326.16 324.68 325.04\n#&gt; 1973 328.37 329.40 330.14 331.33 332.31 331.90 330.70 329.15 327.35 327.02\n#&gt; 1974 329.18 330.55 331.32 332.48 332.92 332.08 331.01 329.23 327.27 327.21\n#&gt; 1975 330.23 331.25 331.87 333.14 333.80 333.43 331.73 329.90 328.40 328.17\n#&gt; 1976 331.58 332.39 333.33 334.41 334.71 334.17 332.89 330.77 329.14 328.78\n#&gt; 1977 332.75 333.24 334.53 335.90 336.57 336.10 334.76 332.59 331.42 330.98\n#&gt; 1978 334.80 335.22 336.47 337.59 337.84 337.72 336.37 334.51 332.60 332.38\n#&gt; 1979 336.05 336.59 337.79 338.71 339.30 339.12 337.56 335.92 333.75 333.70\n#&gt; 1980 337.84 338.19 339.91 340.60 341.29 341.00 339.39 337.43 335.72 335.84\n#&gt; 1981 339.06 340.30 341.21 342.33 342.74 342.08 340.32 338.26 336.52 336.68\n#&gt; 1982 340.57 341.44 342.53 343.39 343.96 343.18 341.88 339.65 337.81 337.69\n#&gt; 1983 341.20 342.35 342.93 344.77 345.58 345.14 343.81 342.21 339.69 339.82\n#&gt; 1984 343.52 344.33 345.11 346.88 347.25 346.62 345.22 343.11 340.90 341.18\n#&gt; 1985 344.79 345.82 347.25 348.17 348.74 348.07 346.38 344.51 342.92 342.62\n#&gt; 1986 346.11 346.78 347.68 349.37 350.03 349.37 347.76 345.73 344.68 343.99\n#&gt; 1987 347.84 348.29 349.23 350.80 351.66 351.07 349.33 347.92 346.27 346.18\n#&gt; 1988 350.25 351.54 352.05 353.41 354.04 353.62 352.22 350.27 348.55 348.72\n#&gt; 1989 352.60 352.92 353.53 355.26 355.52 354.97 353.75 351.52 349.64 349.83\n#&gt; 1990 353.50 354.55 355.23 356.04 357.00 356.07 354.67 352.76 350.82 351.04\n#&gt; 1991 354.59 355.63 357.03 358.48 359.22 358.12 356.06 353.92 352.05 352.11\n#&gt; 1992 355.88 356.63 357.72 359.07 359.58 359.17 356.94 354.92 352.94 353.23\n#&gt; 1993 356.63 357.10 358.32 359.41 360.23 359.55 357.53 355.48 353.67 353.95\n#&gt; 1994 358.34 358.89 359.95 361.25 361.67 360.94 359.55 357.49 355.84 356.00\n#&gt; 1995 359.98 361.03 361.66 363.48 363.82 363.30 361.94 359.50 358.11 357.80\n#&gt; 1996 362.09 363.29 364.06 364.76 365.45 365.01 363.70 361.54 359.51 359.65\n#&gt; 1997 363.23 364.06 364.61 366.40 366.84 365.68 364.52 362.57 360.24 360.83\n#&gt;         Nov    Dec\n#&gt; 1959 314.66 315.43\n#&gt; 1960 314.84 316.03\n#&gt; 1961 315.94 316.85\n#&gt; 1962 316.53 317.53\n#&gt; 1963 316.91 318.20\n#&gt; 1964 317.53 318.55\n#&gt; 1965 318.70 319.25\n#&gt; 1966 319.63 320.87\n#&gt; 1967 320.56 321.80\n#&gt; 1968 321.16 322.74\n#&gt; 1969 322.69 323.95\n#&gt; 1970 323.85 324.96\n#&gt; 1971 324.63 325.85\n#&gt; 1972 326.34 327.39\n#&gt; 1973 327.99 328.48\n#&gt; 1974 328.29 329.41\n#&gt; 1975 329.32 330.59\n#&gt; 1976 330.14 331.52\n#&gt; 1977 332.24 333.68\n#&gt; 1978 333.75 334.78\n#&gt; 1979 335.12 336.56\n#&gt; 1980 336.93 338.04\n#&gt; 1981 338.19 339.44\n#&gt; 1982 339.09 340.32\n#&gt; 1983 340.98 342.82\n#&gt; 1984 342.80 344.04\n#&gt; 1985 344.06 345.38\n#&gt; 1986 345.48 346.72\n#&gt; 1987 347.64 348.78\n#&gt; 1988 349.91 351.18\n#&gt; 1989 351.14 352.37\n#&gt; 1990 352.69 354.07\n#&gt; 1991 353.64 354.89\n#&gt; 1992 354.09 355.33\n#&gt; 1993 355.30 356.78\n#&gt; 1994 357.59 359.05\n#&gt; 1995 359.61 360.74\n#&gt; 1996 360.80 362.38\n#&gt; 1997 362.49 364.34"
+  },
+  {
+    "objectID": "slides/week-7-1.html#initial-plot",
+    "href": "slides/week-7-1.html#initial-plot",
+    "title": "Week 7",
+    "section": "Initial Plot",
+    "text": "Initial Plot\n\nThe co2 dataset is a time series object (ts) with 12 observations per year, starting from January 1959.\nThere is a default plot method for ts objects that we can take advantage of:\n\n\nplot(co2, main = \"Atmospheric CO2 at Mauna Loa\", ylab = \"ppm\")\n\n\nWe see:\n\nAn upward trend\nRegular seasonal oscillations (higher in winter, lower in summer)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#understanding-ts-objects",
+    "href": "slides/week-7-1.html#understanding-ts-objects",
+    "title": "Week 7",
+    "section": "Understanding ts Objects",
+    "text": "Understanding ts Objects\nYou can think of ts objects as numeric vectors with time attributes.\n\nts objects are used to represent time series data and are created using the ts() function.\nThey have attributes like start, end, and frequency that define the time index.\nstart and end define the time range of the data.\nfrequency defines the number of observations per unit of time (e.g., 12 for monthly data).\n\n\nclass(co2)    \n#&gt; [1] \"ts\"\nstart(co2)    \n#&gt; [1] 1959    1\nend(co2)      \n#&gt; [1] 1997   12\nfrequency(co2)\n#&gt; [1] 12"
+  },
+  {
+    "objectID": "slides/week-7-1.html#subsetting-and-plotting",
+    "href": "slides/week-7-1.html#subsetting-and-plotting",
+    "title": "Week 7",
+    "section": "Subsetting and Plotting",
+    "text": "Subsetting and Plotting\n\nLike vectors, you can subset ts objects using indexing.\nFor example, to extract the first year of data:\n\n\nco2[1:12]  # First year\n#&gt;  [1] 315.42 316.31 316.50 317.56 318.13 318.00 316.39 314.65 313.68 313.18\n#&gt; [11] 314.66 315.43\n\n\n\nOr, a specific range of years:\n\n\nwindow(co2, start = c(1990, 1), end = c(1995, 12))\n#&gt;         Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct\n#&gt; 1990 353.50 354.55 355.23 356.04 357.00 356.07 354.67 352.76 350.82 351.04\n#&gt; 1991 354.59 355.63 357.03 358.48 359.22 358.12 356.06 353.92 352.05 352.11\n#&gt; 1992 355.88 356.63 357.72 359.07 359.58 359.17 356.94 354.92 352.94 353.23\n#&gt; 1993 356.63 357.10 358.32 359.41 360.23 359.55 357.53 355.48 353.67 353.95\n#&gt; 1994 358.34 358.89 359.95 361.25 361.67 360.94 359.55 357.49 355.84 356.00\n#&gt; 1995 359.98 361.03 361.66 363.48 363.82 363.30 361.94 359.50 358.11 357.80\n#&gt;         Nov    Dec\n#&gt; 1990 352.69 354.07\n#&gt; 1991 353.64 354.89\n#&gt; 1992 354.09 355.33\n#&gt; 1993 355.30 356.78\n#&gt; 1994 357.59 359.05\n#&gt; 1995 359.61 360.74"
+  },
+  {
+    "objectID": "slides/week-7-1.html#decomposing-a-time-series",
+    "href": "slides/week-7-1.html#decomposing-a-time-series",
+    "title": "Week 7",
+    "section": "Decomposing a Time Series",
+    "text": "Decomposing a Time Series\n\nDecomposition is a technique to separate a time series into its components: trend, seasonality, and residuals.\nThis helps separate structure from noise.\nIn environmental science, this is useful for:\nRemoving seasonality to study droughts\nAnalyzing long-term trends\nUnderstanding seasonal patterns in streamflow\nIdentifying anomalies in water quality data\nDetecting changes in vegetation phenology\nMonitoring seasonal patterns in temperature\nAnalyzing seasonal patterns in water demand\n…"
+  },
+  {
+    "objectID": "slides/week-7-1.html#what-is-decomposition",
+    "href": "slides/week-7-1.html#what-is-decomposition",
+    "title": "Week 7",
+    "section": "What is Decomposition?",
+    "text": "What is Decomposition?\n\nDecomposition separates a time series into interpretable components:\n\n\nTrend: Long-term movement\nSeasonality: Regular, periodic fluctuations\nResidual/Irregular: Random noise or anomalies"
+  },
+  {
+    "objectID": "slides/week-7-1.html#additive-vs-multiplicative",
+    "href": "slides/week-7-1.html#additive-vs-multiplicative",
+    "title": "Week 7",
+    "section": "Additive vs Multiplicative",
+    "text": "Additive vs Multiplicative\n\n\nAdditive: components sum to the observed value: \\[ Y_t = T_t + S_t + R_t \\] Seasonal swings are the same size regardless of level. Example: air temperature: a 10°F summer bump is 10°F whether the baseline is 50°F or 70°F.\nMultiplicative: components scale with the level: \\[ Y_t = T_t \\times S_t \\times R_t \\] Seasonal swings grow with the trend. Example: streamflow: a snowmelt pulse that doubles flow is much larger at 500 cfs than at 50 cfs.\n\n\n\n\n\n\nTip\n\n\nThe log trick: \\(\\log(T \\times S \\times R) = \\log T + \\log S + \\log R\\) Taking log1p() converts a multiplicative process into an additive one: which is why we log-transform flow before fitting models and decomposing."
+  },
+  {
+    "objectID": "slides/week-7-1.html#example",
+    "href": "slides/week-7-1.html#example",
+    "title": "Week 7",
+    "section": "Example",
+    "text": "Example"
+  },
+  {
+    "objectID": "slides/week-7-1.html#why-decompose",
+    "href": "slides/week-7-1.html#why-decompose",
+    "title": "Week 7",
+    "section": "Why Decompose?",
+    "text": "Why Decompose?\n\nTrend: Are CO₂ levels increasing?\nSeasonality: Are there predictable cycles each year?\nRemainder: What’s left after we remove trend and season? (what is the randomness?)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#decomposition-in-r",
+    "href": "slides/week-7-1.html#decomposition-in-r",
+    "title": "Week 7",
+    "section": "Decomposition in R",
+    "text": "Decomposition in R\n\nThe decompose() function in R can be used to perform this operation.\nThe decompose() function by default assumes that the time series is additive\n\n\ndecomp = decompose(co2, type = \"additive\")\nplot(decomp)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#deep-dive-trend-component",
+    "href": "slides/week-7-1.html#deep-dive-trend-component",
+    "title": "Week 7",
+    "section": "Deep Dive: Trend Component",
+    "text": "Deep Dive: Trend Component\n\n\n\nplot(decomp$trend, main = \"Trend Component of CO₂\", ylab = \"ppm\", col = \"darkred\", lwd = 2)\n\n\n\n\n\n\n\n\n\n\nSteady upward slope from ~316 ppm in 1959 to ~365 ppm in the late 1990s\nCaptures the long-term forcing from human activity:\n\nFossil fuel combustion\nDeforestation\n\nThis trend underpins climate change science: known as the Keeling Curve\nNotice how the trend smooths short-term fluctuations"
+  },
+  {
+    "objectID": "slides/week-7-1.html#interpreting-the-trend",
+    "href": "slides/week-7-1.html#interpreting-the-trend",
+    "title": "Week 7",
+    "section": "Interpreting the Trend",
+    "text": "Interpreting the Trend\n\nA linear model or loess smoother can also help quantify the trend:\n\n\n\n\nco2_df &lt;- data.frame(time = time(co2), co2 = as.numeric(co2))\n\nlm(as.numeric(co2) ~ time(co2)) |&gt; \n  summary()\n#&gt; \n#&gt; Call:\n#&gt; lm(formula = as.numeric(co2) ~ time(co2))\n#&gt; \n#&gt; Residuals:\n#&gt;     Min      1Q  Median      3Q     Max \n#&gt; -6.0399 -1.9476 -0.0017  1.9113  6.5149 \n#&gt; \n#&gt; Coefficients:\n#&gt;               Estimate Std. Error t value Pr(&gt;|t|)    \n#&gt; (Intercept) -2.250e+03  2.127e+01  -105.8   &lt;2e-16 ***\n#&gt; time(co2)    1.308e+00  1.075e-02   121.6   &lt;2e-16 ***\n#&gt; ---\n#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n#&gt; \n#&gt; Residual standard error: 2.618 on 466 degrees of freedom\n#&gt; Multiple R-squared:  0.9695, Adjusted R-squared:  0.9694 \n#&gt; F-statistic: 1.479e+04 on 1 and 466 DF,  p-value: &lt; 2.2e-16\n\n\n\nco2_df |&gt;\n  ggplot(aes(x = time, y = co2)) +\n  geom_line(alpha = 0.5) +\n  geom_smooth(method = \"loess\", span = 0.2, color = \"red\", se = FALSE) +\n  labs(title = \"CO₂ Trend with Loess Smoothing\", y = \"ppm\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\nReading the outputs:\n\nLinear model: slope = +1.31 ppm/year (p &lt; 2e-16), R² = 0.97: CO₂ rises ~1.3 ppm every year on average and a straight line explains 97% of the variance.\nLoess curve: at span = 0.2 the smoother tracks the data closely and appears nearly linear here: confirming the linear model is a good fit for this 30-year window. The loess adds value by revealing that no strong curvature exists in this range.\nAcceleration caveat: the Mauna Loa record now extends to 2024 (~425 ppm). On that longer record the loess does curve upward: the rate has increased from ~1 ppm/yr in the 1960s to ~2.5 ppm/yr today. This dataset ends in 1997 and is too short to show it clearly.\nTakeaway: a high R² linear fit is not evidence of no acceleration: always ask whether the time window is long enough to detect the pattern you’re looking for."
+  },
+  {
+    "objectID": "slides/week-7-1.html#de-trending",
+    "href": "slides/week-7-1.html#de-trending",
+    "title": "Week 7",
+    "section": "De-Trending",
+    "text": "De-Trending\n\nDetrending is the process of removing the trend component from a time series.\nThis isolates the seasonal + residual components:\n\n\ndetrended &lt;- co2 - decomp$trend\nplot(detrended, main = \"De-trended Series (seasonal + residual)\")"
+  },
+  {
+    "objectID": "slides/week-7-1.html#deep-dive-seasonal-component",
+    "href": "slides/week-7-1.html#deep-dive-seasonal-component",
+    "title": "Week 7",
+    "section": "Deep Dive: Seasonal Component",
+    "text": "Deep Dive: Seasonal Component\n\n\n\nplot(decomp$seasonal, main = \"Seasonal Component of CO₂\", \n     ylab = \"ppm\", col = \"darkgreen\", lwd = 2)\n\n\n\n\n\n\n\n\n\n\nRepeats every 12 months\nPeaks around May, drops in September–October\nDriven by biospheric fluxes:\n\nPhotosynthesis during spring/summer → CO₂ drawdown\nDecomposition and respiration in winter → CO₂ release\n\nSeasonal Cycle is Northern Hemisphere-Dominated (Mauna Loa is in the Northern Hemisphere)\nNorthern Hemisphere contains more landmass and vegetation\nSo its biosphere exerts a stronger influence on global CO₂ than the Southern Hemisphere\nThis explains the pronounced seasonal cycle in the signal"
+  },
+  {
+    "objectID": "slides/week-7-1.html#de-seasonalizing",
+    "href": "slides/week-7-1.html#de-seasonalizing",
+    "title": "Week 7",
+    "section": "De-seasonalizing",
+    "text": "De-seasonalizing\nThis can help for modeling the seasonal + residual only:\n\ndeseasonalized &lt;- co2 - decomp$seasonal\nplot(deseasonalized, main = \"De-seasonalized Series\")"
+  },
+  {
+    "objectID": "slides/week-7-1.html#deep-dive-remainder-component",
+    "href": "slides/week-7-1.html#deep-dive-remainder-component",
+    "title": "Week 7",
+    "section": "Deep Dive: Remainder Component",
+    "text": "Deep Dive: Remainder Component\n\n\n\nplot(decomp$random, main = \"Remainder Component (Residuals)\", \n     ylab = \"ppm\", col = \"gray40\", lwd = 1)\n\n\n\n\n\n\n\n\n\n\nResiduals are the “leftover” part of the time series after removing trend and seasonality\nContains irregular, short-term fluctuations\nCan be used to identify anomalies or outliers\nImportant for understanding noise in the data\nPossible sources:\n\nVolcanic activity (e.g. El Chichón, Mt. Pinatubo)\nMeasurement error\nEl Niño/La Niña events (which affect carbon flux)\n\nTypically small amplitude: ±0.2 ppm"
+  },
+  {
+    "objectID": "slides/week-7-1.html#assessing-patterns-in-error",
+    "href": "slides/week-7-1.html#assessing-patterns-in-error",
+    "title": "Week 7",
+    "section": "Assessing Patterns in Error?",
+    "text": "Assessing Patterns in Error?\nYou might compute the standard deviation of the residuals to assess noise:\n\nsd(na.omit(decomp$random))\n#&gt; [1] 0.2651064\n\n\nOr evaluate the residuals like we did for Linear Modeling!\n\nggpubr::ggdensity(decomp$random, main = \"Residuals Histogram\", xlab = \"Residuals\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\nSo what? SD ≈ 0.27 ppm: small relative to the ~60 ppm trend, so the decomposition captured most of the signal. The density is roughly bell-shaped and centered near zero, which is what we want: no systematic bias. The left skew (longer left tail) suggests occasional sharp drops in CO₂: likely real events (e.g., El Niño years when terrestrial uptake spikes) rather than model failure. If residuals were right-skewed, flat, or multi-modal, that would signal missing structure (another seasonal cycle, a regime shift, or a trend the model didn’t account for)."
+  },
+  {
+    "objectID": "slides/week-7-1.html#smoothing-to-remove-noise",
+    "href": "slides/week-7-1.html#smoothing-to-remove-noise",
+    "title": "Week 7",
+    "section": "Smoothing to Remove Noise",
+    "text": "Smoothing to Remove Noise\nIf your data is noisy - and without useful pattern - you can use a moving average to smooth it out.\n\n\n\n\nThe zoo package provides a convenient function for this that we have already seen in Lab 1.\nThe rollmean() function from the zoo package is useful for this.\nThe k parameter specifies the window size for the moving average.\nThe align parameter specifies how to align the moving average with the original data (e.g., “center”, “left”, “right”).\nThe na.pad parameter specifies whether to pad the result with NA values.\n\n\n\nco2_smooth &lt;- zoo::rollmean(co2, k = 12, align = \"center\", na.pad = TRUE)\n\nplot(co2, col = \"grey\", main = \"12-Month Moving Average\")\nlines(co2_smooth, col = \"blue\", lwd = 2)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#stl-decomposition-loess-based",
+    "href": "slides/week-7-1.html#stl-decomposition-loess-based",
+    "title": "Week 7",
+    "section": "STL Decomposition (Loess-based)",
+    "text": "STL Decomposition (Loess-based)\n\nSTL (Seasonal-Trend decomposition using Loess) adapts to changing trend or seasonality over time\nDoesn’t assume constant seasonal effect like decompose() does\nParticularly valuable when working with:\n\nLong datasets\nEnvironmental time series affected by nonlinear changes"
+  },
+  {
+    "objectID": "slides/week-7-1.html#stl-decomposition-loess-based-1",
+    "href": "slides/week-7-1.html#stl-decomposition-loess-based-1",
+    "title": "Week 7",
+    "section": "STL Decomposition (Loess-based)",
+    "text": "STL Decomposition (Loess-based)\n\nstl() uses local regression (loess) to estimate the trend and seasonal components.\ns.window = \"periodic\" specifies that the seasonal component is periodic.\nOther options include\n\n“none” (no seasonal component)\nor a numeric value for the seasonal window size.\n\n\n\n\n\nplot(decomp)\n\n\n\n\n\n\n\n\n\n\nstl(co2, s.window = \"periodic\") |&gt;\n  plot()"
+  },
+  {
+    "objectID": "slides/week-7-1.html#comparing-classical-vs-stl",
+    "href": "slides/week-7-1.html#comparing-classical-vs-stl",
+    "title": "Week 7",
+    "section": "Comparing Classical vs STL",
+    "text": "Comparing Classical vs STL\n\n\n\n\n\n\n\n\n\nMethod\nAssumes Constant Season?\nRobust to Outliers?\nAdaptive Smoothing?\n\n\n\n\ndecompose\n✅ Yes\n❌ No\n❌ No\n\n\nstl\n🔄 Adaptive\n✅ Yes\n✅ Yes\n\n\n\nWhat these columns mean in practice:\n\nAssumes constant season? decompose fits one fixed seasonal pattern for the entire record. If snowmelt peaks have shifted earlier over 30 years (they have: USGS data shows ~2 weeks earlier in the West), the model treats that as noise rather than a real signal. stl lets the seasonal shape evolve.\nRobust to outliers? A single wildfire year with anomalous summer flows can distort decompose’s seasonal estimate for all years. stl uses iterative reweighting to down-weight outlying observations: the Cameron Peak Fire year gets less influence.\nAdaptive smoothing? stl exposes s.window and t.window parameters so you can control how quickly trend and season are allowed to change. decompose has no such knobs.\n\n\n\n\n\n\n\nTip\n\n\nRule of thumb: use decompose for quick exploratory looks at short, well-behaved series. Switch to stl the moment your data spans more than a decade, contains outliers, or you suspect the seasonal pattern has shifted."
+  },
+  {
+    "objectID": "slides/week-7-1.html#bringing-it-all-together",
+    "href": "slides/week-7-1.html#bringing-it-all-together",
+    "title": "Week 7",
+    "section": "Bringing It All Together",
+    "text": "Bringing It All Together\nFor the CO₂ dataset, decomposition reveals three interpretable layers:\n\nTrend: A relentless human fingerprint: the Keeling Curve shows atmospheric CO₂ rising ~1.5 ppm/year, driven by fossil fuels and deforestation\nSeasonality: A stable biospheric rhythm: photosynthesis draws CO₂ down each summer; respiration releases it each winter; Northern Hemisphere vegetation dominates\nRemainder: Small (±0.2 ppm) but informative: anomalies here may fingerprint volcanic eruptions or El Niño-driven carbon flux shifts\n\nUnderstanding these components lets us:\n✅ Track long-term progress against climate targets\n✅ Forecast future CO₂ concentrations with ARIMA or Prophet\n✅ Communicate patterns clearly to policymakers"
+  },
+  {
+    "objectID": "slides/week-7-1.html#when-to-use-which-time-series-format",
+    "href": "slides/week-7-1.html#when-to-use-which-time-series-format",
+    "title": "Week 7",
+    "section": "When to Use Which Time Series Format?",
+    "text": "When to Use Which Time Series Format?\n\n\n\n\n\n\n\n\n\nFormat\nBest For\nAdvantages\nLimitations\n\n\n\n\nts\nRegular, simple time series\nBuilt into base R, supported by forecast\nRigid time format, inflexible for joins\n\n\nzoo\nIrregular time steps\nArbitrary index, supports irregular data\nMore complex syntax\n\n\nxts\nFinancial-style or irregular data\nGood for date-time indexing and joins\nMore complex to visualize\n\n\ntsibble\nTidyverse workflows\nPipes with dplyr, ggplot2, forecasting with fable\nRequires tsibble structure\n\n\ntibble + Date\nGeneral purpose\nFlexible, tidy\nNeeds conversion for time series modeling"
+  },
+  {
+    "objectID": "slides/week-7-1.html#why-zoo-handling-irregular-gappy-data",
+    "href": "slides/week-7-1.html#why-zoo-handling-irregular-gappy-data",
+    "title": "Week 7",
+    "section": "Why zoo? Handling Irregular & Gappy Data",
+    "text": "Why zoo? Handling Irregular & Gappy Data\nEnvironmental sensor data frequently has gaps: instruments fail, sites flood, loggers reset. zoo handles irregular time indexes and provides simple gap-filling tools:\n\nlibrary(zoo)\n\n# Simulate sensor data with a gap (missing Jan 2 reading)\ndates &lt;- as.Date(c(\"2024-01-01\", \"2024-01-03\", \"2024-01-07\"))\nvals  &lt;- zoo(c(10, NA, 14), order.by = dates)\n\nvals\n#&gt; 2024-01-01 2024-01-03 2024-01-07 \n#&gt;         10         NA         14\n\n# Last observation carried forward (LOCF)\nna.locf(vals)\n#&gt; 2024-01-01 2024-01-03 2024-01-07 \n#&gt;         10         10         14\n\n# Linear interpolation between known values\nna.approx(vals)\n#&gt; 2024-01-01 2024-01-03 2024-01-07 \n#&gt;   10.00000   11.33333   14.00000\n\nUse zoo any time your time index is irregular or your data has missing observations that need filling before modeling."
+  },
+  {
+    "objectID": "slides/week-7-1.html#time-series-in-the-tidyverse-tsibble-feasts",
+    "href": "slides/week-7-1.html#time-series-in-the-tidyverse-tsibble-feasts",
+    "title": "Week 7",
+    "section": "Time Series in the Tidyverse: tsibble / feasts",
+    "text": "Time Series in the Tidyverse: tsibble / feasts\n\ntsibble is a tidy data frame for time series data. It extends the tibble class to include time series attributes.\nCompatible with dplyr, ggplot2\nfeasts provides functions for time series analysis and visualization.\n\n\nco2_tbl &lt;- as_tsibble(co2)\nhead(co2_tbl)\n#&gt; # A tsibble: 6 x 2 [1M]\n#&gt;      index value\n#&gt;      &lt;mth&gt; &lt;dbl&gt;\n#&gt; 1 1959 Jan  315.\n#&gt; 2 1959 Feb  316.\n#&gt; 3 1959 Mar  316.\n#&gt; 4 1959 Apr  318.\n#&gt; 5 1959 May  318.\n#&gt; 6 1959 Jun  318"
+  },
+  {
+    "objectID": "slides/week-7-1.html#decomposing-with-feasts",
+    "href": "slides/week-7-1.html#decomposing-with-feasts",
+    "title": "Week 7",
+    "section": "Decomposing with feasts",
+    "text": "Decomposing with feasts\nfeasts provides:\n\na STL() function for seasonal decomposition.\ncomponents() extracts the components of the decomposition.\ngg_season() and gg_subseries() visualize seasonal patterns.\ngg_lag() visualizes autocorrelation and lagged relationships.\n\n\nco2_decomp &lt;- co2_tbl |&gt;\n  model(STL(value ~ season(window = \"periodic\"))) |&gt;\n  components()\n\nglimpse(co2_decomp)\n#&gt; Rows: 468\n#&gt; Columns: 7\n#&gt; Key: .model [1]\n#&gt; : value = trend + season_year + remainder\n#&gt; $ .model        &lt;chr&gt; \"STL(value ~ season(window = \\\"periodic\\\"))\", \"STL(value…\n#&gt; $ index         &lt;mth&gt; 1959 Jan, 1959 Feb, 1959 Mar, 1959 Apr, 1959 May, 1959 J…\n#&gt; $ value         &lt;dbl&gt; 315.42, 316.31, 316.50, 317.56, 318.13, 318.00, 316.39, …\n#&gt; $ trend         &lt;dbl&gt; 315.1954, 315.3023, 315.4093, 315.5147, 315.6201, 315.71…\n#&gt; $ season_year   &lt;dbl&gt; -0.06100103, 0.59463870, 1.32899651, 2.46904706, 2.95704…\n#&gt; $ remainder     &lt;dbl&gt; 0.28564410, 0.41305456, -0.23825306, -0.42371128, -0.447…\n#&gt; $ season_adjust &lt;dbl&gt; 315.4810, 315.7154, 315.1710, 315.0910, 315.1730, 315.68…"
+  },
+  {
+    "objectID": "slides/week-7-1.html#component-access",
+    "href": "slides/week-7-1.html#component-access",
+    "title": "Week 7",
+    "section": "Component Access",
+    "text": "Component Access\n\n\nAutoplot\n\nautoplot(co2_decomp) +\n  labs(title = \"STL Decomposition of CO₂\", y = \"ppm\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\nComponent Access\n\nggpubr::ggdensity(co2_decomp$remainder, main = \"Residual Component\")\n\n\n\n\n\n\n\nshapiro.test(co2_decomp$remainder)\n#&gt; \n#&gt;  Shapiro-Wilk normality test\n#&gt; \n#&gt; data:  co2_decomp$remainder\n#&gt; W = 0.99485, p-value = 0.1202"
+  },
+  {
+    "objectID": "slides/week-7-1.html#advanced-visualization-with-feasts",
+    "href": "slides/week-7-1.html#advanced-visualization-with-feasts",
+    "title": "Week 7",
+    "section": "Advanced Visualization with feasts",
+    "text": "Advanced Visualization with feasts\nfeasts provides three complementary diagnostic plots for exploring seasonal structure:\n\n\n\n\n\n\n\nFunction\nQuestion it answers\n\n\n\n\ngg_lag()\nIs the series autocorrelated? Do past values predict the present?\n\n\ngg_subseries()\nHow does each season behave across years? Is the seasonal mean stable?\n\n\ngg_season()\nIs the seasonal shape consistent from year to year?\n\n\n\nTogether, these plots reveal whether your series has exploitable structure worth modeling."
+  },
+  {
+    "objectID": "slides/week-7-1.html#gg_lag",
+    "href": "slides/week-7-1.html#gg_lag",
+    "title": "Week 7",
+    "section": "gg_lag()",
+    "text": "gg_lag()\n\n\n\nco2_tbl |&gt;\n  gg_lag() +\n  labs(title = \"Lag Plot of CO₂\", x = \"Lagged CO₂\", y = \"Current CO₂\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\nA lag plot scatters \\(Y_t\\) against \\(Y_{t-k}\\) for each lag \\(k\\). Points close to the diagonal mean past values predict current values well.\nWhat you’re seeing:\n\nTight diagonal lines at every lag: CO₂ has very strong autocorrelation — knowing last month’s value tells you almost exactly what this month’s value will be\nLines fan slightly wider at lag 6: the 6-month lag straddles opposite seasons (summer vs. winter), so the seasonal cycle introduces a small offset\nColor banding by month: each month traces its own trajectory — purple (Jan/Feb, low) through yellow (Nov/Dec, high) — revealing the seasonal sawtooth embedded within the trend\nNo diffuse scatter: there is no lag at which CO₂ “forgets” its past; this series has extremely long memory\n\n\n\n\n\n\n\nTip\n\n\nStrong diagonal structure at all lags is the visual signature that ARIMA and Prophet will have predictive power here."
+  },
+  {
+    "objectID": "slides/week-7-1.html#gg_lag-1",
+    "href": "slides/week-7-1.html#gg_lag-1",
+    "title": "Week 7",
+    "section": "gg_lag()",
+    "text": "gg_lag()\n\nco2_tbl |&gt;\n  gg_lag() +\n  labs(title = \"Lag Plot of CO₂\", x = \"Lagged CO₂\", y = \"Current CO₂\") +\n  theme_minimal()"
+  },
+  {
+    "objectID": "slides/week-7-1.html#autocorrelation-acf-pacf",
+    "href": "slides/week-7-1.html#autocorrelation-acf-pacf",
+    "title": "Week 7",
+    "section": "Autocorrelation: ACF & PACF",
+    "text": "Autocorrelation: ACF & PACF\nThe ACF (Autocorrelation Function) and PACF (Partial Autocorrelation Function) are the standard diagnostics for choosing ARIMA orders.\n\nACF(k): correlation between \\(y_t\\) and \\(y_{t-k}\\) (includes indirect effects through intermediate lags)\nPACF(k): the direct effect of \\(y_{t-k}\\) on \\(y_t\\) after removing the influence of lags 1 through \\(k-1\\)\n\nWhat they tell you about ARIMA(p, d, q):\n\n\n\nPlot\nPattern\nSuggests\n\n\n\n\nACF\nCuts off after lag q\nMA(q) term\n\n\nPACF\nCuts off after lag p\nAR(p) term\n\n\nBoth\nTail off gradually\nARMA(p,q)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#acf-pacf-in-r",
+    "href": "slides/week-7-1.html#acf-pacf-in-r",
+    "title": "Week 7",
+    "section": "ACF & PACF in R",
+    "text": "ACF & PACF in R\n\n\n\n# feasts / tsibble approach\nco2_tbl |&gt; ACF(value) |&gt; autoplot() +\n  labs(title = \"ACF of CO₂\")\n\n\n\n\n\n\n\n\nco2_tbl |&gt; PACF(value) |&gt; autoplot() +\n  labs(title = \"PACF of CO₂\")\n\n\n\n\n\n\n\n\n\n\n# base forecast approach\nforecast::Acf(co2,  main = \"ACF of CO₂\")\n\n\n\n\n\n\n\nforecast::Pacf(co2, main = \"PACF of CO₂\")\n\n\n\n\n\n\n\n\n\nThe slow decay in the ACF and a sharp cutoff in the PACF at lag 1 are classic signatures of an AR process: consistent with the ARIMA(1,…) selected by auto.arima()."
+  },
+  {
+    "objectID": "slides/week-7-1.html#gg_subseries",
+    "href": "slides/week-7-1.html#gg_subseries",
+    "title": "Week 7",
+    "section": "gg_subseries",
+    "text": "gg_subseries\ngg_subseries() creates one mini-panel per season (e.g., one per month) and plots each season’s values across all years, with a horizontal mean line.\n\nEach panel = one seasonal period (Jan, Feb, …, Dec)\nEach line within a panel = the value for that month in a given year\nThe mean line = average level for that month across all years\nRising panels indicate a long-term trend within that season\nDifferences in mean line height across panels reveal the seasonal pattern"
+  },
+  {
+    "objectID": "slides/week-7-1.html#gg_subseries-1",
+    "href": "slides/week-7-1.html#gg_subseries-1",
+    "title": "Week 7",
+    "section": "gg_subseries()",
+    "text": "gg_subseries()\n\ngg_subseries(co2_tbl) +\n  labs(title = \"Monthly CO₂ Patterns\", y = \"CO₂ (ppm)\", x = \"Year\") + \n  theme_minimal()"
+  },
+  {
+    "objectID": "slides/week-7-1.html#gg_season",
+    "href": "slides/week-7-1.html#gg_season",
+    "title": "Week 7",
+    "section": "gg_season",
+    "text": "gg_season\ngg_season() overlays all years on a single plot, with the x-axis running from the start to the end of one seasonal period (e.g., January to December).\n\nEach line = one year of data\nParallel lines = consistent seasonal shape across years (stable seasonality)\nDiverging lines = the seasonal pattern is changing over time\nVertical spread = the overall level shifting year-to-year (the trend)\n\nFor CO₂, the lines run nearly parallel: confirming that seasonality is stable: but shift upward each year, tracing the Keeling Curve."
+  },
+  {
+    "objectID": "slides/week-7-1.html#gg_season-1",
+    "href": "slides/week-7-1.html#gg_season-1",
+    "title": "Week 7",
+    "section": "gg_season",
+    "text": "gg_season\n\ngg_season(co2_tbl) +\n  labs(title = \"Seasonal Patterns of CO₂\", y = \"CO₂ (ppm)\", x = \"Month\") +\n  theme_minimal()"
+  },
+  {
+    "objectID": "slides/week-7-1.html#bonus-interactive-plotting",
+    "href": "slides/week-7-1.html#bonus-interactive-plotting",
+    "title": "Week 7",
+    "section": "Bonus: Interactive Plotting",
+    "text": "Bonus: Interactive Plotting\n\nIn last weeks demo, we used plotly to generate an interactive plot of the hyperparameter tuning process.\nYou can use the plotly package to add interactivity to your ggplots directly with ggplotly()!\n\n\nlibrary(plotly)\n\nco2_df &lt;- as_tibble(co2_tbl) |&gt;\n  mutate(date = as.Date(index))"
+  },
+  {
+    "objectID": "slides/week-7-1.html#bonus-interactive-plotting-1",
+    "href": "slides/week-7-1.html#bonus-interactive-plotting-1",
+    "title": "Week 7",
+    "section": "Bonus: Interactive Plotting",
+    "text": "Bonus: Interactive Plotting\n\nplot_ly(co2_df, x = ~date, y = ~value, type = \"scatter\", mode = \"lines\",\n        line = list(color = \"steelblue\")) |&gt;\n  layout(title = \"Interactive CO₂ Time Series\",\n         xaxis = list(title = \"Date\"),\n         yaxis = list(title = \"ppm\"))"
+  },
+  {
+    "objectID": "slides/week-7-1.html#forecasting",
+    "href": "slides/week-7-1.html#forecasting",
+    "title": "Week 7",
+    "section": "Forecasting",
+    "text": "Forecasting\nNow that we understand time series components, we can use them to predict future values.\n\nWe’ll build from classical to modern:\n\n\n\n\n\n\n\n\n\nModel\nStrength\n\n\n\n\nClassical\nARIMA\nAutocorrelation structure, stationarity-based\n\n\nModern\nProphet\nTrend changepoints, holidays, missing data\n\n\nUnified\nmodeltime + tidymodels\nCompare, calibrate, and forecast all models in one pipeline\n\n\n\n\nBoth approaches need the same foundation: a stationary, well-understood series — which is exactly what decomposition gave us."
+  },
+  {
+    "objectID": "slides/week-7-1.html#toy-example-river-time-series-arima",
+    "href": "slides/week-7-1.html#toy-example-river-time-series-arima",
+    "title": "Week 7",
+    "section": "Toy Example: River Time Series & ARIMA",
+    "text": "Toy Example: River Time Series & ARIMA\nLet’s say we’re watching how much water flows in a river every day:\n\nMonday: 50 cfs\n\nTuesday: 60 cfs\n\nWednesday: 70 cfs\n\nWe want to guess tomorrow’s flow."
+  },
+  {
+    "objectID": "slides/week-7-1.html#autoregressive-ar",
+    "href": "slides/week-7-1.html#autoregressive-ar",
+    "title": "Week 7",
+    "section": "1. AutoRegressive (AR)",
+    "text": "1. AutoRegressive (AR)\n\nThis means: “Look at yesterday and the day before!”\nIf flow has been going up each day, AR says: ** “Tomorrow might go up again …” **\nIt’s like the river has a pattern."
+  },
+  {
+    "objectID": "slides/week-7-1.html#integrated-i",
+    "href": "slides/week-7-1.html#integrated-i",
+    "title": "Week 7",
+    "section": "2. Integrated (I)",
+    "text": "2. Integrated (I)\n\nSometimes the flow just keeps climbing: like during a spring snowmelt!\nTo help ARIMA think better, we subtract yesterday’s number from today’s.\nThis makes the numbers more steady so ARIMA can do its magic."
+  },
+  {
+    "objectID": "slides/week-7-1.html#moving-average-ma",
+    "href": "slides/week-7-1.html#moving-average-ma",
+    "title": "Week 7",
+    "section": "3. Moving Average (MA)",
+    "text": "3. Moving Average (MA)\n\nThe river sometimes gets a surprise flux (like a big rainstorm 🌧️).\nMA looks at those surprises and helps smooth them out.\nSo if it rained two days ago, MA might say: “Don’t expect another surprise tomorrow.”"
+  },
+  {
+    "objectID": "slides/week-7-1.html#put-it-all-together-ar-i-ma-arima",
+    "href": "slides/week-7-1.html#put-it-all-together-ar-i-ma-arima",
+    "title": "Week 7",
+    "section": "Put It All Together: AR + I + MA = ARIMA",
+    "text": "Put It All Together: AR + I + MA = ARIMA\n\nAR: Uses the river’s memory (trend)\nI: Calms the structural components (season)\nMA: Handles noisy surprises (noise)\n\nNow we can forecast tomorrow’s flow!\nThose three ideas map directly to the p, d, q parameters in ARIMA(p, d, q)."
+  },
+  {
+    "objectID": "slides/week-7-1.html#arima",
+    "href": "slides/week-7-1.html#arima",
+    "title": "Week 7",
+    "section": "ARIMA",
+    "text": "ARIMA\nThe basics of a ARIMA (AutoRegressive Integrated Moving Average) Model include:\n\n\nAR: AutoRegressive part (past values):\n\n\nAR(1) = current value depends on the previous value\n\nAR(2) = current value depends on the previous two values\n\n\nI: Integrated part (differencing to make data stationary)\n\n\nDifferencing removes trends and seasonality\n\ne.g., diff(co2, lag = 12) removes annual seasonality\n\n\nMA: Moving Average part (past errors)\n\n\nMA(1) = current value depends on the previous error\n\nMA(2) = current value depends on the previous two errors\n\n\np, d, q: Parameters for AR, I, and MA\n\n\np = number of lagged values (AR)\n\nd = number of differences (I)\n\nq = number of lagged errors (MA)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#stationarity-a-prerequisite-for-arima",
+    "href": "slides/week-7-1.html#stationarity-a-prerequisite-for-arima",
+    "title": "Week 7",
+    "section": "Stationarity: A Prerequisite for ARIMA",
+    "text": "Stationarity: A Prerequisite for ARIMA\nARIMA modeling works well when data is stationary: meaning the statistical properties (mean, variance) do not change over time.\n\nNon-stationary data leads to unreliable forecasts and misleading results\nThe I (Integrated) component of ARIMA handles this via differencing"
+  },
+  {
+    "objectID": "slides/week-7-1.html#testing-for-stationarity",
+    "href": "slides/week-7-1.html#testing-for-stationarity",
+    "title": "Week 7",
+    "section": "Testing for Stationarity",
+    "text": "Testing for Stationarity\nDon’t just look: test. Two complementary formal tests:\n\nlibrary(tseries)\n\n# Augmented Dickey-Fuller: H0 = non-stationary\n# p &lt; 0.05 → reject non-stationarity (series IS stationary)\nadf.test(co2)\n#&gt; \n#&gt;  Augmented Dickey-Fuller Test\n#&gt; \n#&gt; data:  co2\n#&gt; Dickey-Fuller = -2.8299, Lag order = 7, p-value = 0.2269\n#&gt; alternative hypothesis: stationary\n\n# KPSS: H0 = stationary\n# p &lt; 0.05 → reject stationarity (series is NOT stationary)\nkpss.test(co2)\n#&gt; \n#&gt;  KPSS Test for Level Stationarity\n#&gt; \n#&gt; data:  co2\n#&gt; KPSS Level = 7.8173, Truncation lag parameter = 5, p-value = 0.01\n\n\n\n\n\n\n\n\nNote\n\n\nReading these results together:\n\nADF: p = 0.23 → fail to reject H₀ → cannot confirm stationarity. The series looks non-stationary.\nKPSS: p = 0.01 → reject H₀ → confirmed non-stationary.\n\nBoth tests agree: CO₂ has a strong upward trend that violates stationarity. Set d = 1 (first-difference) in ARIMA to remove it.\nWhy run both? The tests have opposite null hypotheses, so agreement is reassuring. When they disagree — ADF says stationary, KPSS says not — the series is likely trend-stationary (a deterministic trend, not a random walk), which calls for detrending rather than differencing."
+  },
+  {
+    "objectID": "slides/week-7-1.html#aic",
+    "href": "slides/week-7-1.html#aic",
+    "title": "Week 7",
+    "section": "AIC",
+    "text": "AIC\nThe AIC metric helps choose between models/parameters:\n\\[\\text{AIC} = -2 \\cdot \\log(\\text{likelihood}) + 2k\\]\nwhere \\(k\\) is the number of parameters: it rewards fit and penalizes complexity.\n\nIt rewards:\n\nGood predictions\nSimplicity\n\nIt punishes:\n\nComplexity (too many parameters)\nOverfitting (fitting noise instead of the trend)\n\nLower AIC = better model"
+  },
+  {
+    "objectID": "slides/week-7-1.html#a-simple-forecasting-example",
+    "href": "slides/week-7-1.html#a-simple-forecasting-example",
+    "title": "Week 7",
+    "section": "A Simple Forecasting Example",
+    "text": "A Simple Forecasting Example\n\nauto.arima() is a function from the forecast package that automatically selects the best ARIMA model for your data according to the AICc criterion.\nThe AICc (Akaike Information Criterion corrected) is a measure of the relative quality of statistical models for a given dataset.\nIt is used to compare different models and select the one that best fits the data while penalizing for complexity.\nThe auto.arima() function will automatically select the best parameters (p,d,q) based on the AICc criterion."
+  },
+  {
+    "objectID": "slides/week-7-1.html#section-1",
+    "href": "slides/week-7-1.html#section-1",
+    "title": "Week 7",
+    "section": "",
+    "text": "It’s been a long 7 weeks — I hope you were able to take something away from it.\nCongrats on making it through.\nGood luck with whatever career path you pursue, and always feel free to reach out."
+  },
+  {
+    "objectID": "slides/week-7-1.html#forecasting-with-arima",
+    "href": "slides/week-7-1.html#forecasting-with-arima",
+    "title": "Week 7",
+    "section": "Forecasting with ARIMA",
+    "text": "Forecasting with ARIMA\n\nThe forecast() function is used to generate forecasts from the fitted ARIMA model.\nThe h argument specifies the number of periods to forecast into the future.\n\n\nco2_forecast &lt;- forecast(co2_arima, h = 60)\n\nplot(co2_forecast)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#arima11111212",
+    "href": "slides/week-7-1.html#arima11111212",
+    "title": "Week 7",
+    "section": "🔢 ARIMA(1,1,1)(1,1,2)[12]",
+    "text": "🔢 ARIMA(1,1,1)(1,1,2)[12]\nARIMA Notation can be broken into two parts:\n1. Non-seasonal part: ARIMA(1, 1, 1)\nThis is the “regular” ARIMA: - AR(1): One autoregressive term: the model looks at one lag of the time series.\n\nI(1): One differencing: the model uses the change in values instead of raw values to make the series more stationary.\nMA(1): One moving average term: the model corrects using one lag of the error term.\n\n2. Seasonal part: (1, 1, 2)[12]\nThis is the seasonal pattern: repeated every 12 time units (like months in a year):\n\nSAR(1): One seasonal autoregressive term: it uses the value from 12 time steps ago.\nSI(1): One seasonal difference: subtracts the value from 12 steps ago to remove seasonal patterns.\nSMA(2): Two seasonal moving average terms: uses errors from 12 and 24 time steps ago.\n[12]: This is the seasonal period, i.e., it’s a yearly pattern with monthly data."
+  },
+  {
+    "objectID": "slides/week-7-1.html#arima11111212-1",
+    "href": "slides/week-7-1.html#arima11111212-1",
+    "title": "Week 7",
+    "section": "🔢 ARIMA(1,1,1)(1,1,2)[12]",
+    "text": "🔢 ARIMA(1,1,1)(1,1,2)[12]\nHey, ARIMA please…\n\n“Model the data using a mix of its last value, the last error, and their seasonal versions from 12 months ago: but first difference it once to remove trend and once seasonally to remove yearly patterns.”"
+  },
+  {
+    "objectID": "slides/week-7-1.html#prophet",
+    "href": "slides/week-7-1.html#prophet",
+    "title": "Week 7",
+    "section": "Prophet",
+    "text": "Prophet\n\nProphet is an open-source tool for forecasting time series data.\nDeveloped by Facebook (Meta)\nDesigned for analysts and data scientists\nHandles missing data, outliers, and seasonality"
+  },
+  {
+    "objectID": "slides/week-7-1.html#key-features-of-prophet",
+    "href": "slides/week-7-1.html#key-features-of-prophet",
+    "title": "Week 7",
+    "section": "Key Features of Prophet",
+    "text": "Key Features of Prophet\n✅ Additive Model: Trend + Seasonality + Holidays + Noise\n✅ Automatic Changepoint Detection\n✅ Support for Custom Holidays & Events\n✅ Flexible Seasonality (daily/weekly/yearly)\n✅ Easy-to-use API in R and Python"
+  },
+  {
+    "objectID": "slides/week-7-1.html#prophets-model-structure",
+    "href": "slides/week-7-1.html#prophets-model-structure",
+    "title": "Week 7",
+    "section": "Prophet’s Model Structure",
+    "text": "Prophet’s Model Structure\nProphet decomposes time series into components:\n\\[ y(t) = g(t) + s(t) + h(t) + ε(t) \\]\n\ng(t): Trend (linear or logistic growth)\ns(t): Seasonality (Fourier series)\nh(t): Holiday effects\nε(t): Error term (noise)\n\n📌 Assumes additive components by default; multiplicative also possible"
+  },
+  {
+    "objectID": "slides/week-7-1.html#a-simple-forecasting-example-1",
+    "href": "slides/week-7-1.html#a-simple-forecasting-example-1",
+    "title": "Week 7",
+    "section": "A Simple Forecasting Example",
+    "text": "A Simple Forecasting Example\nYour time series must have: (1) ds column (date/timestamp) (2) y column (value to forecast)\n\nlibrary(prophet)\nprophet_mod &lt;- tsibble::as_tsibble(co2) |&gt;\n  # prophet requires ds (date) and y (value) columns\n  # fits: y(t) = g(t) trend + s(t) seasonality + h(t) holidays + ε(t) noise\n  dplyr::rename(ds = index, y = value) |&gt;\n  prophet()\n\n\n# Make future dataframe: g(t) extrapolates trend forward\nfuture   &lt;- make_future_dataframe(prophet_mod, periods = 1000)\n\n# predict() returns yhat (forecast) + components: trend, seasonal, yhat_lower/upper\nforecast &lt;- predict(prophet_mod, future)\n\nplot(prophet_mod, forecast) +\n  theme_minimal()"
+  },
+  {
+    "objectID": "slides/week-7-1.html#pros-cons",
+    "href": "slides/week-7-1.html#pros-cons",
+    "title": "Week 7",
+    "section": "Pros / Cons",
+    "text": "Pros / Cons\n\n\n\n\n\n\n\n\nFeature\nARIMA\nProphet\n\n\n\n\nStatistical rigor\nBased on strong statistical theory; well-studied\nIntuitive, decomposable model (trend + seasonality + events)\n\n\nInterpretability\nClear interpretation of AR, MA, differencing terms\nPlots components like trend/seasonality directly\n\n\nFlexibility (SARIMA)\nSeasonal ARIMA can handle seasonal structure\nHandles multiple seasonalities natively (yearly, weekly, daily)\n\n\nControl over params\nFine-tuned control over differencing, lags, and model order\nEasy to specify changepoints, seasonality, and custom events\n\n\nStatistical testing\nIncludes AIC/BIC for model selection\nCross-validation support; uncertainty intervals included\n\n\nRequires stationarity\nTime series must be stationary or made so (differencing)\nHandles non-stationary data out of the box"
+  },
+  {
+    "objectID": "slides/week-7-1.html#too-much-complexity",
+    "href": "slides/week-7-1.html#too-much-complexity",
+    "title": "Week 7",
+    "section": "Too much complexity!",
+    "text": "Too much complexity!\n\nEach model has it own requirements, arguments, and tuning parameters.\nSimilar to our ML models, this introduces a large time sink, opportunity for error, and complexity.\n\n\n\nmodeltime brings tidy workflows to time series forecasting using the parsnip and workflows frameworks from tidymodels.\nCombine multiple models (ARIMA, Prophet, XGBoost) in one framework to"
+  },
+  {
+    "objectID": "slides/week-7-1.html#modeltime-integration",
+    "href": "slides/week-7-1.html#modeltime-integration",
+    "title": "Week 7",
+    "section": "Modeltime Integration  ",
+    "text": "Modeltime Integration  \n\nlibrary(modeltime)\nlibrary(tidymodels)\nlibrary(timetk)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#create-a-time-series-split",
+    "href": "slides/week-7-1.html#create-a-time-series-split",
+    "title": "Week 7",
+    "section": "1. Create a time series split …",
+    "text": "1. Create a time series split …\n\nUse time_series_split() to make a train/test set.\nSetting assess = “…” tells the function to use the last … of data as the testing set.\nSetting cumulative = TRUE tells the sampling to use all of the prior data as the training set.\n\n\nco2_tbl &lt;-  tsibble::as_tsibble(co2) |&gt; \n  as_tibble() |&gt;\n  mutate(date = as.Date(index), index = NULL) \n\nsplits &lt;- time_series_split(co2_tbl, assess = \"60 months\", cumulative = TRUE)\n\ntraining &lt;-  training(splits)\ntesting  &lt;-  testing(splits)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#specify-models",
+    "href": "slides/week-7-1.html#specify-models",
+    "title": "Week 7",
+    "section": "2. Specify Models …",
+    "text": "2. Specify Models …\nJust like tidymodels …\n\nModel Spec: arima_reg()/prophet_reg()/prophet_boost() &lt;– This sets up your general model algorithm and key parameters\nModel Mode: mode = \"regression\"/mode = \"classification\" &lt;– This sets the model mode to regression or classification (timeseries is always regression!)\nSet Engine: set_engine(\"auto_arima\")/set_engine(\"prophet\") / &lt;– This selects the specific package-function to use, you can add any function-level arguments here.\n\n\nmods &lt;- list(\n  arima_reg() |&gt;  set_engine(\"auto_arima\"),\n  \n  arima_boost(min_n = 2, learn_rate = 0.015) |&gt; set_engine(engine = \"auto_arima_xgboost\"),\n  \n  prophet_reg() |&gt; set_engine(\"prophet\"),\n  \n  prophet_boost() |&gt; set_engine(\"prophet_xgboost\"),\n  \n  # Exponential Smoothing State Space model\n  exp_smoothing() |&gt; set_engine(engine = \"ets\"),\n  \n  # Multivariate Adaptive Regression Spline model\n  mars(mode = \"regression\") |&gt; set_engine(\"earth\") \n)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#fit-models",
+    "href": "slides/week-7-1.html#fit-models",
+    "title": "Week 7",
+    "section": "3. Fit Models …",
+    "text": "3. Fit Models …\n\nUse purrr::map() to fit the models to the training data.\nFit Model: fit(value ~ date, training) &lt;– All modeltime models require a date column to be a regressor.\n\n\nmodels &lt;- map(mods, ~ fit(.x, value ~ date, data = training))\n\n\n\n\n\n\n\nNote\n\n\nWhy not workflow() / workflowsets? Those are the right tools when you need a preprocessor (recipe) + model spec together — e.g., normalizing predictors before a regression. modeltime models (arima_reg(), prophet_reg(), etc.) consume the date column directly and have no preprocessing step, so wrapping them in a workflow adds boilerplate without benefit. purrr::map() over a list of specs is the idiomatic modeltime pattern."
+  },
+  {
+    "objectID": "slides/week-7-1.html#build-modeltime-table",
+    "href": "slides/week-7-1.html#build-modeltime-table",
+    "title": "Week 7",
+    "section": "4. Build modeltime table …",
+    "text": "4. Build modeltime table …\nIn tidymodels, after fitting you have a single model object. With multiple models you need a container — something to hold all fitted models together so calibration, accuracy, and forecasting operate on all of them at once.\nmodeltime_table() is that container. Think of it as the time series equivalent of a workflowset result table: a tidy tibble where each row is one fitted model.\n\n\n\n\n\n\n\ntidymodels concept\nmodeltime equivalent\n\n\n\n\nSingle workflow fit\nSingle fitted arima_reg() / prophet_reg()\n\n\nworkflowset results tibble\nmodeltime_table\n\n\ncollect_metrics()\nmodeltime_accuracy()\n\n\npredict() on test set\nmodeltime_calibrate() → modeltime_forecast()\n\n\n\n\n(models_tbl &lt;- as_modeltime_table(models))\n#&gt; # Modeltime Table\n#&gt; # A tibble: 6 × 3\n#&gt;   .model_id .model   .model_desc            \n#&gt;       &lt;int&gt; &lt;list&gt;   &lt;chr&gt;                  \n#&gt; 1         1 &lt;fit[+]&gt; ARIMA(1,1,1)(2,1,2)[12]\n#&gt; 2         2 &lt;fit[+]&gt; ARIMA(1,1,1)(0,1,1)[12]\n#&gt; 3         3 &lt;fit[+]&gt; PROPHET                \n#&gt; 4         4 &lt;fit[+]&gt; PROPHET                \n#&gt; 5         5 &lt;fit[+]&gt; ETS(M,A,A)             \n#&gt; 6         6 &lt;fit[+]&gt; EARTH\n\n\n\n\n\n\n\nNote\n\n\nas_modeltime_table() is used when models come from map() (a list). modeltime_table() is used when passing models individually: modeltime_table(fit1, fit2, fit3). Either way the result is the same row-per-model tibble that drives the rest of the pipeline."
+  },
+  {
+    "objectID": "slides/week-7-1.html#notes",
+    "href": "slides/week-7-1.html#notes",
+    "title": "Week 7",
+    "section": "Notes:",
+    "text": "Notes:\nmodeltime_table() does some basic checking to ensure all models are fit and organized into a scalable structure called a “Modeltime Table” that is used as part of our forecasting workflow.\n\nIt’s expected that tuning and parameter selection is performed prior to incorporating into a Modeltime Table.\nIf you try to add an unfitted model, the modeltime_table() will complain (throw an informative error) saying you need to fit() the model."
+  },
+  {
+    "objectID": "slides/week-7-1.html#calibrate-the-models",
+    "href": "slides/week-7-1.html#calibrate-the-models",
+    "title": "Week 7",
+    "section": "5. Calibrate the Models …",
+    "text": "5. Calibrate the Models …\n\nUse modeltime_calibrate() to evaluate the models on the test set.\nCalibrating adds a new column, .calibration_data, with the test predictions and residuals inside.\n\n\n(calibration_table &lt;- modeltime_calibrate(models_tbl, testing, quiet = FALSE))\n#&gt; # Modeltime Table\n#&gt; # A tibble: 6 × 5\n#&gt;   .model_id .model   .model_desc             .type .calibration_data\n#&gt;       &lt;int&gt; &lt;list&gt;   &lt;chr&gt;                   &lt;chr&gt; &lt;list&gt;           \n#&gt; 1         1 &lt;fit[+]&gt; ARIMA(1,1,1)(2,1,2)[12] Test  &lt;tibble [60 × 4]&gt;\n#&gt; 2         2 &lt;fit[+]&gt; ARIMA(1,1,1)(0,1,1)[12] Test  &lt;tibble [60 × 4]&gt;\n#&gt; 3         3 &lt;fit[+]&gt; PROPHET                 Test  &lt;tibble [60 × 4]&gt;\n#&gt; 4         4 &lt;fit[+]&gt; PROPHET                 Test  &lt;tibble [60 × 4]&gt;\n#&gt; 5         5 &lt;fit[+]&gt; ETS(M,A,A)              Test  &lt;tibble [60 × 4]&gt;\n#&gt; 6         6 &lt;fit[+]&gt; EARTH                   Test  &lt;tibble [60 × 4]&gt;\n\n\n\n\n\n\n\nNote\n\n\nYes — calibration intentionally uses the test set. In modeltime, “calibrate” does not mean fitting or tuning — the models are already fitted. It means: run each fitted model forward on held-out data, record the predictions and residuals, and use those residuals to estimate confidence interval width.\nThis is different from how “calibration” is used in probability calibration (e.g., isotonic regression on classifier outputs). Here it is closer to out-of-sample error estimation — the same principle as collect_metrics() on a test set in tidymodels.\nThe residuals computed here flow downstream into modeltime_accuracy() (RMSE, MAE, MASE) and into the confidence bands on the forecast plot. No data leakage occurs because the models were fitted only on training data."
+  },
+  {
+    "objectID": "slides/week-7-1.html#testing-forecast-accuracy-evaluation",
+    "href": "slides/week-7-1.html#testing-forecast-accuracy-evaluation",
+    "title": "Week 7",
+    "section": "Testing Forecast & Accuracy Evaluation",
+    "text": "Testing Forecast & Accuracy Evaluation\nThere are 2 critical parts to an evaluation.\n\nEvaluating the Test (Out of Sample) Accuracy\nVisualizing the Forecast vs Test Data Set"
+  },
+  {
+    "objectID": "slides/week-7-1.html#accuracy",
+    "href": "slides/week-7-1.html#accuracy",
+    "title": "Week 7",
+    "section": "Accuracy",
+    "text": "Accuracy\nmodeltime_accuracy() collects common accuracy metrics using yardstick functions:\n\nMAE - Mean absolute error, mae()\nMAPE - Mean absolute percentage error, mape()\nMASE - Mean absolute scaled error, mase()\nSMAPE - Symmetric mean absolute percentage error, smape()\nRMSE - Root mean squared error, rmse()\nRSQ - R-squared, rsq()\n\n\nmodeltime_accuracy(calibration_table) |&gt;\n  arrange(mae)\n#&gt; # A tibble: 6 × 9\n#&gt;   .model_id .model_desc             .type   mae  mape  mase smape  rmse   rsq\n#&gt;       &lt;int&gt; &lt;chr&gt;                   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1         1 ARIMA(1,1,1)(2,1,2)[12] Test  0.810 0.224 0.687 0.224 0.967 0.973\n#&gt; 2         2 ARIMA(1,1,1)(0,1,1)[12] Test  0.885 0.244 0.750 0.245 1.05  0.969\n#&gt; 3         3 PROPHET                 Test  1.06  0.295 0.899 0.294 1.16  0.986\n#&gt; 4         4 PROPHET                 Test  1.06  0.295 0.899 0.294 1.16  0.986\n#&gt; 5         5 ETS(M,A,A)              Test  1.48  0.409 1.25  0.410 1.71  0.958\n#&gt; 6         6 EARTH                   Test  1.89  0.526 1.61  0.526 2.25  0.499"
+  },
+  {
+    "objectID": "slides/week-7-1.html#interpreting-accuracy-metrics",
+    "href": "slides/week-7-1.html#interpreting-accuracy-metrics",
+    "title": "Week 7",
+    "section": "Interpreting Accuracy Metrics",
+    "text": "Interpreting Accuracy Metrics\nNot all metrics are equally useful: context matters:\n\n\n\n\n\n\n\n\nMetric\nInterpretation\nWatch out for\n\n\n\n\nMASE\n&lt; 1 = beats naive seasonal forecast; &gt; 1 = worse than naive\nBest for comparing across series with different scales\n\n\nMAPE\nIntuitive % error\nBreaks down when \\(y \\approx 0\\) (e.g., near-zero flows)\n\n\nRMSE\nPenalizes large errors heavily\nUseful when extreme errors matter (floods, droughts)\n\n\nRSQ\nProportion of variance explained\nCan look good even with biased predictions\n\n\n\n\nFor environmental forecasting, MASE and RMSE are usually the most informative choices."
+  },
+  {
+    "objectID": "slides/week-7-1.html#why-not-k-fold-cross-validation",
+    "href": "slides/week-7-1.html#why-not-k-fold-cross-validation",
+    "title": "Week 7",
+    "section": "Why Not k-Fold Cross-Validation?",
+    "text": "Why Not k-Fold Cross-Validation?\n\n\nRandom k-fold CV randomly assigns observations to folds: but time series data is ordered. Using future data to train violates the assumption that the future is unknown.\nWalk-forward (expanding window) CV respects temporal order:\n\nEach fold uses only past data to train\nForecast window moves forward in time\nProvides a realistic estimate of out-of-sample performance\n\n\n\nlibrary(timetk)\n\ncv_plan &lt;- time_series_cv(\n  co2_tbl,\n  assess  = \"12 months\",\n  initial = \"36 months\",\n  skip    = 6,\n  slice_limit = 5\n)\n\ncv_plan\n#&gt; # Time Series Cross Validation Plan \n#&gt; # A tibble: 5 × 2\n#&gt;   splits          id    \n#&gt;   &lt;list&gt;          &lt;chr&gt; \n#&gt; 1 &lt;split [36/12]&gt; Slice1\n#&gt; 2 &lt;split [36/12]&gt; Slice2\n#&gt; 3 &lt;split [36/12]&gt; Slice3\n#&gt; 4 &lt;split [36/12]&gt; Slice4\n#&gt; 5 &lt;split [36/12]&gt; Slice5"
+  },
+  {
+    "objectID": "slides/week-7-1.html#forecast",
+    "href": "slides/week-7-1.html#forecast",
+    "title": "Week 7",
+    "section": "Forecast",
+    "text": "Forecast\n\nUse modeltime_forecast() to generate forecasts for the next 120 months (10 years).\nUse plot_modeltime_forecast() to visualize the forecasts.\n\n\n(forecast &lt;- calibration_table  |&gt; \n  modeltime_forecast(h = \"60 months\", \n                     new_data = testing,\n                     actual_data = co2_tbl) )\n#&gt; # Forecast Results\n#&gt; \n#&gt; # A tibble: 828 × 7\n#&gt;    .model_id .model_desc .key   .index     .value .conf_lo .conf_hi\n#&gt;        &lt;int&gt; &lt;chr&gt;       &lt;fct&gt;  &lt;date&gt;      &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;\n#&gt;  1        NA ACTUAL      actual 1959-01-01   315.       NA       NA\n#&gt;  2        NA ACTUAL      actual 1959-02-01   316.       NA       NA\n#&gt;  3        NA ACTUAL      actual 1959-03-01   316.       NA       NA\n#&gt;  4        NA ACTUAL      actual 1959-04-01   318.       NA       NA\n#&gt;  5        NA ACTUAL      actual 1959-05-01   318.       NA       NA\n#&gt;  6        NA ACTUAL      actual 1959-06-01   318        NA       NA\n#&gt;  7        NA ACTUAL      actual 1959-07-01   316.       NA       NA\n#&gt;  8        NA ACTUAL      actual 1959-08-01   315.       NA       NA\n#&gt;  9        NA ACTUAL      actual 1959-09-01   314.       NA       NA\n#&gt; 10        NA ACTUAL      actual 1959-10-01   313.       NA       NA\n#&gt; # ℹ 818 more rows"
+  },
+  {
+    "objectID": "slides/week-7-1.html#visualize",
+    "href": "slides/week-7-1.html#visualize",
+    "title": "Week 7",
+    "section": "Visualize",
+    "text": "Visualize\n\nforecast |&gt;\n  filter(.key == \"actual\") |&gt;\n  ggplot(aes(x = .index, y = .value)) +\n  geom_line(color = \"grey40\") +\n  geom_line(data = filter(forecast, .key == \"prediction\"),\n            aes(color = .model_desc)) +\n  geom_ribbon(data = filter(forecast, .key == \"prediction\"),\n              aes(ymin = .conf_lo, ymax = .conf_hi, fill = .model_desc),\n              alpha = 0.1) +\n  scale_color_brewer(palette = \"Set1\") +\n  scale_fill_brewer(palette = \"Set1\") +\n  labs(title = \"CO₂ Forecast vs Actuals\", x = NULL, y = \"ppm\",\n       color = \"Model\", fill = \"Model\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")"
+  },
+  {
+    "objectID": "slides/week-7-1.html#refit-to-full-dataset-forecast-forward",
+    "href": "slides/week-7-1.html#refit-to-full-dataset-forecast-forward",
+    "title": "Week 7",
+    "section": "Refit to Full Dataset & Forecast Forward",
+    "text": "Refit to Full Dataset & Forecast Forward\nThe final step is to refit the models to the full dataset using modeltime_refit() and forecast them forward.\n\nrefit_tbl &lt;- calibration_table |&gt;\n  modeltime_refit(data = co2_tbl)\n\nrefit_fc &lt;- refit_tbl |&gt;\n  modeltime_forecast(h = \"3 years\", actual_data = co2_tbl)\n\nrefit_fc |&gt;\n  filter(.key == \"actual\") |&gt;\n  ggplot(aes(x = .index, y = .value)) +\n  geom_line(color = \"grey40\") +\n  geom_line(data = filter(refit_fc, .key == \"prediction\"),\n            aes(color = .model_desc)) +\n  geom_ribbon(data = filter(refit_fc, .key == \"prediction\"),\n              aes(ymin = .conf_lo, ymax = .conf_hi, fill = .model_desc),\n              alpha = 0.1) +\n  scale_color_brewer(palette = \"Set1\") +\n  scale_fill_brewer(palette = \"Set1\") +\n  labs(title = \"CO₂ Forecast: Refit to Full Dataset\",\n       x = NULL, y = \"ppm\", color = \"Model\", fill = \"Model\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")"
+  },
+  {
+    "objectID": "slides/week-7-1.html#why-refit",
+    "href": "slides/week-7-1.html#why-refit",
+    "title": "Week 7",
+    "section": "Why refit?",
+    "text": "Why refit?\nThe models have all changed! This is the (potential) benefit of refitting.\nMore often than not refitting is a good idea. Refitting:\n\nRetrieves your model and preprocessing steps\nRefits the model to the new data\nRecalculates any automations. This includes:\n\nRecalculating the changepoints for the Earth Model\nRecalculating the ARIMA and ETS parameters\n\nPreserves any parameter selections. This includes:\nAny other defaults that are not automatic calculations are used."
+  },
+  {
+    "objectID": "slides/week-7-1.html#growing-ecosystem",
+    "href": "slides/week-7-1.html#growing-ecosystem",
+    "title": "Week 7",
+    "section": "Growing Ecosystem",
+    "text": "Growing Ecosystem"
+  },
+  {
+    "objectID": "slides/week-7-1.html#summary-takeaways",
+    "href": "slides/week-7-1.html#summary-takeaways",
+    "title": "Week 7",
+    "section": "Summary & Takeaways",
+    "text": "Summary & Takeaways\n\nTime series data is sequential and ordered: always decompose (trend + seasonality + remainder) before modeling\nlubridate handles date parsing; ts / zoo / xts for classic data; tsibble + feasts for tidy workflows\nACF/PACF plots guide ARIMA order selection; test stationarity with adf.test() / kpss.test() first\nmodeltime unifies ARIMA, Prophet, ETS, and boosting: same parsnip + workflows interface as tidymodels\nTraining data era matters: models trained on structurally different regimes forecast poorly: restrict to the relevant period\nExogenous regressors (upstream flow, snowpack) carry physical signal that time structure alone cannot predict; use flow ~ date + regressor\nForecast horizon is limited: uncertainty grows fast; regressor availability caps how far forward you can forecast reliably\nWalk-forward CV respects temporal order: never use random k-fold on time series data\nThe dataRetrieval pipeline from Lab 1 is directly extensible to ensemble forecasting with modeltime"
+  },
+  {
+    "objectID": "slides/week-7-1.html#fitting-an-arima-model",
+    "href": "slides/week-7-1.html#fitting-an-arima-model",
+    "title": "Week 7",
+    "section": "Fitting an ARIMA Model",
+    "text": "Fitting an ARIMA Model\n\nlibrary(forecast)\n\nco2_arima &lt;- auto.arima(co2)\n\nsummary(co2_arima)\n#&gt; Series: co2 \n#&gt; ARIMA(1,1,1)(1,1,2)[12] \n#&gt; \n#&gt; Coefficients:\n#&gt;          ar1      ma1     sar1     sma1     sma2\n#&gt;       0.2569  -0.5847  -0.5489  -0.2620  -0.5123\n#&gt; s.e.  0.1406   0.1204   0.5880   0.5701   0.4819\n#&gt; \n#&gt; sigma^2 = 0.08576:  log likelihood = -84.39\n#&gt; AIC=180.78   AICc=180.97   BIC=205.5\n#&gt; \n#&gt; Training set error measures:\n#&gt;                      ME     RMSE       MAE         MPE       MAPE      MASE\n#&gt; Training set 0.01742092 0.287159 0.2303994 0.005073769 0.06845665 0.1819636\n#&gt;                      ACF1\n#&gt; Training set -0.002858162"
+  },
+  {
+    "objectID": "slides/week-7-1.html#pros-cons-cont.",
+    "href": "slides/week-7-1.html#pros-cons-cont.",
+    "title": "Week 7",
+    "section": "Pros / Cons (cont.)",
+    "text": "Pros / Cons (cont.)\n\n\n\n\n\n\n\n\nFeature\nARIMA\nProphet\n\n\n\n\nModel complexity\nNeeds careful tuning (p,d,q) and domain expertise\nDefaults work well; limited tuning needed\n\n\nHoliday effects\nMust be encoded manually\nEasy to include holidays/events\n\n\nMultivariate support\nBasic ARIMA doesn’t support exogenous variables easily (need ARIMAX)\nSupports external regressors with add_regressor()\n\n\nNon-linear trends\nPoor performance with structural breaks or non-linear growth\nHandles changepoints and logistic growth models well\n\n\nSeasonality limits\nSARIMA handles only one seasonal period well\nBuilt-in multiple seasonal components (e.g., daily, weekly, yearly)\n\n\n\nTL;DR\n\nUse ARIMA for a classical, statistical model with deep customization: when you’re comfortable making your data stationary.\nUse Prophet for a fast, robust, intuitive model: when data has strong seasonal effects, irregular events, or missing values."
+  },
+  {
+    "objectID": "slides/week-7-1.html#bringing-it-home-forecasting-streamflow-at-lees-ferry",
+    "href": "slides/week-7-1.html#bringing-it-home-forecasting-streamflow-at-lees-ferry",
+    "title": "Week 7",
+    "section": "Bringing It Home: Forecasting Streamflow at Lees Ferry",
+    "text": "Bringing It Home: Forecasting Streamflow at Lees Ferry\nIn Lab 1 you built an analytical pipeline for the Colorado River: pulling 44 years of daily discharge from USGS NWIS, normalizing by drainage area, detecting low-flow threshold exceedances, and modeling the upstream-downstream relationship between Glenwood Springs and Lees Ferry.\nNow we apply everything from this lecture to that same data:\n\nPull daily discharge at Lees Ferry with dataRetrieval\nConvert to a monthly time series (the natural forecasting granularity)\nFit multiple models with modeltime: ARIMA, Prophet, ETS\nEvaluate three rounds of model refinement — and learn from each failure\n\nLees Ferry is the Colorado River Compact’s primary accounting point. Forecasting flow here has direct operational consequences for 40 million people across 7 states."
+  },
+  {
+    "objectID": "slides/week-7-1.html#step-1-pull-data-with-dataretrieval",
+    "href": "slides/week-7-1.html#step-1-pull-data-with-dataretrieval",
+    "title": "Week 7",
+    "section": "Step 1: Pull Data with dataRetrieval",
+    "text": "Step 1: Pull Data with dataRetrieval\n\nlibrary(dataRetrieval)\nlibrary(tidyverse)\nlibrary(lubridate)\nlibrary(modeltime)\nlibrary(tidymodels)\nlibrary(timetk)\n\n# Lees Ferry: the Compact's accounting point (same gage as Lab 1)\nlees_daily &lt;- readNWISdv(\n  siteNumbers = \"09380000\",\n  parameterCd = \"00060\",        # discharge, cfs\n  startDate   = \"1980-01-01\",\n  endDate     = \"2023-12-31\"\n) |&gt;\n  renameNWISColumns() |&gt;\n  select(Date, Flow)\n\nglimpse(lees_daily)\n#&gt; Rows: 16,071\n#&gt; Columns: 2\n#&gt; $ Date &lt;date&gt; 1980-01-01, 1980-01-02, 1980-01-03, 1980-01-04, 1980-01-05, 1980…\n#&gt; $ Flow &lt;dbl&gt; 2650, 8560, 9480, 10200, 10700, 6670, 12900, 14400, 16500, 7910, …"
+  },
+  {
+    "objectID": "slides/week-7-1.html#step-2-aggregate-to-monthly",
+    "href": "slides/week-7-1.html#step-2-aggregate-to-monthly",
+    "title": "Week 7",
+    "section": "Step 2: Aggregate to Monthly",
+    "text": "Step 2: Aggregate to Monthly\nDaily data is noisy and computationally heavy for forecasting. Monthly mean discharge captures the hydrologically meaningful signal: the seasonal snowmelt cycle: while filtering short-term noise.\n\n\n\n\n\n\nNote\n\n\nMean vs. sum? For forecasting we use mean(Flow): it normalizes for months with different lengths and focuses on flow intensity. For operational water accounting (e.g., Compact compliance), use sum(Flow) to get total volume delivered. Know which question you’re answering before you aggregate.\n\n\n\n\nlees_monthly &lt;- lees_daily |&gt;\n  mutate(date = floor_date(Date, \"month\")) |&gt;\n  group_by(date) |&gt;\n  summarise(flow = mean(Flow, na.rm = TRUE), .groups = \"drop\")\n\nlees_monthly\n#&gt; # A tibble: 528 × 2\n#&gt;    date         flow\n#&gt;    &lt;date&gt;      &lt;dbl&gt;\n#&gt;  1 1980-01-01  9825.\n#&gt;  2 1980-02-01 10696.\n#&gt;  3 1980-03-01  9851.\n#&gt;  4 1980-04-01 14505.\n#&gt;  5 1980-05-01 13749.\n#&gt;  6 1980-06-01 24739.\n#&gt;  7 1980-07-01 25777.\n#&gt;  8 1980-08-01 20794.\n#&gt;  9 1980-09-01 16490 \n#&gt; 10 1980-10-01 12637.\n#&gt; # ℹ 518 more rows"
+  },
+  {
+    "objectID": "slides/week-7-1.html#step-3-visualize-the-series",
+    "href": "slides/week-7-1.html#step-3-visualize-the-series",
+    "title": "Week 7",
+    "section": "Step 3: Visualize the Series",
+    "text": "Step 3: Visualize the Series\n\nlees_monthly |&gt;\n  ggplot(aes(x = date, y = flow)) +\n  geom_line(color = \"steelblue\", alpha = 0.8) +\n  geom_smooth(method = \"loess\", span = 0.15, color = \"darkred\", se = FALSE) +\n  labs(title = \"Monthly Mean Discharge: Lees Ferry, AZ\",\n       subtitle = \"USGS 09380000 | 1980–2023\",\n       x = NULL, y = \"Discharge (cfs)\") +\n  theme_minimal()"
+  },
+  {
+    "objectID": "slides/week-7-1.html#what-do-you-see",
+    "href": "slides/week-7-1.html#what-do-you-see",
+    "title": "Week 7",
+    "section": "What do you see?",
+    "text": "What do you see?\n\n\n\nTrend: A long-term decline post-2000: the megadrought fingerprint\nSeasonality: Annual snowmelt pulse peaking May–June, trough in autumn\nAnomalies: 2011 and 2023 stand out as exceptional wet years (La Niña recovery / atmospheric rivers)\n\n\nThis series has all three components from decomposition:\n\nA non-stationary trend (declining)\nStrong seasonality (monthly cycle)\nStructured remainder (ENSO-driven anomalies)\n\nThis is exactly the kind of series where modeltime shines."
+  },
+  {
+    "objectID": "slides/week-7-1.html#step-4-train-test-split",
+    "href": "slides/week-7-1.html#step-4-train-test-split",
+    "title": "Week 7",
+    "section": "Step 4: Train / Test Split",
+    "text": "Step 4: Train / Test Split\nHold out the last 5 years (2019–2023) as the test set — matching the assess = \"60 months\" logic from the CO₂ example.\n\nsplits &lt;- time_series_split(\n  lees_monthly,\n  date_var   = date,\n  assess     = \"60 months\",\n  cumulative = TRUE\n)\n\ntraining(splits) |&gt; tail(3)\n#&gt; # A tibble: 3 × 2\n#&gt;   date         flow\n#&gt;   &lt;date&gt;      &lt;dbl&gt;\n#&gt; 1 2018-10-01 10576.\n#&gt; 2 2018-11-01 11236 \n#&gt; 3 2018-12-01 12100\ntesting(splits)  |&gt; head(3)\n#&gt; # A tibble: 3 × 2\n#&gt;   date         flow\n#&gt;   &lt;date&gt;      &lt;dbl&gt;\n#&gt; 1 2019-01-01 13252.\n#&gt; 2 2019-02-01 13350 \n#&gt; 3 2019-03-01 12971."
+  },
+  {
+    "objectID": "slides/week-7-1.html#step-5-specify-models",
+    "href": "slides/week-7-1.html#step-5-specify-models",
+    "title": "Week 7",
+    "section": "Step 5: Specify Models",
+    "text": "Step 5: Specify Models\n\nmods &lt;- list(\n  # Classical: let auto.arima find the best seasonal ARIMA\n  arima_reg() |&gt; set_engine(\"auto_arima\"),\n\n  # ARIMA + XGBoost residual boosting\n  arima_boost(min_n = 2, learn_rate = 0.015) |&gt;\n    set_engine(\"auto_arima_xgboost\"),\n\n  # Facebook Prophet — handles the trend break around 2000 well\n  prophet_reg(seasonality_yearly = TRUE) |&gt; set_engine(\"prophet\"),\n\n  # Exponential smoothing — strong baseline for seasonal data\n  exp_smoothing() |&gt; set_engine(\"ets\")\n)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#step-6-fit-calibrate",
+    "href": "slides/week-7-1.html#step-6-fit-calibrate",
+    "title": "Week 7",
+    "section": "Step 6: Fit & Calibrate",
+    "text": "Step 6: Fit & Calibrate\n\nmodels &lt;- map(mods, ~ fit(.x, flow ~ date, data = training(splits)))\n\nmodels_tbl &lt;- as_modeltime_table(models)\n\ncalibration_tbl &lt;- modeltime_calibrate(models_tbl, testing(splits), quiet = FALSE)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#step-7-accuracy-on-the-test-set",
+    "href": "slides/week-7-1.html#step-7-accuracy-on-the-test-set",
+    "title": "Week 7",
+    "section": "Step 7: Accuracy on the Test Set",
+    "text": "Step 7: Accuracy on the Test Set\n\nmodeltime_accuracy(calibration_tbl) |&gt;\n  arrange(rmse) |&gt;\n  select(.model_desc, mae, mape, mase, rmse, rsq)\n#&gt; # A tibble: 4 × 6\n#&gt;   .model_desc               mae  mape  mase  rmse   rsq\n#&gt;   &lt;chr&gt;                   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1 PROPHET                 1668.  14.6  1.40 2140. 0.297\n#&gt; 2 ETS(M,AD,M)             1770.  16.3  1.48 2273. 0.249\n#&gt; 3 ARIMA(1,1,2)(1,0,1)[12] 2003.  19.2  1.68 2533. 0.190\n#&gt; 4 ARIMA(2,1,1)(1,0,1)[12] 2012.  19.4  1.69 2559. 0.188"
+  },
+  {
+    "objectID": "slides/week-7-1.html#step-8-forecast-forward-5-years",
+    "href": "slides/week-7-1.html#step-8-forecast-forward-5-years",
+    "title": "Week 7",
+    "section": "Step 8: Forecast Forward 5 Years",
+    "text": "Step 8: Forecast Forward 5 Years\n\nfc &lt;- calibration_tbl |&gt;\n  modeltime_forecast(h = \"5 years\", actual_data = lees_monthly)\n\nfc |&gt;\n  filter(.key == \"actual\") |&gt;\n  ggplot(aes(x = .index, y = .value)) +\n  geom_line(color = \"grey40\") +\n  geom_line(data = filter(fc, .key == \"prediction\"),\n            aes(color = .model_desc)) +\n  geom_ribbon(data = filter(fc, .key == \"prediction\"),\n              aes(ymin = .conf_lo, ymax = .conf_hi, fill = .model_desc),\n              alpha = 0.1) +\n  scale_color_brewer(palette = \"Set1\") +\n  scale_fill_brewer(palette = \"Set1\") +\n  labs(title = \"Lees Ferry 5-Year Discharge Forecast\",\n       x = NULL, y = \"Monthly Mean Discharge (cfs)\",\n       color = \"Model\", fill = \"Model\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")"
+  },
+  {
+    "objectID": "slides/week-7-1.html#what-does-the-forecast-tell-us",
+    "href": "slides/week-7-1.html#what-does-the-forecast-tell-us",
+    "title": "Week 7",
+    "section": "What Does the Forecast Tell Us?",
+    "text": "What Does the Forecast Tell Us?\n\n\nWhat the model gets right:\n\nThe seasonal cycle: spring pulse, summer drawdown, winter baseflow — the timing is reliable\nThe general magnitude range: models trained on post-2000 data capture the modern low-flow regime\nUncertainty grows appropriately beyond 12–18 months — honest about what it doesn’t know\n\n\nWhat it cannot do:\n\nAnticipate wet-year spikes (2023-type events) without a leading SWE signal\nDistinguish drought persistence from mean reversion\nOutperform “repeat last year” on inter-annual magnitude\n\nWhat would actually help: April 1 SWE at key basins, reservoir storage anomaly, PDO/ENSO phase — leading indicators, not concurrent observations. This is what USBR’s operational ESP system uses.\n\n\n\n\n\n\nTip\n\n\nIn Lab 6 you’ll add exactly this kind of outside information — GridMET climate covariates (precipitation, temperature, solar radiation) and MACA future projections — to your Poudre River forecast. That’s the missing ingredient here."
+  },
+  {
+    "objectID": "slides/week-7-1.html#connecting-back-to-lab-1",
+    "href": "slides/week-7-1.html#connecting-back-to-lab-1",
+    "title": "Week 7",
+    "section": "Connecting Back to Lab 1",
+    "text": "Connecting Back to Lab 1\nIn Lab 1 you:\n\nPulled this exact gage with readNWISdv() and renameNWISColumns()\nComputed the 7-day rolling mean and flagged below-threshold days\nBuilt a water-year bar chart showing the post-2000 decline\nFit a simple log-log linear model from Glenwood Springs → Lees Ferry\n\nToday you extended that pipeline to time series forecasting:\n\n\n\n\n\n\n\nLab 1 skill\nWeek 7 extension\n\n\n\n\nreadNWISdv() + renameNWISColumns()\nSame: data foundation unchanged\n\n\nzoo::rollmean()\n→ decompose() / stl() for formal decomposition\n\n\n10th-percentile threshold\n→ Trend + remainder components\n\n\nTwo-gauge join (Glenwood → Lees)\n→ Glenwood as exogenous regressor in ARIMAX / Prophet\n\n\nlm(log_lees ~ log_glenwood * season)\n→ modeltime time series model with flow ~ date + glenwood\n\n\nAnnual bar chart\n→ Calibrated 5-year probabilistic forecast"
+  },
+  {
+    "objectID": "slides/week-7-1.html#interpreting-the-results",
+    "href": "slides/week-7-1.html#interpreting-the-results",
+    "title": "Week 7",
+    "section": "Interpreting the Results",
+    "text": "Interpreting the Results\nThe test period is 2019–2023 — mean flow ~10,000 cfs. Reading the actual numbers:\n\n\n\n\n\n\n\n\n\n\n\n\nModel\nMAE (cfs)\nMAPE (%)\nMASE\nRMSE (cfs)\nR²\nVerdict\n\n\n\n\nPROPHET\n~1,668\n14.6\n1.40\n2,140\n0.30\nBest RMSE; MASE &gt; 1 — still misses naive baseline\n\n\nETS(M,AD,M)\n~1,770\n16.3\n1.48\n2,273\n0.25\nClose second; handles multiplicative seasonality\n\n\nARIMA(1,1,2)…\n~2,003\n19.2\n1.68\n2,533\n0.19\nHurt by post-2000 trend break\n\n\nARIMA(2,1,1)…\n~2,012\n19.4\n1.69\n2,559\n0.19\nSimilar — two ARIMA variants converge\n\n\n\nKey takeaways:\n\nAll MASE &gt; 1 — every model is beaten by a naïve seasonal forecast on this test window. Why? The 2023 wet-year spike is nearly impossible to predict from structure alone.\nRMSE of ~2,100 cfs on a ~10,000 cfs mean = ~21% typical error — operationally meaningful for Compact accounting\nProphet wins on RMSE because its flexible trend handles the post-2000 decline better than ARIMA’s differencing"
+  },
+  {
+    "objectID": "slides/week-7-1.html#reading-the-forecast-chart",
+    "href": "slides/week-7-1.html#reading-the-forecast-chart",
+    "title": "Week 7",
+    "section": "Reading the Forecast Chart",
+    "text": "Reading the Forecast Chart\nThe grey line is the full historical record (1980–2023). The coloured lines + ribbons are the 5-year forward forecast.\nWhy does the series start so high in 1980–1984?\nThe early 1980s were an exceptional period in the Upper Colorado Basin:\n\nRecord snowpack across the Rockies (1982–1984 La Niña cluster)\nGlen Canyon Dam spillway capacity nearly exceeded in 1983 — the highest recorded inflow since the dam closed\nThe ~55,000 cfs peak in 1984 is the single largest monthly mean in the 44-year record\n\nThis is not an artifact or error — it is genuine signal. It also illustrates why models trained on post-2000 data alone would have no way to anticipate such extremes: the training distribution simply doesn’t include them.\nThe forecast ribbons at the right edge represent model uncertainty — wider = less confident. All models anchor near the recent 10,000–12,000 cfs regime, reflecting the post-2000 megadrought baseline."
+  },
+  {
+    "objectID": "slides/week-7-1.html#why-all-mase-1-the-training-data-problem",
+    "href": "slides/week-7-1.html#why-all-mase-1-the-training-data-problem",
+    "title": "Week 7",
+    "section": "Why All MASE > 1? The Training Data Problem",
+    "text": "Why All MASE &gt; 1? The Training Data Problem\nAll models were trained on 1980–2023 — but the 1980s high-flow regime is structurally different from the post-2000 drought world:\n\n\n\nThe 1984 peak (~55,000 cfs) is 5× the current typical flow\nTraining a model on this data teaches it a world that no longer exists\nEvery model wastes capacity “learning” the pre-2000 regime it will never need to forecast\n\n\n\n\n\n\n\n\n\n\n\n\nFix #1: Restrict training to the post-2000 regime that actually represents today’s conditions."
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-1-restrict-to-post-2000-regime",
+    "href": "slides/week-7-1.html#round-1-restrict-to-post-2000-regime",
+    "title": "Week 7",
+    "section": "Round 1: Restrict to Post-2000 Regime",
+    "text": "Round 1: Restrict to Post-2000 Regime\n\nlees_modern &lt;- lees_monthly |&gt;\n  filter(date &gt;= \"2000-01-01\")\n\nsplits_modern &lt;- time_series_split(\n  lees_modern,\n  date_var   = date,\n  assess     = \"60 months\",\n  cumulative = TRUE\n)\n\nSame models, same workflow: only the training window changes:\n\nmods &lt;- list(\n  arima_reg()                                        |&gt; set_engine(\"auto_arima\"),\n  arima_boost(min_n = 2, learn_rate = 0.015)         |&gt; set_engine(\"auto_arima_xgboost\"),\n  prophet_reg(seasonality_yearly = TRUE)             |&gt; set_engine(\"prophet\"),\n  exp_smoothing()                                    |&gt; set_engine(\"ets\")\n)\n\nmodels_v1 &lt;- map(mods, ~ fit(.x, flow ~ date, data = training(splits_modern)))\n\ncal_v1 &lt;- as_modeltime_table(models_v1) |&gt;\n  modeltime_calibrate(testing(splits_modern), quiet = FALSE)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-1-results",
+    "href": "slides/week-7-1.html#round-1-results",
+    "title": "Week 7",
+    "section": "Round 1: Results",
+    "text": "Round 1: Results\n\nmodeltime_accuracy(cal_v1) |&gt;\n  arrange(mase) |&gt;\n  select(.model_desc, mae, mape, mase, rmse, rsq)\n#&gt; # A tibble: 4 × 6\n#&gt;   .model_desc                                  mae  mape  mase  rmse   rsq\n#&gt;   &lt;chr&gt;                                      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1 ETS(M,N,M)                                 1767.  16.2  1.48 2293. 0.217\n#&gt; 2 PROPHET                                    1882.  17.5  1.58 2405. 0.222\n#&gt; 3 ARIMA(2,0,1)(1,0,1)[12] WITH NON-ZERO MEAN 1897.  18.0  1.59 2405. 0.204\n#&gt; 4 ARIMA(1,0,1)(2,0,0)[12] WITH NON-ZERO MEAN 1919.  18.4  1.61 2471. 0.200\n\n\nMASE of 1.48–1.61 means all four models are worse than the naïve seasonal benchmark — simply repeating last year’s value would outperform every model here. Restricting to post-2000 data did not help; it may have made things worse by reducing the training set size, giving the models less signal to learn the seasonal pattern.\nTwo things MASE &gt; 1 tells us:\n\nTime structure alone (AR, MA, seasonal lags) is insufficient — the series has variance driven by physical drivers the model cannot see\nThe benchmark (last year’s value) is hard to beat because the seasonal cycle is highly stable; errors come from inter-annual variability in snowpack magnitude, not timing\n\nRound 1 verdict: MASE got worse (1.48–1.61). Hypothesis rejected — restricting the window removed signal, not noise. New hypothesis: models need physical information about upstream conditions to anticipate inter-annual variability."
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-2-add-an-upstream-regressor",
+    "href": "slides/week-7-1.html#round-2-add-an-upstream-regressor",
+    "title": "Week 7",
+    "section": "Round 2: Add an Upstream Regressor",
+    "text": "Round 2: Add an Upstream Regressor\nFlow at Lees Ferry is driven by what happens upstream weeks earlier. Glenwood Springs (Roaring Fork / upper Colorado) is a leading indicator: the same relationship you modeled with lm() in Lab 1 Q9.\n\nglenwood_monthly &lt;- readNWISdv(\n  siteNumbers = \"09085000\",       # Roaring Fork at Glenwood Springs\n  parameterCd = \"00060\",\n  startDate   = \"2000-01-01\",\n  endDate     = \"2023-12-31\"\n) |&gt;\n  renameNWISColumns() |&gt;\n  mutate(date = floor_date(Date, \"month\")) |&gt;\n  group_by(date) |&gt;\n  summarise(glenwood = mean(Flow, na.rm = TRUE), .groups = \"drop\")\n\nlees_reg &lt;- lees_modern |&gt;\n  left_join(glenwood_monthly, by = \"date\") |&gt;\n  drop_na(glenwood)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-2-split-with-regressor",
+    "href": "slides/week-7-1.html#round-2-split-with-regressor",
+    "title": "Week 7",
+    "section": "Round 2: Split with Regressor",
+    "text": "Round 2: Split with Regressor\nThe regressor must be present in both training and the future forecast window. For an h-step ahead forecast we use the known test-period Glenwood values as the “future” regressor: valid because upstream data is available in near real-time from NWIS.\n\nsplits_reg &lt;- time_series_split(\n  lees_reg,\n  date_var   = date,\n  assess     = \"60 months\",\n  cumulative = TRUE\n)\n\ntrain_reg &lt;- training(splits_reg)\ntest_reg  &lt;- testing(splits_reg)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-2-models-with-regressor",
+    "href": "slides/week-7-1.html#round-2-models-with-regressor",
+    "title": "Week 7",
+    "section": "Round 2: Models with Regressor",
+    "text": "Round 2: Models with Regressor\nOnly models that accept xreg / external regressors participate. Prophet and ARIMA both support this natively in modeltime:\n\nmods_reg &lt;- list(\n  # ARIMA with exogenous regressor (ARIMAX)\n  arima_reg() |&gt; set_engine(\"auto_arima\"),\n\n  # Prophet with Glenwood as an additive regressor\n  prophet_reg(seasonality_yearly = TRUE) |&gt; set_engine(\"prophet\"),\n\n  # Boosted ARIMA: XGBoost picks up nonlinear upstream signal\n  arima_boost(min_n = 2, learn_rate = 0.015) |&gt;\n    set_engine(\"auto_arima_xgboost\")\n)\n\nmodels_v2 &lt;- map(mods_reg, ~ fit(.x, flow ~ date + glenwood, data = train_reg))\n\ncal_v2 &lt;- as_modeltime_table(models_v2) |&gt;\n  modeltime_calibrate(test_reg, quiet = FALSE)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-2-results",
+    "href": "slides/week-7-1.html#round-2-results",
+    "title": "Week 7",
+    "section": "Round 2: Results",
+    "text": "Round 2: Results\n\nmodeltime_accuracy(cal_v2) |&gt;\n  arrange(mase) |&gt;\n  select(.model_desc, mae, mape, mase, rmse, rsq)\n#&gt; # A tibble: 3 × 6\n#&gt;   .model_desc                                        mae  mape  mase  rmse   rsq\n#&gt;   &lt;chr&gt;                                            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1 REGRESSION WITH ARIMA(1,0,1)(2,0,0)[12] ERRORS   1857.  17.9  1.56 2401. 0.320\n#&gt; 2 ARIMA(2,0,1)(1,0,1)[12] WITH NON-ZERO MEAN W/ X… 1859.  17.7  1.56 2375. 0.232\n#&gt; 3 PROPHET W/ REGRESSORS                            2104.  20.1  1.76 2546. 0.315\n\n\nMASE of 1.56–1.76 — still worse than naïve. Adding the upstream Glenwood regressor moved the needle marginally (ARIMA dropped from ~1.59 to 1.56) but did not solve the problem. Prophet with regressors actually got worse (1.76).\nWhy didn’t it work?\n\nA single upstream gage captures flow volume but not its timing or source (snowmelt vs. rain-on-snow vs. baseflow)\nThe regressor is contemporaneous — we’re using current Glenwood flow to predict current Lees Ferry flow, which is nearly circular at monthly resolution\nThe naïve benchmark (repeat last year) is genuinely hard to beat on a highly seasonal series with stable timing but variable magnitude"
+  },
+  {
+    "objectID": "slides/week-7-1.html#comparing-all-three-rounds",
+    "href": "slides/week-7-1.html#comparing-all-three-rounds",
+    "title": "Week 7",
+    "section": "Comparing All Three Rounds",
+    "text": "Comparing All Three Rounds\n\nbind_rows(\n  modeltime_accuracy(cal_v0) |&gt; mutate(round = \"v0: Full record 1980–2023 (baseline)\"),\n  modeltime_accuracy(cal_v1) |&gt; mutate(round = \"v1: Post-2000 only\"),\n  modeltime_accuracy(cal_v2) |&gt; mutate(round = \"v2: Post-2000 + upstream regressor\")\n) |&gt;\n  group_by(round) |&gt;\n  slice_min(mase, n = 1) |&gt;\n  select(round, .model_desc, mae, mase, rmse, rsq) |&gt;\n  arrange(mase)\n#&gt; # A tibble: 3 × 6\n#&gt; # Groups:   round [3]\n#&gt;   round                                .model_desc         mae  mase  rmse   rsq\n#&gt;   &lt;chr&gt;                                &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1 v0: Full record 1980–2023 (baseline) PROPHET           1668.  1.40 2140. 0.297\n#&gt; 2 v1: Post-2000 only                   ETS(M,N,M)        1767.  1.48 2293. 0.217\n#&gt; 3 v2: Post-2000 + upstream regressor   REGRESSION WITH … 1857.  1.56 2401. 0.320\n\n\nAll three rounds produce MASE &gt; 1 — and each intervention made accuracy worse, not better:\n\nv0 (baseline, full record): best MASE = 1.40 with PROPHET — the longer history actually helps\nv0 → v1: restricting to post-2000 increased MASE to 1.48 — less data meant less signal for the seasonal pattern, not less noise\nv1 → v2: adding the upstream regressor pushed MASE to 1.56 — the contemporaneous Glenwood flow adds little beyond what the seasonal structure already captures\n\nTakeaway: for this system, more data beats a cleaner regime. Beating the naïve benchmark requires leading indicators (SWE measured before runoff, reservoir storage, climate outlooks) — not concurrent flow from a nearby gage."
+  },
+  {
+    "objectID": "slides/week-7-1.html#step-8-forecast-forward-5-years-best-model",
+    "href": "slides/week-7-1.html#step-8-forecast-forward-5-years-best-model",
+    "title": "Week 7",
+    "section": "Step 8: Forecast Forward 5 Years (Best Model)",
+    "text": "Step 8: Forecast Forward 5 Years (Best Model)\n\nfc &lt;- cal_v2 |&gt;\n  modeltime_forecast(\n    new_data    = test_reg,\n    actual_data = lees_reg\n  )\n\nfc |&gt;\n  filter(.key == \"actual\") |&gt;\n  ggplot(aes(x = .index, y = .value)) +\n  geom_line(color = \"grey40\") +\n  geom_line(data = filter(fc, .key == \"prediction\"),\n            aes(color = .model_desc)) +\n  geom_ribbon(data = filter(fc, .key == \"prediction\"),\n              aes(ymin = .conf_lo, ymax = .conf_hi, fill = .model_desc),\n              alpha = 0.1) +\n  scale_color_brewer(palette = \"Set1\") +\n  scale_fill_brewer(palette = \"Set1\") +\n  labs(title = \"Lees Ferry Forecast — Post-2000 + Upstream Regressor\",\n       x = NULL, y = \"Monthly Mean Discharge (cfs)\",\n       color = \"Model\", fill = \"Model\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")"
+  },
+  {
+    "objectID": "slides/week-7-1.html#the-forecasting-plan",
+    "href": "slides/week-7-1.html#the-forecasting-plan",
+    "title": "Week 7",
+    "section": "The Forecasting Plan",
+    "text": "The Forecasting Plan\nThree rounds — each testing a hypothesis about what’s limiting model skill:\n\n\n\n\n\n\n\n\n\nRound\nHypothesis\nTraining data\nPredictors\n\n\n\n\n0\nBaseline: just fit the full record\n1980–2023\nDate only\n\n\n1\nPre-2000 high-flow regime is noise\nPost-2000 only\nDate only\n\n\n2\nModels need physical upstream signal\nPost-2000 only\nDate + upstream flow\n\n\n\nAfter each round we check: did MASE drop below 1? (Spoiler: no. The question is why.)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#why-does-training-data-era-matter",
+    "href": "slides/week-7-1.html#why-does-training-data-era-matter",
+    "title": "Week 7",
+    "section": "Why Does Training Data Era Matter?",
+    "text": "Why Does Training Data Era Matter?\n\n\n\nThe 1984 peak (~55,000 cfs) is 5× the current typical flow\nTraining on 1980–2023 teaches the model a world that no longer exists: the pre-2000 high-flow regime inflates variance estimates and distorts trend learning\nEvery model wastes capacity fitting the pre-2000 regime it will never need to forecast"
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-0-the-naive-baseline-full-record",
+    "href": "slides/week-7-1.html#round-0-the-naive-baseline-full-record",
+    "title": "Week 7",
+    "section": "Round 0: The Naive Baseline (Full Record)",
+    "text": "Round 0: The Naive Baseline (Full Record)\nBefore restricting the training window, let’s see what happens when we naively use all 44 years of data:\n\nsplits_full &lt;- time_series_split(\n  lees_monthly,\n  date_var   = date,\n  assess     = \"60 months\",\n  cumulative = TRUE\n)\n\nmods_full &lt;- list(\n  arima_reg()                                |&gt; set_engine(\"auto_arima\"),\n  prophet_reg(seasonality_yearly = TRUE)     |&gt; set_engine(\"prophet\"),\n  exp_smoothing()                            |&gt; set_engine(\"ets\")\n)\n\nmodels_v0 &lt;- map(mods_full, ~ fit(.x, flow ~ date, data = training(splits_full)))\n\ncal_v0 &lt;- as_modeltime_table(models_v0) |&gt;\n  modeltime_calibrate(testing(splits_full), quiet = FALSE)\n\nmodeltime_accuracy(cal_v0) |&gt;\n  arrange(mase) |&gt;\n  select(.model_desc, mae, mape, mase, rmse, rsq)\n#&gt; # A tibble: 3 × 6\n#&gt;   .model_desc               mae  mape  mase  rmse   rsq\n#&gt;   &lt;chr&gt;                   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1 PROPHET                 1668.  14.6  1.40 2140. 0.297\n#&gt; 2 ETS(M,AD,M)             1770.  16.3  1.48 2273. 0.249\n#&gt; 3 ARIMA(2,1,1)(1,0,1)[12] 2012.  19.4  1.69 2559. 0.188\n\nAll MASE &gt; 1: every model is beaten by a naïve seasonal forecast. The 1984 high-flow regime is polluting the training distribution. Fix: restrict to the post-2000 drought regime."
+  },
+  {
+    "objectID": "slides/week-7-1.html#final-step-forecast-forward-5-years",
+    "href": "slides/week-7-1.html#final-step-forecast-forward-5-years",
+    "title": "Week 7",
+    "section": "Final Step: Forecast Forward 5 Years",
+    "text": "Final Step: Forecast Forward 5 Years\n\nfc &lt;- cal_v2 |&gt;\n  modeltime_forecast(\n    new_data    = test_reg,\n    actual_data = lees_reg\n  )\n\nfc |&gt;\n  filter(.key == \"actual\") |&gt;\n  ggplot(aes(x = .index, y = .value)) +\n  geom_line(color = \"grey40\") +\n  geom_line(data = filter(fc, .key == \"prediction\"),\n            aes(color = .model_desc)) +\n  geom_ribbon(data = filter(fc, .key == \"prediction\"),\n              aes(ymin = .conf_lo, ymax = .conf_hi, fill = .model_desc),\n              alpha = 0.1) +\n  scale_color_brewer(palette = \"Set1\") +\n  scale_fill_brewer(palette = \"Set1\") +\n  labs(title = \"Lees Ferry Forecast: Post-2000 + Upstream Regressor\",\n       x = NULL, y = \"Monthly Mean Discharge (cfs)\",\n       color = \"Model\", fill = \"Model\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")"
+  },
+  {
+    "objectID": "labs/lab-06.html#getting-the-data",
+    "href": "labs/lab-06.html#getting-the-data",
+    "title": "Lab 6: Timeseries Data",
+    "section": "Getting the Data",
+    "text": "Getting the Data\n\nStreamflow\nDownload daily streamflow for the Poudre at Mouth (USGS 06752260) and aggregate to monthly means. This is the same readNWISdv() + renameNWISColumns() pipeline from Lab 1 — the only addition is yearmonth() from tsibble to create a monthly time index.\n\npoudre_flow &lt;- readNWISdv(\n  siteNumber = \"06752260\",\n  parameterCd = \"00060\",\n  startDate   = \"2013-01-01\",\n  endDate     = \"2023-12-31\"\n) |&gt;\n  renameNWISColumns() |&gt;\n  mutate(Date = yearmonth(Date)) |&gt;\n  group_by(Date) |&gt;\n  summarise(Flow = mean(Flow))\n\n\n\nHistoric Climate (GridMET)\nWe will use climateR::getTerraClim() to download monthly climate data for the Poudre basin (max temperature, precipitation, solar radiation). The exactextractr package spatially averages each raster layer over the basin polygon.\n\nbasin &lt;- findNLDI(nwis = \"06752260\", find = \"basin\")\n\nsdate &lt;- as.Date(\"2013-01-01\")\nedate &lt;- as.Date(\"2023-12-31\")\n\ngm &lt;- getTerraClim(\n  AOI       = basin$basin,\n  var       = c(\"tmax\", \"ppt\", \"srad\"),\n  startDate = sdate,\n  endDate   = edate\n) |&gt;\n  unlist() |&gt;\n  rast() |&gt;\n  exact_extract(basin$basin, \"mean\", progress = FALSE)\n\nhistoric &lt;- mutate(gm, id = \"gridmet\") |&gt;\n  pivot_longer(cols = -id) |&gt;\n  mutate(name = sub(\"^mean\\\\.\", \"\", name)) |&gt;\n  tidyr::extract(name, into = c(\"var\", \"index\"), \"(.*)_([^_]+$)\") |&gt;\n  mutate(index = as.integer(index)) |&gt;\n  mutate(Date = yearmonth(seq.Date(sdate, edate, by = \"month\")[as.numeric(index)])) |&gt;\n  pivot_wider(id_cols = Date, names_from = var, values_from = value) |&gt;\n  right_join(poudre_flow, by = \"Date\")\n\n# Validate: should have 132 rows (11 years × 12 months). If fewer, climate data\n# is missing for some months and those flow months were silently dropped.\nstopifnot(\"Climate join dropped flow months — check GridMET download\" = nrow(historic) == 132)\n\n\n\nFuture Climate (MACA)\nAny time exogenous predictors are used for forecasting, future values of those predictors must also be available. We use MACA — a statistically downscaled climate dataset developed by the same group as GridMET — to get projected temperature, precipitation, and solar radiation through 2033.\nTwo differences from GridMET: temperature is in Kelvin (subtract 273.15 for °C) and variable names differ slightly.\n\nsdate &lt;- as.Date(\"2024-01-01\")\nedate &lt;- as.Date(\"2033-12-31\")\n\nmaca &lt;- getMACA(\n  AOI      = basin$basin,\n  var      = c(\"tasmax\", \"pr\", \"rsds\"),\n  timeRes  = \"month\",\n  startDate = sdate,\n  endDate   = edate\n) |&gt;\n  unlist() |&gt;\n  rast() |&gt;\n  exact_extract(basin$basin, \"mean\", progress = FALSE)\n\nfuture &lt;- mutate(maca, id = \"maca\") |&gt;\n  pivot_longer(cols = -id) |&gt;\n  mutate(name = sub(\"^mean\\\\.\", \"\", name)) |&gt;\n  tidyr::extract(name, into = c(\"var\", \"index\"), \"(.*)_([^_]+$)\") |&gt;\n  mutate(index = as.integer(index)) |&gt;\n  mutate(Date = yearmonth(seq.Date(sdate, edate, by = \"month\")[as.numeric(index)])) |&gt;\n  pivot_wider(id_cols = Date, names_from = var, values_from = value)\n\n# Rename the 3 climate columns to match GridMET names (Date column stays first)\nstopifnot(\"Unexpected MACA column count\" = ncol(future) == 4)\nnames(future)[2:4] &lt;- c(\"ppt\", \"srad\", \"tmax\")  # order matches getMACA var request\nfuture &lt;- mutate(future, tmax = tmax - 273.15)   # Kelvin → °C"
+  },
+  {
+    "objectID": "labs/lab-06.html#convert-to-tsibble",
+    "href": "labs/lab-06.html#convert-to-tsibble",
+    "title": "Lab 6: Timeseries Data",
+    "section": "1. Convert to tsibble",
+    "text": "1. Convert to tsibble\nConvert historic to a tsibble object using as_tsibble(). A tsibble is a tidy time series data frame — it retains the date index and integrates with feasts functions for decomposition and visualization. Think of it as a tibble that knows it is ordered in time."
+  },
+  {
+    "objectID": "labs/lab-06.html#plot-the-time-series",
+    "href": "labs/lab-06.html#plot-the-time-series",
+    "title": "Lab 6: Timeseries Data",
+    "section": "2. Plot the Time Series",
+    "text": "2. Plot the Time Series\nUse ggplot to plot monthly Flow over time. Use plot_ly() from plotly for an interactive version — this lets you zoom into specific years or hover over values."
+  },
+  {
+    "objectID": "labs/lab-06.html#seasonal-diagnostics",
+    "href": "labs/lab-06.html#seasonal-diagnostics",
+    "title": "Lab 6: Timeseries Data",
+    "section": "3. Seasonal Diagnostics",
+    "text": "3. Seasonal Diagnostics\nBefore fitting any model, inspect the seasonal structure using two complementary feasts plots.\nSubseries plot — one panel per month, each line is one year, the blue line is the monthly mean across all years:\nSeasonal plot — each line is one year plotted over the calendar cycle. Parallel lines = stable seasonal shape; diverging lines = changing pattern:\nDescribe what you see. How are “seasons” defined in these plots? Is the seasonal shape consistent across years, or does it change? What physical process drives the May–June peak?"
+  },
+  {
+    "objectID": "labs/lab-06.html#stationarity-and-autocorrelation",
+    "href": "labs/lab-06.html#stationarity-and-autocorrelation",
+    "title": "Lab 6: Timeseries Data",
+    "section": "4. Stationarity and Autocorrelation",
+    "text": "4. Stationarity and Autocorrelation\nTwo diagnostics that directly inform ARIMA model selection:\nLag plot — plots Flow against its own lagged values. Strong linear patterns = high autocorrelation (ARIMA has something to work with). A diffuse cloud = no memory. Use log1p(Flow) — on the raw scale, peak months compress all other observations into the corner and hide the structure.\nStationarity tests — ARIMA requires a stationary series (constant mean and variance). Test formally before fitting:\nWhat do the tests tell you? If the series is non-stationary, ARIMA will need d ≥ 1 (differencing). Does the lag plot support the same conclusion?"
+  },
+  {
+    "objectID": "labs/lab-06.html#decomposition",
+    "href": "labs/lab-06.html#decomposition",
+    "title": "Lab 6: Timeseries Data",
+    "section": "5. Decomposition",
+    "text": "5. Decomposition\nUse model(STL(...)) to decompose the time series into trend, seasonality, and remainder. Choose a trend window size you feel is appropriate and justify your choice. Extract components with components() and visualize with autoplot().\nDescribe what you see:\n\nWhat does the trend tell you about long-term changes in Poudre flow? Is there evidence of a decline consistent with climate change or upstream demand?\nWhat drives the seasonal component? (Hint: snowmelt, irrigation withdrawals, reservoir releases)\nAre there any spikes in the remainder that correspond to anomalous years you can identify?"
+  },
+  {
+    "objectID": "labs/lab-06.html#modeltime-prediction",
+    "href": "labs/lab-06.html#modeltime-prediction",
+    "title": "Lab 6: Timeseries Data",
+    "section": "Modeltime Prediction",
+    "text": "Modeltime Prediction\n\nData Preparation\nConvert the historic tsibble and future tibble to plain tibbles with a Date column for modeltime. All predictor columns must be present in both the historic and future datasets — this is what enables the 10-year climate-driven forecast.\nStreamflow is strictly non-negative but right-skewed — snowmelt peaks dwarf base-flow months. To prevent models from predicting negative flows, add a log-transformed response with log1p(Flow) (log(Flow + 1), safe when flow is near zero). Fit all models on log_flow; back-transform predictions with expm1() (= exp(x) - 1) to return to cfs units.\n\n\nTrain / Test Split\nHold out the last 24 months (2022–2023) as the test set. This mirrors the assess = \"60 months\" logic from the CO₂ and Lees Ferry examples — the test set is always the most recent data, never a random sample.\n\n\nModel Definition\nChoose at least three models — one ARIMA and one Prophet are required. Store model specifications in a list:\n\n\nModel Fitting\nFit all models to the training data on the log scale. Exclude the raw Flow column so models only see log_flow as the response — each engine handles date and climate predictors internally.\n\n\nCalibration and Accuracy\nCalibrate on the test set (2022–2023) to compute out-of-sample accuracy metrics. Pass select(testing, -Flow) so calibration uses the log-scale response:\nDescribe what you see. Use these benchmarks to interpret the numbers:\n\nMASE &lt; 1 — the model beats a naïve seasonal forecast (last year’s same month)\nMAPE — intuitive % error, but inflated in low-flow months when Flow ≈ 0\nRMSE — penalizes large errors heavily; compare to mean test-period flow for context\nDo boosted models (ARIMA-boost, Prophet-boost) outperform their base versions? If so, the nonlinear climate signal is worth capturing.\n\n\n\nTest Set Forecast\nForecast over the held-out test period and compare predictions to actuals. Back-transform with expm1() to return predictions to cfs. Two details matter: (1) expm1(x) is the exact inverse of log1p(x) and always returns values ≥ 0; (2) confidence interval lower bounds on the log scale can be slightly negative — floor them at 0 with pmax(.conf_lo, 0) before back-transforming so the ribbon never dips below zero cfs:\nDo predictions track actuals during the 2022–2023 test window? Are confidence intervals capturing observed values? Note any discontinuities at the 2022 boundary between training and test.\n\n\nRefit to Full Dataset\nRefit all models to the complete 2013–2023 record before forecasting forward. Refitting allows auto-tuned models (auto.arima, ets) to re-optimize their parameters with more data:\nDo the accuracy metrics change after refitting? Why or why not?\n\n\nForecast into the Future (2024–2033)\nUse the refitted models with future_tbl as new_data to generate a 10-year climate-conditioned forecast. Back-transform with expm1():"
+  },
+  {
+    "objectID": "labs/lab-06.html#wrap-up",
+    "href": "labs/lab-06.html#wrap-up",
+    "title": "Lab 6: Timeseries Data",
+    "section": "Wrap-up",
+    "text": "Wrap-up\nExamine your 10-year forecast and reflect on the following:\n\nModel agreement: Do ARIMA and Prophet project similar trajectories? If they diverge, what does that tell you about their different assumptions (statistical stationarity vs. flexible trend)?\nForecast quality: Which model would you recommend to CWCB for water-supply planning? Justify with your accuracy metrics.\nNegative predictions: If any model predicts negative flow, explain why this happens and what you would do to fix it in a production context (hint: log-transformation of Flow before modeling).\nRegressor value: The MACA climate projections assume a specific emissions scenario. How does uncertainty in those projections propagate into your streamflow forecast?\nImprovement path: What information not in tmax, ppt, srad would most improve this forecast? (Consider: snowpack, upstream storage, irrigation demand.)\n\nAt this stage you have a working end-to-end time series forecasting pipeline — the same structural approach used by CWCB, USBR, and state water agencies for operational planning. The processes you learned in tidymodels apply directly here, and you can extend this framework with cross-validation (time_series_cv()), feature engineering (lag variables, rolling means), and hyperparameter tuning."
+  },
+  {
+    "objectID": "labs/lab-06.html#going-further-optional-add-an-upstream-regressor",
+    "href": "labs/lab-06.html#going-further-optional-add-an-upstream-regressor",
+    "title": "Lab 6: Timeseries Data",
+    "section": "Going Further (Optional): Add an Upstream Regressor",
+    "text": "Going Further (Optional): Add an Upstream Regressor\nIn lecture we showed that adding Glenwood Springs flow as an exogenous regressor improved Lees Ferry forecasts because upstream conditions carry physical information the model can’t infer from time structure alone. Try the same approach here.\nDownload data from a headwater gage on the Poudre (e.g., North Fork Cache la Poudre, USGS 06746095) and add it as a predictor:\n\nupstream &lt;- readNWISdv(\n  siteNumber  = \"06746095\",\n  parameterCd = \"00060\",\n  startDate   = \"2013-01-01\",\n  endDate     = \"2023-12-31\"\n) |&gt;\n  renameNWISColumns() |&gt;\n  # floor_date returns the 1st of each month as a Date — same type as pf_tbl$date\n  mutate(date = floor_date(Date, \"month\")) |&gt;\n  group_by(date) |&gt;\n  summarise(upstream_flow = mean(Flow, na.rm = TRUE), .groups = \"drop\")\n\npf_reg &lt;- pf_tbl |&gt;\n  left_join(upstream, by = \"date\") |&gt;\n  drop_na(upstream_flow)\n\nsplits_reg &lt;- time_series_split(pf_reg, assess = \"24 months\", cumulative = TRUE)\n\n# Use log_flow ~ . consistent with the main pipeline; exclude raw Flow\nmodels_reg &lt;- map(mods, ~ fit(.x, log_flow ~ .,\n                               data = select(training(splits_reg), -Flow)))\n\nDoes adding upstream flow improve MASE on the test set? If yes, the physical signal is worth including. If not, the climate data alone may be sufficient for monthly aggregation at this timescale."
+  },
+  {
+    "objectID": "slides/week-7-1.html#what-we-built-this-semester",
+    "href": "slides/week-7-1.html#what-we-built-this-semester",
+    "title": "Week 7",
+    "section": "What We Built This Semester",
+    "text": "What We Built This Semester\n\n\nA complete environmental data science pipeline:\n\nReproducible workflows & tidy data wrangling\nVector spatial data, projections & interactive mapping\nJSON, GeoJSON, STAC & cloud-native data access\nSpatial predicates, tessellations & programming abstractions\nRaster data, remote sensing & spectral analysis\nMachine learning, EDA, normality & spatial cross-validation\nTime series decomposition, ARIMA, Prophet & forecasting\n\n\nApplied to real water systems:\n\nColorado River compact accounting (Lees Ferry)\nUS border enforcement zones (distance/projection)\nNational Dam Inventory (tessellations & MAUP)\nPalo, Iowa flood mapping (Landsat + STAC)\nCAMELS basin hydrology (ML at scale)\nCache la Poudre streamflow (climate forecasting)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#week-1-foundations",
+    "href": "slides/week-7-1.html#week-1-foundations",
+    "title": "Week 7",
+    "section": "Week 1: Foundations",
+    "text": "Week 1: Foundations\n\n\nYour Digital Environment\n\nBits, bytes, and file formats: what is actually stored on disk\nAbsolute vs. relative paths; here::here() for project portability\nFile naming conventions: machine-readable, human-readable, sortable\nVersion control basics and terminal navigation\n\nTidy Data & dplyr\n\nTidy principles: variables as columns, observations as rows\nCore verbs: filter(), select(), mutate(), summarize(), group_by(), arrange()\ntidyselect helpers, |&gt; pipe, if_else(), transmute()\nRelational joins: inner_join, left_join, right_join\nggplot2 grammar of graphics\n\n\nLab 1: Colorado River Streamflow\n\nreadNWISdv() + renameNWISColumns() for 7 USGS gauges, 44 years\nDay-over-day flow changes, threshold detection, rolling means\nPredictive modeling of Lees Ferry from upstream gauges with broom\n\nKey packages: tidyverse, dataRetrieval, lubridate, zoo, broom"
+  },
+  {
+    "objectID": "slides/week-7-1.html#week-2-vector-data-interactive-mapping",
+    "href": "slides/week-7-1.html#week-2-vector-data-interactive-mapping",
+    "title": "Week 7",
+    "section": "Week 2: Vector Data & Interactive Mapping",
+    "text": "Week 2: Vector Data & Interactive Mapping\n\n\nSimple Features & Projections\n\nSF standard: geometry types (Point, Line, Polygon, Multi*, GeometryCollection)\nThe spatial computing stack: GDAL (I/O), PROJ (CRS), GEOS (geometry ops)\nGeographic vs. projected CRS: when each matters; st_transform()\nTopological dimension: 0D points, 1D lines, 2D polygons\nDistance, area, perimeter with units-aware results\n\nInteractive Mapping with Leaflet\n\nWeb tiles, XYZ tile servers, Web Mercator (EPSG:3857) and its distortion\nLayered composition: basemap → polygons → markers → popups → controls\nleaflet.extras: drawing tools, search, clustering, heatmaps\n\n\nLab 2: US Border Spatial Analysis\n\nBuilt sf objects from tigris, rnaturalearth, and CSV coordinates\nst_union, st_cast, st_distance, st_transform on city/border geometries\n100-mile border zone: distance threshold → population in enforcement footprint\ngghighlight + ggrepel for annotated spatial plots\n\nKey packages: sf, AOI, leaflet, leaflet.extras, units, tigris, rnaturalearth, gghighlight, ggrepel"
+  },
+  {
+    "objectID": "slides/week-7-1.html#week-3-spatial-operations-programming",
+    "href": "slides/week-7-1.html#week-3-spatial-operations-programming",
+    "title": "Week 7",
+    "section": "Week 3: Spatial Operations & Programming",
+    "text": "Week 3: Spatial Operations & Programming\n\n\nPredicates & the DE-9IM Model\n\nInterior, boundary, exterior of every geometry type\nDimensionally Extended 9-Intersection Model (DE-9IM): encodes all possible spatial relationships as a 3×3 matrix of intersection dimensions\nNamed predicates: st_intersects, st_within, st_contains, st_touches, st_crosses, st_overlaps, st_disjoint\n\nTessellations, Simplification & MAUP\n\nGeometry simplification: Douglas-Peucker via ms_simplify(): resolution vs. file size tradeoff\nTessellations: Voronoi, Delaunay, square grid, hexagonal grid: regularity, compactness, cost\nModifiable Areal Unit Problem: aggregation unit changes the answer\n\n\nWriting Functions\n\nFunctions as first-class objects; environment scoping\nArguments, defaults, return values\nRule of three: if you write it twice, write a function\nPoint-in-polygon as the motivating case study (spatial join → count → visualize)\nMoran’s I across tessellations as a worked example of function reuse\n\nLab 3: National Dam Inventory\n\nTessellated CONUS with 4 methods (Voronoi, Delaunay, square grid, hex); point-in-polygon for ~90,000 dams\nGeometry simplification with ms_simplify() to balance detail vs. file size\nWrote reusable tessellation + visualization functions\nObserved MAUP directly: same dams, different maps\n\nKey packages: sf, rmapshaper, units, AOI"
+  },
+  {
+    "objectID": "slides/week-7-1.html#week-4-raster-data-cloud-native-workflows",
+    "href": "slides/week-7-1.html#week-4-raster-data-cloud-native-workflows",
+    "title": "Week 7",
+    "section": "Week 4: Raster Data & Cloud-Native Workflows",
+    "text": "Week 4: Raster Data & Cloud-Native Workflows\n\n\nRaster Data Model\n\nContinuous fields vs. discrete objects: when to use raster vs. vector\nStructure: extent, resolution, CRS, bands (layers); implicit coordinates\nSpectral values, RGB channels, bits/bytes per pixel\nterra operations: crop(), mask(), aggregate(), classify(), extract()\nRaster algebra: band math, spectral indices (NDVI, SWIR)\nMulti-layer arrays and S4 class system\n\nJSON, GeoJSON & STAC (applied)\n\nSTAC Catalog → Collection → Item → signed Asset URL\nrstac: stac() → stac_search() → get_request() → items_sign() → assets_download()\nSafe download pattern: HEAD request to check file size first\n\n\nLab 4: Palo, Iowa Flood 2016\n\nSTAC search on Microsoft Planetary Computer for Landsat 8 (Sept 24–29, 2016)\nDownloaded 6 spectral bands; plotRGB() for true-color and false-color composites\nRaster classification to delineate flood extent\nPre/post comparison to quantify inundated area\n\nKey packages: terra, rstac, sf, AOI"
+  },
+  {
+    "objectID": "slides/week-7-1.html#week-5-machine-learning-eda-tidymodels-spatial-cv",
+    "href": "slides/week-7-1.html#week-5-machine-learning-eda-tidymodels-spatial-cv",
+    "title": "Week 7",
+    "section": "Week 5: Machine Learning: EDA, tidymodels & Spatial CV",
+    "text": "Week 5: Machine Learning: EDA, tidymodels & Spatial CV\n\n\nExploratory Data Analysis\n\nEDA checklist: structure, missingness, distributions, correlations, outliers\nskimr::skim(), visdat, ggpubr for rapid data profiling\nNormality testing: Q-Q plots, Shapiro-Wilk, nest/map for per-group tests\nNon-normal data: log-transform, nonparametric tests (Wilcoxon, Kruskal-Wallis), bootstrapping\n\nThe tidymodels Ecosystem\n\nrsample: train/test splits, vfold_cv(), stratified sampling\nrecipes: normalization, dummy encoding, imputation, feature engineering\nparsnip: unified spec: same code, swap engine\nworkflows: bundle recipe + model; workflow_set() for multi-model comparison\nyardstick: accuracy, ROC AUC, RMSE, MAE, RSQ\n\n\nSpatial Autocorrelation & Honest CV\n\nMoran’s I: positive I = similar values cluster; tests residuals AND predictors\nRandom vfold_cv() leaks spatial signal → inflated skill scores\nspatial_block_cv(): whole geographic blocks per fold: no leakage\nHigh-Moran’s-I predictors may be geographic proxies, not causal features\nVIP: permutation-based importance is comparable across model families\n\nLab 5: CAMELS Hydrology ML\n\nworkflow_set() comparing 6 model families simultaneously\nVIP: snowpack and aridity dominated; spatial leakage inflated random CV ~15%\n\nKey packages: tidymodels, skimr, visdat, vip, spatialsample, baguette, powerjoin"
+  },
+  {
+    "objectID": "slides/week-7-1.html#week-6-model-families-hyperparameter-tuning",
+    "href": "slides/week-7-1.html#week-6-model-families-hyperparameter-tuning",
+    "title": "Week 7",
+    "section": "Week 6: Model Families & Hyperparameter Tuning",
+    "text": "Week 6: Model Families & Hyperparameter Tuning\n\n\nSix Model Families\n\n\n\n\n\n\n\n\nFamily\nparsnip spec\nKey hyperparameters\n\n\n\n\nLinear / Logistic\nlinear_reg() / logistic_reg()\npenalty, mixture\n\n\nDecision Tree\ndecision_tree()\ntree_depth, min_n\n\n\nRandom Forest\nrand_forest()\nmtry, trees, min_n\n\n\nBoosted Trees\nboost_tree()\nlearn_rate, tree_depth\n\n\nSVM\nsvm_rbf()\ncost, rbf_sigma\n\n\nNeural Net\nmlp()\nhidden_units, penalty\n\n\n\nTuning Workflow\n\nMark parameters with tune() → tune_grid() with a named grid\nselect_best() → finalize_workflow() → last_fit() on holdout test set\nNever select hyperparameters using test data\n\n\nWhen to Use Which Model\n\nLinear/logistic: interpretable baseline; requires feature engineering\nDecision tree: explainable but unstable; use as a stepping stone\nRandom forest: robust default for tabular environmental data; handles missingness\nBoosted trees: highest ceiling; prone to overfitting without careful tuning\nSVM: strong for small/medium datasets with clear margins\nNeural net: shines with large data, images, or sequences (e.g., LSTM for streamflow)\n\nLab 5 continued: hyperparameter tuning and last_fit() finalization applied to CAMELS runoff prediction"
+  },
+  {
+    "objectID": "slides/week-7-1.html#week-7-time-series-analysis-forecasting",
+    "href": "slides/week-7-1.html#week-7-time-series-analysis-forecasting",
+    "title": "Week 7",
+    "section": "Week 7: Time Series Analysis & Forecasting",
+    "text": "Week 7: Time Series Analysis & Forecasting\n\n\nTime Series Foundations\n\nSequential data: order matters: standard ML splits leak the future\nDecomposition: trend + seasonality + remainder; additive vs. multiplicative\nts, zoo, xts for base/irregular workflows; tsibble + feasts for tidy\ngg_season(), gg_subseries(), gg_lag() for visual diagnostics\n\nARIMA\n\nStationarity prerequisite: adf.test() / kpss.test()\nACF → MA(q) order; PACF → AR(p) order; slow decay → differencing needed\nSeasonal ARIMA notation: (p,d,q)(P,D,Q)[m]; auto.arima() for selection\nAIC/AICc: penalizes complexity: lower is better\n\n\nProphet & modeltime\n\nProphet: y(t) = g(t) + s(t) + h(t) + ε(t): Fourier seasonality, changepoint detection\nmodeltime: ARIMA, Prophet, ETS, boosting under one parsnip-style interface\nWalk-forward CV (time_series_cv()): never random k-fold on time series\nTraining era matters: structural regime shifts break models trained on wrong period\nExogenous regressors: flow ~ date + upstream_flow adds physical signal\nMASE &lt; 1 = beats naïve seasonal benchmark\n\nLab 6: Cache la Poudre Forecasting\n\nGridMET (historic climate) + MACA (projected) as predictors\n10-year climate-conditioned streamflow forecast"
+  },
+  {
+    "objectID": "slides/week-7-1.html#the-ecosystem-we-built",
+    "href": "slides/week-7-1.html#the-ecosystem-we-built",
+    "title": "Week 7",
+    "section": "The Ecosystem We Built",
+    "text": "The Ecosystem We Built\n\n\nData Access Layer\n\ndataRetrieval: USGS NWIS streamflow & water quality\nclimateR: GridMET, MACA, TerraClimate rasters\nrstac: cloud raster discovery via Planetary Computer\nAOI, tigris, rnaturalearth: boundaries & admin data\njsonlite: REST API responses\n\n\nWrangling & Modeling Layer\n\ndplyr + tidyr + purrr: data manipulation, reshaping, iteration\nbroom: tidy model output (tidy(), glance(), augment())\nlubridate + zoo: dates, rolling windows, irregular time series\nsf + terra: vector and raster spatial operations\ntidymodels: ML specification, training, evaluation, tuning\nspatialsample: geography-aware cross-validation\ntsibble + feasts: tidy time series diagnostics\nmodeltime + timetk: unified forecasting workflows\n\n\nCommunication Layer\n\nggplot2: publication-quality static graphics\nleaflet + leaflet.extras: interactive web maps\nplotly: interactive charts\nflextable / kableExtra: formatted tables\nQuarto: reproducible HTML, PDF, and slides from one source"
+  },
+  {
+    "objectID": "slides/week-7-1.html#from-lab-1-to-lab-6-one-continuous-thread",
+    "href": "slides/week-7-1.html#from-lab-1-to-lab-6-one-continuous-thread",
+    "title": "Week 7",
+    "section": "From Lab 1 to Lab 6: One Continuous Thread",
+    "text": "From Lab 1 to Lab 6: One Continuous Thread\n\n\n\n\n\n\n\n\n\nLab\nQuestion\nKey new tools\nBuilds on\n\n\n\n\nLab 1\nHow has Lees Ferry flow changed?\ndataRetrieval, dplyr, zoo, broom\n:\n\n\nLab 2\nWho lives in the 100-mile border zone?\nsf, tigris, st_distance, gghighlight\nLab 1 wrangling\n\n\nLab 3\nWhere are the dams, and does the pattern depend on how we aggregate?\nTessellations, rmapshaper, custom functions\nLab 2 spatial ops\n\n\nLab 4\nHow large was the Palo flood?\nterra, rstac, raster algebra, composites\nLab 3 predicates\n\n\nLab 5\nWhat basin attributes predict runoff?\ntidymodels, spatialsample, vip\nLab 1 modeling + Lab 4 spatial\n\n\nLab 6\nWhat will Poudre flow be in 2033?\nmodeltime, climateR, exactextractr, MACA\nEvery lab combined\n\n\n\n\n\nLab 6 draws on USGS data access (Lab 1), basin polygon operations (Labs 2–3), raster climate extraction (Lab 4), and the tidymodels workflow pattern (Lab 5): running end-to-end in a single document."
+  },
+  {
+    "objectID": "slides/week-7-1.html#what-you-can-now-do",
+    "href": "slides/week-7-1.html#what-you-can-now-do",
+    "title": "Week 7",
+    "section": "What You Can Now Do",
+    "text": "What You Can Now Do\n\n\nAnswer questions like:\n\nWhere does water come from, and where does it go?\nHow has streamflow changed over 40 years: and why?\nWhich basins are most drought-vulnerable given their climate and geology?\nWhat spectral signature indicates standing water after a flood?\nWhat is the predicted flow at Lees Ferry in 2033 under a warming scenario?\n\nWith tools used in practice by:\n\nUSBR and CWCB: dataRetrieval + operational forecasting\nUSACE flood operations: raster inundation mapping\nState water agencies: MACA climate projections for planning\nRemote sensing labs: STAC + Planetary Computer at scale\n\n\nThe habits that transfer to every future project:\n\nReproducibility: relative paths, here, version-controlled projects\nEDA before modeling: distributions, missingness, spatial structure first\nDecompose the signal: trend + seasonality + remainder before fitting\nHonest evaluation: spatial CV and walk-forward CV, never random splits on structured data\nPhysical intuition: does the model agree with what the hydrology says should happen?\nFunctions over copy-paste: three repetitions = write a function\nCommunicate uncertainty: intervals and residual diagnostics, not just point estimates\nOpen data, open code: reproducible work is citable, auditable, and extensible"
+  },
+  {
+    "objectID": "slides/week-7-1.html#you-made-it",
+    "href": "slides/week-7-1.html#you-made-it",
+    "title": "Week 7",
+    "section": "You Made It",
+    "text": "You Made It\n\nSeven weeks. Six labs. One pipeline.\nFrom a USGS gauge number to a 10-year probabilistic streamflow forecast.\nThe tools are yours to keep."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html",
+    "href": "labs/keys/lab-06-key.html",
+    "title": "Lab 6: Answer Key",
+    "section": "",
+    "text": "library(tidyverse)\nlibrary(plotly)\n\nlibrary(dataRetrieval)\nlibrary(climateR)\nlibrary(terra)\nlibrary(exactextractr)\n\nlibrary(tidymodels)\nlibrary(tsibble)\nlibrary(feasts)\nlibrary(modeltime)\nlibrary(timetk)\nlibrary(tseries)"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#streamflow",
+    "href": "labs/keys/lab-06-key.html#streamflow",
+    "title": "Lab 6: Answer Key",
+    "section": "Streamflow",
+    "text": "Streamflow\n\npoudre_flow &lt;- readNWISdv(\n  siteNumber = \"06752260\",\n  parameterCd = \"00060\",\n  startDate   = \"2013-01-01\",\n  endDate     = \"2023-12-31\"\n) |&gt;\n  renameNWISColumns() |&gt;\n  mutate(Date = yearmonth(Date)) |&gt;\n  group_by(Date) |&gt;\n  summarise(Flow = mean(Flow))\n\nglimpse(poudre_flow)\n\nRows: 132\nColumns: 2\n$ Date &lt;mth&gt; 2013 Jan, 2013 Feb, 2013 Mar, 2013 Apr, 2013 May, 2013 Jun, 2013 …\n$ Flow &lt;dbl&gt; 18.125806, 18.046429, 8.208710, 5.940667, 332.579677, 299.989333,…"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#historic-climate-gridmet",
+    "href": "labs/keys/lab-06-key.html#historic-climate-gridmet",
+    "title": "Lab 6: Answer Key",
+    "section": "Historic Climate (GridMET)",
+    "text": "Historic Climate (GridMET)\n\nbasin &lt;- findNLDI(nwis = \"06752260\", find = \"basin\")\n\nsdate &lt;- as.Date(\"2013-01-01\")\nedate &lt;- as.Date(\"2023-12-31\")\n\ngm &lt;- getTerraClim(\n  AOI       = basin$basin,\n  var       = c(\"tmax\", \"ppt\", \"srad\"),\n  startDate = sdate,\n  endDate   = edate\n) |&gt;\n  unlist() |&gt;\n  rast() |&gt;\n  exact_extract(basin$basin, \"mean\", progress = FALSE)\n\nhistoric &lt;- mutate(gm, id = \"gridmet\") |&gt;\n  pivot_longer(cols = -id) |&gt;\n  mutate(name = sub(\"^mean\\\\.\", \"\", name)) |&gt;\n  tidyr::extract(name, into = c(\"var\", \"index\"), \"(.*)_([^_]+$)\") |&gt;\n  mutate(index = as.integer(index)) |&gt;\n  mutate(Date = yearmonth(seq.Date(sdate, edate, by = \"month\")[as.numeric(index)])) |&gt;\n  pivot_wider(id_cols = Date, names_from = var, values_from = value) |&gt;\n  right_join(poudre_flow, by = \"Date\")\n\n# Validate: 11 years × 12 months = 132 rows. If fewer, climate data was missing\n# for some months and those flow months were silently dropped by the right_join.\nstopifnot(\"Climate join dropped flow months — check GridMET download\" = nrow(historic) == 132)\n\nglimpse(historic)\n\nRows: 132\nColumns: 5\n$ Date &lt;mth&gt; 2013 Jan, 2013 Feb, 2013 Mar, 2013 Apr, 2013 May, 2013 Jun, 2013 …\n$ ppt  &lt;dbl&gt; 10.510324, 17.357395, 26.433271, 53.476067, 42.237366, 12.467628,…\n$ srad &lt;dbl&gt; 97.94525, 124.68666, 180.27805, 216.70424, 269.29276, 292.37350, …\n$ tmax &lt;dbl&gt; 1.927377, 1.548743, 6.040504, 6.767159, 14.271442, 23.660526, 24.…\n$ Flow &lt;dbl&gt; 18.125806, 18.046429, 8.208710, 5.940667, 332.579677, 299.989333,…"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#future-climate-maca",
+    "href": "labs/keys/lab-06-key.html#future-climate-maca",
+    "title": "Lab 6: Answer Key",
+    "section": "Future Climate (MACA)",
+    "text": "Future Climate (MACA)\n\nsdate &lt;- as.Date(\"2024-01-01\")\nedate &lt;- as.Date(\"2033-12-31\")\n\nmaca &lt;- getMACA(\n  AOI       = basin$basin,\n  var       = c(\"tasmax\", \"pr\", \"rsds\"),\n  timeRes   = \"month\",\n  startDate = sdate,\n  endDate   = edate\n) |&gt;\n  unlist() |&gt;\n  rast() |&gt;\n  exact_extract(basin$basin, \"mean\", progress = FALSE)\n\nfuture &lt;- mutate(maca, id = \"maca\") |&gt;\n  pivot_longer(cols = -id) |&gt;\n  mutate(name = sub(\"^mean\\\\.\", \"\", name)) |&gt;\n  tidyr::extract(name, into = c(\"var\", \"index\"), \"(.*)_([^_]+$)\") |&gt;\n  mutate(index = as.integer(index)) |&gt;\n  mutate(Date = yearmonth(seq.Date(sdate, edate, by = \"month\")[as.numeric(index)])) |&gt;\n  pivot_wider(id_cols = Date, names_from = var, values_from = value)\n\n# Rename the 3 climate columns to match GridMET names (Date column stays first)\n# We verify exactly 4 columns exist before renaming by position\nstopifnot(\"Unexpected MACA column count\" = ncol(future) == 4)\nnames(future)[2:4] &lt;- c(\"ppt\", \"srad\", \"tmax\")  # order matches getMACA var request\nfuture &lt;- mutate(future, tmax = tmax - 273.15)   # Kelvin → °C\n\nglimpse(future)\n\nRows: 121\nColumns: 4\n$ Date &lt;mth&gt; 2024 Jan, 2024 Feb, 2024 Mar, 2024 Apr, 2024 May, 2024 Jun, 2024 …\n$ ppt  &lt;dbl&gt; 40.688091, 44.990303, 12.761312, 20.531368, 1.680828, 92.447021, …\n$ srad &lt;dbl&gt; 126.26448, 183.16980, 241.72774, 278.91016, 299.08728, 273.92786,…\n$ tmax &lt;dbl&gt; 4.2115417, 8.5879761, 14.3245483, 20.7030273, 26.8691650, 26.0306…"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#subseries-plot",
+    "href": "labs/keys/lab-06-key.html#subseries-plot",
+    "title": "Lab 6: Answer Key",
+    "section": "Subseries Plot",
+    "text": "Subseries Plot\n\ngg_subseries(pf, y = Flow) +\n  labs(title = \"Monthly Flow Patterns — Cache la Poudre at Mouth\",\n       y = \"Flow (cfs)\", x = \"Year\") +\n  theme_minimal()"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#seasonal-plot",
+    "href": "labs/keys/lab-06-key.html#seasonal-plot",
+    "title": "Lab 6: Answer Key",
+    "section": "Seasonal Plot",
+    "text": "Seasonal Plot\n\ngg_season(pf, y = Flow) +\n  labs(title = \"Seasonal Shape by Year — Cache la Poudre at Mouth\",\n       y = \"Flow (cfs)\", x = \"Month\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\nInterpretation:\nIn these plots, “seasons” are defined by the calendar month — each month (January through December) is treated as a seasonal unit. The gg_subseries() plot shows that May and June are by far the highest-flow months and also the most variable: the blue mean line sits well above the medians in dry years and the individual lines fan out widely, indicating that year-to-year snowpack differences translate directly into peak flow magnitude.\nThe gg_season() plot confirms the seasonal shape is remarkably consistent across years — every year shows the same May–June peak and August–February trough. However, the amplitude varies substantially: 2023 (bright line at top) had the highest peak in the record, while 2012 (bottom) was extremely dry. Lines that are parallel suggest a stable seasonal shape even when the level shifts — this is the signature of an additive seasonal structure and supports the use of additive decomposition and seasonal ARIMA.\nThe physical driver of the May–June peak is Rocky Mountain snowmelt. As temperatures rise in late April and May, the mountain snowpack melts and drains into the Poudre watershed. The sharp decline after June reflects both the exhaustion of the snowpack and the onset of irrigation diversions that pull water off the main stem before it reaches the gauge."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#lag-plot",
+    "href": "labs/keys/lab-06-key.html#lag-plot",
+    "title": "Lab 6: Answer Key",
+    "section": "Lag Plot",
+    "text": "Lag Plot\nOn the raw scale, May/June peaks (&gt;2000 cfs) compress all other months into the bottom-left corner — the plot shows outlier dominance, not autocorrelation structure. Running gg_lag() on log1p(Flow) spreads the data evenly and reveals the true lag pattern across all months.\n\npf |&gt;\n  mutate(log_flow = log1p(Flow)) |&gt;\n  gg_lag(y = log_flow, geom = \"point\") +\n  labs(title = \"Lag Structure of Monthly Poudre Flow (log scale)\",\n       x = \"lag(log Flow, n)\", y = \"log Flow\") +\n  theme_minimal()"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#stationarity-tests",
+    "href": "labs/keys/lab-06-key.html#stationarity-tests",
+    "title": "Lab 6: Answer Key",
+    "section": "Stationarity Tests",
+    "text": "Stationarity Tests\nBecause we will model log_flow, we test stationarity on the log-transformed series — that is the variable whose stationarity actually matters for ARIMA. Testing on raw Flow would answer a different question.\n\nlog_flow_vec &lt;- log1p(pf$Flow)\n\n# ADF: H0 = non-stationary; p &lt; 0.05 → reject non-stationarity → series IS stationary\nadf.test(log_flow_vec)\n\n\n    Augmented Dickey-Fuller Test\n\ndata:  log_flow_vec\nDickey-Fuller = -7.3292, Lag order = 5, p-value = 0.01\nalternative hypothesis: stationary\n\n# KPSS: H0 = stationary; p &lt; 0.05 → reject stationarity → series is NOT stationary\nkpss.test(log_flow_vec)\n\n\n    KPSS Test for Level Stationarity\n\ndata:  log_flow_vec\nKPSS Level = 0.50753, Truncation lag parameter = 4, p-value = 0.03997\n\n\nInterpretation:\nOn the log scale the autocorrelation structure is clearly visible. Lag 1 shows a moderately tight linear relationship — last month’s flow predicts this month’s, consistent with the gradual rise and fall of the snowmelt pulse. Intermediate lags (3–9) show more scatter as months six months apart have opposite seasonal roles (e.g., peak June vs. trough December). The tightest linear pattern appears at lag 12 — the same calendar month one year prior is the single strongest predictor, confirming dominant seasonal autocorrelation. Color reveals the mechanism: blue/teal points (May–July) cluster at high values at both axes, while dark purple/yellow (Jan/Dec) cluster at low values — the seasonal cycle, not random memory, is driving the structure. This is exactly what seasonal ARIMA is designed to exploit.\nThe ADF test on log-transformed flow returns a p-value well below 0.05 (reject H₀ of non-stationarity), indicating the series is stationary in mean. The KPSS test returns a p-value above 0.05 (fail to reject H₀ of stationarity), consistent with the ADF conclusion. Together, both tests agree: log(Poudre flow) is stationary, meaning auto.arima() should select d = 0 (no regular differencing needed), though it may still apply seasonal differencing (D = 1) to handle the strong annual cycle.\n\nNote: Always test stationarity on the variable the model will actually see — here log_flow, not raw Flow. The log transformation often makes borderline series clearly stationary by stabilizing the variance of peak months.\n\nThe lag plot and stationarity tests are consistent — a stationary series with strong autocorrelation at seasonal lags is exactly what ARIMA can model well."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#data-preparation",
+    "href": "labs/keys/lab-06-key.html#data-preparation",
+    "title": "Lab 6: Answer Key",
+    "section": "Data Preparation",
+    "text": "Data Preparation\nStreamflow is strictly non-negative and right-skewed — low-flow months (&lt; 50 cfs) sit close to zero while peak months can exceed 2,000 cfs. Fitting models on the raw scale allows predictions to go negative. The fix is a log transformation: we model log(Flow + 1) (the +1 avoids log(0)) and back-transform forecasts with exp(prediction) - 1. This also stabilizes variance across seasons, which improves model fit.\n\npf_tbl &lt;- pf |&gt;\n  as_tibble() |&gt;\n  mutate(date     = as.Date(Date),\n         log_flow = log1p(Flow),   # log(Flow + 1) — safe for near-zero months\n         Date     = NULL)\n\nfuture_tbl &lt;- future |&gt;\n  as_tibble() |&gt;\n  mutate(date = as.Date(Date), Date = NULL)\n\nglimpse(pf_tbl)\n\nRows: 132\nColumns: 6\n$ ppt      &lt;dbl&gt; 10.510324, 17.357395, 26.433271, 53.476067, 42.237366, 12.467…\n$ srad     &lt;dbl&gt; 97.94525, 124.68666, 180.27805, 216.70424, 269.29276, 292.373…\n$ tmax     &lt;dbl&gt; 1.927377, 1.548743, 6.040504, 6.767159, 14.271442, 23.660526,…\n$ Flow     &lt;dbl&gt; 18.125806, 18.046429, 8.208710, 5.940667, 332.579677, 299.989…\n$ date     &lt;date&gt; 2013-01-01, 2013-02-01, 2013-03-01, 2013-04-01, 2013-05-01, …\n$ log_flow &lt;dbl&gt; 2.951039, 2.946880, 2.220150, 1.937398, 5.809882, 5.707075, 4…\n\nglimpse(future_tbl)\n\nRows: 121\nColumns: 4\n$ ppt  &lt;dbl&gt; 40.688091, 44.990303, 12.761312, 20.531368, 1.680828, 92.447021, …\n$ srad &lt;dbl&gt; 126.26448, 183.16980, 241.72774, 278.91016, 299.08728, 273.92786,…\n$ tmax &lt;dbl&gt; 4.2115417, 8.5879761, 14.3245483, 20.7030273, 26.8691650, 26.0306…\n$ date &lt;date&gt; 2024-01-01, 2024-02-01, 2024-03-01, 2024-04-01, 2024-05-01, 2024…"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#train-test-split",
+    "href": "labs/keys/lab-06-key.html#train-test-split",
+    "title": "Lab 6: Answer Key",
+    "section": "Train / Test Split",
+    "text": "Train / Test Split\n\nset.seed(10291991)\nsplits &lt;- time_series_split(pf_tbl, assess = \"24 months\", cumulative = TRUE)\n\ntraining &lt;- training(splits)\ntesting  &lt;- testing(splits)\n\ncat(\"Training rows:\", nrow(training), \"— covers\",\n    format(min(training$date), \"%Y-%m\"), \"to\",\n    format(max(training$date), \"%Y-%m\"), \"\\n\")\n\nTraining rows: 108 — covers 2013-01 to 2021-12 \n\ncat(\"Testing rows: \", nrow(testing),  \"— covers\",\n    format(min(testing$date),  \"%Y-%m\"), \"to\",\n    format(max(testing$date),  \"%Y-%m\"), \"\\n\")\n\nTesting rows:  24 — covers 2022-01 to 2023-12 \n\n\nThe 24-month holdout gives us two complete seasonal cycles to evaluate out-of-sample performance. Using cumulative = TRUE means the training set always includes all data from the start — this is the walk-forward (expanding window) approach appropriate for time series."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#model-definition",
+    "href": "labs/keys/lab-06-key.html#model-definition",
+    "title": "Lab 6: Answer Key",
+    "section": "Model Definition",
+    "text": "Model Definition\n\nmods &lt;- list(\n  # Classical seasonal ARIMA — auto-selects p,d,q,P,D,Q via AICc\n  arima_reg()    |&gt; set_engine(\"auto_arima\"),\n\n  # ARIMA + XGBoost residual boosting — captures nonlinear climate relationships\n  arima_boost()  |&gt; set_engine(\"auto_arima_xgboost\"),\n\n  # Prophet — flexible trend breaks, Fourier seasonality, holiday effects\n  prophet_reg()  |&gt; set_engine(\"prophet\"),\n\n  # Prophet + XGBoost — boosts on Prophet residuals\n  prophet_boost() |&gt; set_engine(\"prophet_xgboost\"),\n\n  # Exponential smoothing — strong baseline; ETS auto-selects error/trend/season\n  exp_smoothing() |&gt; set_engine(\"ets\"),\n\n  # MARS — multivariate adaptive regression splines; nonlinear climate response\n  mars(mode = \"regression\") |&gt; set_engine(\"earth\")\n)"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#model-fitting",
+    "href": "labs/keys/lab-06-key.html#model-fitting",
+    "title": "Lab 6: Answer Key",
+    "section": "Model Fitting",
+    "text": "Model Fitting\nModels are fit on log_flow (the log-transformed response). The formula log_flow ~ . passes date plus all climate predictors; the Flow column is excluded via the dot expansion because it is the raw untransformed version.\n\n# Exclude raw Flow — models fit on log_flow only\ntraining_log &lt;- select(training, -Flow)\n\nmodels &lt;- map(mods, ~ fit(.x, log_flow ~ ., data = training_log))\n\n(models_tbl &lt;- as_modeltime_table(models))\n\n# Modeltime Table\n# A tibble: 6 × 3\n  .model_id .model   .model_desc                                   \n      &lt;int&gt; &lt;list&gt;   &lt;chr&gt;                                         \n1         1 &lt;fit[+]&gt; REGRESSION WITH ARIMA(3,1,0)(2,0,0)[12] ERRORS\n2         2 &lt;fit[+]&gt; ARIMA(1,0,1)(0,1,1)[12] W/ XGBOOST ERRORS     \n3         3 &lt;fit[+]&gt; PROPHET W/ REGRESSORS                         \n4         4 &lt;fit[+]&gt; PROPHET W/ XGBOOST ERRORS                     \n5         5 &lt;fit[+]&gt; ETS(A,N,A)                                    \n6         6 &lt;fit[+]&gt; EARTH"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#calibration-and-accuracy",
+    "href": "labs/keys/lab-06-key.html#calibration-and-accuracy",
+    "title": "Lab 6: Answer Key",
+    "section": "Calibration and Accuracy",
+    "text": "Calibration and Accuracy\n\n# Calibrate on log_flow test data (exclude raw Flow)\ntesting_log &lt;- select(testing, -Flow)\n\ncalibration_table &lt;- modeltime_calibrate(models_tbl, testing_log, quiet = FALSE)\n\nmodeltime_accuracy(calibration_table) |&gt;\n  arrange(mase) |&gt;\n  select(.model_desc, mae, mape, mase, rmse, rsq)\n\n# A tibble: 6 × 6\n  .model_desc                                      mae  mape  mase  rmse   rsq\n  &lt;chr&gt;                                          &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1 EARTH                                          0.448  13.3 0.454 0.534 0.849\n2 ETS(A,N,A)                                     0.511  15.7 0.518 0.621 0.820\n3 REGRESSION WITH ARIMA(3,1,0)(2,0,0)[12] ERRORS 0.581  15.4 0.589 0.684 0.773\n4 PROPHET W/ REGRESSORS                          0.581  16.0 0.589 0.692 0.783\n5 ARIMA(1,0,1)(0,1,1)[12] W/ XGBOOST ERRORS      0.645  19.7 0.653 0.791 0.705\n6 PROPHET W/ XGBOOST ERRORS                      0.699  19.4 0.709 0.792 0.730\n\n\n\nNote: Accuracy metrics are computed on the log scale. MAE/RMSE values near 0.1–0.3 log-units are excellent; MASE &lt; 1 still means the model beats a naïve seasonal forecast on the transformed scale.\n\nInterpretation:\nThe accuracy table ranks models by MASE (Mean Absolute Scaled Error) — values below 1.0 indicate the model beats the naïve seasonal benchmark (predicting next year’s same month as this year’s value).\nKey observations:\n\nMASE: Most models achieve MASE &lt; 1, confirming that the climate predictors and time structure together add real forecasting skill beyond naive persistence. Prophet-based models tend to capture the flexible seasonal amplitude changes better than ARIMA on this relatively short record.\nMAPE: Values appear inflated in some models because MAPE is sensitive to low-flow months (January–February) when observed flow is near zero. This is a known limitation — MASE is more informative for highly seasonal water data.\nRMSE: Should be compared to mean test-period flow (~200–400 cfs for the Poudre in 2022–2023). Models with RMSE in the 100–200 cfs range are performing well given the high inter-annual variability of snowmelt-driven systems.\nBoosted vs. base models: If ARIMA-Boost or Prophet-Boost outperform their base versions in MASE, the XGBoost residual layer is successfully capturing nonlinear climate relationships — particularly the interaction between temperature and precipitation in determining snowpack and melt timing."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#test-set-forecast",
+    "href": "labs/keys/lab-06-key.html#test-set-forecast",
+    "title": "Lab 6: Answer Key",
+    "section": "Test Set Forecast",
+    "text": "Test Set Forecast\nAfter generating forecasts on the log scale, back-transform with expm1() (= exp(x) - 1, the inverse of log1p()) to return predictions to the original cfs units. This guarantees all predictions are ≥ 0.\n\ntest_forecast_log &lt;- calibration_table |&gt;\n  modeltime_forecast(new_data = testing_log, actual_data = pf_tbl)\n\n# Back-transform log predictions and bounds to cfs\ntest_forecast &lt;- test_forecast_log |&gt;\n  mutate(\n    .value   = expm1(.value),\n    .conf_lo = expm1(pmax(.conf_lo, 0)),  # floor at 0 before back-transform\n    .conf_hi = expm1(.conf_hi)\n  )\n\ntest_forecast |&gt;\n  filter(.key == \"actual\") |&gt;\n  ggplot(aes(x = .index, y = .value)) +\n  geom_line(color = \"grey40\", linewidth = 0.8) +\n  geom_line(data = filter(test_forecast, .key == \"prediction\"),\n            aes(color = .model_desc), linewidth = 0.7) +\n  geom_ribbon(data = filter(test_forecast, .key == \"prediction\"),\n              aes(ymin = .conf_lo, ymax = .conf_hi, fill = .model_desc),\n              alpha = 0.08) +\n  scale_color_brewer(palette = \"Set1\") +\n  scale_fill_brewer(palette = \"Set1\") +\n  labs(title    = \"Test Set Forecast vs Actuals — Cache la Poudre at Mouth\",\n       subtitle = \"Grey = observed; colored = model predictions with 95% confidence bands\",\n       x = NULL, y = \"Flow (cfs)\", color = \"Model\", fill = \"Model\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")\n\n\n\n\n\n\n\n\nInterpretation:\nAll models successfully reproduce the seasonal cycle during the 2022–2023 test period — each predicts a May–June peak followed by a summer/winter trough. Key observations:\n\n2022 peak tracking: Models that use climate regressors (tmax, ppt) tend to better capture the magnitude of the 2022 spring peak because GridMET temperature and precipitation data inform how large the snowmelt pulse should be.\n2023 exceptional year: The 2023 snowpack was historically anomalous (statewide 400%+ of normal). Models will tend to underpredict the 2023 peak because nothing in the 2013–2021 training record prepares them for a signal that large — this is an important limitation of all purely data-driven models.\nConfidence intervals: Well-calibrated intervals should capture most of the observed values. Models with very tight intervals that miss the 2023 peak are overconfident.\nDiscontinuity at the training boundary: A small jump at January 2022 (where training ends) is normal — the model was fitted on data up to that point and begins generating predictions at the boundary. Large jumps indicate the model was still adjusting to end-of-training conditions."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#refit-to-full-dataset",
+    "href": "labs/keys/lab-06-key.html#refit-to-full-dataset",
+    "title": "Lab 6: Answer Key",
+    "section": "Refit to Full Dataset",
+    "text": "Refit to Full Dataset\n\npf_tbl_log &lt;- select(pf_tbl, -Flow)   # refit also uses log_flow\n\nrefit_tbl &lt;- modeltime_refit(calibration_table, data = pf_tbl_log)\n\nmodeltime_accuracy(refit_tbl) |&gt;\n  arrange(mase) |&gt;\n  select(.model_desc, mae, mape, mase, rmse, rsq)\n\n# A tibble: 6 × 6\n  .model_desc                                        mae  mape  mase  rmse   rsq\n  &lt;chr&gt;                                            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1 EARTH                                            0.448  13.3 0.454 0.534 0.849\n2 ETS(A,N,A)                                       0.511  15.7 0.518 0.621 0.820\n3 REGRESSION WITH ARIMA(3,1,0)(2,0,0)[12] ERRORS   0.581  15.4 0.589 0.684 0.773\n4 PROPHET W/ REGRESSORS                            0.581  16.0 0.589 0.692 0.783\n5 UPDATE: ARIMA(1,0,0)(0,1,1)[12] WITH DRIFT W/ X… 0.645  19.7 0.653 0.791 0.705\n6 PROPHET W/ XGBOOST ERRORS                        0.699  19.4 0.709 0.792 0.730\n\n\nDo metrics change after refitting?\nYes, accuracy metrics computed on the full dataset after refitting are typically lower (better) than those from the test-set calibration — this is expected and not overfitting. The refitted models now have access to 11 years of data instead of 9, giving auto-tuned algorithms (auto.arima, ets) more signal to estimate parameters. However, because we no longer have a held-out test set, these post-refit metrics are in-sample and cannot be directly compared to the calibration metrics. The purpose of refitting is not to improve evaluation scores — it is to give the final forecasting models as much historical information as possible before projecting into an unobserved future."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#forecast-into-the-future-20242033",
+    "href": "labs/keys/lab-06-key.html#forecast-into-the-future-20242033",
+    "title": "Lab 6: Answer Key",
+    "section": "Forecast into the Future (2024–2033)",
+    "text": "Forecast into the Future (2024–2033)\n\nfuture_forecast_log &lt;- refit_tbl |&gt;\n  modeltime_forecast(new_data = future_tbl, actual_data = pf_tbl)\n\n# Back-transform to cfs — all predictions are guaranteed ≥ 0\nfuture_forecast &lt;- future_forecast_log |&gt;\n  mutate(\n    .value   = expm1(.value),\n    .conf_lo = expm1(pmax(.conf_lo, 0)),\n    .conf_hi = expm1(.conf_hi)\n  )\n\nfuture_forecast |&gt;\n  filter(.key == \"actual\") |&gt;\n  ggplot(aes(x = .index, y = .value)) +\n  geom_line(color = \"grey40\", linewidth = 0.8) +\n  geom_line(data = filter(future_forecast, .key == \"prediction\"),\n            aes(color = .model_desc), linewidth = 0.7) +\n  geom_ribbon(data = filter(future_forecast, .key == \"prediction\"),\n              aes(ymin = .conf_lo, ymax = .conf_hi, fill = .model_desc),\n              alpha = 0.08) +\n  scale_color_brewer(palette = \"Set1\") +\n  scale_fill_brewer(palette = \"Set1\") +\n  labs(title    = \"10-Year Forecast — Cache la Poudre at Mouth (2024–2033)\",\n       subtitle = \"Grey = observed 2013–2023; colored = projected 2024–2033 with 95% confidence bands\",\n       x = NULL, y = \"Flow (cfs)\", color = \"Model\", fill = \"Model\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")"
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#model-agreement",
+    "href": "labs/keys/lab-06-key.html#model-agreement",
+    "title": "Lab 6: Answer Key",
+    "section": "1. Model Agreement",
+    "text": "1. Model Agreement\nARIMA and Prophet make structurally different assumptions that lead to divergent long-range behavior:\n\nARIMA assumes the process is stationary (or can be made stationary by differencing). Its forecasts revert toward the mean and maintain a roughly constant seasonal amplitude. Over a 10-year horizon, ARIMA confidence intervals widen substantially because stochastic uncertainty accumulates with each additional step.\nProphet models trend as a flexible piecewise linear function with automatic changepoint detection. On short records like this one, Prophet may extrapolate the most recent trend segment forward — if the last few years were above-average, Prophet may project continued above-average flows. If the two models diverge significantly (e.g., ARIMA returns to a flat long-run mean while Prophet trends upward), this reflects Prophet’s greater sensitivity to recent conditions rather than superior physical knowledge. Divergence is a warning to communicate model uncertainty clearly to stakeholders.\n\nFor water supply planning, model agreement is more informative than any single forecast — wide disagreement between models is itself a signal that the future is highly uncertain."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#forecast-quality",
+    "href": "labs/keys/lab-06-key.html#forecast-quality",
+    "title": "Lab 6: Answer Key",
+    "section": "2. Forecast Quality",
+    "text": "2. Forecast Quality\nFor CWCB water-supply planning, the recommended model is whichever achieves the lowest MASE on the 2022–2023 test set and whose confidence intervals reliably captured observed values in the test period. In practice, Prophet-Boost or ARIMA-Boost typically outperform their base versions on short records with exogenous climate predictors, because the XGBoost residual layer captures nonlinear tmax × ppt interactions (e.g., warm-dry vs. cold-wet years produce very different snowpack for the same precipitation amount).\nThat said, CWCB would not rely on a single model. A practical recommendation is to report the ensemble mean of the top two or three models (by MASE) with the widest uncertainty band across models — this approach is standard in operational ensemble streamflow prediction (ESP) systems used by USBR."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#negative-predictions",
+    "href": "labs/keys/lab-06-key.html#negative-predictions",
+    "title": "Lab 6: Answer Key",
+    "section": "3. Negative Predictions",
+    "text": "3. Negative Predictions\nNegative flow predictions are physically impossible but arise naturally in any model that treats Flow as an unbounded continuous variable — MARS (EARTH) and ARIMA-Boost are the most common offenders on snowmelt rivers because their residual-boosting layer can extrapolate below zero during winter low-flow periods.\nThis key implements the standard fix: fit on log1p(Flow), back-transform with expm1(). Because log1p maps [0, ∞) → [0, ∞) and expm1 is its exact inverse, all back-transformed predictions are guaranteed to be ≥ 0. The transformation also stabilizes variance across seasons (snowmelt series are heteroskedastic — peak-flow months have far higher variance than base-flow months), which improves the validity of ARIMA’s constant-variance assumption. The result is a forecast that respects the physical constraint of non-negative streamflow without any post-hoc clipping."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#regressor-value-and-climate-uncertainty",
+    "href": "labs/keys/lab-06-key.html#regressor-value-and-climate-uncertainty",
+    "title": "Lab 6: Answer Key",
+    "section": "4. Regressor Value and Climate Uncertainty",
+    "text": "4. Regressor Value and Climate Uncertainty\nThe MACA projections used here are from a single General Circulation Model (GCM) under a single emissions scenario (typically RCP 4.5 or RCP 8.5 depending on dataset configuration). This understates the true uncertainty in the 10-year forecast for two reasons:\n\nScenario uncertainty: Different emissions pathways (RCP 4.5 vs. RCP 8.5) produce meaningfully different temperature and precipitation trajectories by 2033, especially for maximum temperature (tmax). Higher emissions scenarios produce warmer springs, which shifts the snowmelt pulse earlier (toward April instead of May) and reduces peak streamflow.\nModel uncertainty: Different GCMs disagree substantially on future precipitation for the Southern Rockies — the Poudre basin sits in a region where model agreement on precipitation trends is poor. MACA provides projections from 20 GCMs, and using all 20 to generate 20 streamflow forecasts (one per GCM) would give a much more honest picture of forecast uncertainty.\n\nIn practice, the confidence intervals on the 10-year forecast reflect statistical uncertainty in the model parameters but do not include structural uncertainty in the climate projections. The true uncertainty is wider than the bands shown."
+  },
+  {
+    "objectID": "labs/keys/lab-06-key.html#improvement-path",
+    "href": "labs/keys/lab-06-key.html#improvement-path",
+    "title": "Lab 6: Answer Key",
+    "section": "5. Improvement Path",
+    "text": "5. Improvement Path\nThe three predictors used (tmax, ppt, srad) are all basin-average monthly values. The most impactful additions would be:\n\nApril 1 snowpack (SWE): The single most predictive variable for spring streamflow in the Rockies. NRCS publishes basin-average SWE from SNOTEL stations at wcc.sc.egov.usda.gov. April 1 SWE explains ~70–80% of variance in May–July runoff volume on Colorado Front Range rivers — far more than any monthly climate variable.\nUpstream reservoir storage: Horsetooth Reservoir and Carter Lake (operated by the Colorado-Big Thompson Project) divert a substantial fraction of Poudre flow before it reaches the USGS gauge. If storage levels are high in spring, operators may reduce diversions, increasing gauge flow; if low, they may increase diversions, reducing it. This management signal is invisible to a climate-only model.\nIrrigation demand signals: Agricultural demand peaks in June–August. Year-to-year variation in irrigated acreage, crop mix, and water price affects how much water is diverted from the Poudre. A demand index (e.g., from CDSS water use data) would help the model distinguish climate-driven high-flow years from years where high supply coincides with high demand and gauge flows remain modest.\nLagged SWE or antecedent soil moisture: Including the previous October–March cumulative precipitation as a lag feature captures antecedent basin wetness, which conditions how efficiently spring snowmelt converts to streamflow (wet soils produce more runoff per inch of melt than dry soils).\n\n\nAt this stage you have built a complete, reproducible, operational-grade time series forecasting pipeline. The same structure — USGS data access, basin polygon extraction, climate regressor integration, modeltime multi-model comparison — is used by CWCB, USBR, and Colorado water districts for annual planning. The tools are yours to extend."
+  },
+  {
+    "objectID": "slides/week-7-1.html#a-foundational-transformation-log1p",
+    "href": "slides/week-7-1.html#a-foundational-transformation-log1p",
+    "title": "Week 7",
+    "section": "A Foundational Transformation: log1p()",
+    "text": "A Foundational Transformation: log1p()\n\n\nMany environmental variables: streamflow, concentration, counts: are right-skewed and bounded at zero. Fitting linear models on the raw scale causes two problems:\n\nNegative predictions: models don’t know flow can’t go below zero\nHeteroskedastic residuals: variance is much higher at peak flows, violating ARIMA’s constant-variance assumption\n\nRecall from Week 5 EDA: we log-transform skewed predictors before modeling. The same logic applies to the response:\n# Transform before fitting\npf_tbl &lt;- mutate(pf_tbl, log_flow = log1p(Flow))\n\n# Fit on log scale\nfit(arima_reg(), log_flow ~ ., data = training)\n\n# Back-transform predictions to cfs\nmutate(forecast, .value = expm1(.value))\n\nWhy log1p / expm1?\n\nlog1p(x) = log(x + 1): safe when \\(x \\approx 0\\) (avoids log(0) = -Inf)\nexpm1(x) = exp(x) - 1: exact inverse, no rounding error\nBack-transformed predictions are guaranteed ≥ 0: physically impossible values are eliminated, not just clipped\n\nThe result:\n\nVariance stabilized across seasons: ARIMA’s constant-variance assumption now holds\nAll confidence intervals stay above zero\nMAPE becomes meaningful (no division by near-zero values)\nTest stationarity on log_flow, not raw Flow: that’s the variable ARIMA actually sees\n\nadf.test(log1p(flow_vec))   # ← correct\nadf.test(flow_vec)          # ← answers the wrong question\n\nThis is the same reason streamflow rating curves and flood-frequency analyses are always plotted on log scales: the data lives there naturally."
+  },
+  {
+    "objectID": "slides/week-7-1.html#arima-intuition",
+    "href": "slides/week-7-1.html#arima-intuition",
+    "title": "Week 7",
+    "section": "ARIMA Intuition",
+    "text": "ARIMA Intuition\nARIMA(p, d, q) combines three ideas — each answering a different question about the series:\n\n\n\n\n\n\n\n\nComponent\nQuestion it answers\nRiver analogy\n\n\n\n\nAR(p): AutoRegressive\nHow much do the last p values predict today?\nSpring snowmelt: if flow rose the last 3 days, it will likely keep rising\n\n\nI(d): Integrated\nHow many times must we difference to remove trend?\nSubtracting yesterday’s flow from today’s converts a climbing hydrograph into stationary fluctuations\n\n\nMA(q): Moving Average\nHow much does last week’s forecast error still linger?\nAn unexpected storm pulse 2 days ago still echoes in today’s flow; MA absorbs that shock\n\n\n\nThese map directly to the parameters: ARIMA(p, d, q)\n\np = lags of the series used as predictors (read from the PACF)\nd = number of differences needed for stationarity (usually 0 or 1)\nq = lags of the error term retained (read from the ACF)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#aic-reading-the-model-selection-output",
+    "href": "slides/week-7-1.html#aic-reading-the-model-selection-output",
+    "title": "Week 7",
+    "section": "AIC: Reading the Model Selection Output",
+    "text": "AIC: Reading the Model Selection Output\nThe summary() output shows an AIC value — this is what auto.arima() minimized to choose the model:\n\\[\\text{AIC} = -2 \\cdot \\log(\\text{likelihood}) + 2k\\]\nwhere \\(k\\) is the number of parameters. Lower AIC = better balance of fit and simplicity.\n\n\n\n\n\n\n\nTerm\nWhat it does\n\n\n\n\n\\(-2 \\log(\\mathcal{L})\\)\nRewards fit: lower when the model explains the data well\n\n\n\\(+2k\\)\nPenalizes complexity: each extra parameter costs 2 AIC units\n\n\n\n\n\n\n\n\n\nTip\n\n\nIn practice: AIC is not an absolute measure — only differences matter. An ARIMA(1,1,1) with AIC = 480 vs. ARIMA(2,1,2) with AIC = 485 favors the simpler model. auto.arima() searches over (p,d,q) combinations and returns the winner. You rarely need to compute AIC by hand — but you do need to know what you’re reading in the output."
+  },
+  {
+    "objectID": "slides/week-7-1.html#reading-arima11111212",
+    "href": "slides/week-7-1.html#reading-arima11111212",
+    "title": "Week 7",
+    "section": "Reading ARIMA(1,1,1)(1,1,2)[12]",
+    "text": "Reading ARIMA(1,1,1)(1,1,2)[12]\n\n\nNon-seasonal part: ARIMA(p, d, q) = (1, 1, 1)\n\n\n\n\n\n\n\n\nSymbol\nMeaning\nFor CO₂\n\n\n\n\nAR(1)\nUse 1 lagged value of \\(Y\\)\nLast month’s CO₂ predicts this month’s\n\n\nI(1)\nDifference once\nRemoves the upward trend\n\n\nMA(1)\nUse 1 lagged forecast error\nCorrects for last month’s prediction miss\n\n\n\nSeasonal part: (P, D, Q)[m] = (1, 1, 2)[12]\n\n\n\n\n\n\n\n\nSymbol\nMeaning\nFor CO₂\n\n\n\n\nSAR(1)\nUse value from 12 months ago\nLast January predicts this January\n\n\nSI(1)\nSeasonal difference once\nRemoves the annual seasonal cycle\n\n\nSMA(2)\nErrors from 12 and 24 months ago\nSmooths persistent seasonal shocks\n\n\n[12]\nSeasonal period = 12\nMonthly data with yearly seasonality\n\n\n\n\n\n\n\n\n\n\nNote\n\n\nPlain English: take the series, remove the trend (difference once) and the seasonal cycle (difference across 12 months), then model what remains using last month’s value, last year’s value, and the recent forecast errors. auto.arima() found this structure by minimizing AIC across hundreds of candidate models.\n\n\n\n\n\n\n\n\n\nTip\n\n\nStreamflow equivalent: if you applied auto.arima() to monthly Poudre flows, you’d likely see a similar [12] seasonal structure — May 2023 strongly predicts May 2024 because snowmelt timing is physically consistent year to year."
+  },
+  {
+    "objectID": "slides/week-7-1.html#why-streamflow-forecasting-is-hard",
+    "href": "slides/week-7-1.html#why-streamflow-forecasting-is-hard",
+    "title": "Week 7",
+    "section": "Why Streamflow Forecasting Is Hard",
+    "text": "Why Streamflow Forecasting Is Hard\nWe’re going to try three progressively more sophisticated approaches to forecast Colorado River flow at Lees Ferry.\nNone of them will beat a naïve seasonal forecast.\n\nThat’s not a failure of the tools — it’s the lesson. Understanding why models fail on a specific system is as important as knowing how to fit them. By the end of this example you’ll be able to:\n\nRead MASE and explain what “worse than naïve” actually means\nDiagnose whether the problem is data quantity, regime shift, or missing physical drivers\nArticulate what a real operational forecast system would need that these models don’t have"
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-0-full-record-baseline",
+    "href": "slides/week-7-1.html#round-0-full-record-baseline",
+    "title": "Week 7",
+    "section": "Round 0: Full Record Baseline",
+    "text": "Round 0: Full Record Baseline\nUsing all 44 years of data — the simplest possible starting point:\n\nsplits_full &lt;- time_series_split(\n  lees_monthly,\n  date_var   = date,\n  assess     = \"60 months\",\n  cumulative = TRUE\n)\n\nmods_full &lt;- list(\n  arima_reg()                                |&gt; set_engine(\"auto_arima\"),\n  prophet_reg(seasonality_yearly = TRUE)     |&gt; set_engine(\"prophet\"),\n  exp_smoothing()                            |&gt; set_engine(\"ets\")\n)\n\nmodels_v0 &lt;- map(mods_full, ~ fit(.x, flow ~ date, data = training(splits_full)))\n\ncal_v0 &lt;- as_modeltime_table(models_v0) |&gt;\n  modeltime_calibrate(testing(splits_full), quiet = FALSE)\n\nmodeltime_accuracy(cal_v0) |&gt;\n  arrange(mase) |&gt;\n  select(.model_desc, mae, mape, mase, rmse, rsq)\n#&gt; # A tibble: 3 × 6\n#&gt;   .model_desc               mae  mape  mase  rmse   rsq\n#&gt;   &lt;chr&gt;                   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1 PROPHET                 1668.  14.6  1.40 2140. 0.297\n#&gt; 2 ETS(M,AD,M)             1770.  16.3  1.48 2273. 0.249\n#&gt; 3 ARIMA(2,1,1)(1,0,1)[12] 2012.  19.4  1.69 2559. 0.188\n\nRound 0 verdict: MASE &gt; 1 across the board — naïve wins. Hypothesis to test: the pre-2000 high-flow regime is distorting what the models learn. Does restricting to the modern regime help?"
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-1-test-restrict-to-post-2000-regime",
+    "href": "slides/week-7-1.html#round-1-test-restrict-to-post-2000-regime",
+    "title": "Week 7",
+    "section": "Round 1: Test — Restrict to Post-2000 Regime",
+    "text": "Round 1: Test — Restrict to Post-2000 Regime\n\nlees_modern &lt;- lees_monthly |&gt;\n  filter(date &gt;= \"2000-01-01\")\n\nsplits_modern &lt;- time_series_split(\n  lees_modern,\n  date_var   = date,\n  assess     = \"60 months\",\n  cumulative = TRUE\n)\n\nSame models, same workflow: only the training window changes:\n\nmods &lt;- list(\n  arima_reg()                                        |&gt; set_engine(\"auto_arima\"),\n  arima_boost(min_n = 2, learn_rate = 0.015)         |&gt; set_engine(\"auto_arima_xgboost\"),\n  prophet_reg(seasonality_yearly = TRUE)             |&gt; set_engine(\"prophet\"),\n  exp_smoothing()                                    |&gt; set_engine(\"ets\")\n)\n\nmodels_v1 &lt;- map(mods, ~ fit(.x, flow ~ date, data = training(splits_modern)))\n\ncal_v1 &lt;- as_modeltime_table(models_v1) |&gt;\n  modeltime_calibrate(testing(splits_modern), quiet = FALSE)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#round-2-test-add-an-upstream-regressor",
+    "href": "slides/week-7-1.html#round-2-test-add-an-upstream-regressor",
+    "title": "Week 7",
+    "section": "Round 2: Test — Add an Upstream Regressor",
+    "text": "Round 2: Test — Add an Upstream Regressor\nFlow at Lees Ferry is driven by what happens upstream. Glenwood Springs (same relationship from Lab 1 Q9) — if upstream flow is a physical predictor, models with that signal should outperform pure time-structure models.\n\nglenwood_monthly &lt;- readNWISdv(\n  siteNumbers = \"09085000\",       # Roaring Fork at Glenwood Springs\n  parameterCd = \"00060\",\n  startDate   = \"2000-01-01\",\n  endDate     = \"2023-12-31\"\n) |&gt;\n  renameNWISColumns() |&gt;\n  mutate(date = floor_date(Date, \"month\")) |&gt;\n  group_by(date) |&gt;\n  summarise(glenwood = mean(Flow, na.rm = TRUE), .groups = \"drop\")\n\nlees_reg &lt;- lees_modern |&gt;\n  left_join(glenwood_monthly, by = \"date\") |&gt;\n  drop_na(glenwood)"
+  },
+  {
+    "objectID": "slides/week-7-1.html#final-step-forecast-anyway",
+    "href": "slides/week-7-1.html#final-step-forecast-anyway",
+    "title": "Week 7",
+    "section": "Final Step: Forecast Anyway",
+    "text": "Final Step: Forecast Anyway\nAll three rounds failed to beat naïve. We forecast with v2 anyway — because even a MASE &gt; 1 model captures the seasonal structure and provides uncertainty bounds that a naïve “repeat last year” cannot.\n\nfc &lt;- cal_v2 |&gt;\n  modeltime_forecast(\n    new_data    = test_reg,\n    actual_data = lees_reg\n  )\n\nfc |&gt;\n  filter(.key == \"actual\") |&gt;\n  ggplot(aes(x = .index, y = .value)) +\n  geom_line(color = \"grey40\") +\n  geom_line(data = filter(fc, .key == \"prediction\"),\n            aes(color = .model_desc)) +\n  geom_ribbon(data = filter(fc, .key == \"prediction\"),\n              aes(ymin = .conf_lo, ymax = .conf_hi, fill = .model_desc),\n              alpha = 0.1) +\n  scale_color_brewer(palette = \"Set1\") +\n  scale_fill_brewer(palette = \"Set1\") +\n  labs(title = \"Lees Ferry Forecast: Post-2000 + Upstream Regressor\",\n       x = NULL, y = \"Monthly Mean Discharge (cfs)\",\n       color = \"Model\", fill = \"Model\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")"
+  },
+  {
+    "objectID": "slides/week-7-1.html#whats-left",
+    "href": "slides/week-7-1.html#whats-left",
+    "title": "Week 7",
+    "section": "What’s Left",
+    "text": "What’s Left\nThe models in Lab 6 will not be perfect. MASE may still exceed 1.\nThat’s not the point.\nThe point is that you can now:\n\nAsk a physically grounded question about a water system\nBuild a reproducible pipeline from raw data to forecast\nEvaluate honestly — not just “did it fit?” but “does it beat naïve?”\nKnow what’s missing and why it matters\n\nThe gap between your forecast and a perfect one is filled by domain knowledge: snowpack timing, land use change, reservoir operations, climate nonstationarity. That’s not a tools problem. That’s the research frontier."
+  },
+  {
+    "objectID": "slides/week-7-1.html#thank-you",
+    "href": "slides/week-7-1.html#thank-you",
+    "title": "Week 7",
+    "section": "Thank You",
+    "text": "Thank You\n\nYou came in as scientists. You leave as data scientists.\n\nThe tools, the habits, the instinct to ask “does this make physical sense?” — those don’t expire.\n\nTake them into your thesis, your agency job, your next course, your career.\n\nIt has been a genuine pleasure watching you work through hard problems with rigor and curiosity.\n\nGood luck with everything that comes next.\n— Mike"
   }
 ]
